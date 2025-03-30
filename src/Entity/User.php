@@ -14,7 +14,7 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: "id_U", type: "integer")]
-    private ?int $id_U = null; 
+    private ?int $id_U = null;
 
     #[ORM\Column(type: "string", length: 255)]
     private string $name;
@@ -58,7 +58,7 @@ class User
     }
 
     // Getters et Setters
-    public function getId(): ?int
+    public function getIdU(): ?int
     {
         return $this->id_U;
     }
