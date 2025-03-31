@@ -23,17 +23,14 @@ final class StationController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_station_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'app_station_new', methods: ['GET','POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
         $station = new Station();
-        $user = $userRepository->find(40);
-    
-        if (!$user) {
-            throw $this->createNotFoundException("L'utilisateur avec l'ID 40 n'existe pas.");
-        }
-
+        $user = $userRepository->find(40);        
         $station->setUser($user);
+        
+
         $form = $this->createForm(StationType::class, $station);
         $form->handleRequest($request);
 
@@ -46,7 +43,7 @@ final class StationController extends AbstractController
 
         return $this->render('station/new.html.twig', [
             'station' => $station,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 

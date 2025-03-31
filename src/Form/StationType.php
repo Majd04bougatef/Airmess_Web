@@ -14,19 +14,40 @@ class StationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom')
-            ->add('latitude')
-            ->add('longitude')
-            ->add('capacite')
-            ->add('nombreVelo')
-            ->add('typeVelo')
-            ->add('prixHeure')
-            ->add('pays')
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id_U',
-            ])
-        ;
+    ->add('nom', null, [
+        'attr' => ['class' => 'input-text'],
+        'label_attr' => ['class' => 'label']
+    ])
+    ->add('latitude', null, [
+        'attr' => ['class' => 'input-text'],
+        'label_attr' => ['class' => 'label']
+    ])
+    ->add('longitude', null, [
+        'attr' => ['class' => 'input-text'],
+        'label_attr' => ['class' => 'label']
+    ])
+    ->add('capacite', null, [
+        'attr' => ['class' => 'input-text'],
+        'label_attr' => ['class' => 'label']
+    ])
+    ->add('nombreVelo', null, [
+        'attr' => ['class' => 'input-text'],
+        'label_attr' => ['class' => 'label']
+    ])
+    ->add('typeVelo', null, [
+        'attr' => ['class' => 'input-text'],
+        'label_attr' => ['class' => 'label']
+    ])
+    ->add('prixHeure', null, [
+        'attr' => ['class' => 'input-text'],
+        'label_attr' => ['class' => 'label']
+    ])
+    ->add('pays', null, [
+        'attr' => ['class' => 'input-text'],
+        'label_attr' => ['class' => 'label']
+    ])
+
+   ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
