@@ -1,10 +1,12 @@
 {% extends 'base.html.twig' %}
 {% block js%}
-
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+                      
    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 {% endblock %}
 {% block stylesheets %}
+                      <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
 
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 
@@ -24,7 +26,17 @@
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
 
-                     
+                     <div id="map" style="height: 500px;"></div>
+                      <script>
+                          mapboxgl.accessToken = 'sk.eyJ1IjoibW1tMDQiLCJhIjoiY204ejNwN2oxMDZzbjJqc2E3YWgxNnZlaiJ9.SMQ_PIIkMBK82mch7Y1RjA';
+                          var map = new mapboxgl.Map({
+                              container: 'map',
+                              style: 'mapbox://styles/mapbox/streets-v11',
+                              center: [2.3522, 48.8566],
+                              zoom: 13
+                          });
+                      </script>
+
                         <section class="get-in-touch">
                             <h1 class="title">Ajouter une Station</h1>
                                 {{ form_start(form, {'method': 'POST', 'action': path('app_station_new'), 'attr': {'class': 'contact-form row'}}) }}
