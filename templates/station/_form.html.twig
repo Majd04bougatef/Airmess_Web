@@ -1,12 +1,10 @@
 {% extends 'base.html.twig' %}
 {% block js%}
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 {% endblock %}
 {% block stylesheets %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 
@@ -25,10 +23,11 @@
                     </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
+
+                     
                         <section class="get-in-touch">
                             <h1 class="title">Ajouter une Station</h1>
                                 {{ form_start(form, {'method': 'POST', 'action': path('app_station_new'), 'attr': {'class': 'contact-form row'}}) }}
-                                <div id="map" style="height: 400px; width: 100%;"></div>
                                 <div class="row">
                                     <div class="form-field col-lg-6">
                                         {{ form_row(form.nom, {'attr': {'class': 'input-text'}}) }}
@@ -61,6 +60,7 @@
                                 </div>
                             {{ form_end(form) }}
                         </section>
+
                     </div>
                 </div>
             </div>
@@ -102,6 +102,12 @@
 
 
     <style>
+
+    .alert {
+    font-size: 1.2em;
+    margin-top: 20px;
+}
+
       
 .get-in-touch {
   max-width: 800px;
@@ -175,30 +181,5 @@
   cursor: pointer;
 }
     </style>
-    <script>
-  // Initialisation de la carte avec les coordonnées par défaut (Tunisie)
-  var map = L.map('map').setView([36.8065, 10.1815], 6); // Coordonnées de la Tunisie
-
-  // Ajout du fond de carte OSM
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-     attribution: '&copy; <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors'
-  }).addTo(map);
-
-  // Ajout d'un marqueur pour la sélection de station (Coordonnée par défaut à Paris)
-  var marker = L.marker([36.8065, 10.1815]).addTo(map); // Coordonnée par défaut
-
-  // Mise à jour des coordonnées de latitude et longitude lors du clic sur la carte
-  map.on('click', function(e) {
-     var lat = e.latlng.lat;
-     var lng = e.latlng.lng;
-
-     // Déplacer le marqueur à l'endroit cliqué
-     marker.setLatLng([lat, lng]);
-
-     // Mettre à jour les champs latitude et longitude dans le formulaire
-     document.getElementById('station_lat').value = lat;
-     document.getElementById('station_lng').value = lng;
-  });
-</script>
-
+    
 {% endblock %}

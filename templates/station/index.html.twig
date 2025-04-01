@@ -3,6 +3,8 @@
 
 {% block title %}Station index{% endblock %}
 {% block js %}
+
+
 <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
@@ -111,9 +113,12 @@
 
 
                       <td class="align-middle">
-                            <a href="{{ path('app_station_delete', {'idS': station.idS}) }}">Supprimer</a>
-                            <a href="{{ path('app_station_edit', {'idS': station.idS}) }}">Modifier</a>
-                      </td>
+    <a href="{{ path('app_station_edit', {'idS': station.idS}) }}" class="btn btn-sm btn-info">Modifier</a>
+  <!-- Formulaire de suppression -->
+  <form method="post" action="{{ path('app_station_delete', {'idS': station.idS}) }}" style="display:inline;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ station.idS) }}">
+    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette station ?');">Supprimer</button>
+  </form>
                     </tr>
                     
                    {% endfor %}
@@ -124,6 +129,10 @@
           </div>
         </div>
       </div>
+
+
+
+
 {% endblock %}
 
 

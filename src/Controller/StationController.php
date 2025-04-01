@@ -38,7 +38,7 @@ final class StationController extends AbstractController
             $entityManager->persist($station);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_station_index', [], Response::HTTP_SEE_OTHER);
+            return $this->render('dashEntreprise/dashboardEntreprise.html.twig');            
         }
 
         return $this->render('station/new.html.twig', [
@@ -81,6 +81,15 @@ final class StationController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_station_index', [], Response::HTTP_SEE_OTHER);
+        return $this->render('dashEntreprise/dashboardEntreprise.html.twig');
     }
+
+    
+
+    #[Route('/dashEntreprise', name: 'app_dashboard')]
+    public function dashboard(): Response
+    {
+        return $this->render('dashEntreprise/dashboardEntreprise.html.twig');
+    }
+
 }
