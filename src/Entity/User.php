@@ -52,6 +52,9 @@ class User
     #[ORM\OneToMany(mappedBy: "user", targetEntity: Station::class, cascade: ["persist", "remove"])]
     private Collection $stations;
 
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: ReservationTransport::class, cascade: ["remove"])]
+    private Collection $reservations;
+
     public function __construct()
     {
         $this->stations = new ArrayCollection();
@@ -213,4 +216,35 @@ class User
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, ReservationTransport>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(ReservationTransport $reservation): self
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(ReservationTransport $reservation): self
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // Set the owning side to null (unless already changed)
+            if ($reservation->getUser() === $this) {
+                $reservation->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

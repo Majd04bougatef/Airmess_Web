@@ -1,49 +1,138 @@
 {% extends 'base.html.twig' %}
 
+
 {% block title %}Station index{% endblock %}
+{% block js %}
+
+
+<script src="../assets/js/core/popper.min.js"></script>
+  <script src="../assets/js/core/bootstrap.min.js"></script>
+  <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="../assets/js/argon-dashboard.min.js?v=2.1.0"></script>
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+
+{% endblock %}
+{% block stylesheets %}
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <!-- Nucleo Icons -->
+  <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <!-- CSS Files -->
+  <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
+  {% endblock %}
 
 {% block body %}
-    <h1>Station New</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IdS</th>
-                <th>Nom</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Capacite</th>
-                <th>NombreVelo</th>
-                <th>TypeVelo</th>
-                <th>PrixHeure</th>
-                <th>Pays</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for station in stations %}
-            <tr>
-                <td>{{ station.idS }}</td>
-                <td>{{ station.nom }}</td>
-                <td>{{ station.latitude }}</td>
-                <td>{{ station.longitude }}</td>
-                <td>{{ station.capacite }}</td>
-                <td>{{ station.nombreVelo }}</td>
-                <td>{{ station.typeVelo }}</td>
-                <td>{{ station.prixHeure }}</td>
-                <td>{{ station.pays }}</td>
-                <td>
-                    <a href="{{ path('app_station_show', {'idS': station.idS}) }}">show</a>
-                    <a href="{{ path('app_station_edit', {'idS': station.idS}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="10">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 
-    <a href="{{ path('app_station_new') }}">Create new</a>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0">
+                        <h6>Stations</h6>
+                    </div>
+            <div class="card-body px-0 pt-0 pb-2">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center justify-content-center mb-0">
+                  <thead>
+                    <tr>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Nom</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Capacite</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">NombreVelo</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">TypeVelo</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">PrixHeure</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Pays</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">pourcentage</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">actions</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  
+    
+                  <tbody>
+                  {% for station in stations %}
+                    <tr>
+                      
+                      <td>
+                        <p class="text-sm font-weight-bold mb-0">{{ station.nom }}</p>
+                      </td>
+                      <td>
+                        <span class="text-xs font-weight-bold">{{ station.capacite }}</span>
+                      </td>
+                      <td>
+                        <span class="text-xs font-weight-bold">{{ station.nombreVelo }}</span>
+                      </td>
+
+                      <td>
+                        <span class="text-xs font-weight-bold">{{ station.typeVelo }}</span>
+                      </td>
+
+                      <td>
+                        <span class="text-xs font-weight-bold">{{ station.prixHeure }}</span>
+                      </td>
+                      <td>
+                        <span class="text-xs font-weight-bold">{{ station.pays }}</span>
+                      </td>
+
+                      <td class="align-middle text-center">
+                        <div class="d-flex align-items-center justify-content-center">
+                            {% set pourcentage = (station.nombreVelo / station.capacite) * 100 %}
+                            <span class="me-2 text-xs font-weight-bold">{{ pourcentage|round(2) }}%</span>
+                            <div>
+                                <div class="progress">
+                                    <div class="progress-bar 
+                                        {% if pourcentage >= 80 %} bg-gradient-success 
+                                        {% elseif pourcentage >= 30 %} bg-gradient-info 
+                                        {% else %} bg-gradient-danger {% endif %}" 
+                                        role="progressbar"  
+                                        aria-valuenow="{{ pourcentage|round(2) }}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100" 
+                                        style="width: {{ pourcentage|round(2) }}%;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+
+                      <td class="align-middle">
+    <a href="{{ path('app_station_edit', {'idS': station.idS}) }}" class="btn btn-sm btn-info">Modifier</a>
+  <!-- Formulaire de suppression -->
+  <form method="post" action="{{ path('app_station_delete', {'idS': station.idS}) }}" style="display:inline;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ station.idS) }}">
+    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette station ?');">Supprimer</button>
+  </form>
+                    </tr>
+                    
+                   {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
 {% endblock %}
+
+

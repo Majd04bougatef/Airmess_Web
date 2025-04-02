@@ -1,4 +1,197 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+{% extends 'base.html.twig' %}
+{% block js%}
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+                      
+   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% endblock %}
+{% block stylesheets %}
+                      <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
+{% endblock %}
+
+
+{% block body %}
+    
+
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0">
+                        <h6>Stations</h6>
+                    </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+
+                     <div id="map" style="height: 500px;"></div>
+                      <script>
+                          mapboxgl.accessToken = 'sk.eyJ1IjoibW1tMDQiLCJhIjoiY204ejNwN2oxMDZzbjJqc2E3YWgxNnZlaiJ9.SMQ_PIIkMBK82mch7Y1RjA';
+                          var map = new mapboxgl.Map({
+                              container: 'map',
+                              style: 'mapbox://styles/mapbox/streets-v11',
+                              center: [2.3522, 48.8566],
+                              zoom: 13
+                          });
+                      </script>
+
+                        <section class="get-in-touch">
+                            <h1 class="title">Ajouter une Station</h1>
+                                {{ form_start(form, {'method': 'POST', 'action': path('app_station_new'), 'attr': {'class': 'contact-form row'}}) }}
+                                <div class="row">
+                                    <div class="form-field col-lg-6">
+                                        {{ form_row(form.nom, {'attr': {'class': 'input-text'}}) }}
+                                    </div>
+                                    <div class="form-field col-lg-6">
+                                        {{ form_row(form.capacite, {'attr': {'class': 'input-text'}}) }}
+                                    </div>
+                                    <div class="form-field col-lg-6">
+                                        {{ form_row(form.nombreVelo, {'attr': {'class': 'input-text'}}) }}
+                                    </div>
+                                    <div class="form-field col-lg-6">
+                                        {{ form_row(form.typeVelo, {'attr': {'class': 'input-text'}}) }}
+                                    </div>
+                                    <div class="form-field col-lg-6">
+                                        {{ form_row(form.prixHeure, {'attr': {'class': 'input-text'}}) }}
+                                    </div>
+                                    <div class="form-field col-lg-6">
+                                        {{ form_row(form.pays, {'attr': {'class': 'input-text'}}) }}
+                                    </div>
+                                    <div class="form-field col-lg-6">
+                                        {{ form_row(form.longitude, {'attr': {'class': 'input-text'}}) }}
+                                    </div>
+                                    <div class="form-field col-lg-6">
+                                        {{ form_row(form.latitude, {'attr': {'class': 'input-text'}}) }}
+                                    </div>
+                                    
+                                    <div class="form-field col-lg-12 text-center">
+                                        <button class="submit-btn">{{ button_label|default('Ajouter') }}</button>
+                                    </div>
+                                </div>
+                            {{ form_end(form) }}
+                        </section>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="footer pt-3  ">
+        <div class="container-fluid">
+          <div class="row align-items-center justify-content-lg-between">
+            <div class="col-lg-6 mb-lg-0 mb-4">
+              <div class="copyright text-center text-sm text-muted text-lg-start">
+                © <script>
+                  document.write(new Date().getFullYear())
+                </script>,
+                made with <i class="fa fa-heart"></i> by
+                <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
+                for a better web.
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <ul class="nav nav-footer justify-content-center justify-content-lg-end">
+                <li class="nav-item">
+                  <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>
+                </li>
+                <li class="nav-item">
+                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About Us</a>
+                </li>
+                <li class="nav-item">
+                  <a href="https://www.creative-tim.com/blog" class="nav-link text-muted" target="_blank">Blog</a>
+                </li>
+                <li class="nav-item">
+                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+
+
+    <style>
+
+    .alert {
+    font-size: 1.2em;
+    margin-top: 20px;
+}
+
+      
+.get-in-touch {
+  max-width: 800px;
+  margin: 50px auto;
+  position: relative;
+
+}
+.get-in-touch .title {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 3.2em;
+  line-height: 48px;
+  padding-bottom: 48px;
+     color: #5543ca;
+    background: #5543ca;
+    background: -moz-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
+    background: -webkit-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
+    background: linear-gradient(to right,#f4524d  0%,#5543ca  100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.contact-form .form-field {
+  position: relative;
+  margin: 32px 0;
+}
+.contact-form .input-text {
+  display: block;
+  width: 100%;
+  height: 36px;
+  border-width: 0 0 2px 0;
+  border-color: #5543ca;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+}
+.contact-form .input-text:focus {
+  outline: none;
+}
+.contact-form .input-text:focus + .label,
+.contact-form .input-text.not-empty + .label {
+  -webkit-transform: translateY(-24px);
+          transform: translateY(-24px);
+}
+.contact-form .label {
+  position: absolute;
+  left: 20px;
+  bottom: 11px;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+  color: #5543ca;
+  cursor: text;
+  transition: -webkit-transform .2s ease-in-out;
+  transition: transform .2s ease-in-out;
+  transition: transform .2s ease-in-out, 
+  -webkit-transform .2s ease-in-out;
+}
+.contact-form .submit-btn {
+  display: inline-block;
+  background-color: #000;
+   background-image: linear-gradient(125deg,#a72879,#064497);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 16px;
+  padding: 8px 16px;
+  border: none;
+  width:200px;
+  cursor: pointer;
+}
+    </style>
+    
+{% endblock %}
