@@ -17,22 +17,18 @@ class ReservationTransportType extends AbstractType
         $builder
             ->add('dateRes', null, [
                 'widget' => 'single_text',
+                'attr' => ['class' => 'form-control'],
+                'label_attr' => ['class' => 'label']
             ])
             ->add('dateFin', null, [
                 'widget' => 'single_text',
-            ])
-            ->add('prix')
-            ->add('statut')
-            ->add('reference')
-            ->add('nombreVelo')
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id_U',
-            ])
-            ->add('station', EntityType::class, [
-                'class' => Station::class,
-                'choice_label' => 'idS',
-            ])
+                'attr' => ['class' => 'form-control'],
+                'label_attr' => ['class' => 'label']
+            ])      
+            ->add('nombreVelo',null,['attr' => ['class' => 'form-control'],
+                'label_attr' => ['class' => 'label']])
+
+               
         ;
     }
 

@@ -49,10 +49,6 @@
         <a onclick="loadPage('{{ path('app_reservation_transport_index') }}')">Voir Réservations</a>
     </div>
 
-    <!-- Contenu Dynamique -->
-    <div class="content" id="pageContent">
-    </div>
-
     <script>
     function loadPage(url) {
         fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
@@ -80,5 +76,4 @@
     </script>
     {{ include('reservation_transport/_form.html.twig') }}
 
-    <a href="{{ path('app_reservation_transport_index') }}">back to list</a>
 {% endblock %}

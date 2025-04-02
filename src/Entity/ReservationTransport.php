@@ -22,6 +22,11 @@ class ReservationTransport
     #[ORM\JoinColumn(name: "idS", referencedColumnName: "idS", nullable: true)]
     private ?Station $station = null;
 
+    public function __construct()
+    {
+        $this->dateRes = new \DateTime(); // Définit la date actuelle par défaut
+    }
+
     #[ORM\Column(name: "dateRes", type: "datetime")]
     private \DateTimeInterface $dateRes;
 
