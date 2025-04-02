@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\ReservationTransport;
 use App\Repository\StationRepository;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: StationRepository::class)]
 #[ORM\Table(name: "station")]
@@ -17,6 +20,9 @@ class Station
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "stations")]
     #[ORM\JoinColumn(name: "id_U", referencedColumnName: "id_U", nullable: false)]
     private ?User $user = null;
+
+    #[ORM\OneToMany(mappedBy: "station", targetEntity: ReservationTransport::class, cascade: ["remove"])]
+    private Collection $reservations;
 
     #[ORM\Column(type: "string", length: 255)]
     private string $nom;
@@ -149,5 +155,34 @@ class Station
         return $this;
     }
 
+    /**
+     * @return Collection<int, ReservationTransport>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(ReservationTransport $reservation): self
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setStation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(ReservationTransport $reservation): self
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // Set the owning side to null (unless already changed)
+            if ($reservation->getStation() === $this) {
+                $reservation->setStation(null);
+            }
+        }
+
+        return $this;
+    }
     
 }
