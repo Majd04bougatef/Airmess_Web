@@ -24,8 +24,9 @@ class SocialMedia
     #[ORM\Column(type: "text")]
     private string $contenu;
 
-    #[ORM\Column(type: "date")]
-    private \DateTimeInterface $publicationDate;
+#[ORM\Column(type: "date", name: "publicationDate")]
+private \DateTimeInterface $publicationDate;
+    
 
     #[ORM\Column(type: "string", length: 255)]
     private string $lieu;
