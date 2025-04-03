@@ -78,10 +78,10 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/new2', name: 'app_reservation_transport_new', methods: ['GET', 'POST'])]
-    public function new2(Request $request, $id, EntityManagerInterface $entityManager, UserRepository $userRepository, StationRepository $stationRepository): Response
+    public function new2(Request $request,  EntityManagerInterface $entityManager, UserRepository $userRepository, StationRepository $stationRepository): Response
     {
         // Récupérer la station avec l'ID reçu
-        $station = $stationRepository->find($id);
+        $station = $stationRepository->find(40);
         
         if (!$station) {
             throw $this->createNotFoundException('Station non trouvée');
@@ -109,7 +109,7 @@ final class ReservationTransportController extends AbstractController
             return $this->redirectToRoute('app_reservation_transport_index');
         }
 
-        return $this->render('reservation_transport/new.html.twig', [
+        return $this->render('reservation_transport/steps.html.twig', [
             'reservation_transport' => $reservationTransport,
             'form' => $form,
         ]);
