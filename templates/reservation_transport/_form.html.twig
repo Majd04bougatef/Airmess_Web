@@ -59,11 +59,14 @@
         <img src="{{asset('images/signalisation (2).png')}}" alt="rocket_contact"/>
     </div>
     <h3>Réserver Votre vélo</h3>
-    {{ form_start(form, {'method': 'POST', 'action': path('app_reservation_transport_new')}) }}
+    <form action="{{ path('app_reservation_transport_new_reservation', {'id': idS}) }}" method="POST">
+    <input type="hidden" name="station_id" value="{{ idS }}">    
     <div class="row">
     <!-- Affichage du prix en texte -->
             <div class="form-group">
-                <label>Prix :</label>
+                <label>{{nom}}</label><br>
+                <label>Prix : {{prix}}/h</label><br>
+                <label>Nombre Vélo disponibles : {{nombreVelo}}</label>
             </div>
 
 
@@ -84,7 +87,7 @@
              
         </div>
         <div class="form-group">
-                <button class="btnn">{{ button_label|default('Save') }}</button>
+                <button class="btnn">{{ button_label|default('Réserver') }}</button>
             </div>
     </div>
     {{ form_end(form) }}

@@ -11,30 +11,29 @@
         }
 
         .navbar {
-    display: flex;
-    background: #ffffff;
-    padding: 10px;
-    justify-content: center;
-    gap: 20px;
-    margin: 20px auto; /* Centrer la navbar */
-    width: 90%;
-    max-width: 1200px; /* Facultatif : limite la largeur maximale */
-    border-radius: 10px; /* Pour un effet arrondi si nécessaire */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Ajoute une légère ombre pour un effet visuel */
-}
-
+            display: flex;
+            background: #ffffff;
+            padding: 10px;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px auto; /* Centrer la navbar */
+            width: 90%;
+            max-width: 1200px; /* Facultatif : limite la largeur maximale */
+            border-radius: 10px; /* Pour un effet arrondi si nécessaire */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Ajoute une légère ombre pour un effet visuel */
+        }
 
         .navbar a {
-            color: white;
+            color: black; /* Couleur de texte initiale */
             text-decoration: none;
             padding: 10px 15px;
             font-weight: bold;
             cursor: pointer;
         }
 
-        .navbar a:hover {
-            background: #6c99bc;
-            border-radius: 5px;
+        .navbar .nav-link:hover {
+            color: #6c99bc;
+                border-bottom: 2px solid #6c99bc; /* Ajouter une ligne sous le lien */
         }
 
         /* Zone de contenu */
@@ -48,9 +47,12 @@
 
     <!-- Menu Horizontal -->
     <div class="navbar">
-        <a onclick="loadPage('{{ path('app_reservation_transport_new') }}')">Réserver</a>
-        <a onclick="loadPage('{{ path('app_reservation_transport_index') }}')">Voir Réservations</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_new') }}')">Réserver</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_index') }}')">Voir Réservations</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Stations</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Discussions</a>
     </div>
+
 
     <!-- Contenu Dynamique -->
     <div class="content" id="pageContent">
@@ -77,10 +79,8 @@
         .then(html => {
             document.getElementById('pageContent').innerHTML = html;
         })
-        .catch(error => console.error('Erreur lors de l'envoi du formulaire:', error));
+        .catch(error => console.error('Erreur lors de l\'envoi du formulaire:', error));
     }
-
-        
     </script>
 
 </body>
