@@ -16,7 +16,7 @@ class SocialMedia
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "id_U", referencedColumnName: "id_U", nullable: false)]
-    private ?User $user = null;
+private ?User $user = null; // Ensure to use getIdU() for accessing user ID
 
     #[ORM\Column(type: "string", length: 255)]
     private string $titre;

@@ -1,47 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SocialMedia index{% endblock %}
+{% block title %}SocialMedia{% endblock %}
 
 {% block body %}
-    <h1>SocialMedia index</h1>
+    <h1>Social Media Posts</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IdEB</th>
-                <th>Titre</th>
-                <th>Contenu</th>
-                <th>PublicationDate</th>
-                <th>Lieu</th>
-                <th>Likee</th>
-                <th>Dislike</th>
-                <th>Imagemedia</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for social_media in social_media %}
-            <tr>
-                <td>{{ social_media.idEB }}</td>
-                <td>{{ social_media.titre }}</td>
-                <td>{{ social_media.contenu }}</td>
-                <td>{{ social_media.publicationDate ? social_media.publicationDate|date('Y-m-d') : '' }}</td>
-                <td>{{ social_media.lieu }}</td>
-                <td>{{ social_media.likee }}</td>
-                <td>{{ social_media.dislike }}</td>
-                <td>{{ social_media.imagemedia }}</td>
-                <td>
-                    <a href="{{ path('app_social_media_show', {'idEB': social_media.idEB}) }}">show</a>
-                    <a href="{{ path('app_social_media_edit', {'idEB': social_media.idEB}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
+    <div>
+        {% for post in pagination %}
+            <div class="post">
+                <h2>{{ post.titre }}</h2>
+                <p>{{ post.contenu }}</p>
+                <p><strong>Lieu:</strong> {{ post.lieu }}</p>
+                <p><strong>Date de publication:</strong> {{ post.publicationDate ? post.publicationDate|date('Y-m-d') : '' }}</p>
+                <a href="{{ path('app_social_media_show', {'idEB': post.idEB}) }}">Voir les détails</a>
+                <form method="post" action="{{ path('app_social_media_delete', {'idEB': post.idEB}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.idEB) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
         {% endfor %}
-        </tbody>
-    </table>
+    </div>
 
-    <a href="{{ path('app_social_media_new') }}">Create new</a>
+    <div>
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+    <a href="{{ path('app_social_media_new') }}">Ajouter une nouvelle publication</a>
 {% endblock %}

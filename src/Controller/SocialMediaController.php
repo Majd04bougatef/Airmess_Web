@@ -3,21 +3,33 @@
 namespace App\Controller;
 
 use App\Entity\SocialMedia;
+use App\Entity\User;
 use App\Form\SocialMediaType;
 use App\Repository\SocialMediaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[Route('/social/media')]
-final class SocialMediaController extends AbstractController{
+final class SocialMediaController extends AbstractController
+{
     #[Route(name: 'app_social_media_index', methods: ['GET'])]
-    public function index(SocialMediaRepository $socialMediaRepository): Response
+    public function index(SocialMediaRepository $socialMediaRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        $queryBuilder = $socialMediaRepository->createQueryBuilder('s')
+            ->orderBy('s.publicationDate', 'DESC'); // Tri par date de publication
+
+        $pagination = $paginator->paginate(
+            $queryBuilder, 
+            $request->query->getInt('page', 1), // Numéro de page
+            10 // Nombre de posts par page
+        );
+
         return $this->render('social_media/index.html.twig', [
-            'social_media' => $socialMediaRepository->findAll(),
+            'pagination' => $pagination,
         ]);
     }
 
@@ -27,6 +39,15 @@ final class SocialMediaController extends AbstractController{
         $socialMedia = new SocialMedia();
         $form = $this->createForm(SocialMediaType::class, $socialMedia);
         $form->handleRequest($request);
+
+        // Assurer que l'utilisateur est authentifié
+        $user = $this->getUser();
+        if ($user instanceof User) {
+            $socialMedia->setUser($user); // Lier l'utilisateur à la publication
+        } else {
+            // Si l'utilisateur n'est pas authentifié, lier un utilisateur par défaut (ID 1)
+            $socialMedia->setUser($entityManager->getRepository(User::class)->find(1));
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($socialMedia);
@@ -70,7 +91,8 @@ final class SocialMediaController extends AbstractController{
     #[Route('/{idEB}', name: 'app_social_media_delete', methods: ['POST'])]
     public function delete(Request $request, SocialMedia $socialMedia, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$socialMedia->getIdEB(), $request->getPayload()->getString('_token'))) {
+        // Vérifier le token CSRF
+        if ($this->isCsrfTokenValid('delete' . $socialMedia->getIdEB(), $request->request->get('_token'))) {
             $entityManager->remove($socialMedia);
             $entityManager->flush();
         }
