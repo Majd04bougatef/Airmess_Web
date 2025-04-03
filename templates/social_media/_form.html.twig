@@ -1,83 +1,76 @@
 {% extends 'base.html.twig' %}
+
 {% block js%}
+{# Keep these includes as they were in the source template #}
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-                      
-   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 {% endblock %}
-{% block stylesheets %}
-                      <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
 
+{% block stylesheets %}
+{# Keep these includes as they were in the source template #}
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 
 {% endblock %}
 
 
 {% block body %}
-    
-
-    <div class="container-fluid py-4">
-        <div class="row">
-            <div class="col-12">
-                <div class="card mb-4">
-                    <div class="card-header pb-0">
-                        <h6>social_media</h6>
-                    </div>
-                <div class="card-body px-0 pt-0 pb-2">
-                    <div class="table-responsive p-0">
-
-                     <div id="map" style="height: 500px;"></div>
-                      <script>
-                          mapboxgl.accessToken = 'sk.eyJ1IjoibW1tMDQiLCJhIjoiY204ejNwN2oxMDZzbjJqc2E3YWgxNnZlaiJ9.SMQ_PIIkMBK82mch7Y1RjA';
-                          var map = new mapboxgl.Map({
-                              container: 'map',
-                              style: 'mapbox://styles/mapbox/streets-v11',
-                              center: [2.3522, 48.8566],
-                              zoom: 13
-                          });
-                      </script>
-
-                        <section class="get-in-touch">
-                            <h1 class="title">Ajouter une publication/h1>
-                                {{ form_start(form, {'method': 'POST', 'action': path('app_social_media_new'), 'attr': {'class': 'contact-form row'}}) }}
-                                <div class="row">
-                                    <div class="form-field col-lg-6">
-                                        {{ form_row(form.nom, {'attr': {'class': 'input-text'}}) }}
-                                    </div>
-                                    <div class="form-field col-lg-6">
-                                        {{ form_row(form.capacite, {'attr': {'class': 'input-text'}}) }}
-                                    </div>
-                                    <div class="form-field col-lg-6">
-                                        {{ form_row(form.nombreVelo, {'attr': {'class': 'input-text'}}) }}
-                                    </div>
-                                    <div class="form-field col-lg-6">
-                                        {{ form_row(form.typeVelo, {'attr': {'class': 'input-text'}}) }}
-                                    </div>
-                                    <div class="form-field col-lg-6">
-                                        {{ form_row(form.prixHeure, {'attr': {'class': 'input-text'}}) }}
-                                    </div>
-                                    <div class="form-field col-lg-6">
-                                        {{ form_row(form.pays, {'attr': {'class': 'input-text'}}) }}
-                                    </div>
-                                    <div class="form-field col-lg-6">
-                                        {{ form_row(form.longitude, {'attr': {'class': 'input-text'}}) }}
-                                    </div>
-                                    <div class="form-field col-lg-6">
-                                        {{ form_row(form.latitude, {'attr': {'class': 'input-text'}}) }}
-                                    </div>
-                                    
-                                    <div class="form-field col-lg-12 text-center">
-                                        <button class="submit-btn">{{ button_label|default('Ajouter') }}</button>
-                                    </div>
-                                </div>
-                            {{ form_end(form) }}
-                        </section>
-
-                    </div>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    {# === Changed Title === #}
+                    <h6>Nouvelle Publication</h6>
                 </div>
-            </div>
-        </div>
-        <footer class="footer pt-3  ">
+                <div class="card-body px-lg-5 pt-0 pb-2"> {# Added more padding #}
+                    {# Removed table-responsive div #}
+                    {# === Removed Map Div and Script === #}
+
+                    <section class="get-in-touch">
+                        {# === Changed Title === #}
+                        <h1 class="title">Ajouter une publication</h1>
+
+                        {# === Changed form action path === #}
+                        {{ form_start(form, {'method': 'POST', 'action': path('app_social_media_new'), 'attr': {'class': 'contact-form'}}) }}
+                            {# Removed outer 'row' class from form_start, using it inside #}
+                            <div class="row">
+
+                                {# === Replaced Station fields with SocialMedia fields === #}
+
+                                <div class="form-field col-lg-6">
+                                    {# Using form_row to replicate original structure #}
+                                    {{ form_row(form.titre, {'attr': {'class': 'input-text'}}) }}
+                                </div>
+                                <div class="form-field col-lg-6">
+                                    {{ form_row(form.lieu, {'attr': {'class': 'input-text'}}) }}
+                                </div>
+                                <div class="form-field col-lg-12"> {# Content full width #}
+                                     {# Ensure 'contenu' uses TextareaType in your Form Class #}
+                                    {{ form_row(form.contenu, {'attr': {'class': 'input-text'}}) }}
+                                </div>
+                                <div class="form-field col-lg-12"> {# Image full width #}
+                                     {# Ensure 'imagemedia' uses FileType in your Form Class #}
+                                     {# Applying 'input-text' class as per original template, may look odd #}
+                                    {{ form_row(form.imagemedia, {'attr': {'class': 'input-text'}}) }}
+                                </div>
+
+                                {# === Submit Button === #}
+                                <div class="form-field col-lg-12 text-center">
+                                    <button type="submit" class="submit-btn">{{ button_label|default('Ajouter') }}</button>
+                                </div>
+                            </div> {# End inner .row #}
+                        {{ form_end(form) }}
+                    </section>
+
+                </div> {# End .card-body #}
+            </div> {# End .card #}
+        </div> {# End .col-12 #}
+    </div> {# End .row #}
+
+    {# === Footer from original template === #}
+    <footer class="footer pt-3  ">
         <div class="container-fluid">
           <div class="row align-items-center justify-content-lg-between">
             <div class="col-lg-6 mb-lg-0 mb-4">
@@ -108,8 +101,8 @@
             </div>
           </div>
         </div>
-      </footer>
-    </div>
+    </footer>
+</div> {# End .container-fluid #}
 
 
 

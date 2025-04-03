@@ -1,29 +1,210 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SocialMedia{% endblock %}
+{% block title %}Social Media Feed{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* Main container styling (optional, base.html.twig might handle this) */
+    .feed-container {
+        /* background-color: #f8f9fa; */
+        /* padding: 2rem 0; */
+    }
+
+    /* Scrollable area for posts */
+    .posts-scroll-pane {
+        max-height: 65vh; /* Adjust height as needed */
+        overflow-y: auto;
+        padding: 20px; /* Padding inside the scroll area for edge spacing */
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        background-color: #f8f9fa; /* Slightly off-white background for the scroll pane */
+        margin-bottom: 1.5rem;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Inner shadow for depth */
+    }
+
+    /* Styling for individual post cards */
+    .post-card {
+        border: 1px solid #e9ecef; /* Subtle border for each card */
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.07); /* Slightly softer shadow */
+        /* --- INCREASED MARGIN HERE --- */
+        margin-bottom: 2.5rem; /* Further increased space between cards (adjust as needed) */
+        border-radius: 0.375rem;
+        background-color: #fff;
+    }
+     .post-card:last-child {
+        margin-bottom: 0; /* No margin on the last card inside scroll pane */
+    }
+
+    .post-card .card-img-top {
+        max-height: 300px;
+        object-fit: cover;
+        border-top-left-radius: 0.375rem;
+        border-top-right-radius: 0.375rem;
+        border-bottom: 1px solid #e9ecef; /* Separator if image is present */
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+     .post-card .card-body {
+        padding: 1.25rem;
+     }
+
+     /* Styling for the post author */
+    .post-author {
+        display: flex;
+        align-items: center;
+        font-size: 0.9em;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.75rem; /* Space below author name */
+    }
+    .post-author i { /* Style for user icon */
+        margin-right: 0.5rem;
+        color: #6c757d;
+        font-size: 1.2em; /* Slightly larger icon */
+    }
+     /* Optional: if you link the author name */
+     .post-author a {
+         color: inherit;
+         text-decoration: none;
+     }
+      .post-author a:hover {
+          text-decoration: underline;
+      }
+
+    .post-card .card-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.15rem; /* Slightly larger title */
+    }
+
+    .post-card .card-text {
+        color: #495057;
+        margin-bottom: 1rem; /* More space after content */
+        line-height: 1.6; /* Improve readability */
+    }
+
+    .post-meta {
+        font-size: 0.875em;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    .post-meta strong {
+        color: #495057;
+    }
+    .post-meta i { /* Style for meta icons */
+        margin-right: 0.4rem;
+        color: #6c757d;
+        width: 1em; /* Align icons roughly */
+        text-align: center;
+    }
+
+
+    /* Container for action buttons */
+    .post-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem; /* Space between buttons */
+        border-top: 1px solid #eee;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+
+     .post-actions .btn i {
+        margin-right: 0.35rem;
+     }
+
+    /* Center pagination and add post button */
+    .pagination-controls,
+    .add-post-section {
+        display: flex;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+
+    /* Style for the 'no posts' message */
+    .no-posts-message {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+
+</style>
+{% endblock %}
 
 {% block body %}
-    <h1>Social Media Posts</h1>
+<div class="container feed-container mt-4 mb-4">
 
-    <div>
+    <h1 class="text-center mb-4">📢 Social Feed</h1>
+
+    <!-- Scrollable Pane for Posts -->
+    <div class="posts-scroll-pane">
         {% for post in pagination %}
-            <div class="post">
-                <h2>{{ post.titre }}</h2>
-                <p>{{ post.contenu }}</p>
-                <p><strong>Lieu:</strong> {{ post.lieu }}</p>
-                <p><strong>Date de publication:</strong> {{ post.publicationDate ? post.publicationDate|date('Y-m-d') : '' }}</p>
-                <a href="{{ path('app_social_media_show', {'idEB': post.idEB}) }}">Voir les détails</a>
-                <form method="post" action="{{ path('app_social_media_delete', {'idEB': post.idEB}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.idEB) }}">
-                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                </form>
-            </div>
-        {% endfor %}
-    </div>
+            <div class="card post-card">
+                {# Image (if exists) #}
+                {% if post.imagemedia %}
+                    <img src="{{ asset('uploads/' ~ post.imagemedia) }}" class="card-img-top" alt="Image de la publication : {{ post.titre }}">
+                {% endif %}
 
-    <div>
+                <div class="card-body">
+                    {# === CORRECTED Post Author Display === #}
+                    <div class="post-author">
+                         <i class="fas fa-user-circle"></i> {# Requires Font Awesome #}
+                         {# Combines prenom and name from the User entity #}
+                         <span>{{ (post.user.prenom ~ ' ' ~ post.user.name) | default('Utilisateur inconnu') }}</span>
+                    </div>
+
+                    {# Post Title #}
+                    <h5 class="card-title">{{ post.titre }}</h5>
+
+                    {# Post Content - Added nl2br filter #}
+                    <p class="card-text">{{ post.contenu | nl2br }}</p>
+
+                    {# Post Metadata - Added icons #}
+                    <div class="post-meta">
+                        <div><strong><i class="fas fa-map-marker-alt"></i> Lieu:</strong> {{ post.lieu | default('Non spécifié') }}</div>
+                        <div><strong><i class="fas fa-calendar-alt"></i> Publié le:</strong> {{ post.publicationDate ? post.publicationDate|date('d M Y, H:i') : 'Date inconnue' }}</div>
+                    </div>
+
+                    {# Action Buttons #}
+                    <div class="post-actions">
+                        <a href="{{ path('app_social_media_show', {'idEB': post.idEB}) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                        <button class="btn btn-outline-success btn-sm">
+                             <i class="fas fa-thumbs-up"></i> J'aime
+                        </button>
+                        <button class="btn btn-outline-info btn-sm">
+                             <i class="fas fa-comment"></i> Commenter
+                        </button>
+                        {# Delete Form - Pushed to the right #}
+                        <form method="post" action="{{ path('app_social_media_delete', {'idEB': post.idEB}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette publication ?');" class="ms-auto">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.idEB) }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                 <i class="fas fa-trash-alt"></i> Supprimer
+                            </button>
+                        </form>
+                    </div> {# End post-actions #}
+                </div> {# End card-body #}
+            </div> {# End post-card #}
+        {% else %}
+            <p class="no-posts-message">Aucune publication trouvée pour le moment.</p>
+        {% endfor %}
+    </div> {# End posts-scroll-pane #}
+
+    <!-- Pagination - Only shown if needed -->
+    {% if pagination.getTotalItemCount > 0 and pagination.pageCount > 1 %}
+    <div class="pagination-controls">
         {{ knp_pagination_render(pagination) }}
     </div>
+    {% endif %}
 
-    <a href="{{ path('app_social_media_new') }}">Ajouter une nouvelle publication</a>
+    <!-- Bouton Ajouter une publication -->
+    <div class="add-post-section">
+        <a href="{{ path('app_social_media_new') }}" class="btn btn-success btn-lg">
+             <i class="fas fa-plus-circle"></i> Ajouter une publication
+        </a>
+    </div>
+
+</div> {# End container #}
 {% endblock %}

@@ -38,7 +38,7 @@ private \DateTimeInterface $publicationDate;
     private int $dislike;
 
     #[ORM\Column(type: "string", length: 500)]
-    private string $imagemedia;
+private string $imagemedia = ''; // Initialize with a default value
 
     // Getters et Setters
 
