@@ -97,4 +97,18 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+     /**
+     * Récupère les messages entre deux utilisateurs
+     */
+    public function findMessagesForChat(int $userId1, int $userId2)
+    {
+        return $this->createQueryBuilder('m')
+            ->where('(m.sender = :user1 AND m.receiver = :user2) OR (m.sender = :user2 AND m.receiver = :user1)')
+            ->setParameter('user1', $userId1)
+            ->setParameter('user2', $userId2)
+            ->orderBy('m.dateM', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

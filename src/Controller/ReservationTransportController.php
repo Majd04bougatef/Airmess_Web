@@ -195,27 +195,55 @@ final class ReservationTransportController extends AbstractController
     }
     
     // Ajoutez cette méthode dans votre ReservationTransportController.php
-    #[Route('/recap/{id}', name: 'app_reservation_transport_recap', methods: ['GET', 'POST'])]
-    public function recap(Request $request, $id, EntityManagerInterface $entityManager, StationRepository $stationRepository): Response
-    {
-        $reservation = $entityManager->getRepository(ReservationTransport::class)->find($id);
-        $station = $stationRepository->find($reservation->getStation()->getIdS());
-        
-        $template = 'reservation_transport/recap.html.twig';
-        $params = [
-            'reservation' => $reservation,
-            'station' => $station,
-            'currentStep' => 2,
-        ];
-        
-        // If it's an AJAX request, use a different template or the same template
-        // but without the layout
-        if ($request->isXmlHttpRequest()) {
-            return $this->render($template, $params);
-        }
-        
-        return $this->render($template, $params);
-    }
+   #[Route('/recap/{id}', name: 'app_reservation_transport_recap', methods: ['GET', 'POST'])]
+     public function recap(Request $request, $id, EntityManagerInterface $entityManager, StationRepository $stationRepository): Response
+     {
+         // Récupérer la station avec l'ID reçu
+         $station = $stationRepository->find($id);
+         if (!$station) {
+             throw $this->createNotFoundException('Station non trouvée');
+         }
+     
+         // Récupérer les informations passées via l'URL
+         $dateRes = $request->query->get('dateRes');
+         $dateFin = $request->query->get('dateFin');
+         $nombreVelo = $request->query->get('nombreVelo');
+     
+         if (!$dateRes || !$dateFin || !$nombreVelo) {
+             return $this->redirectToRoute('app_reservation_transport_station');
+         }
+     
+         // Convertir les dates
+         $dateRes = new \DateTime($dateRes);
+         $dateFin = new \DateTime($dateFin);
+     
+         // Calcul de la durée en heures
+         $interval = $dateRes->diff($dateFin);
+         $heures = $interval->h + ($interval->days * 24);
+     
+         // Calcul du prix total
+         $prixTotal = $station->getPrixHeure() * $heures * $nombreVelo;
+     
+         // Récupérer l'utilisateur
+         $user = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
+     
+         // Créer une réservation temporaire pour affichage
+         $reservation = new ReservationTransport();
+         $reservation->setUser($user);
+         $reservation->setStation($station);
+         $reservation->setDateRes($dateRes);
+         $reservation->setDateFin($dateFin);
+         $reservation->setNombreVelo($nombreVelo);
+         $reservation->setPrix($prixTotal);
+         $reservation->setReference($this->generateReference($user));
+         $reservation->setStatut('en attente');
+     
+         return $this->render('reservation_transport/recap.html.twig', [
+             'reservation' => $reservation,
+             'station' => $station,
+             'currentStep' => 2,
+         ]);
+     }
 
     
 

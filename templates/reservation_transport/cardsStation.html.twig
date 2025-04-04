@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des vélos</title>
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
@@ -158,14 +153,13 @@
         }
 
     </style>
-</head>
-<body>
 
-  <div class="navbar">
+
+   <div class="navbar">
         <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Réserver</a>
         <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_index') }}')">Mes Réservations</a>
         <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Stations</a>
-        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Discussions</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_message_voyageurs') }}')">Discussions</a>
     </div>
 
     <!-- Contenu Dynamique -->
@@ -198,32 +192,4 @@
         </div>
     </div>
 
-    <script>
-        // Fonction rateStation déplacée ici
-        function rateStation(starElement, rating) {
-            const stationId = starElement.closest('.stars').getAttribute('data-station-id');
-            const stars = starElement.closest('.stars').querySelectorAll('i');
-            
-            stars.forEach((star, index) => {
-                if (index < rating) {
-                    star.classList.add('filled');
-                } else {
-                    star.classList.remove('filled');
-                }
-            });
 
-            console.log(`Station ${stationId} notée: ${rating} étoiles`);
-        }
-
-        function loadPage(url) {
-            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('pageContent').innerHTML = html;
-                })
-                .catch(error => console.error('Erreur lors du chargement:', error));
-        }
-    </script>
-
-</body>
-</html>
