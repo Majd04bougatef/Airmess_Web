@@ -6,10 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: "users")]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -57,12 +59,11 @@ class User
         $this->stations = new ArrayCollection();
     }
 
-    // Getters et Setters
+    // Getters and Setters
     public function getIdU(): ?int
     {
         return $this->id_U;
     }
-    
 
     public function getName(): string
     {
@@ -97,7 +98,7 @@ class User
         return $this;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -185,7 +186,7 @@ class User
         return $this;
     }
 
-     /**
+    /**
      * @return Collection<int, Station>
      */
     public function getStations(): Collection
@@ -212,5 +213,21 @@ class User
         }
 
         return $this;
+    }
+
+    // Implementing methods from UserInterface
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function getRoles(): array
+    {
+        return [$this->roleUser];
+    }
+
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
     }
 }
