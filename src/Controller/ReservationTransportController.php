@@ -64,7 +64,13 @@ final class ReservationTransportController extends AbstractController
             $entityManager->persist($reservationTransport);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_reservation_transport_index');
+            return $this->redirectToRoute('app_reservation_transport_recap', [
+                'id' => $id,
+                'dateRes' => $reservationTransport->getDateRes()->format('Y-m-d H:i:s'),
+                'dateFin' => $reservationTransport->getDateFin()->format('Y-m-d H:i:s'),
+                'nombreVelo' => $reservationTransport->getNombreVelo(),
+            ]);
+            
         }
 
         return $this->render('reservation_transport/new.html.twig', [
@@ -176,19 +182,118 @@ final class ReservationTransportController extends AbstractController
     public function cardStation(Request $request, StationRepository $stationRepository): Response
     {
         $stations = $stationRepository->findAll();
-
-        // Vérifie si la requête est AJAX
+    
         if ($request->isXmlHttpRequest()) {
             return $this->render('reservation_transport/cardsStation.html.twig', [
                 'stations' => $stations,
-            ]);
+            ], new Response('', Response::HTTP_OK));
         }
-
-        // Retourne la même vue même si ce n'est pas une requête AJAX
+    
         return $this->render('reservation_transport/cardsStation.html.twig', [
             'stations' => $stations,
         ]);
     }
+    
+    // Ajoutez cette méthode dans votre ReservationTransportController.php
+    #[Route('/recap/{id}', name: 'app_reservation_transport_recap', methods: ['GET', 'POST'])]
+    public function recap(Request $request, $id, EntityManagerInterface $entityManager, StationRepository $stationRepository): Response
+    {
+        // Récupérer la station avec l'ID reçu
+        $station = $stationRepository->find($id);
+        if (!$station) {
+            throw $this->createNotFoundException('Station non trouvée');
+        }
+    
+        // Récupérer les informations passées via l'URL
+        $dateRes = $request->query->get('dateRes');
+        $dateFin = $request->query->get('dateFin');
+        $nombreVelo = $request->query->get('nombreVelo');
+    
+        if (!$dateRes || !$dateFin || !$nombreVelo) {
+            return $this->redirectToRoute('app_reservation_transport_station');
+        }
+    
+        // Convertir les dates
+        $dateRes = new \DateTime($dateRes);
+        $dateFin = new \DateTime($dateFin);
+    
+        // Calcul de la durée en heures
+        $interval = $dateRes->diff($dateFin);
+        $heures = $interval->h + ($interval->days * 24);
+    
+        // Calcul du prix total
+        $prixTotal = $station->getPrixHeure() * $heures * $nombreVelo;
+    
+        // Récupérer l'utilisateur
+        $user = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
+    
+        // Créer une réservation temporaire pour affichage
+        $reservation = new ReservationTransport();
+        $reservation->setUser($user);
+        $reservation->setStation($station);
+        $reservation->setDateRes($dateRes);
+        $reservation->setDateFin($dateFin);
+        $reservation->setNombreVelo($nombreVelo);
+        $reservation->setPrix($prixTotal);
+        $reservation->setReference($this->generateReference($user));
+        $reservation->setStatut('en attente');
+    
+        return $this->render('reservation_transport/recap.html.twig', [
+            'reservation' => $reservation,
+            'station' => $station,
+            'currentStep' => 2,
+        ]);
+    }
+    
+
+#[Route('/confirm', name: 'app_reservation_transport_confirm', methods: ['POST'])]
+public function confirm(Request $request, EntityManagerInterface $entityManager, 
+                        StationRepository $stationRepository, UserRepository $userRepository): Response
+{
+    // Récupérer les données temporaires de la session
+    $tempData = $request->getSession()->get('temp_reservation');
+    
+    if (!$tempData) {
+        return $this->redirectToRoute('app_reservation_transport_station');
+    }
+    
+    // Créer la réservation finale
+    $reservation = new ReservationTransport();
+    
+    // Récupérer les données
+    $station = $stationRepository->find($tempData['station_id']);
+    $user = $this->getUser() ?? $userRepository->find(40); // Utilisateur connecté ou par défaut
+    
+    // Configuration de la réservation
+    $reservation->setUser($user);
+    $reservation->setStation($station);
+    $reservation->setDateRes(new \DateTime($tempData['date_res']));
+    $reservation->setDateFin(new \DateTime($tempData['date_fin']));
+    $reservation->setNombreVelo($tempData['nombre_velo']);
+    $reservation->setPrix($tempData['prix']);
+    $reservation->setReference($this->generateReference($user));
+    $reservation->setStatut('en cours');
+    
+    // Enregistrer dans la base de données
+    $entityManager->persist($reservation);
+    $entityManager->flush();
+    
+    // Nettoyer la session
+    $request->getSession()->remove('temp_reservation');
+    
+    // Rediriger vers la page de paiement
+    return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $reservation->getId()]);
+}
+
+#[Route('/payment/{id}', name: 'app_reservation_transport_payment', methods: ['GET'])]
+public function payment(ReservationTransport $reservation): Response
+{
+    return $this->render('reservation_transport/payment.html.twig', [
+        'reservation' => $reservation,
+        'currentStep' => 3, // pour mettre à jour le stepper
+    ]);
+}
+    
 
     
 }

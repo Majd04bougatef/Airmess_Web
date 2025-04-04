@@ -53,7 +53,7 @@
         .card-footer {
             display: flex;
             justify-content: flex-end;
-            align-items: center;
+            align-items: right;
             padding: 10px;
         }
 
@@ -125,6 +125,8 @@
             transition-duration: .3s;
             overflow: hidden;
             position: relative;
+            margin-left: 20px;
+            margin-bottom: 20px;
         }
 
         .button i {
@@ -160,8 +162,8 @@
 <body>
 
   <div class="navbar">
-        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_new') }}')">Réserver</a>
-        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_index') }}')">Voir Réservations</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Réserver</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_index') }}')">Mes Réservations</a>
         <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Stations</a>
         <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Discussions</a>
     </div>
