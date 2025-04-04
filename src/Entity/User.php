@@ -55,9 +55,18 @@ class User
     #[ORM\OneToMany(mappedBy: "user", targetEntity: ReservationTransport::class, cascade: ["remove"])]
     private Collection $reservations;
 
+    #[ORM\OneToMany(mappedBy: "sender", targetEntity: Message::class, cascade: ["remove"])]
+    private Collection $sentMessages;
+    
+    #[ORM\OneToMany(mappedBy: "receiver", targetEntity: Message::class, cascade: ["remove"])]
+    private Collection $receivedMessages;
+
     public function __construct()
     {
         $this->stations = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
+        $this->sentMessages = new ArrayCollection();
+        $this->receivedMessages = new ArrayCollection();
     }
 
     // Getters et Setters
@@ -241,6 +250,66 @@ class User
             // Set the owning side to null (unless already changed)
             if ($reservation->getUser() === $this) {
                 $reservation->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getSentMessages(): Collection
+    {
+        return $this->sentMessages;
+    }
+
+    public function addSentMessage(Message $message): self
+    {
+        if (!$this->sentMessages->contains($message)) {
+            $this->sentMessages->add($message);
+            $message->setSender($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSentMessage(Message $message): self
+    {
+        if ($this->sentMessages->removeElement($message)) {
+            // Définir le côté propriétaire à null (sauf si déjà modifié)
+            if ($message->getSender() === $this) {
+                $message->setSender(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getReceivedMessages(): Collection
+    {
+        return $this->receivedMessages;
+    }
+
+    public function addReceivedMessage(Message $message): self
+    {
+        if (!$this->receivedMessages->contains($message)) {
+            $this->receivedMessages->add($message);
+            $message->setReceiver($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReceivedMessage(Message $message): self
+    {
+        if ($this->receivedMessages->removeElement($message)) {
+            // Définir le côté propriétaire à null (sauf si déjà modifié)
+            if ($message->getReceiver() === $this) {
+                $message->setReceiver(null);
             }
         }
 
