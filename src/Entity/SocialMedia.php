@@ -4,6 +4,9 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\SocialMediaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Commentaire;
 
 #[ORM\Entity(repositoryClass: SocialMediaRepository::class)]
 #[ORM\Table(name: "socialmedia")]
@@ -134,4 +137,44 @@ private string $imagemedia = ''; // Initialize with a default value
         $this->imagemedia = $imagemedia;
         return $this;
     }
+
+
+    #[ORM\OneToMany(mappedBy: 'socialMedia', targetEntity: Commentaire::class, orphanRemoval: true, cascade: ['persist'])]
+    private Collection $commentaires;
+    
+    public function __construct()
+    {
+        $this->commentaires = new ArrayCollection();
+    }
+    
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+    
+    public function addCommentaire(Commentaire $commentaire): self
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires[] = $commentaire;
+            $commentaire->setSocialMedia($this);
+        }
+    
+        return $this;
+    }
+    
+    public function removeCommentaire(Commentaire $commentaire): self
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            if ($commentaire->getSocialMedia() === $this) {
+                $commentaire->setSocialMedia(null);
+            }
+        }
+    
+        return $this;
+    }
+
+
+
+
+
 }

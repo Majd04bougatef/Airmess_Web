@@ -31,11 +31,7 @@ class Commentaire
     #[ORM\Column(type: "integer")]
     private int $numberdislike;
 
-    #[ORM\Column(type: "text", nullable: true)]
-    private ?string $proposedDescription = null;
-
-    #[ORM\Column(type: "boolean")]
-    private bool $isApproved;
+    
 
     // Getters et Setters
 
@@ -99,25 +95,5 @@ class Commentaire
         return $this;
     }
 
-    public function getProposedDescription(): ?string
-    {
-        return $this->proposedDescription;
-    }
-
-    public function setProposedDescription(?string $proposedDescription): self
-    {
-        $this->proposedDescription = $proposedDescription;
-        return $this;
-    }
-
-    public function isApproved(): bool
-    {
-        return $this->isApproved;
-    }
-
-    public function setIsApproved(bool $isApproved): self
-    {
-        $this->isApproved = $isApproved;
-        return $this;
-    }
+   
 }

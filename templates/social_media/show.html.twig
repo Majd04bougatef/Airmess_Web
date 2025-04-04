@@ -1,18 +1,113 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Post Details{% endblock %}
+{% block title %}{{ social_media.titre }} - Publication{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }} {# Inclure les styles de base.html.twig #}
+    {# Assurez-vous que Font Awesome est chargé (via base.html.twig ou décommentez la ligne ci-dessous) #}
+    {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> #}
+    <style>
+        /* Styles pour les avatars */
+        .avatar-sm { width: 40px; height: 40px; object-fit: cover; border: 1px solid #eee; }
+        .comment-avatar { width: 32px; height: 32px; object-fit: cover; border: 1px solid #eee; }
+        /* Ajustement des images dans la publication */
+        .post-image-container img { max-height: 500px; width: 100%; object-fit: contain; background-color: #f8f9fa; border-radius: 0.25rem; border: 1px solid #dee2e6; }
+        /* Style du formulaire de commentaire */
+        .comment-form .form-control { border-radius: 1.5rem; padding-left: 1.25rem; }
+        .comment-form .btn { border-radius: 1.5rem; }
+        /* Style des boutons d'action sous la publication */
+        .post-actions .btn { flex-grow: 1; margin: 0 2px; }
+        /* Style des boutons admin (modifier/supprimer) */
+        .admin-actions .btn { margin-left: 5px; }
+        /* Style des bulles de commentaires */
+        .comment-card { background-color: #f0f2f5; border: none; border-radius: 1rem; padding: 0.75rem 1rem; word-wrap: break-word; }
+        .comment-text { display: block; margin-top: 0.25rem; }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>{{ social_media.titre }}</h1>
-    <p>{{ social_media.contenu }}</p>
-    <p><strong>Lieu:</strong> {{ social_media.lieu }}</p>
-    <p><strong>Date de publication:</strong> {{ social_media.publicationDate ? social_media.publicationDate|date('Y-m-d') : '' }}</p>
-    <a href="{{ path('app_social_media_edit', {'idEB': social_media.idEB}) }}">Editer</a>
+<div class="container feed-container mt-4 mb-4">
 
-    <form method="post" action="{{ path('app_social_media_delete', {'idEB': social_media.idEB}) }}">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
-        <button type="submit" class="btn btn-danger">Supprimer</button>
-    </form>
+    <h1 class="text-center mb-4">📢 Social Feed</h1>
 
-    <a href="{{ path('app_social_media_index') }}">Retour à la liste</a>
+    <!-- Scrollable Pane for Posts -->
+    <div class="posts-scroll-pane" id="posts-list">
+        {% for post in pagination %}
+            <div class="card post-card">
+                {% if post.imagemedia %}
+                    <img src="{{ asset('uploads/' ~ post.imagemedia) }}" class="card-img-top" alt="Image de la publication : {{ post.titre }}">
+                {% endif %}
+
+                <div class="card-body">
+                    <div class="post-author">
+                         <i class="fas fa-user-circle"></i>
+                         <span>{{ (post.user.prenom ~ ' ' ~ post.user.name) | default('Utilisateur inconnu') }}</span>
+                    </div>
+                    <h5 class="card-title">{{ post.titre }}</h5>
+                    <p class="card-text">{{ post.contenu | nl2br }}</p>
+                    <div class="post-meta">
+                        <div><strong><i class="fas fa-map-marker-alt"></i> Lieu:</strong> {{ post.lieu | default('Non spécifié') }}</div>
+                        <div><strong><i class="fas fa-calendar-alt"></i> Publié le:</strong> {{ post.publicationDate ? post.publicationDate|date('d M Y, H:i') : 'Date inconnue' }}</div>
+                    </div>
+                    <div class="post-actions">
+                        <a href="{{ path('app_social_media_show', {'idEB': post.idEB}) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                        <button class="btn btn-outline-success btn-sm">
+                             <i class="fas fa-thumbs-up"></i> J'aime
+                        </button>
+                        <button class="btn btn-outline-info btn-sm">
+                             <i class="fas fa-comment"></i> Commenter
+                        </button>
+                        <form method="post" action="{{ path('app_social_media_delete', {'idEB': post.idEB}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette publication ?');" class="ms-auto">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.idEB) }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                 <i class="fas fa-trash-alt"></i> Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="no-posts-message">Aucune publication trouvée pour le moment.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination - With AJAX -->
+    {% if pagination.getTotalItemCount > 0 and pagination.pageCount > 1 %}
+        <div class="pagination-controls" id="pagination-controls">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    {% endif %}
+
+    <div class="add-post-section">
+        <a href="{{ path('app_social_media_new') }}" class="btn btn-success btn-lg">
+             <i class="fas fa-plus-circle"></i> Ajouter une publication
+        </a>
+    </div>
+
+</div>
+
+<script>
+    // AJAX Pagination
+    document.querySelectorAll('.pagination-controls a').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent the default link action
+            var url = link.getAttribute('href');
+            
+            // Make the AJAX request
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    // Update the posts section with the new content
+                    document.getElementById('posts-list').innerHTML = data.match(/<div class="posts-scroll-pane">([\s\S]+)<\/div>/)[1];
+
+                    // Update the pagination controls
+                    document.getElementById('pagination-controls').innerHTML = data.match(/<div class="pagination-controls">([\s\S]+)<\/div>/)[1];
+                })
+                .catch(error => console.error('Error fetching posts:', error));
+        });
+    });
+</script>
+
 {% endblock %}
