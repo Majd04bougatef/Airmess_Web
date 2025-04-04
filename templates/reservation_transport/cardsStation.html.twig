@@ -1,0 +1,195 @@
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            display: flex;
+            background: #ffffff;
+            padding: 10px;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px auto; /* Centrer la navbar */
+            width: 90%;
+            max-width: 1200px; /* Facultatif : limite la largeur maximale */
+            border-radius: 10px; /* Pour un effet arrondi si nécessaire */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Ajoute une légère ombre pour un effet visuel */
+        }
+
+        .navbar a {
+            color: black; /* Couleur de texte initiale */
+            text-decoration: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .navbar .nav-link:hover {
+            color: #6c99bc;
+                border-bottom: 2px solid #6c99bc; /* Ajouter une ligne sous le lien */
+        }
+
+        /* Zone de contenu */
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: right;
+            padding: 10px;
+        }
+
+        .custom-card {
+            width: 30%;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .custom-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            height: 150px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .card-text {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* Style du bouton de notation (étoiles) */
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .stars i {
+            font-size: 1.5rem;
+            color: #d3d3d3;
+            cursor: pointer;
+        }
+
+        .stars i.filled {
+            color: gold;
+        }
+
+        /* Style du bouton de réservation */
+        .button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgb(25, 135, 238);
+            border: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+            cursor: pointer;
+            transition-duration: .3s;
+            overflow: hidden;
+            position: relative;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .button i {
+            color: white;
+        }
+
+        .button:hover {
+            width: 140px;
+            border-radius: 50px;
+            transition-duration: .3s;
+            background-color: rgb(25, 135, 238);
+            align-items: center;
+        }
+
+        .button::before {
+            position: absolute;
+            top: -20px;
+            content: "Réserver";
+            color: white;
+            transition-duration: .3s;
+            font-size: 2px;
+        }
+
+        .button:hover::before {
+            font-size: 13px;
+            opacity: 1;
+            transform: translateY(30px);
+            transition-duration: .3s;
+        }
+
+    </style>
+
+
+   <div class="navbar">
+        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Réserver</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_index') }}')">Mes Réservations</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Stations</a>
+        <a class="nav-link" onclick="loadPage('{{ path('app_message_voyageurs') }}')">Discussions</a>
+    </div>
+
+    <!-- Contenu Dynamique -->
+    <div class="content" id="pageContent">
+        <div class="cards-container">
+            {% for station in stations %}
+                <div class="custom-card">
+                    <div class="card-header">
+                        <img src="{{ asset('images/logo-airmess.png')}}" alt="Image de la station" style="width: 100%; height: 100%; object-fit: cover;border-radius:20px;">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ station.nom }}</h5>
+                        <p class="card-text">{{ station.nombreVelo }} vélos disponibles</p>
+                        <!-- Section de notation -->
+                        <div class="stars" data-station-id="{{ station.idS }}">
+                            <i class="fas fa-star" onclick="rateStation(this, 1)"></i>
+                            <i class="fas fa-star" onclick="rateStation(this, 2)"></i>
+                            <i class="fas fa-star" onclick="rateStation(this, 3)"></i>
+                            <i class="fas fa-star" onclick="rateStation(this, 4)"></i>
+                            <i class="fas fa-star" onclick="rateStation(this, 5)"></i>
+                        </div>
+                    </div>
+                    <button class="button" onclick="loadPage('{{ path('app_reservation_transport_new_reservation', {'id': station.idS}) }}')">
+                        <i class="fas fa-calendar-check"></i>
+                    </button>
+
+
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+

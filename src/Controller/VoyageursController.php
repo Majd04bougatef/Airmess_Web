@@ -24,7 +24,6 @@ class VoyageursController extends AbstractController{
     #[Route('/StationVoyageursPage', name: 'stationVoyageurs_page')]
     public function stationVoyageursPage()
     {
-        // Vous pouvez ajouter ici des données à passer à la vue
         return $this->render('dashVoyageurs/stationPageVoyageurs.html.twig');
     }
 
