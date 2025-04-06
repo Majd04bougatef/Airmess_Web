@@ -252,7 +252,10 @@ body {
         </div>
     </div>
 
-    <form action="{{ path('app_reservation_transport_new_reservation', {'id': idS}) }}" method="POST">
+{{ form_start(form, {
+    'action': path('app_reservation_transport_new_reservation', {'id': idS}),
+    'attr': {'novalidate': 'novalidate'}
+}) }}
         <input type="hidden" name="station_id" value="{{ idS }}">    
         <div class="row">
             <!-- Affichage du prix en texte -->
@@ -270,11 +273,15 @@ body {
                 </div>
                 <div class="form-group">
                     {{ form_row(form.nombreVelo, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.nombreVelo) }}
+
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
                     {{ form_row(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.dateFin) }}
+
                 </div>
             </div>
             <div class="col-12">
@@ -283,17 +290,16 @@ body {
                 </div>
             </div>
         </div>
-        {{ form_end(form) }}
-    </form>
+    {{ form_end(form) }}
 </div>
 
 <script>
-        function loadPage(url) {
-            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('pageContent').innerHTML = html;
-                })
-                .catch(error => console.error('Erreur lors du chargement:', error));
-        }
-    </script>
+    function loadPage(url) {
+        fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('pageContent').innerHTML = html;
+            })
+            .catch(error => console.error('Erreur lors du chargement:', error));
+    }
+</script>
