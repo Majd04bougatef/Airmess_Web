@@ -39,7 +39,7 @@
 
                         <section class="get-in-touch">
                             <h1 class="title">Ajouter une Station</h1>
-                                {{ form_start(form, {'method': 'POST', 'action': path('app_station_new'), 'attr': {'class': 'contact-form row'}}) }}
+                                {{ form_start(form, {'method': 'POST', 'action': path('app_station_new'), 'attr': {'class': 'contact-form row','novalidate': 'novalidate'}}) }}
                                 <div class="row">
                                     <div class="form-field col-lg-6">
                                         {{ form_row(form.nom, {'attr': {'class': 'input-text'}}) }}
