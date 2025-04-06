@@ -4,8 +4,6 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ReservationTransportRepository;
-use Symfony\Component\Validator\Constraints as Assert;
-
 
 #[ORM\Entity(repositoryClass: ReservationTransportRepository::class)]
 #[ORM\Table(name: "reservation_transport")]
@@ -24,12 +22,11 @@ class ReservationTransport
     #[ORM\JoinColumn(name: "idS", referencedColumnName: "idS", nullable: true)]
     private ?Station $station = null;
 
-    
     public function __construct()
     {
         $this->dateRes = new \DateTime('-1 hour');
     }
-            
+
     #[ORM\Column(name: "dateRes", type: "datetime")]
     private \DateTimeInterface $dateRes;
 
