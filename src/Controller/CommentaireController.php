@@ -80,25 +80,39 @@ final class CommentaireController extends AbstractController{
     }
 
     #[Route('/ajouter/{idEB}', name: 'ajouter_commentaire', methods: ['POST'])]
-public function ajouterCommentaire(Request $request, SocialMediaRepository $smRepo, EntityManagerInterface $em, int $idEB, Security $security): Response
-{
-    $socialMedia = $smRepo->find($idEB);
+    public function ajouterCommentaire(Request $request, SocialMediaRepository $smRepo, EntityManagerInterface $em, int $idEB): Response
+    {
+        $socialMedia = $smRepo->find($idEB);
 
-    if (!$socialMedia) {
-        throw $this->createNotFoundException("Publication non trouvée.");
+        if (!$socialMedia) {
+            throw $this->createNotFoundException("Publication non trouvée.");
+        }
+
+        $content = $request->request->get('description');
+        if (empty($content)) {
+            $this->addFlash('error', 'Le commentaire ne peut pas être vide.');
+            return $this->redirectToRoute('app_social_media_show', ['idEB' => $idEB]);
+        }
+
+        $commentaire = new Commentaire();
+        $commentaire->setDescription($content);
+        $commentaire->setSocialMedia($socialMedia);
+        $commentaire->setUser($this->getUser());
+        $commentaire->setDateCommentaire(new \DateTimeImmutable());
+        $commentaire->setNumberlike(0);
+        $commentaire->setNumberdislike(0);
+
+        $em->persist($commentaire);
+        $em->flush();
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('commentaire/_commentaire.html.twig', [
+                'commentaire' => $commentaire
+            ]);
+        }
+
+        $this->addFlash('success', 'Commentaire ajouté avec succès !');
+        return $this->redirectToRoute('app_social_media_show', ['idEB' => $idEB]);
     }
-
-    $commentaire = new Commentaire();
-    $commentaire->setDescription($request->request->get('texte')); // Getting the comment content
-    $commentaire->setSocialMedia($socialMedia); // Link comment to the social media post
-    $commentaire->setUser($security->getUser()); // Set the current logged-in user
-    $commentaire->setNumberlike(0); // Set initial likes
-    $commentaire->setNumberdislike(0); // Set initial dislikes
-
-    $em->persist($commentaire); // Save the comment
-    $em->flush(); // Commit the transaction
-
-    return $this->redirectToRoute('app_social_media_show', ['idEB' => $idEB]); // Redirect back to the post page
-}
 
 }

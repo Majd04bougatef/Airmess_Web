@@ -1,0 +1,17 @@
+<div class="comment-item mb-3">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+                {% if commentaire.user.imagesU %}
+                    <img src="{{ asset('uploads/' ~ commentaire.user.imagesU) }}" 
+                         class="rounded-circle me-2" width="40" height="40" alt="User image">
+                {% endif %}
+                <strong>{{ commentaire.user.name }} {{ commentaire.user.prenom }}</strong>
+            </div>
+            <p>{{ commentaire.description }}</p>
+            <small class="text-muted">
+                {{ commentaire.createdAt|date('d/m/Y H:i') }}
+            </small>
+        </div>
+    </div>
+</div>

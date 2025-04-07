@@ -1,135 +1,138 @@
+{# templates/social_media/index.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Social Media Feed{% endblock %}
 
 {% block stylesheets %}
-<style>
-    /* Main container styling (optional, base.html.twig might handle this) */
-    .feed-container {
-        /* background-color: #f8f9fa; */
-        /* padding: 2rem 0; */
-    }
+    {{ parent() }} {# Include any base styles #}
+    {# === Styles remain here === #}
+    <style>
+        /* Main container styling (optional, base.html.twig might handle this) */
+        .feed-container {
+            /* background-color: #f8f9fa; */
+            /* padding: 2rem 0; */
+        }
 
-    /* Scrollable area for posts */
-    .posts-scroll-pane {
-        max-height: 65vh; /* Adjust height as needed */
-        overflow-y: auto;
-        padding: 20px; /* Padding inside the scroll area for edge spacing */
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-        background-color: #f8f9fa; /* Slightly off-white background for the scroll pane */
-        margin-bottom: 1.5rem;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Inner shadow for depth */
-    }
+        /* Scrollable area for posts */
+        .posts-scroll-pane {
+            max-height: 65vh; /* Adjust height as needed */
+            overflow-y: auto;
+            padding: 20px; /* Padding inside the scroll area for edge spacing */
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            background-color: #f8f9fa; /* Slightly off-white background for the scroll pane */
+            margin-bottom: 1.5rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Inner shadow for depth */
+             /* Added for smooth content transition during AJAX load */
+             transition: opacity 0.3s ease-in-out;
+        }
 
-    /* Styling for individual post cards */
-    .post-card {
-        border: 1px solid #e9ecef; /* Subtle border for each card */
-        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.07); /* Slightly softer shadow */
-        /* --- INCREASED MARGIN HERE --- */
-        margin-bottom: 2.5rem; /* Further increased space between cards (adjust as needed) */
-        border-radius: 0.375rem;
-        background-color: #fff;
-    }
-     .post-card:last-child {
-        margin-bottom: 0; /* No margin on the last card inside scroll pane */
-    }
+        /* Styling for individual post cards */
+        .post-card {
+            border: 1px solid #e9ecef; /* Subtle border for each card */
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.07); /* Slightly softer shadow */
+            margin-bottom: 2.5rem; /* Increased space between cards */
+            border-radius: 0.375rem;
+            background-color: #fff;
+        }
+         .post-card:last-child {
+            margin-bottom: 0; /* No margin on the last card inside scroll pane */
+        }
 
-    .post-card .card-img-top {
-        max-height: 300px;
-        object-fit: cover;
-        border-top-left-radius: 0.375rem;
-        border-top-right-radius: 0.375rem;
-        border-bottom: 1px solid #e9ecef; /* Separator if image is present */
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-    }
+        .post-card .card-img-top {
+            max-height: 300px;
+            object-fit: cover;
+            border-top-left-radius: 0.375rem;
+            border-top-right-radius: 0.375rem;
+            border-bottom: 1px solid #e9ecef; /* Separator if image is present */
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
 
-     .post-card .card-body {
-        padding: 1.25rem;
-     }
+         .post-card .card-body {
+            padding: 1.25rem;
+         }
 
-     /* Styling for the post author */
-    .post-author {
-        display: flex;
-        align-items: center;
-        font-size: 0.9em;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.75rem; /* Space below author name */
-    }
-    .post-author i { /* Style for user icon */
-        margin-right: 0.5rem;
-        color: #6c757d;
-        font-size: 1.2em; /* Slightly larger icon */
-    }
-     /* Optional: if you link the author name */
-     .post-author a {
-         color: inherit;
-         text-decoration: none;
-     }
-      .post-author a:hover {
-          text-decoration: underline;
-      }
+         /* Styling for the post author */
+        .post-author {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.75rem; /* Space below author name */
+        }
+        .post-author i { /* Style for user icon */
+            margin-right: 0.5rem;
+            color: #6c757d;
+            font-size: 1.2em; /* Slightly larger icon */
+        }
+         /* Optional: if you link the author name */
+         .post-author a {
+             color: inherit;
+             text-decoration: none;
+         }
+          .post-author a:hover {
+              text-decoration: underline;
+          }
 
-    .post-card .card-title {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        font-size: 1.15rem; /* Slightly larger title */
-    }
+        .post-card .card-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.15rem; /* Slightly larger title */
+        }
 
-    .post-card .card-text {
-        color: #495057;
-        margin-bottom: 1rem; /* More space after content */
-        line-height: 1.6; /* Improve readability */
-    }
+        .post-card .card-text {
+            color: #495057;
+            margin-bottom: 1rem; /* More space after content */
+            line-height: 1.6; /* Improve readability */
+        }
 
-    .post-meta {
-        font-size: 0.875em;
-        color: #6c757d;
-        margin-bottom: 1rem;
-    }
-    .post-meta strong {
-        color: #495057;
-    }
-    .post-meta i { /* Style for meta icons */
-        margin-right: 0.4rem;
-        color: #6c757d;
-        width: 1em; /* Align icons roughly */
-        text-align: center;
-    }
+        .post-meta {
+            font-size: 0.875em;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        .post-meta strong {
+            color: #495057;
+        }
+        .post-meta i { /* Style for meta icons */
+            margin-right: 0.4rem;
+            color: #6c757d;
+            width: 1em; /* Align icons roughly */
+            text-align: center;
+        }
 
+        /* Container for action buttons */
+        .post-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem; /* Space between buttons */
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
 
-    /* Container for action buttons */
-    .post-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem; /* Space between buttons */
-        border-top: 1px solid #eee;
-        padding-top: 1rem;
-        margin-top: 1rem;
-    }
+         .post-actions .btn i {
+            margin-right: 0.35rem;
+         }
 
-     .post-actions .btn i {
-        margin-right: 0.35rem;
-     }
+        /* Center pagination and add post button */
+        .pagination-controls,
+        .add-post-section {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
 
-    /* Center pagination and add post button */
-    .pagination-controls,
-    .add-post-section {
-        display: flex;
-        justify-content: center;
-        margin-top: 1.5rem;
-    }
+        /* Style for the 'no posts' message */
+        .no-posts-message {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
 
-    /* Style for the 'no posts' message */
-    .no-posts-message {
-        text-align: center;
-        padding: 2rem;
-        color: #6c757d;
-    }
-
-</style>
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -137,32 +140,43 @@
 
     <h1 class="text-center mb-4">📢 Social Feed</h1>
 
-    <!-- Scrollable Pane for Posts -->
-    <div class="posts-scroll-pane">
+    <!-- Scrollable Pane for Posts - THIS is the container with the ID -->
+    <div class="posts-scroll-pane" id="posts-list">
+
+        {# === THE INCLUDE TAG HAS BEEN REMOVED === #}
+        {# === THE FOR LOOP IS NOW DIRECTLY HERE === #}
         {% for post in pagination %}
             <div class="card post-card">
                 {# Image (if exists) #}
                 {% if post.imagemedia %}
-                    <img src="{{ asset('uploads/' ~ post.imagemedia) }}" class="card-img-top" alt="Image de la publication : {{ post.titre }}">
+                    {% set imagePath = 'uploads/' ~ post.imagemedia %}
+                    <img src="{{ asset(imagePath) }}" class="card-img-top" alt="Image de la publication : {{ post.titre | default('') }}">
                 {% endif %}
 
                 <div class="card-body">
-                    {# === CORRECTED Post Author Display === #}
+                    {# Post Author Display #}
                     <div class="post-author">
-                         <i class="fas fa-user-circle"></i> {# Requires Font Awesome #}
-                         {# Combines prenom and name from the User entity #}
-                         <span>{{ (post.user.prenom ~ ' ' ~ post.user.name) | default('Utilisateur inconnu') }}</span>
+                         <i class="fas fa-user-circle"></i>
+                         <span>
+                             {% if post.user is defined and post.user is not null %}
+                                 {{ (post.user.prenom | default('') ~ ' ' ~ post.user.name | default('')) | trim | default('Utilisateur inconnu') }}
+                             {% else %}
+                                 Utilisateur inconnu
+                             {% endif %}
+                         </span>
                     </div>
 
                     {# Post Title #}
-                    <h5 class="card-title">{{ post.titre }}</h5>
+                    <h5 class="card-title">{{ post.titre | default('Sans titre') }}</h5>
 
-                    {# Post Content - Added nl2br filter #}
-                    <p class="card-text">{{ post.contenu | nl2br }}</p>
+                    {# Post Content #}
+                    <p class="card-text">{{ post.contenu | default('') | nl2br }}</p>
 
-                    {# Post Metadata - Added icons #}
+                    {# Post Metadata #}
                     <div class="post-meta">
-                        <div><strong><i class="fas fa-map-marker-alt"></i> Lieu:</strong> {{ post.lieu | default('Non spécifié') }}</div>
+                        {% if post.lieu %}
+                            <div><strong><i class="fas fa-map-marker-alt"></i> Lieu:</strong> {{ post.lieu }}</div>
+                        {% endif %}
                         <div><strong><i class="fas fa-calendar-alt"></i> Publié le:</strong> {{ post.publicationDate ? post.publicationDate|date('d M Y, H:i') : 'Date inconnue' }}</div>
                     </div>
 
@@ -171,30 +185,36 @@
                         <a href="{{ path('app_social_media_show', {'idEB': post.idEB}) }}" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-eye"></i> Voir
                         </a>
-                        <button class="btn btn-outline-success btn-sm">
+                        <button class="btn btn-outline-success btn-sm like-button" data-post-id="{{ post.idEB }}">
                              <i class="fas fa-thumbs-up"></i> J'aime
                         </button>
-                        <button class="btn btn-outline-info btn-sm">
+                        <button class="btn btn-outline-info btn-sm comment-button" data-post-id="{{ post.idEB }}">
                              <i class="fas fa-comment"></i> Commenter
                         </button>
-                        {# Delete Form - Pushed to the right #}
-                        <form method="post" action="{{ path('app_social_media_delete', {'idEB': post.idEB}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette publication ?');" class="ms-auto">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.idEB) }}">
-                            <button type="submit" class="btn btn-outline-danger btn-sm">
-                                 <i class="fas fa-trash-alt"></i> Supprimer
-                            </button>
-                        </form>
+
+                        {# Delete Form #}
+                        {% if is_granted('POST_DELETE', post) or (app.user and app.user == post.user) %}
+                            <form method="post" action="{{ path('app_social_media_delete', {'idEB': post.idEB}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette publication ?');" class="ms-auto d-inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.idEB) }}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                     <i class="fas fa-trash-alt"></i> Supprimer
+                                </button>
+                            </form>
+                        {% endif %}
                     </div> {# End post-actions #}
                 </div> {# End card-body #}
             </div> {# End post-card #}
         {% else %}
+            {# Message shown if 'pagination' is empty #}
             <p class="no-posts-message">Aucune publication trouvée pour le moment.</p>
         {% endfor %}
+        {# === END OF POST LOOP === #}
+
     </div> {# End posts-scroll-pane #}
 
-    <!-- Pagination - Only shown if needed -->
+    <!-- Pagination - Only shown if needed - ADDED ID -->
     {% if pagination.getTotalItemCount > 0 and pagination.pageCount > 1 %}
-    <div class="pagination-controls">
+    <div class="pagination-controls" id="pagination-controls">
         {{ knp_pagination_render(pagination) }}
     </div>
     {% endif %}
@@ -207,4 +227,83 @@
     </div>
 
 </div> {# End container #}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }} {# Include JS from base.html.twig if any #}
+    {# === ROBUST AJAX JAVASCRIPT (Same as before) === #}
+    <script>
+        function handlePaginationClick(event) {
+            event.preventDefault(); // Prevent default link navigation
+            const url = event.currentTarget.getAttribute('href');
+            const postsContainer = document.getElementById('posts-list'); // Target the container
+            const paginationContainer = document.getElementById('pagination-controls');
+
+            if (!postsContainer || !paginationContainer) {
+                console.error('Error: Could not find posts or pagination container elements.');
+                return;
+            }
+
+            // Optional: Show loading state
+            postsContainer.style.opacity = '0.5';
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }}) // Identify as AJAX
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text(); // Fetch the FULL HTML of the next page
+                })
+                .then(html => {
+                    // Use DOMParser to safely parse the fetched FULL HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Find the NEW content container within the parsed HTML document
+                    const newPostsContentElement = doc.getElementById('posts-list');
+                    const newPaginationContentElement = doc.getElementById('pagination-controls');
+
+                    // Update the current page's container's INNER HTML
+                    if (newPostsContentElement) {
+                        postsContainer.innerHTML = newPostsContentElement.innerHTML; // Replace content
+                        postsContainer.scrollTop = 0; // Scroll to top
+                    } else {
+                        console.error('Could not find #posts-list content in fetched data.');
+                         postsContainer.innerHTML = '<p class="no-posts-message text-danger">Error loading posts content.</p>';
+                    }
+
+                    if (newPaginationContentElement) {
+                        paginationContainer.innerHTML = newPaginationContentElement.innerHTML; // Replace pagination
+                    } else {
+                        paginationContainer.innerHTML = ''; // Clear pagination if not found
+                         console.warn('Could not find #pagination-controls content in fetched data.');
+                    }
+
+                    // Re-attach event listeners to the *new* pagination links
+                    attachPaginationListeners();
+
+                })
+                .catch(error => {
+                    console.error('Error fetching posts:', error);
+                    postsContainer.innerHTML = `<p class="no-posts-message text-danger">Failed to load content: ${error.message}</p>`;
+                })
+                .finally(() => {
+                    // Optional: Remove loading state
+                    postsContainer.style.opacity = '1';
+                });
+        }
+
+        function attachPaginationListeners() {
+            const paginationLinks = document.querySelectorAll('#pagination-controls a');
+            paginationLinks.forEach(link => {
+                link.removeEventListener('click', handlePaginationClick);
+                link.addEventListener('click', handlePaginationClick);
+            });
+        }
+
+        // Initial attachment of listeners when the page fully loads
+        document.addEventListener('DOMContentLoaded', function() {
+            attachPaginationListeners();
+        });
+    </script>
 {% endblock %}

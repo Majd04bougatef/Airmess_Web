@@ -15,18 +15,12 @@ class CommentaireType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('description')
-            ->add('numberlike')
-            ->add('numberdislike')
-            ->add('proposedDescription')
-            ->add('isApproved')
-            ->add('socialMedia', EntityType::class, [
-                'class' => SocialMedia::class,
-'choice_label' => 'id',
-            ])
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-'choice_label' => 'id',
+            ->add('description', null, [
+                'label' => 'Votre commentaire',
+                'attr' => [
+                    'placeholder' => 'Écrivez votre commentaire ici...',
+                    'rows' => 3
+                ]
             ])
         ;
     }

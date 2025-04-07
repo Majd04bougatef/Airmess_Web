@@ -1,113 +1,191 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ social_media.titre }} - Publication{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }} {# Inclure les styles de base.html.twig #}
-    {# Assurez-vous que Font Awesome est chargé (via base.html.twig ou décommentez la ligne ci-dessous) #}
-    {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> #}
-    <style>
-        /* Styles pour les avatars */
-        .avatar-sm { width: 40px; height: 40px; object-fit: cover; border: 1px solid #eee; }
-        .comment-avatar { width: 32px; height: 32px; object-fit: cover; border: 1px solid #eee; }
-        /* Ajustement des images dans la publication */
-        .post-image-container img { max-height: 500px; width: 100%; object-fit: contain; background-color: #f8f9fa; border-radius: 0.25rem; border: 1px solid #dee2e6; }
-        /* Style du formulaire de commentaire */
-        .comment-form .form-control { border-radius: 1.5rem; padding-left: 1.25rem; }
-        .comment-form .btn { border-radius: 1.5rem; }
-        /* Style des boutons d'action sous la publication */
-        .post-actions .btn { flex-grow: 1; margin: 0 2px; }
-        /* Style des boutons admin (modifier/supprimer) */
-        .admin-actions .btn { margin-left: 5px; }
-        /* Style des bulles de commentaires */
-        .comment-card { background-color: #f0f2f5; border: none; border-radius: 1rem; padding: 0.75rem 1rem; word-wrap: break-word; }
-        .comment-text { display: block; margin-top: 0.25rem; }
-    </style>
-{% endblock %}
+{% block title %}{{ social_media.getTitre() }} - Détails{% endblock %}
 
 {% block body %}
-<div class="container feed-container mt-4 mb-4">
+<div class="container mt-4">
+    {# --- Post Display --- #}
+    <article class="card shadow-sm mb-4">
+        <div class="card-body">
+            {# Post Header: Title, Author, Date #}
+            <header class="mb-3 pb-3 border-bottom">
+                <h1 class="card-title">{{ social_media.getTitre() }}</h1>
+                <p class="card-subtitle text-muted">
+                    Publié par
+                    {% if social_media.getUser() %}
+                        {# Display user's full name #}
+                        <strong>{{ social_media.getUser().getPrenom() }} {{ social_media.getUser().getName() }}</strong>
+                    {% else %}
+                        <em>Utilisateur inconnu</em>
+                    {% endif %}
+                    le {{ social_media.getPublicationDate()|date('d/m/Y à H:i') }}
+                </p>
+            </header>
 
-    <h1 class="text-center mb-4">📢 Social Feed</h1>
-
-    <!-- Scrollable Pane for Posts -->
-    <div class="posts-scroll-pane" id="posts-list">
-        {% for post in pagination %}
-            <div class="card post-card">
-                {% if post.imagemedia %}
-                    <img src="{{ asset('uploads/' ~ post.imagemedia) }}" class="card-img-top" alt="Image de la publication : {{ post.titre }}">
-                {% endif %}
-
-                <div class="card-body">
-                    <div class="post-author">
-                         <i class="fas fa-user-circle"></i>
-                         <span>{{ (post.user.prenom ~ ' ' ~ post.user.name) | default('Utilisateur inconnu') }}</span>
-                    </div>
-                    <h5 class="card-title">{{ post.titre }}</h5>
-                    <p class="card-text">{{ post.contenu | nl2br }}</p>
-                    <div class="post-meta">
-                        <div><strong><i class="fas fa-map-marker-alt"></i> Lieu:</strong> {{ post.lieu | default('Non spécifié') }}</div>
-                        <div><strong><i class="fas fa-calendar-alt"></i> Publié le:</strong> {{ post.publicationDate ? post.publicationDate|date('d M Y, H:i') : 'Date inconnue' }}</div>
-                    </div>
-                    <div class="post-actions">
-                        <a href="{{ path('app_social_media_show', {'idEB': post.idEB}) }}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-eye"></i> Voir
-                        </a>
-                        <button class="btn btn-outline-success btn-sm">
-                             <i class="fas fa-thumbs-up"></i> J'aime
-                        </button>
-                        <button class="btn btn-outline-info btn-sm">
-                             <i class="fas fa-comment"></i> Commenter
-                        </button>
-                        <form method="post" action="{{ path('app_social_media_delete', {'idEB': post.idEB}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette publication ?');" class="ms-auto">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.idEB) }}">
-                            <button type="submit" class="btn btn-outline-danger btn-sm">
-                                 <i class="fas fa-trash-alt"></i> Supprimer
-                            </button>
-                        </form>
-                    </div>
+            {# Post Image #}
+            {% if social_media.getImagemedia() %}
+                <div class="text-center mb-3">
+                    {# Ensure 'uploads/' matches your public path to the uploads dir #}
+                    <img src="{{ asset('uploads/' ~ social_media.getImagemedia()) }}"
+                         alt="Image pour {{ social_media.getTitre() }}"
+                         class="img-fluid rounded"
+                         style="max-height: 500px; object-fit: cover;"> {# Optional: constrain image size #}
                 </div>
+            {% endif %}
+
+            {# Post Content #}
+            <div class="card-text post-content mb-4">
+                {# Use nl2br to respect line breaks #}
+                <p>{{ social_media.getContenu()|nl2br }}</p>
             </div>
-        {% else %}
-            <p class="no-posts-message">Aucune publication trouvée pour le moment.</p>
-        {% endfor %}
-    </div>
 
-    <!-- Pagination - With AJAX -->
-    {% if pagination.getTotalItemCount > 0 and pagination.pageCount > 1 %}
-        <div class="pagination-controls" id="pagination-controls">
-            {{ knp_pagination_render(pagination) }}
-        </div>
-    {% endif %}
+            {# Like/Dislike Buttons (Placeholder - Requires specific controller actions/JS) #}
+            <div class="mb-3">
+                <button class="btn btn-outline-success btn-sm me-2" disabled> {# Disabled until logic is added #}
+                    <i class="bi bi-hand-thumbs-up"></i> J'aime ({{ social_media.getLikee() }})
+                </button>
+                <button class="btn btn-outline-danger btn-sm" disabled> {# Disabled until logic is added #}
+                    <i class="bi bi-hand-thumbs-down"></i> Je n'aime pas ({{ social_media.getDislike() }})
+                </button>
+            </div>
 
-    <div class="add-post-section">
-        <a href="{{ path('app_social_media_new') }}" class="btn btn-success btn-lg">
-             <i class="fas fa-plus-circle"></i> Ajouter une publication
+            {# Action Buttons: Edit / Delete - Visible only if post belongs to default user ID #}
+{% if social_media.getUser() and social_media.getUser().getIdU() == default_user_id %} {# default_user_id passed from controller #}
+    <div class="actions border-top pt-3">
+        <a href="{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}" class="btn btn-sm btn-primary me-2">
+            <i class="bi bi-pencil-square"></i> Éditer
         </a>
+        {# Delete Form with CSRF protection #}
+        <form action="{{ path('app_social_media_delete', {idEB: social_media.idEB}) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
+            <button type="submit" class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i> Supprimer
+            </button>
+        </form>
     </div>
+{% endif %}
+        </div> {# End card-body for post #}
+    </article> {# End post article #}
 
-</div>
+    {# --- Comments Section --- #}
+    <section id="comments" class="mt-5">
+        <h2 class="mb-4">Commentaires</h2>
 
-<script>
-    // AJAX Pagination
-    document.querySelectorAll('.pagination-controls a').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent the default link action
-            var url = link.getAttribute('href');
-            
-            // Make the AJAX request
-            fetch(url)
-                .then(response => response.text())
-                .then(data => {
-                    // Update the posts section with the new content
-                    document.getElementById('posts-list').innerHTML = data.match(/<div class="posts-scroll-pane">([\s\S]+)<\/div>/)[1];
+        {# Add Comment Form - Shown directly as user is assumed logged in #}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                 <h5 class="card-title mb-3">Laisser un commentaire</h5>
+                 {# Render the form passed from the controller (comment_form) #}
+                 {{ form_start(comment_form, {'attr': {'class': 'add-comment-form'}}) }}
+                     <div class="mb-3">
+                        {# Make sure 'description' is the correct field name in CommentaireType #}
+                        {# CORRECTED form_row call #}
+                        {{ form_row(comment_form.description, {
+                            'label': 'Votre commentaire',
+                            'label_attr': {
+                                'class': 'form-label'
+                             },
+                            'attr': {
+                                'rows': 4,
+                                'placeholder': 'Écrivez votre commentaire ici...',
+                                'class': 'form-control'
+                            }
+                        }) }}
+                     </div>
 
-                    // Update the pagination controls
-                    document.getElementById('pagination-controls').innerHTML = data.match(/<div class="pagination-controls">([\s\S]+)<\/div>/)[1];
-                })
-                .catch(error => console.error('Error fetching posts:', error));
-        });
-    });
-</script>
+                     {# Render submit button if defined in form type #}
+                     {% if comment_form.submit is defined %}
+                         {{ form_widget(comment_form.submit, {'label': 'Envoyer le commentaire', 'attr': {'class': 'btn btn-success'}} ) }}
+                     {% else %}
+                        {# Default submit button if not defined in CommentaireType #}
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-send"></i> Envoyer le commentaire
+                        </button>
+                     {% endif %}
+                {{ form_end(comment_form) }}
+            </div> {# End card-body for comment form #}
+        </div> {# End add comment card #}
 
+
+        {# List Existing Comments - Uses the paginated 'comments' variable #}
+        <div id="comments-list">
+            {% if comments is defined and comments|length > 0 %}
+                {% for commentaire in comments %} {# Iterate over the paginated results #}
+                    <div class="card mb-3 comment-card">
+                        <div class="card-body">
+                             <p class="card-text">{{ commentaire.getDescription()|nl2br }}</p>
+                             <footer class="blockquote-footer mt-2">
+                                Par
+                                {% if commentaire.getUser() %}
+                                    {# Display comment author's full name #}
+                                    <strong>{{ commentaire.getUser().getPrenom() }} {{ commentaire.getUser().getName() }}</strong>
+                                {% else %}
+                                    <em>Utilisateur inconnu</em>
+                                {% endif %}
+                                {# Display comment creation date if available #}
+                                
+                             </footer>
+                             {# Optional: Placeholder for comment actions like like/dislike/reply #}
+                             {#
+                             <div class="comment-actions mt-2">
+                                <button class="btn btn-sm btn-outline-secondary me-1">Like</button>
+                                <button class="btn btn-sm btn-outline-secondary">Reply</button>
+                             </div>
+                             #}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {# Pagination Links - Rendered by KnpPaginatorBundle #}
+                <div class="navigation d-flex justify-content-center mt-4">
+                    {{ knp_pagination_render(comments) }}
+                </div>
+
+            {% else %}
+                {# Message shown when there are no comments #}
+                <div class="alert alert-secondary text-center" role="alert">
+                   <i class="bi bi-chat-dots"></i> Il n'y a pas encore de commentaires. Soyez le premier à réagir !
+                </div>
+            {% endif %}
+        </div> {# End comments-list #}
+
+    </section> {# End comments section #}
+
+</div> {# End container #}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {# Add any specific JavaScript for this page here if needed #}
+    {# e.g., for handling like/dislike buttons via AJAX #}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {# You can include a specific CSS file or add inline styles #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"> {# Example: Include Bootstrap Icons #}
+    <style>
+        .post-content p {
+            line-height: 1.6;
+            white-space: pre-wrap; /* Respect line breaks and wrap text */
+        }
+        .comment-card {
+            border-left: 3px solid #0d6efd; /* Example accent border */
+            background-color: #f8f9fa; /* Slightly off-white background */
+        }
+        .comment-card .card-body {
+            padding: 1rem;
+        }
+        .blockquote-footer {
+            font-size: 0.85em;
+        }
+        .actions .btn, .actions form {
+            margin-bottom: 0.5rem; /* Spacing for buttons on small screens */
+        }
+        /* Ensure images don't exceed container width */
+        .img-fluid {
+          max-width: 100%;
+          height: auto;
+        }
+    </style>
 {% endblock %}
