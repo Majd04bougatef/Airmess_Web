@@ -1,191 +1,288 @@
-{% extends 'base.html.twig' %}
+{# Fichier : templates/social_media/show.html.twig #}
+{% extends 'base.html.twig' %} {# Hérite de votre base partagée #}
 
+{# Définit le titre de la page (sera inséré dans le block title de la base) #}
 {% block title %}{{ social_media.getTitre() }} - Détails{% endblock %}
 
+{# Ce bloc REMPLACE le contenu du block body de base.html.twig #}
 {% block body %}
-<div class="container mt-4">
-    {# --- Post Display --- #}
-    <article class="card shadow-sm mb-4">
-        <div class="card-body">
-            {# Post Header: Title, Author, Date #}
-            <header class="mb-3 pb-3 border-bottom">
-                <h1 class="card-title">{{ social_media.getTitre() }}</h1>
-                <p class="card-subtitle text-muted">
-                    Publié par
-                    {% if social_media.getUser() %}
-                        {# Display user's full name #}
-                        <strong>{{ social_media.getUser().getPrenom() }} {{ social_media.getUser().getName() }}</strong>
-                    {% else %}
-                        <em>Utilisateur inconnu</em>
-                    {% endif %}
-                    le {{ social_media.getPublicationDate()|date('d/m/Y à H:i') }}
-                </p>
-            </header>
+<div class="container mt-4 mb-5"> {# Ajout de marges pour l'espacement #}
+    <div class="row justify-content-center">
+        <div class="col-lg-8"> {# Limite la largeur pour la lisibilité #}
 
-            {# Post Image #}
-            {% if social_media.getImagemedia() %}
-                <div class="text-center mb-3">
-                    {# Ensure 'uploads/' matches your public path to the uploads dir #}
-                    <img src="{{ asset('uploads/' ~ social_media.getImagemedia()) }}"
-                         alt="Image pour {{ social_media.getTitre() }}"
-                         class="img-fluid rounded"
-                         style="max-height: 500px; object-fit: cover;"> {# Optional: constrain image size #}
-                </div>
-            {% endif %}
-
-            {# Post Content #}
-            <div class="card-text post-content mb-4">
-                {# Use nl2br to respect line breaks #}
-                <p>{{ social_media.getContenu()|nl2br }}</p>
-            </div>
-
-            {# Like/Dislike Buttons (Placeholder - Requires specific controller actions/JS) #}
-            <div class="mb-3">
-                <button class="btn btn-outline-success btn-sm me-2" disabled> {# Disabled until logic is added #}
-                    <i class="bi bi-hand-thumbs-up"></i> J'aime ({{ social_media.getLikee() }})
-                </button>
-                <button class="btn btn-outline-danger btn-sm" disabled> {# Disabled until logic is added #}
-                    <i class="bi bi-hand-thumbs-down"></i> Je n'aime pas ({{ social_media.getDislike() }})
-                </button>
-            </div>
-
-            {# Action Buttons: Edit / Delete - Visible only if post belongs to default user ID #}
-{% if social_media.getUser() and social_media.getUser().getIdU() == default_user_id %} {# default_user_id passed from controller #}
-    <div class="actions border-top pt-3">
-        <a href="{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}" class="btn btn-sm btn-primary me-2">
-            <i class="bi bi-pencil-square"></i> Éditer
-        </a>
-        {# Delete Form with CSRF protection #}
-        <form action="{{ path('app_social_media_delete', {idEB: social_media.idEB}) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
-            <button type="submit" class="btn btn-sm btn-danger">
-                <i class="bi bi-trash"></i> Supprimer
-            </button>
-        </form>
-    </div>
-{% endif %}
-        </div> {# End card-body for post #}
-    </article> {# End post article #}
-
-    {# --- Comments Section --- #}
-    <section id="comments" class="mt-5">
-        <h2 class="mb-4">Commentaires</h2>
-
-        {# Add Comment Form - Shown directly as user is assumed logged in #}
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                 <h5 class="card-title mb-3">Laisser un commentaire</h5>
-                 {# Render the form passed from the controller (comment_form) #}
-                 {{ form_start(comment_form, {'attr': {'class': 'add-comment-form'}}) }}
-                     <div class="mb-3">
-                        {# Make sure 'description' is the correct field name in CommentaireType #}
-                        {# CORRECTED form_row call #}
-                        {{ form_row(comment_form.description, {
-                            'label': 'Votre commentaire',
-                            'label_attr': {
-                                'class': 'form-label'
-                             },
-                            'attr': {
-                                'rows': 4,
-                                'placeholder': 'Écrivez votre commentaire ici...',
-                                'class': 'form-control'
-                            }
-                        }) }}
-                     </div>
-
-                     {# Render submit button if defined in form type #}
-                     {% if comment_form.submit is defined %}
-                         {{ form_widget(comment_form.submit, {'label': 'Envoyer le commentaire', 'attr': {'class': 'btn btn-success'}} ) }}
-                     {% else %}
-                        {# Default submit button if not defined in CommentaireType #}
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-send"></i> Envoyer le commentaire
-                        </button>
-                     {% endif %}
-                {{ form_end(comment_form) }}
-            </div> {# End card-body for comment form #}
-        </div> {# End add comment card #}
-
-
-        {# List Existing Comments - Uses the paginated 'comments' variable #}
-        <div id="comments-list">
-            {% if comments is defined and comments|length > 0 %}
-                {% for commentaire in comments %} {# Iterate over the paginated results #}
-                    <div class="card mb-3 comment-card">
-                        <div class="card-body">
-                             <p class="card-text">{{ commentaire.getDescription()|nl2br }}</p>
-                             <footer class="blockquote-footer mt-2">
-                                Par
-                                {% if commentaire.getUser() %}
-                                    {# Display comment author's full name #}
-                                    <strong>{{ commentaire.getUser().getPrenom() }} {{ commentaire.getUser().getName() }}</strong>
+            {# --- Carte Principale du Post --- #}
+            <article class="card shadow-sm mb-4 post-card">
+                <div class="card-body">
+                    {# En-tête du Post avec Image Auteur #}
+                    <header class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                        {% set post_author = social_media.getUser() %}
+                        <div class="me-3 flex-shrink-0"> {# Marge et empêche le rétrécissement #}
+                            <img src="{{ post_author and post_author.getImagesU() ? asset('uploads/profile_pictures/' ~ post_author.getImagesU()) : asset('images/placeholder-avatar.png') }}" {# Placeholder si pas d'image #}
+                                 alt="{{ post_author ? post_author.getPrenom() : 'Utilisateur' }}"
+                                 class="rounded-circle post-author-img">
+                        </div>
+                        <div class="flex-grow-1"> {# Prend l'espace restant #}
+                            <h5 class="mb-0 card-title">
+                                {% if post_author %}
+                                    <strong>{{ post_author.getPrenom() }} {{ post_author.getName() }}</strong>
                                 {% else %}
                                     <em>Utilisateur inconnu</em>
                                 {% endif %}
-                                {# Display comment creation date if available #}
-                                
-                             </footer>
-                             {# Optional: Placeholder for comment actions like like/dislike/reply #}
-                             {#
-                             <div class="comment-actions mt-2">
-                                <button class="btn btn-sm btn-outline-secondary me-1">Like</button>
-                                <button class="btn btn-sm btn-outline-secondary">Reply</button>
-                             </div>
-                             #}
+                            </h5>
+                            <small class="text-muted card-subtitle">
+                                Publié le {{ social_media.getPublicationDate()|date('d/m/Y à H:i') }}
+                            </small>
+                        </div>
+                        {# Boutons Actions (Modifier/Supprimer) en Dropdown #}
+                        {% if post_author and post_author.getIdU() == default_user_id %} {# Condition basée sur l'ID utilisateur par défaut propriétaire #}
+                            <div class="dropdown ms-auto"> {# ms-auto pousse vers la droite #}
+                                <button class="btn btn-light btn-sm" type="button" id="postActionsDropdown{{ social_media.idEB }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="postActionsDropdown{{ social_media.idEB }}">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}">
+                                            <i class="bi bi-pencil-square me-2"></i>Éditer
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        {# Formulaire pour Supprimer (POST + CSRF) #}
+                                        <form action="{{ path('app_social_media_delete', {idEB: social_media.idEB}) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-trash me-2"></i>Supprimer
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </header>
+
+                    {# Contenu du Post #}
+                    <div class="card-text post-content mb-3">
+                        <p>{{ social_media.getContenu()|nl2br }}</p>
+                    </div>
+
+                    {# Image du Post #}
+                    {% if social_media.getImagemedia() %}
+                        <div class="mb-3 post-image-container text-center"> {# Centrer l'image #}
+                            <img src="{{ asset('uploads/' ~ social_media.getImagemedia()) }}" {# Assurez-vous que 'uploads/' est le bon chemin public #}
+                                 alt="Image pour {{ social_media.getTitre() }}"
+                                 class="img-fluid rounded">
+                        </div>
+                    {% endif %}
+
+                    {# Barre J'aime/Je n'aime pas/Commenter #}
+                    <div class="post-actions border-top pt-2 text-center">
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-light w-100" disabled> {# Désactivé pour l'instant #}
+                                    <i class="bi bi-hand-thumbs-up"></i> J'aime ({{ social_media.getLikee() }})
+                                </button>
+                            </div>
+                            <div class="col">
+                                 <button class="btn btn-light w-100" disabled> {# Désactivé pour l'instant #}
+                                     <i class="bi bi-hand-thumbs-down"></i> Je n'aime pas ({{ social_media.getDislike() }})
+                                 </button>
+                            </div>
+                             <div class="col">
+                                <a href="#comments" class="btn btn-light w-100"> {# Lien ancre vers la section commentaires #}
+                                    <i class="bi bi-chat-dots"></i> Commenter
+                                </a>
+                            </div>
                         </div>
                     </div>
-                {% endfor %}
 
-                {# Pagination Links - Rendered by KnpPaginatorBundle #}
-                <div class="navigation d-flex justify-content-center mt-4">
-                    {{ knp_pagination_render(comments) }}
-                </div>
+                </div> {# Fin card-body post #}
+            </article> {# Fin article post #}
 
-            {% else %}
-                {# Message shown when there are no comments #}
-                <div class="alert alert-secondary text-center" role="alert">
-                   <i class="bi bi-chat-dots"></i> Il n'y a pas encore de commentaires. Soyez le premier à réagir !
-                </div>
-            {% endif %}
-        </div> {# End comments-list #}
+            {# --- Section Commentaires --- #}
+            <section id="comments" class="mt-4">
+                <h3 class="mb-3">Commentaires</h3>
 
-    </section> {# End comments section #}
+                {# Formulaire Ajout Commentaire #}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body add-comment-section">
+                         {% set commenter_image = asset('images/placeholder-avatar.png') %} {# Placeholder - TODO: Améliorer si possible #}
+                         <div class="d-flex align-items-start">
+                             <img src="{{ commenter_image }}" alt="Votre avatar" class="rounded-circle comment-author-img me-3">
+                             <div class="flex-grow-1">
+                                {# Rendu simplifié du formulaire #}
+                                <form name="{{ comment_form.vars.name }}" method="{{ comment_form.vars.method }}" action="{{ comment_form.vars.action }}" class="add-comment-form">
+                                    <div class="mb-2">
+                                        {{ form_widget(comment_form.description, {'attr': {'rows': 2, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control form-control-sm'}}) }}
+                                        {{ form_errors(comment_form.description) }} {# Afficher les erreurs pour ce champ #}
+                                    </div>
+                                    <div class="text-end">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-send"></i> Publier
+                                        </button>
+                                    </div>
+                                    {{ form_rest(comment_form) }} {# Important pour le CSRF token et autres champs cachés #}
+                                </form>
+                             </div>
+                         </div>
+                    </div> {# Fin card-body form #}
+                </div> {# Fin card form #}
 
-</div> {# End container #}
+
+                {# Liste des Commentaires Existants #}
+                <div id="comments-list">
+                    {% if comments is defined and comments|length > 0 %}
+                        {% for commentaire in comments %} {# Itération sur les commentaires paginés #}
+                            {% set comment_author = commentaire.getUser() %}
+                            <div class="d-flex align-items-start mb-3 comment-entry">
+                                 {# Image Auteur Commentaire #}
+                                <div class="me-3 flex-shrink-0">
+                                    <img src="{{ comment_author and comment_author.getImagesU() ? asset('uploads/profile_pictures/' ~ comment_author.getImagesU()) : asset('images/placeholder-avatar.png') }}"
+                                         alt="{{ comment_author ? comment_author.getPrenom() : 'Avatar' }}"
+                                         class="rounded-circle comment-author-img">
+                                </div>
+                                 {# Bulle Commentaire #}
+                                <div class="flex-grow-1">
+                                    <div class="comment-bubble p-2 rounded">
+                                        <strong>
+                                            {% if comment_author %}
+                                                {{ comment_author.getPrenom() }} {{ comment_author.getName() }}
+                                            {% else %}
+                                                Utilisateur inconnu
+                                            {% endif %}
+                                        </strong>
+                                        <p class="mb-0 comment-text">{{ commentaire.getDescription()|nl2br }}</p>
+                                    </div>
+                                    {# Meta Données Commentaire #}
+                                    <div class="comment-meta mt-1">
+                                        <small class="text-muted">
+                                            {# Afficher l'ID en attendant createdAt #}
+                                            ID: {{ commentaire.idC }} {# TODO: Remplacer par la date quand elle existera #}
+                                        </small>
+                                        {# Liens actions commentaire (placeholders) #}
+                                        <a href="#" class="text-muted small ms-2 comment-action-link">J'aime</a>
+                                        <span class="text-muted small">·</span>
+                                        <a href="#" class="text-muted small comment-action-link">Répondre</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        {# Liens Pagination #}
+                        <div class="navigation d-flex justify-content-center mt-4">
+                            {{ knp_pagination_render(comments) }}
+                        </div>
+
+                    {% else %}
+                        {# Message si pas de commentaires #}
+                        <div class="alert alert-light text-center border" role="alert">
+                           <small class="text-muted"> Il n'y a pas encore de commentaires.</small>
+                        </div>
+                    {% endif %}
+                </div> {# Fin comments-list #}
+
+            </section> {# Fin section commentaires #}
+
+        </div> {# Fin col-lg-8 #}
+    </div> {# Fin row #}
+</div> {# Fin container #}
+{% endblock %} {# Fin block body #}
+
+
+{# Utilise le nom de bloc JS de la base #}
+{% block js %}
+    {{ parent() }} {# Inclut les JS définis dans le bloc 'js' de base.html.twig #}
+    {# Ajoutez ici des scripts JS spécifiques à cette page si nécessaire #}
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {# Add any specific JavaScript for this page here if needed #}
-    {# e.g., for handling like/dislike buttons via AJAX #}
-{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {# You can include a specific CSS file or add inline styles #}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"> {# Example: Include Bootstrap Icons #}
+{# Utilise le nom de bloc CSS de la base #}
+{% block css %}
+    {{ parent() }} {# Inclut les CSS définis dans le bloc 'css' de base.html.twig #}
+    {# Styles CSS spécifiques à cette page #}
     <style>
+        .post-card .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.1rem;
+        }
+        .post-author-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover; /* Assure que l'image couvre la zone sans déformation */
+        }
+        .comment-author-img {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+        }
         .post-content p {
             line-height: 1.6;
-            white-space: pre-wrap; /* Respect line breaks and wrap text */
+            white-space: pre-wrap; /* Respecte les retours à la ligne et les espaces */
+            font-size: 1rem;
         }
-        .comment-card {
-            border-left: 3px solid #0d6efd; /* Example accent border */
-            background-color: #f8f9fa; /* Slightly off-white background */
+        .post-image-container img {
+            max-width: 100%;
+            height: auto; /* Garde les proportions */
         }
-        .comment-card .card-body {
-            padding: 1rem;
+        .post-actions .btn {
+            font-size: 0.9rem;
+            color: #606770; /* Couleur de texte type gris Facebook */
+            font-weight: 500;
         }
-        .blockquote-footer {
-            font-size: 0.85em;
+        .post-actions .btn:hover {
+            background-color: #f0f2f5; /* Hover léger gris */
         }
-        .actions .btn, .actions form {
-            margin-bottom: 0.5rem; /* Spacing for buttons on small screens */
+        .add-comment-section textarea {
+             background-color: #f0f2f5; /* Fond gris clair type Facebook */
+             border: none; /* Pas de bordure */
+             border-radius: 18px; /* Très arrondi */
+             padding: 8px 12px;
+             line-height: 1.3; /* Ajuster la hauteur de ligne */
         }
-        /* Ensure images don't exceed container width */
-        .img-fluid {
-          max-width: 100%;
-          height: auto;
+        .add-comment-section textarea:focus {
+             background-color: #e4e6eb; /* Un peu plus foncé au focus */
+             box-shadow: none; /* Pas d'ombre au focus */
         }
+        .comment-entry {
+            /* Espacement entre les commentaires si nécessaire */
+        }
+        .comment-bubble {
+            background-color: #f0f2f5; /* Fond gris clair */
+            display: inline-block; /* S'adapte au contenu */
+            padding: 8px 12px;
+            border-radius: 18px; /* Très arrondi */
+            word-wrap: break-word; /* Coupe les mots longs */
+            font-size: 0.9rem;
+        }
+        .comment-bubble strong {
+            font-size: 0.85rem;
+            display: block; /* Nom sur sa propre ligne */
+            margin-bottom: 2px;
+            color: #050505; /* Noir léger pour le nom */
+        }
+        .comment-text {
+             margin: 0;
+             color: #050505; /* Noir léger pour le texte */
+         }
+        .comment-meta {
+             font-size: 0.75rem;
+             padding-left: 12px; /* Aligné un peu avec la bulle */
+             margin-top: 4px; /* Petit espace après la bulle */
+             color: #606770;
+         }
+        .comment-action-link {
+             text-decoration: none;
+             font-weight: 600;
+             color: #606770; /* Gris pour les liens */
+         }
+        .comment-action-link:hover {
+             text-decoration: underline;
+         }
+         /* Assurer que le container a de l'espace par rapport au header fixed-top */
+         body {
+             padding-top: 70px; /* Ajustez cette valeur si la hauteur de votre header est différente */
+         }
+         main.main-content { /* Cible le main ajouté dans la proposition de base.html.twig */
+            padding-top: 1rem; /* Espace supplémentaire si nécessaire */
+         }
     </style>
 {% endblock %}
