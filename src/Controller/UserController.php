@@ -106,7 +106,7 @@ final class UserController extends AbstractController
         $this->addFlash('success', 'Registration successful! You can now login.');
 
         // Redirect to login page 
-        return $this->redirectToRoute('app_login');
+        return $this->redirectToRoute('login');
     }
 
     #[Route(name: 'app_user_index', methods: ['GET'])]

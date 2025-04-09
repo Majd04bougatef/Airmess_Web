@@ -60,6 +60,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: "user", targetEntity: Station::class, cascade: ["persist", "remove"])]
     private Collection $stations;
 
+    #[ORM\Column(name: "resetToken", type: "string", length: 255, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(name: "resetTokenExpires", type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $resetTokenExpires = null;
+
     public function __construct()
     {
         $this->stations = new ArrayCollection();
@@ -220,6 +226,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
+
+    public function getResetTokenExpires(): ?\DateTimeInterface
+    {
+        return $this->resetTokenExpires;
+    }
+
+    public function setResetTokenExpires(?\DateTimeInterface $resetTokenExpires): self
+    {
+        $this->resetTokenExpires = $resetTokenExpires;
+        return $this;
+    }
+
     public function getPhotoUrl(): string
     {
         return '/uploads/user_photos/' . $this->getImagesU();
@@ -262,7 +290,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [$this->getRoleUser()];
+        $role = $this->getRoleUser() ?? 'ROLE_USER';
+        
+        // If the role doesn't start with ROLE_, add the prefix
+        if (strpos($role, 'ROLE_') !== 0) {
+            $role = 'ROLE_' . strtoupper($role);
+        }
+        
+        return [$role];
     }
 
     public function eraseCredentials(): void

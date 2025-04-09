@@ -39,9 +39,10 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/sign-up, roles: PUBLIC_ACCESS }
+        - { path: ^/reset-password, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/dashEntreprise, roles: Entreprise }
-        - { path: ^/dashVoyageurs, roles: Voyageurs }
+        - { path: ^/dashEntreprise, roles: [ROLE_ENTREPRISE, ROLE_USER] }
+        - { path: ^/dashVoyageurs, roles: [ROLE_VOYAGEURS, ROLE_USER] }
 
 when@test:
     security:

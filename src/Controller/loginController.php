@@ -8,11 +8,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class loginController extends AbstractController
 {
-    #[Route('/login', name: 'app_login')]
-    public function login(): Response
-    {
-        return $this->render('login/login.html.twig');
-    }
+    // Commenting out this route as it conflicts with SecurityController
+    // #[Route('/login', name: 'app_login')]
+    // public function login(): Response
+    // {
+    //     return $this->render('login/login.html.twig');
+    // }
 
     #[Route('/sign-up', name: 'app_signup')]
     public function signup(): Response
