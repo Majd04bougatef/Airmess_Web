@@ -1,0 +1,203 @@
+/* public/css/feed.css */
+
+/* Main container styling (optional, base.html.twig might handle this) */
+.feed-container {
+    /* background-color: #f8f9fa; */
+    /* padding: 2rem 0; */
+}
+
+/* Scrollable area for posts */
+.posts-scroll-pane {
+    max-height: 65vh; /* Adjust height as needed */
+    overflow-y: auto;
+    padding: 20px; /* Padding inside the scroll area for edge spacing */
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa; /* Slightly off-white background for the scroll pane */
+    margin-bottom: 1.5rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Inner shadow for depth */
+    /* Added for smooth content transition during AJAX load */
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Styling for individual post cards */
+.post-card {
+    border: 1px solid #e9ecef; /* Subtle border for each card */
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.07); /* Slightly softer shadow */
+    /* --- INCREASED MARGIN HERE --- */
+    margin-bottom: 2.5rem; /* Further increased space between cards (adjust as needed) */
+    border-radius: 0.375rem;
+    background-color: #fff;
+}
+ .post-card:last-child {
+    margin-bottom: 0; /* No margin on the last card inside scroll pane */
+}
+
+.post-card .card-img-top {
+    max-height: 300px;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+    border-bottom: 1px solid #e9ecef;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin: 0 auto;
+    display: block;
+}
+
+ .post-card .card-body {
+    padding: 1.25rem;
+ }
+
+ /* Styling for the post author */
+.post-author {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.75rem; /* Space below author name */
+}
+.post-author i { /* Style for user icon */
+    margin-right: 0.5rem;
+    color: #6c757d;
+    font-size: 1.2em; /* Slightly larger icon */
+}
+ /* Optional: if you link the author name */
+ .post-author a {
+     color: inherit;
+     text-decoration: none;
+ }
+  .post-author a:hover {
+      text-decoration: underline;
+  }
+
+.post-card .card-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1.15rem; /* Slightly larger title */
+}
+
+.post-card .card-text {
+    color: #495057;
+    margin-bottom: 1rem; /* More space after content */
+    line-height: 1.6; /* Improve readability */
+}
+
+.post-meta {
+    font-size: 0.875em;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+.post-meta strong {
+    color: #495057;
+}
+.post-meta i { /* Style for meta icons */
+    margin-right: 0.4rem;
+    color: #6c757d;
+    width: 1em; /* Align icons roughly */
+    text-align: center;
+}
+
+/* Container for action buttons */
+.post-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem; /* Space between buttons */
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+ .post-actions .btn i {
+    margin-right: 0.35rem;
+ }
+
+/* Center pagination and add post button */
+.pagination-controls,
+.add-post-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+/* Style for the 'no posts' message */
+.no-posts-message {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+
+/* --- Styles previously in show.html.twig --- */
+/* (These are now global via feed.css) */
+
+/* Styles pour les avatars (if used elsewhere or for comments) */
+.avatar-sm { width: 40px; height: 40px; object-fit: cover; border: 1px solid #eee; border-radius: 50%;}
+.comment-avatar { width: 32px; height: 32px; object-fit: cover; border: 1px solid #eee; border-radius: 50%; }
+
+/* Ajustement des images DANS la publication (show page specific maybe) */
+/* Consider if this should only apply within a specific container on the show page */
+.post-image-container img {
+    max-height: 400px;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    border: 1px solid #dee2e6;
+    margin: 0 auto 1rem auto;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .post-card .card-img-top,
+    .post-image-container img {
+        max-height: 300px;
+    }
+}
+
+/* Style du formulaire de commentaire */
+.comment-form .form-control { border-radius: 1.5rem; padding-left: 1.25rem; }
+.comment-form .btn { border-radius: 1.5rem; }
+
+/* Style des boutons d'action sous la publication (show page specific maybe) */
+/* If these button styles are different from index, scope them e.g., .show-page-container .post-actions .btn */
+/* .post-actions .btn { flex-grow: 1; margin: 0 2px; } */ /* This might conflict with index layout, check */
+
+/* Style des boutons admin (modifier/supprimer) */
+.admin-actions .btn { margin-left: 5px; }
+
+/* Style des bulles de commentaires */
+.comment-card {
+    background-color: #f0f2f5;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    word-wrap: break-word; /* Prevent long words breaking layout */
+    margin-bottom: 1rem; /* Space between comments */
+}
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.3rem;
+}
+.comment-author {
+    font-weight: 600;
+    margin-right: 0.5rem;
+    font-size: 0.9em;
+}
+.comment-date {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+.comment-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.95em;
+    line-height: 1.5;
+}

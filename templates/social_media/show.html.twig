@@ -1,288 +1,436 @@
 {# Fichier : templates/social_media/show.html.twig #}
 {% extends 'base.html.twig' %} {# Hérite de votre base partagée #}
 
-{# Définit le titre de la page (sera inséré dans le block title de la base) #}
+{# Définit le titre de la page #}
 {% block title %}{{ social_media.getTitre() }} - Détails{% endblock %}
 
 {# Ce bloc REMPLACE le contenu du block body de base.html.twig #}
 {% block body %}
-<div class="container mt-4 mb-5"> {# Ajout de marges pour l'espacement #}
+<div class="container my-4 my-lg-5"> {# Use 'my' for vertical margin #}
     <div class="row justify-content-center">
-        <div class="col-lg-8"> {# Limite la largeur pour la lisibilité #}
+        <div class="col-lg-9 col-xl-8"> {# Slightly wider central column #}
 
             {# --- Carte Principale du Post --- #}
-            <article class="card shadow-sm mb-4 post-card">
-                <div class="card-body">
-                    {# En-tête du Post avec Image Auteur #}
-                    <header class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                        {% set post_author = social_media.getUser() %}
-                        <div class="me-3 flex-shrink-0"> {# Marge et empêche le rétrécissement #}
-                            <img src="{{ post_author and post_author.getImagesU() ? asset('uploads/profile_pictures/' ~ post_author.getImagesU()) : asset('images/placeholder-avatar.png') }}" {# Placeholder si pas d'image #}
-                                 alt="{{ post_author ? post_author.getPrenom() : 'Utilisateur' }}"
-                                 class="rounded-circle post-author-img">
-                        </div>
-                        <div class="flex-grow-1"> {# Prend l'espace restant #}
-                            <h5 class="mb-0 card-title">
-                                {% if post_author %}
-                                    <strong>{{ post_author.getPrenom() }} {{ post_author.getName() }}</strong>
-                                {% else %}
-                                    <em>Utilisateur inconnu</em>
-                                {% endif %}
-                            </h5>
-                            <small class="text-muted card-subtitle">
-                                Publié le {{ social_media.getPublicationDate()|date('d/m/Y à H:i') }}
-                            </small>
-                        </div>
-                        {# Boutons Actions (Modifier/Supprimer) en Dropdown #}
-                        {% if post_author and post_author.getIdU() == default_user_id %} {# Condition basée sur l'ID utilisateur par défaut propriétaire #}
-                            <div class="dropdown ms-auto"> {# ms-auto pousse vers la droite #}
-                                <button class="btn btn-light btn-sm" type="button" id="postActionsDropdown{{ social_media.idEB }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="postActionsDropdown{{ social_media.idEB }}">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}">
-                                            <i class="bi bi-pencil-square me-2"></i>Éditer
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        {# Formulaire pour Supprimer (POST + CSRF) #}
-                                        <form action="{{ path('app_social_media_delete', {idEB: social_media.idEB}) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
-                                            <button type="submit" class="dropdown-item text-danger">
-                                                <i class="bi bi-trash me-2"></i>Supprimer
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        {% endif %}
-                    </header>
-
-                    {# Contenu du Post #}
-                    <div class="card-text post-content mb-3">
-                        <p>{{ social_media.getContenu()|nl2br }}</p>
+            <article class="post-card bg-white rounded-3 shadow-sm mb-4 overflow-hidden"> {# Use bg-white, rounded-3, shadow-sm #}
+                {# En-tête du Post #}
+                <header class="post-header d-flex align-items-center p-3">
+                    {% set post_author = social_media.getUser() %}
+                    <div class="flex-shrink-0 me-3">
+                        <img src="{{ post_author and post_author.getImagesU() ? asset('uploads/profile_pictures/' ~ post_author.getImagesU()) : asset('images/placeholder-avatar.png') }}"
+                             alt="{{ post_author ? post_author.getPrenom() : 'Utilisateur' }}"
+                             class="post-author-img rounded-circle">
                     </div>
-
-                    {# Image du Post #}
-                    {% if social_media.getImagemedia() %}
-                        <div class="mb-3 post-image-container text-center"> {# Centrer l'image #}
-                            <img src="{{ asset('uploads/' ~ social_media.getImagemedia()) }}" {# Assurez-vous que 'uploads/' est le bon chemin public #}
-                                 alt="Image pour {{ social_media.getTitre() }}"
-                                 class="img-fluid rounded">
+                    <div class="post-author-info flex-grow-1">
+                        <h5 class="post-author-name mb-0">
+                            {% if post_author %}
+                                <strong>{{ post_author.getPrenom() }} {{ post_author.getName() }}</strong>
+                            {% else %}
+                                <em class="text-muted">Utilisateur inconnu</em>
+                            {% endif %}
+                        </h5>
+                        <small class="post-timestamp text-muted">
+                            Publié le {{ social_media.getPublicationDate()|date('d/m/Y à H:i') }}
+                        </small>
+                    </div>
+                    {# Boutons Actions (Modifier/Supprimer) en Dropdown #}
+                    {% if post_author and post_author.getIdU() == default_user_id %}
+                        <div class="dropdown ms-auto">
+                            <button class="btn btn-icon text-muted" type="button" id="postActionsDropdown{{ social_media.idEB }}" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Options de publication">
+                                <i class="bi bi-three-dots fs-5"></i> {# Larger dots icon #}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-light" aria-labelledby="postActionsDropdown{{ social_media.idEB }}">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}">
+                                        <i class="bi bi-pencil-square me-2"></i>Éditer
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    {# Formulaire pour Supprimer (POST + CSRF) #}
+                                    <form action="{{ path('app_social_media_delete', {idEB: social_media.idEB}) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
+                                        <button type="submit" class="dropdown-item text-danger d-flex align-items-center">
+                                            <i class="bi bi-trash me-2"></i>Supprimer
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
                         </div>
                     {% endif %}
+                </header>
 
-                    {# Barre J'aime/Je n'aime pas/Commenter #}
-                    <div class="post-actions border-top pt-2 text-center">
-                        <div class="row">
-                            <div class="col">
-                                <button class="btn btn-light w-100" disabled> {# Désactivé pour l'instant #}
-                                    <i class="bi bi-hand-thumbs-up"></i> J'aime ({{ social_media.getLikee() }})
-                                </button>
-                            </div>
-                            <div class="col">
-                                 <button class="btn btn-light w-100" disabled> {# Désactivé pour l'instant #}
-                                     <i class="bi bi-hand-thumbs-down"></i> Je n'aime pas ({{ social_media.getDislike() }})
-                                 </button>
-                            </div>
-                             <div class="col">
-                                <a href="#comments" class="btn btn-light w-100"> {# Lien ancre vers la section commentaires #}
-                                    <i class="bi bi-chat-dots"></i> Commenter
-                                </a>
-                            </div>
-                        </div>
+                {# Contenu du Post #}
+                <div class="post-content p-3 pt-0"> {# Add padding, remove top padding as header has it #}
+                    {# Optionally display title if it's distinct from content #}
+                    {# <h4 class="post-title mb-3">{{ social_media.getTitre() }}</h4> #}
+                    <p class="mb-3">{{ social_media.getContenu()|nl2br }}</p> {# Ensure spacing after content #}
+                </div>
+
+                {# Image du Post #}
+                {% if social_media.getImagemedia() %}
+                    <div class="post-image-container">
+                        <img src="{{ asset('uploads/' ~ social_media.getImagemedia()) }}"
+                             alt="Image pour {{ social_media.getTitre() }}"
+                             class="img-fluid">
                     </div>
+                {% endif %}
 
-                </div> {# Fin card-body post #}
+                {# Statistiques (Likes/Dislikes) - Optionnel, plus clean que les boutons désactivés #}
+                 <div class="post-stats px-3 pb-2 text-muted d-flex justify-content-between">
+                     <small>
+                         {% if social_media.getLikee() > 0 %}
+                            <i class="bi bi-hand-thumbs-up-fill text-primary"></i> {{ social_media.getLikee() }}
+                         {% endif %}
+                     </small>
+                     <small>
+                         {# Vous pouvez ajouter le nombre de commentaires ici aussi #}
+                         {# {{ comments.getTotalItemCount }} commentaires #}
+                          {% if social_media.getDislike() > 0 %}
+                              {{ social_media.getDislike() }} <i class="bi bi-hand-thumbs-down"></i> Je n'aime pas {# Moins commun d'afficher dislike count #}
+                          {% endif %}
+                     </small>
+                 </div>
+
+                {# Barre d'actions J'aime/Commenter #}
+                <div class="post-actions border-top border-light p-2 d-flex justify-content-around">
+                    <button class="btn btn-action flex-grow-1 text-muted" disabled> {# Disabled placeholder #}
+                        <i class="bi bi-hand-thumbs-up me-1"></i> J'aime
+                    </button>
+                    {# <button class="btn btn-action flex-grow-1 text-muted" disabled> <i class="bi bi-hand-thumbs-down me-1"></i> Je n'aime pas </button> #} {# Removed Dislike button for cleaner look #}
+                    <a href="#comments-section" class="btn btn-action flex-grow-1 text-muted">
+                        <i class="bi bi-chat-dots me-1"></i> Commenter
+                    </a>
+                    {# <button class="btn btn-action flex-grow-1 text-muted"> <i class="bi bi-share me-1"></i> Partager </button> #} {# Placeholder for Share #}
+                </div>
+
             </article> {# Fin article post #}
 
             {# --- Section Commentaires --- #}
-            <section id="comments" class="mt-4">
-                <h3 class="mb-3">Commentaires</h3>
+            <section id="comments-section" class="comments-section bg-white rounded-3 shadow-sm p-3 p-md-4">
+                <h3 class="mb-4 section-title">Commentaires</h3>
 
                 {# Formulaire Ajout Commentaire #}
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body add-comment-section">
-                         {% set commenter_image = asset('images/placeholder-avatar.png') %} {# Placeholder - TODO: Améliorer si possible #}
-                         <div class="d-flex align-items-start">
-                             <img src="{{ commenter_image }}" alt="Votre avatar" class="rounded-circle comment-author-img me-3">
-                             <div class="flex-grow-1">
-                                {# Rendu simplifié du formulaire #}
-                                <form name="{{ comment_form.vars.name }}" method="{{ comment_form.vars.method }}" action="{{ comment_form.vars.action }}" class="add-comment-form">
-                                    <div class="mb-2">
-                                        {{ form_widget(comment_form.description, {'attr': {'rows': 2, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control form-control-sm'}}) }}
-                                        {{ form_errors(comment_form.description) }} {# Afficher les erreurs pour ce champ #}
-                                    </div>
-                                    <div class="text-end">
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            <i class="bi bi-send"></i> Publier
-                                        </button>
-                                    </div>
-                                    {{ form_rest(comment_form) }} {# Important pour le CSRF token et autres champs cachés #}
-                                </form>
-                             </div>
-                         </div>
-                    </div> {# Fin card-body form #}
-                </div> {# Fin card form #}
-
+                <div class="add-comment-form-container d-flex align-items-start mb-4">
+                     {% set current_user = app.user %} {# Assuming you have access to the logged-in user #}
+                     <div class="flex-shrink-0 me-2 me-md-3">
+                         <img src="{{ current_user and current_user.getImagesU() ? asset('uploads/profile_pictures/' ~ current_user.getImagesU()) : asset('images/placeholder-avatar.png') }}"
+                              alt="Votre avatar"
+                              class="comment-author-img rounded-circle">
+                     </div>
+                     <div class="flex-grow-1">
+                        <form name="{{ comment_form.vars.name }}" method="{{ comment_form.vars.method }}" action="{{ comment_form.vars.action }}" class="add-comment-form">
+                            <div class="mb-2 position-relative">
+                                {{ form_widget(comment_form.description, {'attr': {'rows': 2, 'placeholder': 'Écrivez un commentaire public...', 'class': 'form-control comment-input'}}) }}
+                                {{ form_errors(comment_form.description) }}
+                                <button type="submit" class="btn btn-primary btn-sm btn-send-comment" aria-label="Publier le commentaire">
+                                    <i class="bi bi-send-fill"></i>
+                                </button>
+                            </div>
+                             {{ form_rest(comment_form) }} {# CSRF token etc. #}
+                        </form>
+                     </div>
+                </div>
 
                 {# Liste des Commentaires Existants #}
                 <div id="comments-list">
                     {% if comments is defined and comments|length > 0 %}
-                        {% for commentaire in comments %} {# Itération sur les commentaires paginés #}
+                        {% for commentaire in comments %}
                             {% set comment_author = commentaire.getUser() %}
-                            <div class="d-flex align-items-start mb-3 comment-entry">
+                            <div class="comment-entry d-flex align-items-start mb-3">
                                  {# Image Auteur Commentaire #}
-                                <div class="me-3 flex-shrink-0">
+                                <div class="flex-shrink-0 me-2 me-md-3">
                                     <img src="{{ comment_author and comment_author.getImagesU() ? asset('uploads/profile_pictures/' ~ comment_author.getImagesU()) : asset('images/placeholder-avatar.png') }}"
                                          alt="{{ comment_author ? comment_author.getPrenom() : 'Avatar' }}"
-                                         class="rounded-circle comment-author-img">
+                                         class="comment-author-img rounded-circle">
                                 </div>
-                                 {# Bulle Commentaire #}
+                                 {# Bulle Commentaire + Meta #}
                                 <div class="flex-grow-1">
-                                    <div class="comment-bubble p-2 rounded">
-                                        <strong>
+                                    <div class="comment-bubble p-2 px-3 rounded-pill"> {# Rounded-pill looks more like modern chat bubbles #}
+                                        <strong class="comment-author-name d-block mb-1">
                                             {% if comment_author %}
                                                 {{ comment_author.getPrenom() }} {{ comment_author.getName() }}
                                             {% else %}
                                                 Utilisateur inconnu
                                             {% endif %}
                                         </strong>
-                                        <p class="mb-0 comment-text">{{ commentaire.getDescription()|nl2br }}</p>
+                                        <p class="comment-text mb-0">{{ commentaire.getDescription()|nl2br }}</p>
                                     </div>
                                     {# Meta Données Commentaire #}
-                                    <div class="comment-meta mt-1">
-                                        <small class="text-muted">
-                                            {# Afficher l'ID en attendant createdAt #}
-                                            ID: {{ commentaire.idC }} {# TODO: Remplacer par la date quand elle existera #}
+                                    <div class="comment-meta mt-1 ps-3"> {# Indent meta slightly #}
+                                        <small class="text-muted me-2">
+                                            {# Replace with date when available #}
+                                            {% if commentaire.createdAt is defined and commentaire.createdAt %}
+                                                {{ commentaire.createdAt|date('d/m/Y H:i') }} {# Example date format #}
+                                            {% else %}
+                                                 ID: {{ commentaire.idC }} {# Fallback #}
+                                            {% endif %}
                                         </small>
-                                        {# Liens actions commentaire (placeholders) #}
-                                        <a href="#" class="text-muted small ms-2 comment-action-link">J'aime</a>
-                                        <span class="text-muted small">·</span>
-                                        <a href="#" class="text-muted small comment-action-link">Répondre</a>
+                                        {# Comment Actions #}
+                                        <a href="#" class="comment-action-link small me-2">J'aime</a>
+                                        <a href="#" class="comment-action-link small">Répondre</a>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
 
                         {# Liens Pagination #}
-                        <div class="navigation d-flex justify-content-center mt-4">
+                        {% if comments.pageCount > 1 %}
+                        <div class="navigation d-flex justify-content-center mt-4 pt-3 border-top border-light">
                             {{ knp_pagination_render(comments) }}
                         </div>
+                        {% endif %}
 
                     {% else %}
                         {# Message si pas de commentaires #}
-                        <div class="alert alert-light text-center border" role="alert">
-                           <small class="text-muted"> Il n'y a pas encore de commentaires.</small>
+                        <div class="text-center text-muted py-3">
+                           <small>Soyez le premier à commenter.</small>
                         </div>
                     {% endif %}
                 </div> {# Fin comments-list #}
 
             </section> {# Fin section commentaires #}
 
-        </div> {# Fin col-lg-8 #}
+        </div> {# Fin col #}
     </div> {# Fin row #}
 </div> {# Fin container #}
 {% endblock %} {# Fin block body #}
 
 
-{# Utilise le nom de bloc JS de la base #}
-{% block js %}
-    {{ parent() }} {# Inclut les JS définis dans le bloc 'js' de base.html.twig #}
-    {# Ajoutez ici des scripts JS spécifiques à cette page si nécessaire #}
-{% endblock %}
-
-
-{# Utilise le nom de bloc CSS de la base #}
+{# Utilise le nom de bloc CSS de la base - PLACE THIS IN A SEPARATE CSS FILE! #}
 {% block css %}
     {{ parent() }} {# Inclut les CSS définis dans le bloc 'css' de base.html.twig #}
-    {# Styles CSS spécifiques à cette page #}
+    {# It's STRONGLY recommended to move this CSS into a dedicated app.css file #}
     <style>
-        .post-card .card-title {
-            font-size: 1.1rem;
-            margin-bottom: 0.1rem;
+        /* --- General & Variables --- */
+        :root {
+            --app-bg-color: #f0f2f5; /* Light grey background like Facebook */
+            --app-card-bg: #ffffff;
+            --app-border-color: #e4e6eb; /* Slightly darker grey for borders */
+            --app-text-color: #050505;
+            --app-text-muted-color: #65676b;
+            --app-primary-color: #0d6efd; /* Bootstrap primary blue */
+            --app-link-color: #050505;
+            --app-link-hover-color: #000000;
+        }
+
+        body {
+            background-color: var(--app-bg-color);
+            color: var(--app-text-color);
+             /* Adjust if your fixed navbar has a different height */
+             /* padding-top: 70px; */
+        }
+        .main-content { /* Assuming your base.html.twig uses <main class="main-content"> */
+             /* padding-top: 1rem; */ /* Add space below navbar if needed */
+        }
+
+        /* --- Post Card --- */
+        .post-card {
+            border: 1px solid var(--app-border-color);
+        }
+        .post-header {
+            /* Spacing handled by padding 'p-3' */
         }
         .post-author-img {
-            width: 40px;
-            height: 40px;
-            object-fit: cover; /* Assure que l'image couvre la zone sans déformation */
-        }
-        .comment-author-img {
-            width: 32px;
-            height: 32px;
+            width: 45px; /* Slightly larger */
+            height: 45px;
             object-fit: cover;
         }
+        .post-author-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--app-link-color);
+        }
+        .post-author-name a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .post-author-name a:hover {
+            text-decoration: underline;
+        }
+        .post-timestamp {
+            font-size: 0.8rem;
+            color: var(--app-text-muted-color);
+        }
         .post-content p {
-            line-height: 1.6;
-            white-space: pre-wrap; /* Respecte les retours à la ligne et les espaces */
-            font-size: 1rem;
+            line-height: 1.5;
+            font-size: 1rem; /* Standard text size */
+            color: var(--app-text-color);
+            word-wrap: break-word;
         }
         .post-image-container img {
+            display: block; /* Remove any potential bottom space */
             max-width: 100%;
-            height: auto; /* Garde les proportions */
+            height: auto;
+            /* Optional: remove rounded corners if image fills width */
+            /* border-radius: 0; */
         }
-        .post-actions .btn {
+        .post-stats {
+            font-size: 0.85rem;
+        }
+        .post-stats .bi {
+            vertical-align: -0.125em; /* Align icons better */
+        }
+        .post-actions {
+            border-color: var(--app-border-color) !important; /* Ensure border color override */
+        }
+        .btn-action {
+            font-weight: 600;
             font-size: 0.9rem;
-            color: #606770; /* Couleur de texte type gris Facebook */
-            font-weight: 500;
+            color: var(--app-text-muted-color);
+            border-radius: 0.25rem; /* Slight rounding */
+            padding: 0.5rem 0.75rem;
+            background: none;
+            border: none;
+            transition: background-color 0.15s ease-in-out;
         }
-        .post-actions .btn:hover {
-            background-color: #f0f2f5; /* Hover léger gris */
+        .btn-action:hover,
+        .btn-action:focus {
+            background-color: rgba(0, 0, 0, 0.05); /* Subtle grey hover */
+            color: var(--app-text-color); /* Darken text slightly on hover */
         }
-        .add-comment-section textarea {
-             background-color: #f0f2f5; /* Fond gris clair type Facebook */
-             border: none; /* Pas de bordure */
-             border-radius: 18px; /* Très arrondi */
-             padding: 8px 12px;
-             line-height: 1.3; /* Ajuster la hauteur de ligne */
+        .btn-action .bi {
+            font-size: 1.2em; /* Make icons slightly larger */
+            vertical-align: -0.175em; /* Adjust icon vertical alignment */
+            margin-bottom: 2px; /* Prevent slight jump */
         }
-        .add-comment-section textarea:focus {
-             background-color: #e4e6eb; /* Un peu plus foncé au focus */
-             box-shadow: none; /* Pas d'ombre au focus */
+        /* Specific icon colors if needed */
+        /* .btn-action.liked { color: var(--app-primary-color); } */
+
+        .btn-icon { /* For the three-dots button */
+            background: none;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            line-height: 1;
         }
+         .btn-icon:hover {
+             background-color: rgba(0, 0, 0, 0.08);
+             border-radius: 50%; /* Circle background on hover */
+         }
+
+        /* --- Comments Section --- */
+        .comments-section {
+            border: 1px solid var(--app-border-color);
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--app-text-color);
+        }
+        .comment-author-img {
+            width: 36px; /* Slightly larger than before */
+            height: 36px;
+            object-fit: cover;
+        }
+        .add-comment-form-container .comment-author-img {
+             width: 36px; /* Match comment author size */
+             height: 36px;
+        }
+        .comment-input {
+            background-color: var(--app-bg-color); /* Use main bg color */
+            border: 1px solid var(--app-border-color);
+            border-radius: 18px; /* Pill shape */
+            padding: 8px 45px 8px 15px; /* Adjust padding: top right bottom left */
+            line-height: 1.4;
+            font-size: 0.9rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .comment-input:focus {
+            background-color: var(--app-card-bg); /* White on focus */
+            border-color: var(--app-primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); /* Bootstrap focus ring */
+            outline: 0;
+        }
+        .btn-send-comment {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0.25rem 0.5rem;
+            border-radius: 50%; /* Circular send button */
+            line-height: 1;
+        }
+         .btn-send-comment .bi {
+             vertical-align: middle;
+         }
+
         .comment-entry {
-            /* Espacement entre les commentaires si nécessaire */
+            /* Spacing handled by mb-3 */
         }
         .comment-bubble {
-            background-color: #f0f2f5; /* Fond gris clair */
-            display: inline-block; /* S'adapte au contenu */
-            padding: 8px 12px;
-            border-radius: 18px; /* Très arrondi */
-            word-wrap: break-word; /* Coupe les mots longs */
+            background-color: var(--app-bg-color);
+            display: inline-block; /* Fit content */
+            word-wrap: break-word;
+            max-width: 100%;
             font-size: 0.9rem;
+            /* border-radius: 18px; */ /* Using rounded-pill BS class */
         }
-        .comment-bubble strong {
+        .comment-author-name {
             font-size: 0.85rem;
-            display: block; /* Nom sur sa propre ligne */
-            margin-bottom: 2px;
-            color: #050505; /* Noir léger pour le nom */
+            font-weight: 600;
+            color: var(--app-link-color);
         }
         .comment-text {
-             margin: 0;
-             color: #050505; /* Noir léger pour le texte */
-         }
+             color: var(--app-text-color);
+             line-height: 1.4;
+        }
         .comment-meta {
-             font-size: 0.75rem;
-             padding-left: 12px; /* Aligné un peu avec la bulle */
-             margin-top: 4px; /* Petit espace après la bulle */
-             color: #606770;
+             font-size: 0.75rem; /* Smaller meta text */
+             color: var(--app-text-muted-color);
+             margin-top: 4px;
          }
         .comment-action-link {
              text-decoration: none;
              font-weight: 600;
-             color: #606770; /* Gris pour les liens */
+             color: var(--app-text-muted-color);
+             transition: text-decoration 0.15s ease-in-out;
          }
         .comment-action-link:hover {
              text-decoration: underline;
+             color: var(--app-text-color);
          }
-         /* Assurer que le container a de l'espace par rapport au header fixed-top */
-         body {
-             padding-top: 70px; /* Ajustez cette valeur si la hauteur de votre header est différente */
+
+         /* KNP Pagination specific styles (Optional: customize if needed) */
+         .pagination {
+             /* Bootstrap defaults are usually okay */
          }
-         main.main-content { /* Cible le main ajouté dans la proposition de base.html.twig */
-            padding-top: 1rem; /* Espace supplémentaire si nécessaire */
+         .pagination .page-item.active .page-link {
+            background-color: var(--app-primary-color);
+            border-color: var(--app-primary-color);
          }
+         .pagination .page-link {
+             color: var(--app-primary-color);
+         }
+          .pagination .page-link:hover {
+             /* color: var(--app-link-hover-color); */
+         }
+         .pagination .page-item.disabled .page-link {
+            color: var(--app-text-muted-color);
+         }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 767.98px) {
+            .post-card, .comments-section {
+                border-radius: 0; /* Remove rounding on small screens for edge-to-edge feel */
+                border-left: none;
+                border-right: none;
+                box-shadow: none; /* Remove shadow on mobile maybe? */
+            }
+            .container {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .post-header, .post-content, .post-stats, .comments-section {
+                padding-left: 1rem; /* Restore some padding */
+                padding-right: 1rem;
+            }
+            .post-image-container img {
+                border-radius: 0;
+            }
+            .comments-section {
+                 border-bottom: none; /* Avoid double border with potential footer */
+            }
+
+        }
+
     </style>
 {% endblock %}

@@ -14,11 +14,11 @@ class Commentaire
     #[ORM\Column(name: "idC", type: "integer")]
     private int $idC;
 
-    #[ORM\ManyToOne(targetEntity: SocialMedia::class)]
+    #[ORM\ManyToOne(targetEntity: SocialMedia::class, inversedBy: "commentaires")]
     #[ORM\JoinColumn(name: "idEB", referencedColumnName: "idEB", nullable: false)]
     private ?SocialMedia $socialMedia = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "commentaires")]
     #[ORM\JoinColumn(name: "id_U", referencedColumnName: "id_U", nullable: false)]
     private ?User $user = null;
 
