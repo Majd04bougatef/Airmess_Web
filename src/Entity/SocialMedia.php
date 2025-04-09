@@ -7,6 +7,7 @@ use App\Repository\SocialMediaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Commentaire;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SocialMediaRepository::class)]
 #[ORM\Table(name: "socialmedia")]
@@ -19,19 +20,36 @@ class SocialMedia
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "id_U", referencedColumnName: "id_U", nullable: false)]
-private ?User $user = null; // Ensure to use getIdU() for accessing user ID
+    private ?User $user = null;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: "Le titre ne peut pas être vide")]
+    #[Assert\Length(
+        min: 5,
+        max: 255,
+        minMessage: "Le titre doit faire au moins {{ limit }} caractères",
+        maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $titre;
 
     #[ORM\Column(type: "text")]
+    #[Assert\NotBlank(message: "Le contenu ne peut pas être vide")]
+    #[Assert\Length(
+        min: 10,
+        minMessage: "Le contenu doit faire au moins {{ limit }} caractères"
+    )]
     private string $contenu;
 
-#[ORM\Column(type: "date", name: "publicationDate")]
-private \DateTimeInterface $publicationDate;
+    #[ORM\Column(type: "date", name: "publicationDate")]
+    private \DateTimeInterface $publicationDate;
     
-
     #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: "Le lieu est obligatoire")]
+
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Le lieu ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $lieu;
 
     #[ORM\Column(type: "integer")]
@@ -41,9 +59,9 @@ private \DateTimeInterface $publicationDate;
     private int $dislike;
 
     #[ORM\Column(type: "string", length: 500)]
-private string $imagemedia = ''; // Initialize with a default value
+    private string $imagemedia = '';
 
-    // Getters et Setters
+    // Getters et Setters...
 
     public function getIdEB(): int
     {
@@ -138,7 +156,6 @@ private string $imagemedia = ''; // Initialize with a default value
         return $this;
     }
 
-
     #[ORM\OneToMany(mappedBy: 'socialMedia', targetEntity: Commentaire::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $commentaires;
     
@@ -172,9 +189,4 @@ private string $imagemedia = ''; // Initialize with a default value
     
         return $this;
     }
-
-
-
-
-
 }

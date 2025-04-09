@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommentaireRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
 #[ORM\Table(name: "commentaire")]
@@ -23,6 +24,13 @@ class Commentaire
     private ?User $user = null;
 
     #[ORM\Column(type: "text")]
+    #[Assert\NotBlank(message: "Le commentaire ne peut pas être vide")]
+    #[Assert\Length(
+        min: 5,
+        max: 1000,
+        minMessage: "Le commentaire doit faire au moins {{ limit }} caractères",
+        maxMessage: "Le commentaire ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $description;
 
     #[ORM\Column(type: "integer")]
@@ -31,9 +39,7 @@ class Commentaire
     #[ORM\Column(type: "integer")]
     private int $numberdislike;
 
-    
-
-    // Getters et Setters
+    // Getters et Setters...
 
     public function getIdC(): int
     {
@@ -94,6 +100,4 @@ class Commentaire
         $this->numberdislike = $numberdislike;
         return $this;
     }
-
-   
 }
