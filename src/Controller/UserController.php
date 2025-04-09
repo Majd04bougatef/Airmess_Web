@@ -41,6 +41,10 @@ final class UserController extends AbstractController
         $diamond = (int)$request->request->get('diamond');
         $deleteFlag = (int)$request->request->get('deleteFlag');
         
+        // Business-specific fields
+        $businessType = $request->request->get('businessType');
+        $companyDescription = $request->request->get('companyDescription');
+        
         // Create a new user
         $user = new User();
         $user->setEmail($email);
@@ -52,6 +56,15 @@ final class UserController extends AbstractController
         $user->setStatut($statut);
         $user->setDiamond($diamond);
         $user->setDeleteFlag($deleteFlag);
+        
+        // Set business-specific fields if present
+        if ($businessType) {
+            $user->setBusinessType($businessType);
+        }
+        
+        if ($companyDescription) {
+            $user->setCompanyDescription($companyDescription);
+        }
         
         // Handle photo upload
         $photoFile = $request->files->get('photo');

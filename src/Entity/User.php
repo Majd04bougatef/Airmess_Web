@@ -50,6 +50,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(name: "imagesU", type: "string", length: 255, nullable: true)]
     private ?string $imagesU = null;
+    
+    #[ORM\Column(name: "businessType", type: "string", length: 50, nullable: true)]
+    private ?string $businessType = null;
+    
+    #[ORM\Column(name: "companyDescription", type: "text", nullable: true)]
+    private ?string $companyDescription = null;
 
     #[ORM\OneToMany(mappedBy: "user", targetEntity: Station::class, cascade: ["persist", "remove"])]
     private Collection $stations;
@@ -189,6 +195,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setImagesU(?string $imagesU): self
     {
         $this->imagesU = $imagesU;
+        return $this;
+    }
+    
+    public function getBusinessType(): ?string
+    {
+        return $this->businessType;
+    }
+    
+    public function setBusinessType(?string $businessType): self
+    {
+        $this->businessType = $businessType;
+        return $this;
+    }
+    
+    public function getCompanyDescription(): ?string
+    {
+        return $this->companyDescription;
+    }
+    
+    public function setCompanyDescription(?string $companyDescription): self
+    {
+        $this->companyDescription = $companyDescription;
         return $this;
     }
 
