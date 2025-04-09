@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des vélos</title>
-    <style>
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Bon Plan{% endblock %}
+
+{% block body %}
+
+<style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -43,18 +43,10 @@
             text-align: center;
         }
     </style>
-</head>
-<body>
-
     <!-- Menu Horizontal -->
     <div class="navbar">
-        <a onclick="loadPage('{{ path('app_bonplan_new') }}')">Ajouter un Bon Plan </a>
-        <a onclick="loadPage('{{ path('app_bonplan_index') }}')">Voir les Bons Plans </a>
-    </div>
-
-    <!-- Contenu Dynamique -->
-    <div class="content" id="pageContent">
-        <p>Bienvenue dans notre site. Sélectionnez une option.</p>
+        <a onclick="loadPage('{{ path('app_bonplan_new') }}')">Ajouter un Bon Plan</a>
+        <a onclick="loadPage('{{ path('app_bonplan_index') }}')">Voir les Bons Plans</a>
     </div>
 
     <script>
@@ -82,6 +74,6 @@
 
         
     </script>
+    {{ include('bonplan/_form.html.twig') }}
 
-</body>
-</html>
+{% endblock %}
