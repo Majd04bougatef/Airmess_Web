@@ -13,47 +13,47 @@
             </tr>
             <tr>
                 <th>Name</th>
-                <td>{{ user.name }}</td>
+                <td>{{ user.name is defined ? user.name : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>Prenom</th>
-                <td>{{ user.prenom }}</td>
+                <td>{{ user.prenom is defined ? user.prenom : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td>{{ user.email }}</td>
+                <td>{{ user.email is defined ? user.email : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>Password</th>
-                <td>{{ user.password }}</td>
+                <td>{{ user.password is defined ? user.password : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>RoleUser</th>
-                <td>{{ user.roleUser }}</td>
+                <td>{{ user.roleUser is defined ? user.roleUser : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>DateNaiss</th>
-                <td>{{ user.dateNaiss ? user.dateNaiss|date('Y-m-d') : '' }}</td>
+                <td>{{ user.dateNaiss is defined and user.dateNaiss ? user.dateNaiss|date('Y-m-d') : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>PhoneNumber</th>
-                <td>{{ user.phoneNumber }}</td>
+                <td>{{ user.phoneNumber is defined ? user.phoneNumber : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>Statut</th>
-                <td>{{ user.statut }}</td>
+                <td>{{ user.statut is defined ? user.statut : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>Diamond</th>
-                <td>{{ user.diamond }}</td>
+                <td>{{ user.diamond is defined ? user.diamond : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>DeleteFlag</th>
-                <td>{{ user.deleteFlag }}</td>
+                <td>{{ user.deleteFlag is defined ? user.deleteFlag : 'N/A' }}</td>
             </tr>
             <tr>
                 <th>ImagesU</th>
-                <td>{{ user.imagesU }}</td>
+                <td>{{ user.imagesU is defined ? user.imagesU : 'N/A' }}</td>
             </tr>
         </tbody>
     </table>

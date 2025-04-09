@@ -27,17 +27,17 @@
         {% for user in users %}
             <tr>
                 <td>{{ user.idU }}</td>
-                <td>{{ user.name }}</td>
-                <td>{{ user.prenom }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.password }}</td>
-                <td>{{ user.roleUser }}</td>
-                <td>{{ user.dateNaiss ? user.dateNaiss|date('Y-m-d') : '' }}</td>
-                <td>{{ user.phoneNumber }}</td>
-                <td>{{ user.statut }}</td>
-                <td>{{ user.diamond }}</td>
-                <td>{{ user.deleteFlag }}</td>
-                <td>{{ user.imagesU }}</td>
+                <td>{{ user.name is defined ? user.name : 'N/A' }}</td>
+                <td>{{ user.prenom is defined ? user.prenom : 'N/A' }}</td>
+                <td>{{ user.email is defined ? user.email : 'N/A' }}</td>
+                <td>{{ user.password is defined ? user.password : 'N/A' }}</td>
+                <td>{{ user.roleUser is defined ? user.roleUser : 'N/A' }}</td>
+                <td>{{ user.dateNaiss is defined and user.dateNaiss ? user.dateNaiss|date('Y-m-d') : 'N/A' }}</td>
+                <td>{{ user.phoneNumber is defined ? user.phoneNumber : 'N/A' }}</td>
+                <td>{{ user.statut is defined ? user.statut : 'N/A' }}</td>
+                <td>{{ user.diamond is defined ? user.diamond : 'N/A' }}</td>
+                <td>{{ user.deleteFlag is defined ? user.deleteFlag : 'N/A' }}</td>
+                <td>{{ user.imagesU is defined ? user.imagesU : 'N/A' }}</td>
                 <td>
                     <a href="{{ path('app_user_show', {'id_U': user.idU}) }}">show</a>
                     <a href="{{ path('app_user_edit', {'id_U': user.idU}) }}">edit</a>

@@ -11,26 +11,62 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 #[Route('/user')]
 final class UserController extends AbstractController
 {
     private $userService;
+    private $entityManager;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, EntityManagerInterface $entityManager)
     {
         $this->userService = $userService;
+        $this->entityManager = $entityManager;
     }
 
     #[Route('/register', name: 'user_register')]
     public function register(Request $request): Response
     {
+        // Get all form data
         $email = $request->request->get('email');
         $plainPassword = $request->request->get('password');
+        $name = $request->request->get('name');
+        $prenom = $request->request->get('prenom');
+        $phoneNumber = $request->request->get('phoneNumber');
+        $dateNaiss = $request->request->get('dateNaiss');
+        $roleUser = $request->request->get('roleUser');
+        $statut = $request->request->get('statut');
+        $diamond = (int)$request->request->get('diamond');
+        $deleteFlag = (int)$request->request->get('deleteFlag');
+        $imagesU = $request->request->get('imagesU');
 
-        $user = $this->userService->createUser($email, $plainPassword);
+        // Create a new user
+        $user = new User();
+        $user->setEmail($email);
+        $user->setName($name);
+        $user->setPrenom($prenom);
+        $user->setPhoneNumber($phoneNumber);
+        $user->setDateNaiss(new \DateTime($dateNaiss));
+        $user->setRoleUser($roleUser);
+        $user->setStatut($statut);
+        $user->setDiamond($diamond);
+        $user->setDeleteFlag($deleteFlag);
+        $user->setImagesU($imagesU);
 
-        return new Response('User created with hashed password: ' . $user->getPassword());
+        // Hash the password
+        $hashedPassword = $this->userService->hashPassword($user, $plainPassword);
+        $user->setPassword($hashedPassword);
+
+        // Save the user to the database
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        // Add a success message
+        $this->addFlash('success', 'Registration successful! You can now login.');
+
+        // Redirect to login page 
+        return $this->redirectToRoute('app_login');
     }
 
     #[Route(name: 'app_user_index', methods: ['GET'])]

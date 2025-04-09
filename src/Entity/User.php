@@ -18,38 +18,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: "id_U", type: "integer")]
     private ?int $id_U = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $name;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $name = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $prenom;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $prenom = null;
 
     #[ORM\Column(type: "string", length: 255, unique: true)]
-    private string $email;
+    private ?string $email = null;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $password;
+    private ?string $password = null;
 
-    #[ORM\Column(name: "roleUser", type: "string", length: 50)]
-    private string $roleUser;
+    #[ORM\Column(name: "roleUser", type: "string", length: 50, nullable: true)]
+    private ?string $roleUser = null;
 
-    #[ORM\Column(name: "dateNaiss", type: "date")]
-    private \DateTimeInterface $dateNaiss;
+    #[ORM\Column(name: "dateNaiss", type: "date", nullable: true)]
+    private ?\DateTimeInterface $dateNaiss = null;
 
-    #[ORM\Column(name: "phoneNumber", type: "string", length: 20)]
-    private string $phoneNumber;
+    #[ORM\Column(name: "phoneNumber", type: "string", length: 20, nullable: true)]
+    private ?string $phoneNumber = null;
 
-    #[ORM\Column(name: "statut", type: "string", length: 10)]
-    private string $statut;
+    #[ORM\Column(name: "statut", type: "string", length: 10, nullable: true)]
+    private ?string $statut = null;
 
-    #[ORM\Column(name: "diamond", type: "integer")]
-    private int $diamond;
+    #[ORM\Column(name: "diamond", type: "integer", nullable: true)]
+    private ?int $diamond = null;
 
-    #[ORM\Column(name: "deleteFlag", type: "integer")]
-    private int $deleteFlag;
+    #[ORM\Column(name: "deleteFlag", type: "integer", nullable: true)]
+    private ?int $deleteFlag = null;
 
-    #[ORM\Column(name: "imagesU", type: "string", length: 255)]
-    private string $imagesU;
+    #[ORM\Column(name: "imagesU", type: "string", length: 255, nullable: true)]
+    private ?string $imagesU = null;
 
     #[ORM\OneToMany(mappedBy: "user", targetEntity: Station::class, cascade: ["persist", "remove"])]
     private Collection $stations;
@@ -57,6 +57,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->stations = new ArrayCollection();
+        $this->dateNaiss = new \DateTime();
+        $this->statut = 'active';
+        $this->diamond = 0;
+        $this->deleteFlag = 0;
+        $this->imagesU = 'default.jpg';
+        $this->roleUser = 'ROLE_USER';
     }
 
     // Getters and Setters
@@ -65,34 +71,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id_U;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
-        return $this->name;
+        return $this->name ?? '';
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
         return $this;
     }
 
-    public function getPrenom(): string
+    public function getPrenom(): ?string
     {
-        return $this->prenom;
+        return $this->prenom ?? '';
     }
 
-    public function setPrenom(string $prenom): self
+    public function setPrenom(?string $prenom): self
     {
         $this->prenom = $prenom;
         return $this;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
-        return $this->email;
+        return $this->email ?? '';
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
         return $this;
@@ -100,87 +106,87 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getPassword(): ?string
     {
-        return $this->password;
+        return $this->password ?? '';
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(?string $password): self
     {
         $this->password = $password;
         return $this;
     }
 
-    public function getRoleUser(): string
+    public function getRoleUser(): ?string
     {
-        return $this->roleUser;
+        return $this->roleUser ?? 'ROLE_USER';
     }
 
-    public function setRoleUser(string $roleUser): self
+    public function setRoleUser(?string $roleUser): self
     {
         $this->roleUser = $roleUser;
         return $this;
     }
 
-    public function getDateNaiss(): \DateTimeInterface
+    public function getDateNaiss(): ?\DateTimeInterface
     {
         return $this->dateNaiss;
     }
 
-    public function setDateNaiss(\DateTimeInterface $dateNaiss): self
+    public function setDateNaiss(?\DateTimeInterface $dateNaiss): self
     {
         $this->dateNaiss = $dateNaiss;
         return $this;
     }
 
-    public function getPhoneNumber(): string
+    public function getPhoneNumber(): ?string
     {
-        return $this->phoneNumber;
+        return $this->phoneNumber ?? '';
     }
 
-    public function setPhoneNumber(string $phoneNumber): self
+    public function setPhoneNumber(?string $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
         return $this;
     }
 
-    public function getStatut(): string
+    public function getStatut(): ?string
     {
-        return $this->statut;
+        return $this->statut ?? 'active';
     }
 
-    public function setStatut(string $statut): self
+    public function setStatut(?string $statut): self
     {
         $this->statut = $statut;
         return $this;
     }
 
-    public function getDiamond(): int
+    public function getDiamond(): ?int
     {
-        return $this->diamond;
+        return $this->diamond ?? 0;
     }
 
-    public function setDiamond(int $diamond): self
+    public function setDiamond(?int $diamond): self
     {
         $this->diamond = $diamond;
         return $this;
     }
 
-    public function getDeleteFlag(): int
+    public function getDeleteFlag(): ?int
     {
-        return $this->deleteFlag;
+        return $this->deleteFlag ?? 0;
     }
 
-    public function setDeleteFlag(int $deleteFlag): self
+    public function setDeleteFlag(?int $deleteFlag): self
     {
         $this->deleteFlag = $deleteFlag;
         return $this;
     }
 
-    public function getImagesU(): string
+    public function getImagesU(): ?string
     {
-        return $this->imagesU;
+        return $this->imagesU ?? 'default.jpg';
     }
 
-    public function setImagesU(string $imagesU): self
+    public function setImagesU(?string $imagesU): self
     {
         $this->imagesU = $imagesU;
         return $this;
@@ -218,12 +224,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // Implementing methods from UserInterface
     public function getUserIdentifier(): string
     {
-        return $this->email;
+        return $this->email ?? '';
     }
 
     public function getRoles(): array
     {
-        return [$this->roleUser];
+        return [$this->getRoleUser()];
     }
 
     public function eraseCredentials(): void

@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace App\Service;
 
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -19,22 +17,9 @@ class UserService
         $this->entityManager = $entityManager;
     }
 
-    public function createUser(string $email, string $plainPassword): User
-    {
-        $user = new User();
-        $user->setEmail($email);
-
-        // Hash the password
-        $hashedPassword = $this->hashPassword($user, $plainPassword);
-        $user->setPassword($hashedPassword);
-
-        // Save the user to the database
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-
-        return $user;
-    }
-
+    /**
+     * Hash a user's password
+     */
     public function hashPassword(User $user, string $plainPassword): string
     {
         return $this->passwordHasher->hashPassword($user, $plainPassword);
