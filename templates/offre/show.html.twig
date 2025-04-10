@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Offre{% endblock %}
+
+{% block body %}
+    <h1>Offre</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>IdO</th>
+                <td>{{ offre.idO }}</td>
+            </tr>
+            <tr>
+                <th>PriceInit</th>
+                <td>{{ offre.priceInit }}</td>
+            </tr>
+            <tr>
+                <th>PriceAfter</th>
+                <td>{{ offre.priceAfter }}</td>
+            </tr>
+            <tr>
+                <th>StartDate</th>
+                <td>{{ offre.startDate ? offre.startDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>EndDate</th>
+                <td>{{ offre.endDate ? offre.endDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>NumberLimit</th>
+                <td>{{ offre.numberLimit }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ offre.description }}</td>
+            </tr>
+            <tr>
+                <th>Place</th>
+                <td>{{ offre.place }}</td>
+            </tr>
+            <tr>
+                <th>ImagePath</th>
+                <td>{{ offre.imagePath }}</td>
+            </tr>
+            <tr>
+                <th>Aidesc</th>
+                <td>{{ offre.aidesc }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_offre_index') }}">back to list</a>
+
+    <a href="{{ path('app_offre_edit', {'idO': offre.idO}) }}">edit</a>
+
+    {{ include('offre/_delete_form.html.twig') }}
+{% endblock %}

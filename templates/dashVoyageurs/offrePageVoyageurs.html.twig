@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Offres</title>
+    <style>
+        /* Reset all margins and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .navbar {
+            display: flex;
+            background: #ffffff;
+            padding: 10px;
+            justify-content: center;
+            margin: 20px auto 0;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar a {
+            color: black;
+            text-decoration: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            color: #6c99bc;
+            border-bottom: 2px solid #6c99bc;
+        }
+        
+        .content {
+            padding: 20px;
+            text-align: center;
+            margin: 0 auto;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .offre-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+            text-align: left;
+        }
+
+        .offre-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .offre-card p {
+            margin-bottom: 5px;
+        }
+
+        .offre-card .actions {
+            margin-top: 10px;
+        }
+
+        .offre-card .actions a {
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .offre-card .actions a:hover {
+            background-color: #0056b3;
+        }
+
+        .offre-card .actions form {
+            display: inline;
+        }
+
+        .offre-card .actions form button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .offre-card .actions form button:hover {
+            background-color: #a71d2a;
+        }
+
+        .btn-new {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-new:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Horizontal -->
+    <div class="navbar">
+        <a class="nav-link" href="{{ path('app_offre_index') }}">Offres</a>
+        <a class="nav-link" href="{{ path('app_reservation_transport_index') }}">Mes Réservations</a>
+        <a class="nav-link" href="{{ path('app_reservation_transport_station') }}">Stations</a>
+        <a class="nav-link" href="{{ path('app_message_voyageurs') }}">Discussions</a>
+    </div>
+    
+    <!-- Contenu Dynamique -->
+    <div class="content">
+        <h1>Liste des Offres</h1>
+
+        <!-- Button to redirect to the new offer page -->
+        <a href="{{ path('app_offre_new') }}" class="btn-new">Créer une Nouvelle Offre</a>
+
+        {% for offre in offres %}
+            <div class="offre-card">
+                <h3>{{ offre.place }}</h3>
+                <p><strong>Prix Initial:</strong> {{ offre.priceInit }} €</p>
+                <p><strong>Prix Après Réduction:</strong> {{ offre.priceAfter }} €</p>
+                <p><strong>Date de Début:</strong> {{ offre.startDate|date('d/m/Y') }}</p>
+                <p><strong>Date de Fin:</strong> {{ offre.endDate|date('d/m/Y') }}</p>
+                <p><strong>Description:</strong> {{ offre.description }}</p>
+                {% if offre.imagePath %}
+                    <img src="{{ asset(offre.imagePath) }}" alt="Image de l'offre" style="max-width: 100%; border-radius: 10px;">
+                {% endif %}
+                <div class="actions">
+                    <a href="{{ path('app_offre_edit', { idO: offre.idO }) }}">Modifier</a>
+                    <form action="{{ path('app_offre_delete', { idO: offre.idO }) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ offre.idO) }}">
+                        <button type="submit">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <p>Aucune offre disponible pour le moment.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

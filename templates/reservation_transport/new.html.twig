@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New ReservationTransport{% endblock %}
+{% block title %}Créer une Nouvelle Offre{% endblock %}
 
 {% block body %}
 
@@ -75,6 +75,56 @@
 
         
     </script>
-    {{ include('reservation_transport/_form.html.twig') }}
+    <h1>Créer une Nouvelle Offre</h1>
+
+    {{ form_start(form) }}
+        {{ form_errors(form) }}
+
+        <div>
+            {{ form_label(form.place) }}
+            {{ form_widget(form.place) }}
+            {{ form_errors(form.place) }}
+        </div>
+
+        <div>
+            {{ form_label(form.priceInit) }}
+            {{ form_widget(form.priceInit) }}
+            {{ form_errors(form.priceInit) }}
+        </div>
+
+        <div>
+            {{ form_label(form.priceAfter) }}
+            {{ form_widget(form.priceAfter) }}
+            {{ form_errors(form.priceAfter) }}
+        </div>
+
+        <div>
+            {{ form_label(form.startDate) }}
+            {{ form_widget(form.startDate) }}
+            {{ form_errors(form.startDate) }}
+        </div>
+
+        <div>
+            {{ form_label(form.endDate) }}
+            {{ form_widget(form.endDate) }}
+            {{ form_errors(form.endDate) }}
+        </div>
+
+        <div>
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div>
+            {{ form_label(form.imagePath) }}
+            {{ form_widget(form.imagePath) }}
+            {{ form_errors(form.imagePath) }}
+        </div>
+
+        <button type="submit">Créer</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_offre_index') }}">Retour à la liste</a>
 
 {% endblock %}

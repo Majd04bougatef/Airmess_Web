@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\ReservationTransport;
 use App\Repository\StationRepository;
@@ -47,6 +48,11 @@ class Station
 
     #[ORM\Column(name: "pays",type: "string", length: 50)]
     private string $pays;
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+    }
 
     // Getters et Setters
 
