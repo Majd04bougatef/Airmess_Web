@@ -50,11 +50,14 @@ class SecurityController extends AbstractController
         
         $roles = $user->getRoles();
         
+        // Debug roles
+        // dump($roles);
+        
         if (in_array('ROLE_ADMIN', $roles)) {
             return $this->redirectToRoute('app_dash');
-        } else if (in_array('Entreprise', $roles)) {
+        } else if (in_array('ROLE_ENTREPRISE', $roles) || in_array('Entreprise', $roles)) {
             return $this->redirectToRoute('app_dashEntreprise');
-        } else if (in_array('Voyageurs', $roles)) {
+        } else if (in_array('ROLE_VOYAGEURS', $roles) || in_array('Voyageurs', $roles)) {
             return $this->redirectToRoute('app_dashVoyageurs');
         } else {
             // Default to voyageur dashboard for any other role

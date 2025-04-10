@@ -41,6 +41,13 @@ security:
         - { path: ^/sign-up, roles: PUBLIC_ACCESS }
         - { path: ^/reset-password, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/dash$, roles: ROLE_ADMIN }
+        - { path: ^/dashboardPage, roles: ROLE_ADMIN }
+        - { path: ^/UserPage, roles: ROLE_ADMIN }
+        - { path: ^/StationPage, roles: ROLE_ADMIN }
+        - { path: ^/BonplanPage, roles: ROLE_ADMIN }
+        - { path: ^/OffrePage, roles: ROLE_ADMIN }
+        - { path: ^/SocialPage, roles: ROLE_ADMIN }
         - { path: ^/dashEntreprise, roles: [ROLE_ENTREPRISE, ROLE_USER] }
         - { path: ^/dashVoyageurs, roles: [ROLE_VOYAGEURS, ROLE_USER] }
 
