@@ -60,4 +60,31 @@ class SocialMediaRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Trouver les publications par lieu (recherche partielle).
+     */
+    public function findByLieu(string $lieu): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.lieu LIKE :lieu')
+            ->setParameter('lieu', '%'.$lieu.'%')
+            ->orderBy('s.publicationDate', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    
+    public function createFilteredQueryBuilder(?string $lieu = null)
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->orderBy('s.publicationDate', 'DESC');
+
+        if ($lieu) {
+            $qb->andWhere('s.lieu LIKE :lieu')
+               ->setParameter('lieu', '%'.$lieu.'%');
+        }
+
+        return $qb;
+    }
 }

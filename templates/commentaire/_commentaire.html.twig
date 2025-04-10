@@ -1,16 +1,33 @@
 <div class="comment-item mb-3">
     <div class="card">
         <div class="card-body">
-            <div class="d-flex align-items-center mb-2">
-                {% if commentaire.user.imagesU %}
-                    <img src="{{ asset('uploads/' ~ commentaire.user.imagesU) }}" 
-                         class="rounded-circle me-2" width="40" height="40" alt="User image">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center">
+                    {% if commentaire.user.imagesU %}
+                        <img src="{{ asset('uploads/' ~ commentaire.user.imagesU) }}" 
+                             class="rounded-circle me-2" width="40" height="40" alt="User image">
+                    {% endif %}
+                    <strong>{{ commentaire.user.name }} {{ commentaire.user.prenom }}</strong>
+                </div>
+                {% if app.user and app.user.id == commentaire.user.id %}
+                <div class="comment-actions">
+                    <a href="{{ path('app_commentaire_edit', {'idC': commentaire.idC}) }}" 
+                       class="btn btn-sm btn-outline-primary me-1">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form method="post" action="{{ path('app_commentaire_delete', {'idC': commentaire.idC}) }}" 
+                          class="d-inline" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commentaire.idC) }}">
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
                 {% endif %}
-                <strong>{{ commentaire.user.name }} {{ commentaire.user.prenom }}</strong>
             </div>
             <p>{{ commentaire.description }}</p>
             <small class="text-muted">
-                {{ commentaire.createdAt|date('d/m/Y H:i') }}
+                {{ commentaire.dateCommentaire|date('d/m/Y H:i') }}
             </small>
         </div>
     </div>

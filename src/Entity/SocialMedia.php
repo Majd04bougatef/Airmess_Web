@@ -25,8 +25,8 @@ class SocialMedia
     #[ORM\Column(type: "string", length: 255)]
     #[Assert\NotBlank(message: "Le titre ne peut pas être vide")]
     #[Assert\Length(
-        min: 5,
-        max: 255,
+        min: 3,
+        max: 20,
         minMessage: "Le titre doit faire au moins {{ limit }} caractères",
         maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
     )]

@@ -11,9 +11,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\SocialMediaRepository;
+use App\Service\ForbiddenWordsChecker;
 
 #[Route('/commentaire')]
-final class CommentaireController extends AbstractController{
+final class CommentaireController extends AbstractController
+{
+    public function __construct(
+        private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker
+    ) {
+    }
     #[Route(name: 'app_commentaire_index', methods: ['GET'])]
     public function index(CommentaireRepository $commentaireRepository): Response
     {
@@ -91,6 +97,11 @@ final class CommentaireController extends AbstractController{
         $content = $request->request->get('description');
         if (empty($content)) {
             $this->addFlash('error', 'Le commentaire ne peut pas être vide.');
+            return $this->redirectToRoute('app_social_media_show', ['idEB' => $idEB]);
+        }
+
+        if ($this->forbiddenWordsChecker->containsForbiddenWords($content)) {
+            $this->addFlash('error', 'Le commentaire contient des mots interdits.');
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $idEB]);
         }
 

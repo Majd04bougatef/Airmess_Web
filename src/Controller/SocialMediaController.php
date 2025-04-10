@@ -23,6 +23,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException; // Keep for explicit checks
 use LogicException; // For default user error
+use App\Service\ForbiddenWordsChecker;
 
 
 #[Route('/social/media')]
@@ -38,7 +39,8 @@ class SocialMediaController extends AbstractController
         private UserRepository $userRepository, // Inject UserRepository
         private SluggerInterface $slugger,
         private PaginatorInterface $paginator,
-        private string $uploadsDirectory // Ensure this parameter is bound in services.yaml
+        private string $uploadsDirectory = __DIR__.'/../../assets/imagemedia',
+        private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker // Inject our new service
     ) {
     }
 
@@ -60,10 +62,10 @@ class SocialMediaController extends AbstractController
     #[Route(name: 'app_social_media_index', methods: ['GET'])]
     public function index(SocialMediaRepository $socialMediaRepository, Request $request): Response
     {
-        $queryBuilder = $socialMediaRepository->createQueryBuilder('s')
+        $lieu = $request->query->get('lieu');
+        $queryBuilder = $socialMediaRepository->createFilteredQueryBuilder($lieu)
             ->select('s', 'u')
-            ->leftJoin('s.user', 'u')
-            ->orderBy('s.publicationDate', 'DESC');
+            ->leftJoin('s.user', 'u');
 
         $pagination = $this->paginator->paginate(
             $queryBuilder,
@@ -113,7 +115,26 @@ class SocialMediaController extends AbstractController
 
 
         if ($form->isSubmitted() && $form->isValid()) {
-            dump('Inside isSubmitted && isValid block - attempting save...'); // Add this dump
+            // Check for forbidden words in title and content
+            $forbiddenInTitle = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getTitre());
+            $forbiddenInContent = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getContenu());
+
+            if (!empty($forbiddenInTitle) || !empty($forbiddenInContent)) {
+                $message = 'Contient des mots interdits: ';
+                if (!empty($forbiddenInTitle)) {
+                    $message .= 'Titre: ' . implode(', ', $forbiddenInTitle) . ' ';
+                }
+                if (!empty($forbiddenInContent)) {
+                    $message .= 'Contenu: ' . implode(', ', $forbiddenInContent);
+                }
+                $this->addFlash('error', trim($message));
+                return $this->renderCustomForm($request, 'social_media/new.html.twig', $socialMedia, $form, 'Ajouter', [
+                    'forbidden_words' => [
+                        'title' => $forbiddenInTitle,
+                        'content' => $forbiddenInContent
+                    ]
+                ]);
+            }
 
             try { // Wrap flush in try-catch for debugging DB errors
                 $this->handleImageUpload($form, $socialMedia, $request);
@@ -190,6 +211,27 @@ class SocialMediaController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Check for forbidden words in title and content
+            $forbiddenInTitle = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getTitre());
+            $forbiddenInContent = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getContenu());
+
+            if (!empty($forbiddenInTitle) || !empty($forbiddenInContent)) {
+                $message = 'Contient des mots interdits: ';
+                if (!empty($forbiddenInTitle)) {
+                    $message .= 'Titre: ' . implode(', ', $forbiddenInTitle) . ' ';
+                }
+                if (!empty($forbiddenInContent)) {
+                    $message .= 'Contenu: ' . implode(', ', $forbiddenInContent);
+                }
+                $this->addFlash('error', trim($message));
+                return $this->renderCustomForm($request, 'social_media/edit.html.twig', $socialMedia, $form, 'Mettre à jour', [
+                    'forbidden_words' => [
+                        'title' => $forbiddenInTitle,
+                        'content' => $forbiddenInContent
+                    ]
+                ]);
+            }
+
             $this->handleImageUpload($form, $socialMedia, $request, $originalImage);
             // No need to persist, Doctrine tracks changes to managed entities
             $this->entityManager->flush();
@@ -200,8 +242,38 @@ class SocialMediaController extends AbstractController
         return $this->renderCustomForm($request, 'social_media/edit.html.twig', $socialMedia, $form, 'Mettre à jour');
     }
 
+    #[Route('/{idEB}/like', name: 'app_social_media_like', methods: ['POST'], requirements: ['idEB' => '\d+'])]
+    public function like(Request $request, SocialMedia $socialMedia): Response
+    {
+        $submittedToken = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('like-post', $submittedToken)) {
+            return $this->json(['success' => false, 'error' => 'Invalid CSRF token'], 403);
+        }
+
+        $socialMedia->setLikee($socialMedia->getLikee() + 1);
+        $this->entityManager->flush();
+        
+        return $this->json([
+            'success' => true,
+            'likeCount' => $socialMedia->getLikee(),
+            'dislikeCount' => $socialMedia->getDislike()
+        ]);
+    }
+
+    #[Route('/{idEB}/dislike', name: 'app_social_media_dislike', methods: ['POST'], requirements: ['idEB' => '\d+'])]
+    public function dislike(SocialMedia $socialMedia): Response
+    {
+        $socialMedia->setDislike($socialMedia->getDislike() + 1);
+        $this->entityManager->flush();
+        
+        return $this->json([
+            'success' => true,
+            'likeCount' => $socialMedia->getLikee(),
+            'dislikeCount' => $socialMedia->getDislike()
+        ]);
+    }
+
     #[Route('/{idEB}/commentaire', name: 'app_social_media_ajouter_commentaire', methods: ['POST'], requirements: ['idEB' => '\d+'])]
-    // No longer requires login - uses default user
     public function ajouterCommentaire(Request $request, SocialMedia $socialMedia): RedirectResponse // Return type is RedirectResponse
     {
         $commentaire = new Commentaire();
@@ -296,17 +368,14 @@ class SocialMediaController extends AbstractController
             $newFilename = $this->uploadImage($imageFile);
             $socialMedia->setImagemedia($newFilename);
 
-            // Delete the old image if a new one was uploaded successfully and an old one existed
             if ($originalImage && $originalImage !== $newFilename) {
                  @unlink($this->uploadsDirectory . '/' . $originalImage);
             }
-        } elseif ($request->request->get('remove_imagemedia')) { // Handle image removal checkbox/flag (ensure your form supports this if needed)
+        } elseif ($request->request->get('remove_imagemedia')) { 
              $this->handleImageDeletion($socialMedia);
              $socialMedia->setImagemedia(null);
         } else {
-             // Keep the original image if no new file uploaded and no removal requested
-             // Ensure entity is loaded with original value if not submitted
-             // This logic might need adjustment depending on how forms handle unchanged FileType fields
+             
              if ($originalImage && !$socialMedia->getImagemedia() && !$request->files->has($form->get('imagemedia')->getName())) {
                  $socialMedia->setImagemedia($originalImage);
              }
@@ -365,12 +434,9 @@ class SocialMediaController extends AbstractController
             : $this->redirectToRoute('app_social_media_index', [], Response::HTTP_SEE_OTHER); // Redirect for non-AJAX
     }
 
-    /**
-     * Renders the index content partial, typically for AJAX responses.
-     */
+   
     private function renderUpdatedIndex(): Response
     {
-        // Re-fetch the first page of results to update the list
         $repo = $this->entityManager->getRepository(SocialMedia::class);
         $queryBuilder = $repo->createQueryBuilder('s')
             ->select('s', 'u')
@@ -379,7 +445,7 @@ class SocialMediaController extends AbstractController
 
         $pagination = $this->paginator->paginate(
             $queryBuilder,
-            1, // Always render page 1 for AJAX index updates
+            1, 
             self::POSTS_PER_PAGE
         );
 
@@ -388,18 +454,14 @@ class SocialMediaController extends AbstractController
         ]);
     }
 
-    /**
-     * Renders the form, handling AJAX vs non-AJAX requests and validation status.
-     */
     protected function renderCustomForm(Request $request, string $template, SocialMedia $socialMedia, $form, string $buttonLabel): Response
     {
         $usePartial = $request->isXmlHttpRequest();
         $view = $usePartial ? 'social_media/_form.html.twig' : $template;
 
-        // Determine HTTP status code for response (especially useful for AJAX validation)
         $status = ($form->isSubmitted() && !$form->isValid())
-            ? Response::HTTP_UNPROCESSABLE_ENTITY // 422 for validation errors
-            : Response::HTTP_OK; // 200 otherwise
+            ? Response::HTTP_UNPROCESSABLE_ENTITY 
+            : Response::HTTP_OK;
 
         return $this->render($view, [
             'social_media' => $socialMedia,

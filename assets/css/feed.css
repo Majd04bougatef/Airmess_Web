@@ -1,203 +1,675 @@
-/* public/css/feed.css */
+/* ==========================================================================
+   Base & General Styles
+   ========================================================================== */
 
-/* Main container styling (optional, base.html.twig might handle this) */
-.feed-container {
-    /* background-color: #f8f9fa; */
-    /* padding: 2rem 0; */
+   body {
+    background-color: #f8f9fa; /* Light gray background */
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Scrollable area for posts */
-.posts-scroll-pane {
-    max-height: 65vh; /* Adjust height as needed */
-    overflow-y: auto;
-    padding: 20px; /* Padding inside the scroll area for edge spacing */
+a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+a:hover {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+/* General card/section styling for consistency */
+.post-card,
+.comments-section {
+    background-color: #ffffff;
     border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-    background-color: #f8f9fa; /* Slightly off-white background for the scroll pane */
+    border-radius: 8px; /* Consistent rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07); /* Softer, consistent shadow */
+    margin-bottom: 2rem; /* Spacing */
+    overflow: hidden; /* Important for child elements like images */
+}
+
+/* Container for the main feed content */
+.feed-container {
+     /* Specific styles if needed for feed page layout */
+}
+
+/* Container for the show page (helps center content) */
+.show-page-container { /* Add this class to the main container div in show.html.twig if needed */
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+
+/* ==========================================================================
+   Feed Page Specific (Index) - Scroll Pane
+   ========================================================================== */
+
+.posts-scroll-pane {
+    max-height: 70vh; /* Adjust height as needed */
+    overflow-y: auto;
+    padding: 15px; /* Padding inside scroll area */
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background-color: #f1f3f5; /* Slightly different background for scroll area */
     margin-bottom: 1.5rem;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Inner shadow for depth */
-    /* Added for smooth content transition during AJAX load */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
     transition: opacity 0.3s ease-in-out;
 }
 
-/* Styling for individual post cards */
-.post-card {
-    border: 1px solid #e9ecef; /* Subtle border for each card */
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.07); /* Slightly softer shadow */
-    /* --- INCREASED MARGIN HERE --- */
-    margin-bottom: 2.5rem; /* Further increased space between cards (adjust as needed) */
-    border-radius: 0.375rem;
-    background-color: #fff;
-}
- .post-card:last-child {
-    margin-bottom: 0; /* No margin on the last card inside scroll pane */
+/* Remove margin from last card *inside the scroll pane* */
+.posts-scroll-pane .post-card:last-child {
+    margin-bottom: 0;
 }
 
-.post-card .card-img-top {
-    max-height: 300px;
-    max-width: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    border-top-left-radius: 0.375rem;
-    border-top-right-radius: 0.375rem;
-    border-bottom: 1px solid #e9ecef;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    margin: 0 auto;
-    display: block;
-}
+/* ==========================================================================
+   Post Card Shared Styles (Feed & Show)
+   ========================================================================== */
 
- .post-card .card-body {
-    padding: 1.25rem;
- }
-
- /* Styling for the post author */
-.post-author {
+/* --- Post Header --- */
+.post-header {
     display: flex;
     align-items: center;
-    font-size: 0.9em;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 0.75rem; /* Space below author name */
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f1f3f5; /* Lighter separator */
 }
-.post-author i { /* Style for user icon */
-    margin-right: 0.5rem;
+
+.post-author-img { /* Used in show.html.twig */
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    flex-shrink: 0; /* Prevent shrinking */
+    margin-right: 0.8rem; /* From me-3 */
+}
+
+.post-author-info {
+    flex-grow: 1;
+    line-height: 1.3; /* Tighter line height for name/date */
+}
+
+.post-author-name { /* Applied to the <strong> or container */
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.1rem !important; /* Reduce space below name */
+    display: block; /* Ensure it takes block space */
+}
+.post-author-name a {
+    color: inherit;
+}
+.post-author-name a:hover {
+    text-decoration: underline;
+}
+
+.post-timestamp { /* Applied to the <small> tag */
+    font-size: 0.85em;
     color: #6c757d;
-    font-size: 1.2em; /* Slightly larger icon */
-}
- /* Optional: if you link the author name */
- .post-author a {
-     color: inherit;
-     text-decoration: none;
- }
-  .post-author a:hover {
-      text-decoration: underline;
-  }
-
-.post-card .card-title {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    font-size: 1.15rem; /* Slightly larger title */
 }
 
-.post-card .card-text {
-    color: #495057;
-    margin-bottom: 1rem; /* More space after content */
-    line-height: 1.6; /* Improve readability */
+/* --- Dropdown Action Button (Edit/Delete) --- */
+.post-header .dropdown {
+    margin-left: auto; /* Pushes to the right */
+}
+.post-header .dropdown .btn-icon { /* Style the button toggler */
+    padding: 0.2rem 0.4rem;
+    background: none;
+    border: none;
+    color: #6c757d;
+    line-height: 1;
+    border-radius: 50%; /* Make it round */
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+.post-header .dropdown .btn-icon:hover,
+.post-header .dropdown .btn-icon:focus {
+    background-color: #e9ecef; /* Subtle hover */
+    color: #343a40;
+    box-shadow: none;
+}
+.post-header .dropdown .dropdown-menu {
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Nicer shadow */
+    border-color: #e9ecef;
+}
+.post-header .dropdown .dropdown-item {
+    padding: 0.4rem 1rem;
+    transition: background-color 0.15s ease;
+}
+.post-header .dropdown .dropdown-item i {
+    width: 1.5em;
+    margin-right: 0.5rem; /* Space between icon and text */
+    color: #6c757d;
+    vertical-align: middle;
+}
+.post-header .dropdown .dropdown-item.text-danger i {
+    color: inherit; /* Inherit red color */
+}
+.post-header .dropdown .dropdown-item:active {
+    background-color: #e9ecef; /* Feedback on click */
 }
 
-.post-meta {
+
+/* --- Post Content & Title --- */
+.post-content {
+    padding: 1.25rem;
+    color: #3a3f44; /* Slightly darker, richer text color */
+    line-height: 1.7; /* IMPROVED Readability */
+    font-size: 0.98rem; /* Slightly larger base text */
+}
+/* Enhance title if you add one inside .post-content */
+.post-content .post-title { /* Example if you add <h4 class="post-title"> */
+    font-size: 1.4rem;
+    font-weight: 700; /* BOLDER Title */
+    color: #1c1e21; /* Darker Title */
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+.post-content p:last-child {
+    margin-bottom: 0; /* Clean up spacing */
+}
+
+/* --- Post Image --- */
+.post-image-container {
+    background-color: #f0f2f5; /* Slightly different background for image area */
+    margin: 0; /* Remove margin, handled by card padding */
+    text-align: center; /* Center images narrower than the card */
+}
+.post-image-container img {
+    max-height: 65vh; /* Generous max height */
+    max-width: 100%; /* Ensure it doesn't overflow card */
+    width: auto; /* Maintain aspect ratio if not full width */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: contain; /* Show whole image, letterbox if needed */
+    display: block; /* Remove extra space */
+    margin: 0 auto; /* Center image if aspect ratio makes it narrow */
+    border-top: 1px solid #f1f3f5; /* Optional subtle top border */
+    border-bottom: 1px solid #f1f3f5; /* Optional subtle bottom border */
+}
+/* On feed view, maybe constrain image height more */
+.posts-scroll-pane .post-image-container img {
+    max-height: 400px;
+}
+
+
+/* --- Post Stats (Likes/Comments Count - from show.twig) --- */
+.post-stats {
+    padding: 0.6rem 1.25rem;
     font-size: 0.875em;
     color: #6c757d;
-    margin-bottom: 1rem;
+    border-top: 1px solid #f1f3f5; /* Add separator */
 }
-.post-meta strong {
-    color: #495057;
+.post-stats i {
+    vertical-align: middle;
+    margin-right: 0.3rem;
+    font-size: 1.1em; /* Slightly larger icons */
 }
-.post-meta i { /* Style for meta icons */
-    margin-right: 0.4rem;
-    color: #6c757d;
-    width: 1em; /* Align icons roughly */
-    text-align: center;
+.post-stats .bi-hand-thumbs-up-fill {
+    color: var(--bs-primary); /* Use Bootstrap primary color */
 }
 
-/* Container for action buttons */
+
+/* --- Post Actions Bar (Like/Comment/Edit/Delete Buttons) --- */
 .post-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem; /* Space between buttons */
-    border-top: 1px solid #eee;
-    padding-top: 1rem;
-    margin-top: 1rem;
+    /* justify-content: space-around; */ /* space-around might create too much space if few buttons */
+    justify-content: center; /* Center the buttons */
+    align-items: stretch; /* Make items stretch vertically */
+    flex-wrap: wrap; /* Allow wrapping */
+    background-color: #fcfdff;
+    padding: 0.5rem; /* Adjusted padding */
+    border-top: 1px solid #e9ecef;
 }
 
- .post-actions .btn i {
-    margin-right: 0.35rem;
- }
-
-/* Center pagination and add post button */
-.pagination-controls,
-.add-post-section {
-    display: flex;
-    justify-content: center;
-    margin-top: 1.5rem;
+/* Style for the form containing the delete button */
+.post-actions form {
+    display: flex; /* Make form a flex item */
+    flex-grow: 1; /* Allow form to grow like other buttons */
+    margin: 0; /* Reset form margin */
+     /* mx-1 my-1 class handles spacing */
 }
 
-/* Style for the 'no posts' message */
-.no-posts-message {
+/* General style for all action buttons/links */
+.post-actions .btn-action {
+    flex-grow: 1; /* Allow buttons to grow */
+    flex-basis: 0; /* Allow buttons to shrink below their content size if needed */
+    min-width: 100px; /* Ensure buttons have a minimum width */
+    margin: 0.25rem 0.25rem; /* Consistent margin using CSS */
+    padding: 0.6rem 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #5a6a7a;
+    border: none;
+    background-color: transparent;
+    border-radius: 6px;
     text-align: center;
-    padding: 2rem;
-    color: #6c757d;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.1s ease;
+    line-height: 1.4; /* Adjust line-height for alignment */
+    display: inline-flex; /* Use flex for icon/text alignment inside button */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Make the button inside the form fill the form's space */
+.post-actions form .btn-action {
+   width: 100%; /* Fill the form wrapper */
 }
 
 
-/* --- Styles previously in show.html.twig --- */
-/* (These are now global via feed.css) */
-
-/* Styles pour les avatars (if used elsewhere or for comments) */
-.avatar-sm { width: 40px; height: 40px; object-fit: cover; border: 1px solid #eee; border-radius: 50%;}
-.comment-avatar { width: 32px; height: 32px; object-fit: cover; border: 1px solid #eee; border-radius: 50%; }
-
-/* Ajustement des images DANS la publication (show page specific maybe) */
-/* Consider if this should only apply within a specific container on the show page */
-.post-image-container img {
-    max-height: 400px;
-    max-width: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    background-color: #f8f9fa;
-    border-radius: 0.25rem;
-    border: 1px solid #dee2e6;
-    margin: 0 auto 1rem auto;
-    display: block;
+/* Standard hover/active */
+.post-actions .btn-action:not(.text-danger):hover {
+    background-color: #e9eef2;
+    color: #343a40;
+    transform: translateY(-1px);
+}
+.post-actions .btn-action:not(.text-danger):active {
+    transform: translateY(0px);
+    background-color: #dce3e9;
 }
 
-@media (max-width: 768px) {
-    .post-card .card-img-top,
-    .post-image-container img {
-        max-height: 300px;
+/* Danger button specific styles */
+.post-actions .btn-action.text-danger {
+    color: #dc3545; /* Bootstrap danger */
+    /* Optional: border? background? */
+}
+.post-actions .btn-action.text-danger:hover {
+    background-color: rgba(220, 53, 69, 0.1); /* Light danger background on hover */
+    color: #a4212e; /* Darker danger text on hover */
+    transform: translateY(-1px);
+}
+.post-actions .btn-action.text-danger:active {
+    transform: translateY(0px);
+    background-color: rgba(220, 53, 69, 0.15); /* Slightly darker danger background active */
+    color: #a4212e;
+}
+
+
+/* Icons within action buttons */
+.post-actions .btn-action i {
+    margin-right: 0.5rem;
+    font-size: 1.15em;
+    /* vertical-align: middle; */ /* Flex alignment handles this better */
+    /* position: relative; */
+    /* top: -1px; */
+}
+
+/* Optional: Hide text on very small screens */
+@media (max-width: 450px) {
+    .post-actions .btn-action .action-text {
+        display: none; /* Hide the text */
+    }
+    .post-actions .btn-action i {
+        margin-right: 0; /* Remove margin when text is hidden */
+        font-size: 1.3em; /* Make icon slightly larger */
+    }
+    .post-actions .btn-action {
+        min-width: 50px; /* Reduce min-width when only icon */
     }
 }
 
-/* Style du formulaire de commentaire */
-.comment-form .form-control { border-radius: 1.5rem; padding-left: 1.25rem; }
-.comment-form .btn { border-radius: 1.5rem; }
 
-/* Style des boutons d'action sous la publication (show page specific maybe) */
-/* If these button styles are different from index, scope them e.g., .show-page-container .post-actions .btn */
-/* .post-actions .btn { flex-grow: 1; margin: 0 2px; } */ /* This might conflict with index layout, check */
-
-/* Style des boutons admin (modifier/supprimer) */
-.admin-actions .btn { margin-left: 5px; }
-
-/* Style des bulles de commentaires */
-.comment-card {
-    background-color: #f0f2f5;
-    border: none;
-    border-radius: 1rem;
-    padding: 0.75rem 1rem;
-    word-wrap: break-word; /* Prevent long words breaking layout */
-    margin-bottom: 1rem; /* Space between comments */
+/* Liked state (same as before) */
+.post-actions .btn-action.liked {
+    color: var(--bs-primary);
 }
-.comment-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.3rem;
+.post-actions .btn-action.liked i.bi-hand-thumbs-up::before {
+    content: "\f393";
 }
-.comment-author {
+/* ==========================================================================
+   Comments Section (Show Page Specific)
+   ========================================================================== */
+
+/* Ensure comments section doesn't have double borders if it follows a card */
+.post-card + .comments-section {
+    border-top: none; /* Remove top border if directly after post */
+    margin-top: -1px; /* Overlap slightly to hide potential gap */
+    border-top-left-radius: 0; /* Match card bottom */
+    border-top-right-radius: 0;
+}
+
+.comments-section {
+    padding: 1.5rem;
+}
+.comments-section .section-title { /* The H3 */
+    font-size: 1.3rem;
     font-weight: 600;
-    margin-right: 0.5rem;
-    font-size: 0.9em;
+    color: #343a40;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.8rem !important;
+    border-bottom: 1px solid #e9ecef;
 }
-.comment-date {
+
+/* Comment Author Image */
+.comment-author-img { /* Used in comments */
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid #eee;
+    flex-shrink: 0;
+}
+
+/* Add Comment Form */
+.add-comment-form-container { /* The d-flex container */
+    margin-bottom: 2.5rem !important; /* More space before list */
+}
+.add-comment-form-container .comment-author-img { /* User's avatar */
+    margin-top: 0.25rem;
+}
+.add-comment-form { /* The form element itself */
+    position: relative; /* For positioning the button */
+}
+.add-comment-form .comment-input { /* The textarea */
+    border-radius: 18px; /* More rounded */
+    padding: 0.7rem 3.5rem 0.7rem 1.1rem; /* Adjust padding: top/bottom, right(for button), left */
+    min-height: 45px; /* Good minimum height */
+    line-height: 1.5;
+    font-size: 0.95rem;
+    background-color: #f1f3f5; /* Subtle background for input */
+    border: 1px solid #e1e4e8;
+    resize: none;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease;
+}
+.add-comment-form .comment-input:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2);
+    background-color: #fff;
+    outline: none;
+}
+.add-comment-form .btn-send-comment {
+    position: absolute;
+    top: 50%;
+    right: 0.6rem;
+    transform: translateY(-50%);
+    padding: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+    color: #ffffff;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+    transition: background-color 0.2s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.2s ease-in-out;
+    z-index: 10; /* <<< ADD THIS LINE */
+}
+.add-comment-form .btn-send-comment:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+.add-comment-form .btn-send-comment i {
+    font-size: 1rem;
+    line-height: 1; /* Ensure icon is centered */
+}
+
+/* --- Individual Comments --- */
+#comments-list {
+    /* Styles for the container ul/div if needed */
+}
+.comment-entry { /* The d-flex container for a single comment */
+    padding-bottom: 1rem;
+    margin-bottom: 1rem !important;
+    border-bottom: 1px solid #f1f3f5;
+}
+.comment-entry:last-child {
+    border-bottom: none;
+    margin-bottom: 0 !important;
+    padding-bottom: 0;
+}
+
+.comment-bubble { /* The div wrapping name/text */
+    background-color: #f1f3f5; /* Bubble background */
+    border-radius: 15px; /* Rounded bubble */
+    padding: 0.5rem 0.9rem; /* Bubble padding */
+    display: inline-block;
+    max-width: 100%;
+}
+
+.comment-author-name { /* Strong tag inside bubble */
+    font-size: 0.88em;
+    font-weight: 600;
+    color: #1c1e21;
+    display: block; /* Ensure block display */
+    margin-bottom: 0.15rem !important; /* Space between name and text */
+}
+.comment-text { /* The actual comment p tag */
+    font-size: 0.95em;
+    color: #3a3f44;
+    line-height: 1.55;
+    word-wrap: break-word;
+    white-space: pre-wrap; /* Respect newlines */
+    margin-bottom: 0 !important;
+}
+
+/* Comment Meta (Date, Like, Reply) */
+.comment-meta { /* Div below bubble */
     font-size: 0.8em;
     color: #6c757d;
+    padding-left: 0.9rem; /* Indent slightly */
+    margin-top: 0.3rem !important;
 }
-.comment-text {
-    display: block;
-    margin-top: 0.25rem;
-    font-size: 0.95em;
-    line-height: 1.5;
+.comment-meta .comment-action-link { /* Like/Reply links */
+    color: #5a6a7a;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 0.75rem; /* Space actions */
+    transition: color 0.2s ease;
+}
+.comment-meta .comment-action-link:first-of-type {
+    margin-left: 0; /* No left margin on first action */
+}
+.comment-meta .comment-action-link:hover {
+    color: #343a40;
+    text-decoration: underline;
+}
+
+/* --- No Comments Message --- */
+#comments-list > .text-center.text-muted {
+    padding: 2rem 0;
+    font-style: italic;
+}
+/* --- Comment Actions --- */
+.comment-meta {
+    gap: 0.75rem; /* Use gap for spacing between flex items (links/form) */
+    padding-left: 0 !important; /* Override ps-3 if using gap */
+}
+
+/* Ensure the links and the delete button align well */
+.comment-meta .comment-action-link,
+.comment-meta .delete-comment-form button {
+    vertical-align: middle; /* Helps align text and icons */
+    line-height: 1.2; /* Adjust if needed */
+}
+
+/* Style for the delete button (styled as a link) */
+.delete-comment-form button.comment-action-link {
+    text-decoration: none; /* Remove default button underline if any */
+    cursor: pointer;
+}
+.delete-comment-form button.comment-action-link:hover {
+    text-decoration: underline; /* Add underline on hover like other links */
+    color: #a4212e !important; /* Darker danger color on hover */
+}
+
+/* Add icons to action links (optional consistency) */
+.comment-action-link i {
+    margin-right: 0.25rem; /* Space between icon and text */
+    font-size: 0.95em; /* Adjust icon size */
+}
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+
+.navigation .pagination {
+    margin-bottom: 0;
+    justify-content: center; /* Center pagination */
+}
+.navigation .page-item .page-link {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    transition: all 0.2s ease;
+}
+.navigation .page-item.active .page-link {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+}
+.navigation .page-item:not(.active) .page-link:hover {
+    background-color: #e9ecef;
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 767.98px) { /* Below Medium */
+    .post-card,
+    .comments-section {
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+        box-shadow: none;
+        /* Use container border instead */
+        border-top: 1px solid #dee2e6;
+        border-bottom: 1px solid #dee2e6;
+        margin-left: -var(--bs-gutter-x, 0.75rem); /* Extend to screen edge */
+        margin-right: -var(--bs-gutter-x, 0.75rem);
+        margin-bottom: 1rem;
+    }
+
+    /* Remove top/bottom border for first/last element in main container */
+     .container > .row > .col-lg-9 > *:first-child {
+       border-top: none;
+       margin-top: -1px; /* Prevent jump */
+    }
+     .container > .row > .col-lg-9 > *:last-child {
+       border-bottom: none;
+    }
+    /* Adjust padding on mobile */
+    .post-header,
+    .post-content,
+    .post-stats,
+    .comments-section,
+    .post-image-container img { /* Also constrain image padding */
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+     .post-actions {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    /* Reduce avatar sizes slightly */
+    .post-author-img,
+    .comment-author-img {
+        width: 40px;
+        height: 40px;
+    }
+     .add-comment-form-container .comment-author-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Adjust comment bubble padding */
+    .comment-bubble {
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+@media (max-width: 575.98px) { /* Below Small */
+     .post-actions .btn-action {
+        font-size: 0.85rem; /* Slightly smaller text */
+        padding: 0.5rem 0.3rem;
+    }
+     .post-actions .btn-action i {
+         font-size: 1.1em; /* Adjust icon size */
+         margin-right: 0.3rem;
+     }
+    /* Optionally hide action text like "Commenter" on very small screens */
+    /* .post-actions .btn-action span { display: none; } */
+    /* .post-actions .btn-action i { margin-right: 0; } */
+
+    /* Adjust comment input padding */
+     .add-comment-form .comment-input {
+        padding: 0.6rem 3rem 0.6rem 0.9rem;
+        min-height: 40px;
+    }
+     .add-comment-form .btn-send-comment {
+        right: 0.5rem;
+        width: 28px;
+        height: 28px;
+    }
+      .add-comment-form .btn-send-comment i {
+         font-size: 0.9rem;
+     }
+     /* --- Add Comment Form - Enhanced Send Button --- */
+.add-comment-form { /* Ensure the parent form has position: relative */
+    position: relative;
+}
+
+.add-comment-form .btn-send-comment { /* The Send Icon Button */
+    position: absolute;
+    top: 50%;
+    right: 0.6rem; /* Position from right edge of the form div */
+    transform: translateY(-50%); /* Vertically center */
+    padding: 0; /* Remove padding, control size with width/height */
+    width: 34px; /* Slightly larger button */
+    height: 34px; /* Slightly larger button */
+    border-radius: 50%; /* Perfectly round */
+    background-color: var(--bs-primary); /* Use Bootstrap primary color */
+    color: #ffffff; /* White icon */
+    border: none;
+    display: inline-flex; /* Use inline-flex for centering icon */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    outline: none; /* Remove default outline */
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3); /* Subtle shadow */
+    transition: background-color 0.2s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transitions */
+}
+
+.add-comment-form .btn-send-comment:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4); /* Enhance shadow on hover */
+    transform: translateY(-50%) scale(1.05); /* Combine centering with slight scale up */
+}
+
+.add-comment-form .btn-send-comment:active {
+    background-color: #004a99; /* Even darker blue when pressed */
+    transform: translateY(-50%) scale(0.98); /* Slight scale down when pressed */
+    box-shadow: 0 1px 2px rgba(0, 123, 255, 0.2); /* Reduce shadow when pressed */
+}
+
+/* Accessibility: Style for keyboard focus */
+.add-comment-form .btn-send-comment:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.5); /* Standard Bootstrap focus ring */
+}
+
+.add-comment-form .btn-send-comment i { /* The icon itself */
+    font-size: 1rem; /* Adjust icon size as needed */
+    line-height: 1; /* Ensure icon is vertically centered within the flex container */
+    /* No extra margin needed due to flex centering */
+}
+
+/* --- Responsive adjustments for the send button --- */
+@media (max-width: 575.98px) {
+    .add-comment-form .btn-send-comment {
+        right: 0.5rem; /* Closer to edge on small screens */
+        width: 30px; /* Slightly smaller */
+        height: 30px;
+    }
+    .add-comment-form .btn-send-comment i {
+        font-size: 0.9rem; /* Smaller icon */
+    }
+}
 }
