@@ -10,9 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: "bonplan")]
 class BonPlan
 {
-     #[ORM\Id]
-     #[ORM\GeneratedValue]
-     #[ORM\Column(name: 'idP', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'idP', type: 'integer')]
     private ?int $idP = null;
 
     #[ORM\Column(type: 'integer')]
@@ -30,14 +30,16 @@ class BonPlan
     )]
     private ?string $nomplace = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message: "La localisation est requise.")]
     #[Assert\Length(
         max: 255,
         maxMessage: "La localisation ne peut pas dépasser {{ limit }} caractères."
     )]
     private ?string $localisation = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(type: 'text')]
+    #[Assert\NotBlank(message: "La description est requise.")]
     #[Assert\Length(
         max: 1000,
         maxMessage: "La description ne peut pas dépasser {{ limit }} caractères."
@@ -50,12 +52,10 @@ class BonPlan
         choices: ['restaurant', 'hôtel', 'activité', 'autre'],
         message: "Choisissez un type valide : restaurant, hôtel, activité ou autre."
     )]
-private ?string $typePlace = null;
+    private ?string $typePlace = null;
 
-
-
-#[ORM\Column(name: 'imageBP', type: 'string', length: 500, nullable: true)]
-private ?string $imageBP = null;
+    #[ORM\Column(name: 'imageBP', type: 'string', length: 500)]
+        private ?string $imageBP = null;
 
     // Getters et Setters
     public function getId(): ?int
@@ -90,7 +90,7 @@ private ?string $imageBP = null;
         return $this->localisation;
     }
 
-    public function setLocalisation(?string $localisation): self
+    public function setLocalisation(string $localisation): self
     {
         $this->localisation = $localisation;
         return $this;
@@ -101,7 +101,7 @@ private ?string $imageBP = null;
         return $this->description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription(string $description): self
     {
         $this->description = $description;
         return $this;
@@ -123,7 +123,7 @@ private ?string $imageBP = null;
         return $this->imageBP;
     }
 
-    public function setImageBP(?string $imageBP): self
+    public function setImageBP(string $imageBP): self
     {
         $this->imageBP = $imageBP;
         return $this;

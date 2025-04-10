@@ -11,26 +11,21 @@
     border-radius: 20px;
     padding: 2rem;
 }
-
 .contact-form .form-control {
     border-radius: 1rem;
 }
-
 .contact-image {
     text-align: center;
 }
-
 .contact-image img {
     width: 11%;
     margin-top: -3%;
 }
-
 .contact-form h3 {
     margin-top: 3%;
     text-align: center;
     color: rgb(197, 0, 204);
 }
-
 .contact-form .btnContact {
     width: 50%;
     border: none;
@@ -41,7 +36,6 @@
     color: #fff;
     cursor: pointer;
 }
-
 .btnn {
     width: 100%;
     border-radius: 1rem;
@@ -57,7 +51,6 @@
     margin-top: 5px;
     font-weight: bold;
 }
-
 </style>
 
 <div class="container contact-form">
@@ -66,8 +59,15 @@
     </div>
     <h3>Ajouter un Bon Plan</h3>
 
-{% form_theme form _self %}
-    {{ form_start(form, {'method': 'POST', 'action': path('app_bonplan_new') , attr: {'novalidate': 'novalidate'}}) }}
+    {% form_theme form _self %}
+    {{ form_start(form, {
+        'method': 'POST',
+        'action': path('app_bonplan_new'),
+        'attr': {
+            'novalidate': 'novalidate',
+            'enctype': 'multipart/form-data'
+        }
+    }) }}
 
     <div class="row">
         <div class="col-md-6">
@@ -75,11 +75,8 @@
                 {{ form_row(form.id_U, {'attr': {'class': 'form-control'}}) }}
             </div>
             <div class="form-group">
-    {{ form_label(form.nomplace) }}
-    {{ form_widget(form.nomplace, {'attr': {'class': 'form-control'}}) }}
-    {{ form_errors(form.nomplace) }}
-</div>
-
+                {{ form_row(form.nomplace, {'attr': {'class': 'form-control'}}) }}
+            </div>
             <div class="form-group">
                 {{ form_row(form.localisation, {'attr': {'class': 'form-control'}}) }}
             </div>
@@ -99,19 +96,18 @@
     </div>
 
     <div class="form-group text-center mt-4">
-        <button class="btnn">{{ button_label|default('Save') }}</button>
+        <button class="btnn">{{ button_label|default('Enregistrer') }}</button>
     </div>
-    
-
 
     {{ form_end(form) }}
+
+    {% block form_errors %}
+        {% if form.vars.errors|length > 0 %}
+            <div class="form-error">
+                {% for error in form.vars.errors %}
+                    {{ error.message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endblock %}
 </div>
-{% block form_errors %}
-    {% if form.vars.errors|length > 0 %}
-        <div class="form-error">
-            {% for error in form.vars.errors %}
-                {{ error.message }}
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endblock %}
