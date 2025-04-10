@@ -8,9 +8,14 @@ framework:
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
     # Remove or comment this section to explicitly disable session support.
     session:
-        handler_id: null
+        handler_id: 'session.handler.native_file'
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
         cookie_secure: auto
         cookie_samesite: lax
+        cookie_lifetime: 86400  # 24 hours in seconds
+        gc_maxlifetime: 86400   # 24 hours in seconds
+        sid_length: 48          # recommended security setting
+        sid_bits_per_character: 6
 
     #esi: true
     #fragments: true
