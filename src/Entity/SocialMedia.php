@@ -26,7 +26,7 @@ class SocialMedia
     #[Assert\NotBlank(message: "Le titre ne peut pas être vide")]
     #[Assert\Length(
         min: 3,
-        max: 20,
+        max: 50,
         minMessage: "Le titre doit faire au moins {{ limit }} caractères",
         maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
     )]

@@ -37,9 +37,7 @@ class SocialMediaRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * Trouver les publications les plus aimées.
-     */
+    
     public function findMostLiked(int $limit = 10): array
     {
         return $this->createQueryBuilder('s')
@@ -49,9 +47,7 @@ class SocialMediaRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /**
-     * Trouver les publications par utilisateur.
-     */
+   
     public function findByUser(int $userId): array
     {
         return $this->createQueryBuilder('s')
@@ -61,9 +57,7 @@ class SocialMediaRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /**
-     * Trouver les publications par lieu (recherche partielle).
-     */
+    
     public function findByLieu(string $lieu): array
     {
         return $this->createQueryBuilder('s')

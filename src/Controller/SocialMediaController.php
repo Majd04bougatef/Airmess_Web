@@ -9,7 +9,7 @@ use App\Form\CommentaireType;
 use App\Form\SocialMediaType;
 use App\Repository\CommentaireRepository;
 use App\Repository\SocialMediaRepository;
-use App\Repository\UserRepository; // Import UserRepository
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,11 +18,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-// use Symfony\Component\Security\Http\Attribute\IsGranted; // Attributes removed where default user is used
+// use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException; // Keep for explicit checks
-use LogicException; // For default user error
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use LogicException;
 use App\Service\ForbiddenWordsChecker;
 
 
@@ -31,33 +31,26 @@ class SocialMediaController extends AbstractController
 {
     private const POSTS_PER_PAGE = 5;
     private const COMMENTS_PER_PAGE = 5;
-    private const DEFAULT_USER_ID = 1; // Define the default user ID
+    private const DEFAULT_USER_ID = 1;
 
-    // Inject UserRepository to find the default user easily
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private UserRepository $userRepository, // Inject UserRepository
+        private UserRepository $userRepository,
         private SluggerInterface $slugger,
         private PaginatorInterface $paginator,
         private string $uploadsDirectory = __DIR__.'/../../assets/imagemedia',
-        private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker // Inject our new service
+        private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker
     ) {
     }
 
-    /**
-     * Helper function to get the default user entity.
-     * Throws an exception if the default user is not found.
-     */
     private function getDefaultUser(): User
     {
         $defaultUser = $this->userRepository->find(self::DEFAULT_USER_ID);
         if (!$defaultUser) {
-            // This is a critical configuration error if the default user doesn't exist
             throw new LogicException('Default user with ID ' . self::DEFAULT_USER_ID . ' not found in the database. Please ensure this user exists.');
         }
         return $defaultUser;
     }
-
 
     #[Route(name: 'app_social_media_index', methods: ['GET'])]
     public function index(SocialMediaRepository $socialMediaRepository, Request $request): Response
@@ -95,27 +88,18 @@ class SocialMediaController extends AbstractController
         $form = $this->createForm(SocialMediaType::class, $socialMedia);
         $form->handleRequest($request);
 
-        // --- DEBUGGING START ---
-        if ($form->isSubmitted()) { // Check if submitted first
+        if ($form->isSubmitted()) {
              if (!$form->isValid()) {
-                 // Dump the errors to the screen/profiler
                  dump('Form is submitted but NOT valid.');
-                 // Get errors as a string for easy viewing
                  dump((string) $form->getErrors(true, false));
-                 // Optionally dump the data that was submitted
-                 dump($form->getData()); // See the entity state after handleRequest
-                 dump($request->request->all()); // See raw POST data
-                 // You might want to add a dd() here to stop execution and see the dumps
-                 // dd('Stopped after dumping form errors');
+                 dump($form->getData());
+                 dump($request->request->all());
              } else {
                  dump('Form submitted AND valid.');
              }
         }
-        // --- DEBUGGING END ---
-
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Check for forbidden words in title and content
             $forbiddenInTitle = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getTitre());
             $forbiddenInContent = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getContenu());
 
@@ -136,54 +120,47 @@ class SocialMediaController extends AbstractController
                 ]);
             }
 
-            try { // Wrap flush in try-catch for debugging DB errors
-                $this->handleImageUpload($form, $socialMedia, $request);
-                $this->entityManager->persist($socialMedia);
-                dump('Entity persisted, attempting flush:', $socialMedia); // Dump before flush
-                $this->entityManager->flush();
-                dump('Flush successful!'); // Confirm flush worked
+                try {
+                    $this->handleImageUpload($form, $socialMedia, $request);
+                    $this->entityManager->persist($socialMedia);
+                    dump('Entity persisted, attempting flush:', $socialMedia);
+                    $this->entityManager->flush();
+                    dump('Flush successful!');
 
                 return $this->handleSaveRedirect($request, 'Publication ajoutée !');
 
-            } catch (\Exception $e) {
-                // Catch potential DB errors during flush
-                dump('EXCEPTION during flush: ' . $e->getMessage());
-                dump($e); // Dump the full exception object
-                // Add dd() to stop and see the exception
-                 dd('Stopped after catching flush exception');
-                 // Optionally add a flash message for the user
-                 // $this->addFlash('error', 'Erreur lors de la sauvegarde: ' . $e->getMessage());
+                } catch (\Exception $e) {
+                    dump('EXCEPTION during flush: ' . $e->getMessage());
+                    dump($e);
+                     dd('Stopped after catching flush exception');
             }
         }
 
-        // Re-render the form if not valid or if exception occurred before redirect
         return $this->renderCustomForm($request, 'social_media/new.html.twig', $socialMedia, $form, 'Ajouter');
     }
 
     #[Route('/{idEB}', name: 'app_social_media_show', methods: ['GET'], requirements: ['idEB' => '\d+'])]
     public function show(
         Request $request,
-        SocialMedia $socialMedia, // ParamConverter automatically fetches the entity
+        SocialMedia $socialMedia,
         CommentaireRepository $commentaireRepository
     ): Response {
-        // Prepare the form for adding a new comment (display only)
         $commentaire = new Commentaire();
         $commentForm = $this->createForm(CommentaireType::class, $commentaire, [
             'action' => $this->generateUrl('app_social_media_ajouter_commentaire', ['idEB' => $socialMedia->getIdEB()]),
             'method' => 'POST',
         ]);
 
-        // Fetch and paginate comments for this social media post
         $commentsQuery = $commentaireRepository->createQueryBuilder('c')
             ->where('c.socialMedia = :socialMedia')
             ->setParameter('socialMedia', $socialMedia)
             ->leftJoin('c.user', 'u')
-            ->select('c', 'u') // Select user data too if needed in the template
-            ->orderBy('c.idC', 'DESC'); // Order by comment ID
+            ->select('c', 'u')
+            ->orderBy('c.idC', 'DESC');
 
         $commentsPagination = $this->paginator->paginate(
             $commentsQuery,
-            $request->query->getInt('page', 1), // Use 'page' consistently
+            $request->query->getInt('page', 1),
             self::COMMENTS_PER_PAGE
         );
 
@@ -191,27 +168,22 @@ class SocialMediaController extends AbstractController
             'social_media' => $socialMedia,
             'comments' => $commentsPagination,
             'comment_form' => $commentForm->createView(),
-            // Pass the default user ID to the template for conditional logic (e.g., showing edit/delete buttons)
             'default_user_id' => self::DEFAULT_USER_ID
         ]);
     }
 
     #[Route('/{idEB}/edit', name: 'app_social_media_edit', methods: ['GET', 'POST'], requirements: ['idEB' => '\d+'])]
-    // No longer requires login - checks ownership by default ID
     public function edit(Request $request, SocialMedia $socialMedia): Response
     {
-        // Check if the post belongs to the default user ID
-        // Optional: Add role check like || $this->isGranted('ROLE_ADMIN') to allow admins too
         if (!$socialMedia->getUser() || $socialMedia->getUser()->getIdU() !== self::DEFAULT_USER_ID) {
              throw $this->createAccessDeniedException('Vous ne pouvez modifier que les publications appartenant à l\'utilisateur par défaut (ID '.self::DEFAULT_USER_ID.').');
         }
 
-        $originalImage = $socialMedia->getImagemedia(); // Store original image name
+        $originalImage = $socialMedia->getImagemedia();
         $form = $this->createForm(SocialMediaType::class, $socialMedia);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Check for forbidden words in title and content
             $forbiddenInTitle = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getTitre());
             $forbiddenInContent = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getContenu());
 
@@ -233,7 +205,6 @@ class SocialMediaController extends AbstractController
             }
 
             $this->handleImageUpload($form, $socialMedia, $request, $originalImage);
-            // No need to persist, Doctrine tracks changes to managed entities
             $this->entityManager->flush();
 
             return $this->handleSaveRedirect($request, 'Publication mise à jour !');
@@ -274,20 +245,18 @@ class SocialMediaController extends AbstractController
     }
 
     #[Route('/{idEB}/commentaire', name: 'app_social_media_ajouter_commentaire', methods: ['POST'], requirements: ['idEB' => '\d+'])]
-    public function ajouterCommentaire(Request $request, SocialMedia $socialMedia): RedirectResponse // Return type is RedirectResponse
+    public function ajouterCommentaire(Request $request, SocialMedia $socialMedia): RedirectResponse
     {
         $commentaire = new Commentaire();
-        $form = $this->createForm(CommentaireType::class, $commentaire); // Create form to handle request data
+        $form = $this->createForm(CommentaireType::class, $commentaire);
         $form->handleRequest($request);
 
-        // You can use the form for validation instead of manual checks
         if ($form->isSubmitted() && $form->isValid()) {
-            // Assign the default user
             $defaultUser = $this->getDefaultUser();
             $commentaire->setUser($defaultUser);
 
             $commentaire->setSocialMedia($socialMedia);
-            $commentaire->setNumberlike(0); // Default values should ideally be set in Entity constructor or lifecycle callback
+            $commentaire->setNumberlike(0);
             $commentaire->setNumberdislike(0);
 
             $this->entityManager->persist($commentaire);
@@ -296,27 +265,20 @@ class SocialMediaController extends AbstractController
             $this->addFlash('success', 'Commentaire ajouté avec succès !');
 
         } else {
-             // Handle validation errors - add flash messages from form errors
              foreach ($form->getErrors(true) as $error) {
                  $this->addFlash('error', $error->getMessage());
              }
-             // Or a generic message if not using form validation extensively here
-             if (!$form->isSubmitted()) { // Prevent error flash if just loaded show page
-                 $this->addFlash('error', 'Impossible d\'ajouter le commentaire (non soumis).'); // Adjusted message
+             if (!$form->isSubmitted()) { 
+                 $this->addFlash('error', 'Impossible d\'ajouter le commentaire (non soumis).');
              }
         }
 
-        // Always redirect back to the show page for this social media post
         return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
     }
 
-
     #[Route('/{idEB}', name: 'app_social_media_delete', methods: ['POST'], requirements: ['idEB' => '\d+'])]
-    // No longer requires login - checks ownership by default ID
     public function delete(Request $request, SocialMedia $socialMedia): Response
     {
-        // Check if the post belongs to the default user ID
-        // Optional: Add role check like || $this->isGranted('ROLE_ADMIN') to allow admins too
         if (!$socialMedia->getUser() || $socialMedia->getUser()->getIdU() !== self::DEFAULT_USER_ID) {
              throw $this->createAccessDeniedException('Vous ne pouvez supprimer que les publications appartenant à l\'utilisateur par défaut (ID '.self::DEFAULT_USER_ID.').');
         }
@@ -325,7 +287,7 @@ class SocialMediaController extends AbstractController
         $isAjax = $request->isXmlHttpRequest();
 
         if ($this->isCsrfTokenValid($tokenName, $request->request->get('_token'))) {
-            $this->handleImageDeletion($socialMedia); // Delete image first
+            $this->handleImageDeletion($socialMedia); 
             $this->entityManager->remove($socialMedia);
             $this->entityManager->flush();
 
@@ -336,29 +298,20 @@ class SocialMediaController extends AbstractController
         } else {
              $message = 'Token CSRF invalide.';
              if ($isAjax) {
-                 // For AJAX, maybe return a JSON error or just the updated index which shows the item still exists
                  return new Response($message, Response::HTTP_FORBIDDEN);
              } else {
                  $this->addFlash('error', $message);
-                 // Redirect back to show page if CSRF fails in non-AJAX context
                  return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
              }
         }
 
-        // For both successful AJAX and non-AJAX delete
         return $isAjax
             ? $this->renderUpdatedIndex()
             : $this->redirectToRoute('app_social_media_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    // --- Helper Methods ---
-
-    /**
-     * Handles image upload from the form, updates the entity, and deletes old image if necessary.
-     */
     private function handleImageUpload($form, SocialMedia $socialMedia, Request $request, ?string $originalImage = null): void
     {
-        // Check if 'imagemedia' field exists and is submitted
         if (!$form->has('imagemedia')) {
             return;
         }
@@ -375,17 +328,12 @@ class SocialMediaController extends AbstractController
              $this->handleImageDeletion($socialMedia);
              $socialMedia->setImagemedia(null);
         } else {
-             
              if ($originalImage && !$socialMedia->getImagemedia() && !$request->files->has($form->get('imagemedia')->getName())) {
                  $socialMedia->setImagemedia($originalImage);
              }
         }
     }
 
-    /**
-     * Uploads the image file and returns the new filename.
-     * @throws FileException
-     */
     private function uploadImage(UploadedFile $imageFile): string
     {
         $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -395,34 +343,23 @@ class SocialMediaController extends AbstractController
         try {
             $imageFile->move($this->uploadsDirectory, $newFilename);
         } catch (FileException $e) {
-            // Log the error details for debugging
-            // error_log('Image upload failed: ' . $e->getMessage());
             $this->addFlash('error', 'L\'upload de l\'image a échoué. Veuillez réessayer.');
-            // Consider logging the exception $e->getMessage()
-            throw $e; // Re-throwing might stop execution, handle appropriately
+            throw $e;
         }
         return $newFilename;
     }
 
-    /**
-     * Deletes the physical image file associated with the SocialMedia entity.
-     */
     private function handleImageDeletion(SocialMedia $socialMedia): void
     {
         $imageFilename = $socialMedia->getImagemedia();
         if ($imageFilename) {
             $filePath = $this->uploadsDirectory . '/' . $imageFilename;
             if (file_exists($filePath)) {
-                 @unlink($filePath); // Use @ to suppress errors if file not found, though checking first is better
+                 @unlink($filePath);
             }
-            // Optionally update the entity if not removing it entirely
-            // $socialMedia->setImagemedia(null);
         }
     }
 
-    /**
-     * Handles redirection after a successful save (new or edit).
-     */
     private function handleSaveRedirect(Request $request, string $flashMessage): Response
     {
         if (!$request->isXmlHttpRequest()) {
@@ -430,11 +367,10 @@ class SocialMediaController extends AbstractController
         }
 
         return $request->isXmlHttpRequest()
-            ? $this->renderUpdatedIndex() // Render partial for AJAX
-            : $this->redirectToRoute('app_social_media_index', [], Response::HTTP_SEE_OTHER); // Redirect for non-AJAX
+            ? $this->renderUpdatedIndex()
+            : $this->redirectToRoute('app_social_media_index', [], Response::HTTP_SEE_OTHER);
     }
 
-   
     private function renderUpdatedIndex(): Response
     {
         $repo = $this->entityManager->getRepository(SocialMedia::class);
@@ -445,7 +381,7 @@ class SocialMediaController extends AbstractController
 
         $pagination = $this->paginator->paginate(
             $queryBuilder,
-            1, 
+            1,
             self::POSTS_PER_PAGE
         );
 
@@ -460,7 +396,7 @@ class SocialMediaController extends AbstractController
         $view = $usePartial ? 'social_media/_form.html.twig' : $template;
 
         $status = ($form->isSubmitted() && !$form->isValid())
-            ? Response::HTTP_UNPROCESSABLE_ENTITY 
+            ? Response::HTTP_UNPROCESSABLE_ENTITY
             : Response::HTTP_OK;
 
         return $this->render($view, [
