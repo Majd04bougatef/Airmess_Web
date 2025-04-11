@@ -122,59 +122,7 @@
 .custom-file-input {
     height: calc(2.25rem + 10px);
 }
-.invalid-feedback {
-    display: none;
-    width: 100%;
-    margin-top: .25rem;
-    font-size: 80%;
-    color: #dc3545;
-}
-.is-invalid {
-    border-color: #dc3545;
-}
-.is-valid {
-    border-color: #28a745;
-}
-.password-strength {
-    margin-top: 5px;
-    height: 5px;
-    border-radius: 5px;
-}
-.strength-weak {
-    background-color: #dc3545;
-    width: 30%;
-}
-.strength-medium {
-    background-color: #ffc107;
-    width: 60%;
-}
-.strength-strong {
-    background-color: #28a745;
-    width: 100%;
-}
-.password-toggle {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    z-index: 10;
-}
-.form-group {
-    position: relative;
-}
-.custom-file-label.is-invalid {
-    border-color: #dc3545;
-}
-.custom-file-label.is-valid {
-    border-color: #28a745;
-}
-.custom-file .invalid-feedback {
-    display: block;
-    margin-top: 0.25rem;
-}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
 <div class="container register">
@@ -198,106 +146,80 @@
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                                 <h3 class="register-heading">Apply as a voyager</h3>
-                                <form id="voyagerForm" action="{{ path('user_register') }}" method="post" enctype="multipart/form-data" novalidate>
+                                <form action="{{ path('user_register') }}" method="post" enctype="multipart/form-data">
                                     <div class="row register-form">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" id="voyager-name" name="name" placeholder="Last Name *" value="" required>
-                                                <div class="invalid-feedback">Last name is required (min 2 characters)</div>
+                                                <input type="text" class="form-control" name="name" placeholder="Last Name *" value="" required>
                                             </div>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" id="voyager-prenom" name="prenom" placeholder="First Name *" value="" required>
-                                                <div class="invalid-feedback">First name is required (min 2 characters)</div>
+                                                <input type="text" class="form-control" name="prenom" placeholder="First Name *" value="" required>
                                             </div>
                                             <div class="form-group">
-                                                <input type="password" class="form-control" id="voyager-password" name="password" placeholder="Password *" value="" required>
-                                                <div class="password-strength" id="voyager-password-strength"></div>
-                                                <span toggle="#voyager-password" class="password-toggle fa fa-eye"></span>
-                                                <div class="invalid-feedback">Password must be at least 8 characters and include letters, numbers, and special characters</div>
+                                                <input type="password" class="form-control" name="password" placeholder="Password *" value="" required>
                                             </div>
                                             <div class="form-group">
-                                                <input type="password" class="form-control" id="voyager-confirm-password" placeholder="Confirm Password *" value="" required>
-                                                <span toggle="#voyager-confirm-password" class="password-toggle fa fa-eye"></span>
-                                                <div class="invalid-feedback">Passwords do not match</div>
+                                                <input type="date" class="form-control" name="dateNaiss" placeholder="Birth Date *" required>
                                             </div>
                                             <div class="form-group">
-                                                <input type="date" class="form-control" id="voyager-dateNaiss" name="dateNaiss" placeholder="Birth Date *" required>
-                                                <div class="invalid-feedback">You must be at least 18 years old</div>
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="voyagerPhoto" name="photo" accept="image/*">
+                                                    <label class="custom-file-label" for="voyagerPhoto">Choose profile photo</label>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <input type="email" class="form-control" id="voyager-email" name="email" placeholder="Your Email *" value="" required>
-                                                <div class="invalid-feedback">Please enter a valid email address</div>
+                                                <input type="email" class="form-control" name="email" placeholder="Your Email *" value="" required>
                                             </div>
                                             <div class="form-group">
-                                                <input type="text" maxlength="5" minlength="5" id="voyager-phone" name="phoneNumber" class="form-control" placeholder="Your Phone *" value="" required>
-                                                <div class="invalid-feedback">Phone number must be 5 digits</div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="custom-file">
-                                                    <input type="file" class="custom-file-input" id="voyagerPhoto" name="photo" accept="image/*" required>
-                                                    <label class="custom-file-label" for="voyagerPhoto">Choose profile photo *</label>
-                                                    <div class="invalid-feedback">Profile photo is required</div>
-                                                </div>
+                                                <input type="text" minlength="10" maxlength="10" name="phoneNumber" class="form-control" placeholder="Your Phone *" value="" required>
                                             </div>
                                             <input type="hidden" name="roleUser" value="Voyageurs">
                                             <input type="hidden" name="statut" value="active">
                                             <input type="hidden" name="diamond" value="0">
                                             <input type="hidden" name="deleteFlag" value="0">
-                                            <button type="submit" class="btnRegister" id="voyager-submit">Register</button>
+                                            <button type="submit" class="btnRegister">Register</button>
                                         </div>
                                     </div>
                                 </form>
                             </div>
                             <div class="tab-pane fade show" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                                 <h3 class="register-heading">Apply as a entreprise</h3>
-                                <form id="entrepriseForm" action="{{ path('user_register') }}" method="post" enctype="multipart/form-data" novalidate>
+                                <form action="{{ path('user_register') }}" method="post" enctype="multipart/form-data">
                                     <div class="row register-form">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" id="entreprise-name" name="name" placeholder="Company Name *" value="" required>
-                                                <div class="invalid-feedback">Company name is required (min 2 characters)</div>
+                                                <input type="text" class="form-control" name="name" placeholder="Company Name *" value="" required>
                                             </div>
                                             
                                             <div class="form-group">
-                                                <input type="email" class="form-control" id="entreprise-email" name="email" placeholder="Business Email *" value="" required>
-                                                <div class="invalid-feedback">Please enter a valid email address</div>
+                                                <input type="email" class="form-control" name="email" placeholder="Business Email *" value="" required>
                                             </div>
                                             <div class="form-group">
-                                                <input type="text" maxlength="5" minlength="5" id="entreprise-phone" name="phoneNumber" class="form-control" placeholder="Business Phone *" value="" required>
-                                                <div class="invalid-feedback">Phone number must be 5 digits</div>
+                                                <input type="text" maxlength="10" minlength="10" name="phoneNumber" class="form-control" placeholder="Business Phone *" value="" required>
                                             </div>
 
                                             <div class="form-group">
-                                                <input type="date" class="form-control" id="entreprise-dateNaiss" name="dateNaiss" placeholder="Business Founded Date *" required>
-                                                <div class="invalid-feedback">Please enter a valid founded date</div>
+                                                <input type="date" class="form-control" name="dateNaiss" placeholder="Business Founded Date *" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <input type="password" class="form-control" id="entreprise-password" name="password" placeholder="Password *" value="" required>
-                                                <div class="password-strength" id="entreprise-password-strength"></div>
-                                                <span toggle="#entreprise-password" class="password-toggle fa fa-eye"></span>
-                                                <div class="invalid-feedback">Password must be at least 8 characters and include letters, numbers, and special characters</div>
+                                                <input type="password" class="form-control" name="password" placeholder="Password *" value="" required>
                                             </div>
-                                            <div class="form-group">
-                                                <input type="password" class="form-control" id="entreprise-confirm-password" placeholder="Confirm Password *" value="" required>
-                                                <span toggle="#entreprise-confirm-password" class="password-toggle fa fa-eye"></span>
-                                                <div class="invalid-feedback">Passwords do not match</div>
-                                            </div>
+                                           
                                             <div class="form-group">
                                                 <div class="custom-file">
-                                                    <input type="file" class="custom-file-input" id="entreprisePhoto" name="photo" accept="image/*" required>
-                                                    <label class="custom-file-label" for="entreprisePhoto">Choose company logo *</label>
-                                                    <div class="invalid-feedback">Company logo is required</div>
+                                                    <input type="file" class="custom-file-input" id="entreprisePhoto" name="photo" accept="image/*">
+                                                    <label class="custom-file-label" for="entreprisePhoto">Choose company logo</label>
                                                 </div>
                                             </div>
                                             <input type="hidden" name="roleUser" value="Entreprise">
                                             <input type="hidden" name="statut" value="active">
                                             <input type="hidden" name="diamond" value="0">
                                             <input type="hidden" name="deleteFlag" value="0">
-                                            <button type="submit" class="btnRegister" id="entreprise-submit">Register Business</button>
+                                            <button type="submit" class="btnRegister">Register Business</button>
                                         </div>
                                     </div>
                                 </form>
@@ -311,308 +233,6 @@
             $('.custom-file-input').on('change', function() {
                 let fileName = $(this).val().split('\\').pop();
                 $(this).next('.custom-file-label').addClass("selected").html(fileName);
-                
-                // Validate file selection
-                if (fileName) {
-                    $(this).next('.custom-file-label').removeClass('is-invalid').addClass('is-valid');
-                } else {
-                    $(this).next('.custom-file-label').removeClass('is-valid').addClass('is-invalid');
-                }
-            });
-
-            // Validate email format
-            function isValidEmail(email) {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return emailRegex.test(email);
-            }
-
-            // Validate password strength
-            function validatePassword(password) {
-                // Check if password is at least 8 characters
-                if (password.length < 8) {
-                    return 'weak';
-                }
-                
-                // Check if password has letters and numbers
-                const hasLetters = /[a-zA-Z]/.test(password);
-                const hasNumbers = /[0-9]/.test(password);
-                const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-                
-                if (hasLetters && hasNumbers && hasSpecial) {
-                    return 'strong';
-                } else if ((hasLetters && hasNumbers) || (hasLetters && hasSpecial) || (hasNumbers && hasSpecial)) {
-                    return 'medium';
-                } else {
-                    return 'weak';
-                }
-            }
-
-            // Update password strength indicator
-            function updatePasswordStrength(passwordField, strengthIndicator) {
-                const password = passwordField.val();
-                const strength = validatePassword(password);
-                
-                strengthIndicator.removeClass('strength-weak strength-medium strength-strong');
-                
-                if (password.length > 0) {
-                    if (strength === 'weak') {
-                        strengthIndicator.addClass('strength-weak');
-                    } else if (strength === 'medium') {
-                        strengthIndicator.addClass('strength-medium');
-                    } else if (strength === 'strong') {
-                        strengthIndicator.addClass('strength-strong');
-                    }
-                }
-                
-                return strength !== 'weak';
-            }
-
-            // Validate phone number
-            function isValidPhone(phone) {
-                return /^\d{5}$/.test(phone);
-            }
-
-            // Validate name
-            function isValidName(name) {
-                return name.length >= 2;
-            }
-
-            // Validate birth date
-            function isValidBirthDate(dateString) {
-                const today = new Date();
-                const birthDate = new Date(dateString);
-                const age = today.getFullYear() - birthDate.getFullYear();
-                const monthDiff = today.getMonth() - birthDate.getMonth();
-                
-                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                    return age - 1 >= 18;
-                }
-                
-                return age >= 18;
-            }
-
-            // Form validation for Voyager
-            $('#voyagerForm').on('submit', function(e) {
-                let isValid = true;
-                
-                // Validate name
-                const name = $('#voyager-name');
-                if (!isValidName(name.val())) {
-                    name.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    name.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate prenom
-                const prenom = $('#voyager-prenom');
-                if (!isValidName(prenom.val())) {
-                    prenom.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    prenom.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate password
-                const password = $('#voyager-password');
-                const confirmPassword = $('#voyager-confirm-password');
-                
-                if (validatePassword(password.val()) === 'weak') {
-                    password.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    password.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate confirm password
-                if (password.val() !== confirmPassword.val()) {
-                    confirmPassword.addClass('is-invalid');
-                    isValid = false;
-                } else if (confirmPassword.val().length > 0) {
-                    confirmPassword.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate birth date
-                const dateNaiss = $('#voyager-dateNaiss');
-                if (!dateNaiss.val() || !isValidBirthDate(dateNaiss.val())) {
-                    dateNaiss.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    dateNaiss.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate email
-                const email = $('#voyager-email');
-                if (!isValidEmail(email.val())) {
-                    email.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    email.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate phone
-                const phone = $('#voyager-phone');
-                if (!isValidPhone(phone.val())) {
-                    phone.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    phone.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate photo
-                const photo = $('#voyagerPhoto');
-                if (photo[0].files.length === 0) {
-                    photo.closest('.custom-file').find('.custom-file-label').addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    photo.closest('.custom-file').find('.custom-file-label').removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
-
-            // Form validation for Entreprise
-            $('#entrepriseForm').on('submit', function(e) {
-                let isValid = true;
-                
-                // Validate company name
-                const name = $('#entreprise-name');
-                if (!isValidName(name.val())) {
-                    name.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    name.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate email
-                const email = $('#entreprise-email');
-                if (!isValidEmail(email.val())) {
-                    email.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    email.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate phone
-                const phone = $('#entreprise-phone');
-                if (!isValidPhone(phone.val())) {
-                    phone.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    phone.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate date
-                const dateNaiss = $('#entreprise-dateNaiss');
-                if (!dateNaiss.val()) {
-                    dateNaiss.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    dateNaiss.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate password
-                const password = $('#entreprise-password');
-                const confirmPassword = $('#entreprise-confirm-password');
-                
-                if (validatePassword(password.val()) === 'weak') {
-                    password.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    password.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate confirm password
-                if (password.val() !== confirmPassword.val()) {
-                    confirmPassword.addClass('is-invalid');
-                    isValid = false;
-                } else if (confirmPassword.val().length > 0) {
-                    confirmPassword.removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                // Validate photo
-                const photo = $('#entreprisePhoto');
-                if (photo[0].files.length === 0) {
-                    photo.closest('.custom-file').find('.custom-file-label').addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    photo.closest('.custom-file').find('.custom-file-label').removeClass('is-invalid').addClass('is-valid');
-                }
-                
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
-
-            // Real-time validation
-            $('#voyager-email, #entreprise-email').on('input', function() {
-                const email = $(this);
-                if (isValidEmail(email.val())) {
-                    email.removeClass('is-invalid').addClass('is-valid');
-                } else {
-                    email.removeClass('is-valid').addClass('is-invalid');
-                }
-            });
-
-            $('#voyager-phone, #entreprise-phone').on('input', function() {
-                const phone = $(this);
-                if (isValidPhone(phone.val())) {
-                    phone.removeClass('is-invalid').addClass('is-valid');
-                } else {
-                    phone.removeClass('is-valid').addClass('is-invalid');
-                }
-            });
-
-            $('#voyager-password').on('input', function() {
-                updatePasswordStrength($(this), $('#voyager-password-strength'));
-            });
-
-            $('#entreprise-password').on('input', function() {
-                updatePasswordStrength($(this), $('#entreprise-password-strength'));
-            });
-
-            $('#voyager-confirm-password, #entreprise-confirm-password').on('input', function() {
-                const confirmPassword = $(this);
-                const password = confirmPassword.attr('id').includes('voyager') ? 
-                    $('#voyager-password') : $('#entreprise-password');
-                
-                if (confirmPassword.val() === password.val()) {
-                    confirmPassword.removeClass('is-invalid').addClass('is-valid');
-                } else {
-                    confirmPassword.removeClass('is-valid').addClass('is-invalid');
-                }
-            });
-
-            $('#voyager-name, #voyager-prenom, #entreprise-name').on('input', function() {
-                const name = $(this);
-                if (isValidName(name.val())) {
-                    name.removeClass('is-invalid').addClass('is-valid');
-                } else {
-                    name.removeClass('is-valid').addClass('is-invalid');
-                }
-            });
-
-            $('#voyager-dateNaiss').on('change', function() {
-                const dateInput = $(this);
-                if (isValidBirthDate(dateInput.val())) {
-                    dateInput.removeClass('is-invalid').addClass('is-valid');
-                } else {
-                    dateInput.removeClass('is-valid').addClass('is-invalid');
-                }
-            });
-
-            // Password toggle visibility
-            $('.password-toggle').on('click', function() {
-                const passwordField = $($(this).attr('toggle'));
-                if (passwordField.attr('type') === 'password') {
-                    passwordField.attr('type', 'text');
-                    $(this).removeClass('fa-eye').addClass('fa-eye-slash');
-                } else {
-                    passwordField.attr('type', 'password');
-                    $(this).removeClass('fa-eye-slash').addClass('fa-eye');
-                }
             });
             </script>
             
