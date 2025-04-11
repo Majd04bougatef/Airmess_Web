@@ -89,7 +89,9 @@ final class StationController extends AbstractController
     #[Route('/dashEntreprise', name: 'app_dashboard')]
     public function dashboard(): Response
     {
-        return $this->render('dashEntreprise/dashboardEntreprise.html.twig');
+        return $this->render('dashEntreprise/dashboardEntreprise.html.twig', [
+            'controller_name' => 'StationController',
+        ]);
     }
 
 }

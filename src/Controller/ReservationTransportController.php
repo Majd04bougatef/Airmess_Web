@@ -20,16 +20,15 @@ final class ReservationTransportController extends AbstractController
     #[Route(name: 'app_reservation_transport_index', methods: ['GET'])]
     public function index(Request $request, ReservationTransportRepository $reservationTransportRepository): Response
     {
-        $reservations = $reservationTransportRepository->findAll();
 
-        // Vérifier si la requête est AJAX
+        $reservations = $reservationTransportRepository->findByUserId(40);
+
         if ($request->isXmlHttpRequest()) {
             return $this->render('reservation_transport/_list.html.twig', [
                 'reservation_transports' => $reservations,
             ]);
         }
 
-        // Si ce n'est pas AJAX, charger la mise en page complète
         return $this->render('reservation_transport/index.html.twig', [
             'reservation_transports' => $reservations,
         ]);
