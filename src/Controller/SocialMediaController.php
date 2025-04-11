@@ -217,36 +217,147 @@ class SocialMediaController extends AbstractController
     public function like(Request $request, SocialMedia $socialMedia): Response
     {
         $submittedToken = $request->request->get('_token');
+        
         if (!$this->isCsrfTokenValid('like-post', $submittedToken)) {
-            return $this->json(['success' => false, 'error' => 'Invalid CSRF token'], 403);
+            $this->addFlash('error', 'Token CSRF invalide.');
+            
+            if ($request->isXmlHttpRequest()) {
+                return $this->json(['success' => false, 'error' => 'Invalid CSRF token'], 403);
+            }
+            
+            return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
         }
 
-        $socialMedia->setLikee($socialMedia->getLikee() + 1);
-        $this->entityManager->flush();
+        // Vérifier si l'utilisateur a déjà "disliké" cette publication
+        $session = $request->getSession();
+        $userActions = $session->get('user_post_actions', []);
+        $postId = $socialMedia->getIdEB();
         
-        return $this->json([
-            'success' => true,
-            'likeCount' => $socialMedia->getLikee(),
-            'dislikeCount' => $socialMedia->getDislike()
-        ]);
+        try {
+            // Si l'utilisateur a déjà aimé ce post, ne rien faire
+            if (isset($userActions[$postId]) && $userActions[$postId] === 'like') {
+                // L'utilisateur a déjà aimé ce post, toggle off
+                $socialMedia->setLikee($socialMedia->getLikee() - 1);
+                unset($userActions[$postId]);
+            } 
+            // Si l'utilisateur a déjà disliké ce post, changer pour like
+            elseif (isset($userActions[$postId]) && $userActions[$postId] === 'dislike') {
+                $socialMedia->setDislike($socialMedia->getDislike() - 1);
+                $socialMedia->setLikee($socialMedia->getLikee() + 1);
+                $userActions[$postId] = 'like';
+            } 
+            // Sinon, ajouter un like
+            else {
+                $socialMedia->setLikee($socialMedia->getLikee() + 1);
+                $userActions[$postId] = 'like';
+            }
+            
+            // Sauvegarder les actions de l'utilisateur
+            $session->set('user_post_actions', $userActions);
+            $this->entityManager->flush();
+            
+            $message = isset($userActions[$postId]) ? 'J\'aime ajouté!' : 'J\'aime retiré!';
+            $this->addFlash('success', $message);
+            
+            if ($request->isXmlHttpRequest()) {
+                return $this->json([
+                    'success' => true,
+                    'likeCount' => $socialMedia->getLikee(),
+                    'dislikeCount' => $socialMedia->getDislike(),
+                    'message' => $message,
+                    'action' => isset($userActions[$postId]) ? $userActions[$postId] : null
+                ]);
+            }
+            
+            return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'ajout du j\'aime.');
+            
+            if ($request->isXmlHttpRequest()) {
+                return $this->json(['success' => false, 'error' => 'Database error'], 500);
+            }
+            
+            return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+        }
     }
 
     #[Route('/{idEB}/dislike', name: 'app_social_media_dislike', methods: ['POST'], requirements: ['idEB' => '\d+'])]
-    public function dislike(SocialMedia $socialMedia): Response
+    public function dislike(Request $request, SocialMedia $socialMedia): Response
     {
-        $socialMedia->setDislike($socialMedia->getDislike() + 1);
-        $this->entityManager->flush();
+        $submittedToken = $request->request->get('_token');
         
-        return $this->json([
-            'success' => true,
-            'likeCount' => $socialMedia->getLikee(),
-            'dislikeCount' => $socialMedia->getDislike()
-        ]);
+        if (!$this->isCsrfTokenValid('dislike-post', $submittedToken)) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            
+            if ($request->isXmlHttpRequest()) {
+                return $this->json(['success' => false, 'error' => 'Invalid CSRF token'], 403);
+            }
+            
+            return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+        }
+        
+        // Vérifier si l'utilisateur a déjà "aimé" cette publication
+        $session = $request->getSession();
+        $userActions = $session->get('user_post_actions', []);
+        $postId = $socialMedia->getIdEB();
+        
+        try {
+            // Si l'utilisateur a déjà disliké ce post, ne rien faire
+            if (isset($userActions[$postId]) && $userActions[$postId] === 'dislike') {
+                // L'utilisateur a déjà disliké ce post, toggle off
+                $socialMedia->setDislike($socialMedia->getDislike() - 1);
+                unset($userActions[$postId]);
+            } 
+            // Si l'utilisateur a déjà liké ce post, changer pour dislike
+            elseif (isset($userActions[$postId]) && $userActions[$postId] === 'like') {
+                $socialMedia->setLikee($socialMedia->getLikee() - 1);
+                $socialMedia->setDislike($socialMedia->getDislike() + 1);
+                $userActions[$postId] = 'dislike';
+            } 
+            // Sinon, ajouter un dislike
+            else {
+                $socialMedia->setDislike($socialMedia->getDislike() + 1);
+                $userActions[$postId] = 'dislike';
+            }
+            
+            // Sauvegarder les actions de l'utilisateur
+            $session->set('user_post_actions', $userActions);
+            $this->entityManager->flush();
+            
+            $message = isset($userActions[$postId]) ? 'Je n\'aime pas ajouté!' : 'Je n\'aime pas retiré!';
+            $this->addFlash('success', $message);
+            
+            if ($request->isXmlHttpRequest()) {
+                return $this->json([
+                    'success' => true,
+                    'likeCount' => $socialMedia->getLikee(),
+                    'dislikeCount' => $socialMedia->getDislike(),
+                    'message' => $message,
+                    'action' => isset($userActions[$postId]) ? $userActions[$postId] : null
+                ]);
+            }
+            
+            return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'ajout du je n\'aime pas.');
+            
+            if ($request->isXmlHttpRequest()) {
+                return $this->json(['success' => false, 'error' => 'Database error'], 500);
+            }
+            
+            return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+        }
     }
 
     #[Route('/{idEB}/commentaire', name: 'app_social_media_ajouter_commentaire', methods: ['POST'], requirements: ['idEB' => '\d+'])]
     public function ajouterCommentaire(Request $request, SocialMedia $socialMedia): RedirectResponse
     {
+        $submittedToken = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('comment_token', $submittedToken)) {
+            $this->addFlash('error', 'Token CSRF invalide pour la soumission du commentaire.');
+            return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+        }
+        
         $commentaire = new Commentaire();
         $form = $this->createForm(CommentaireType::class, $commentaire);
         $form->handleRequest($request);
@@ -254,23 +365,42 @@ class SocialMediaController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $defaultUser = $this->getDefaultUser();
             $commentaire->setUser($defaultUser);
-
             $commentaire->setSocialMedia($socialMedia);
             $commentaire->setNumberlike(0);
             $commentaire->setNumberdislike(0);
+            
+            // Vérifier si le contenu du commentaire est vide
+            if (empty(trim($commentaire->getDescription()))) {
+                $this->addFlash('error', 'Le commentaire ne peut pas être vide.');
+                return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+            }
+            
+            // Vérifier les mots interdits
+            $forbiddenWords = $this->forbiddenWordsChecker->containsForbiddenWords($commentaire->getDescription());
+            if (!empty($forbiddenWords)) {
+                $this->addFlash('error', 'Votre commentaire contient des mots interdits: ' . implode(', ', $forbiddenWords));
+                return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+            }
 
             $this->entityManager->persist($commentaire);
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Commentaire ajouté avec succès !');
-
+            
+            if ($request->isXmlHttpRequest()) {
+                return $this->json([
+                    'success' => true,
+                    'message' => 'Commentaire ajouté!',
+                    'commentId' => $commentaire->getIdC()
+                ]);
+            }
         } else {
-             foreach ($form->getErrors(true) as $error) {
-                 $this->addFlash('error', $error->getMessage());
-             }
-             if (!$form->isSubmitted()) { 
-                 $this->addFlash('error', 'Impossible d\'ajouter le commentaire (non soumis).');
-             }
+            foreach ($form->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+            if (!$form->isSubmitted()) { 
+                $this->addFlash('error', 'Impossible d\'ajouter le commentaire (non soumis).');
+            }
         }
 
         return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);

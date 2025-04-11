@@ -1,13 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Commentaire{% endblock %}
+{% block title %}Modifier un commentaire{% endblock %}
 
 {% block body %}
-    <h1>Edit Commentaire</h1>
+    <div class="container my-4">
+        <h1>Modifier le commentaire</h1>
 
-    {{ include('commentaire/_form.html.twig', {'button_label': 'Update'}) }}
+        {{ include('commentaire/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_commentaire_index') }}">back to list</a>
-
-    {{ include('commentaire/_delete_form.html.twig') }}
+        <div class="mt-3">
+            <a href="{{ path('app_social_media_show', {'idEB': commentaire.socialMedia.idEB}) }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour au post
+            </a>
+        </div>
+    </div>
 {% endblock %}
