@@ -41,4 +41,19 @@ class ReservationTransportRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+   /**
+     * Trouver toutes les réservations de l'utilisateur connecté
+     */
+    public function findByUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.user = :userId')
+            ->setParameter('userId', $userId)
+            ->orderBy('r.dateRes', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+
 }

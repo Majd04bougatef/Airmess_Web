@@ -20,16 +20,15 @@ final class ReservationTransportController extends AbstractController
     #[Route(name: 'app_reservation_transport_index', methods: ['GET'])]
     public function index(Request $request, ReservationTransportRepository $reservationTransportRepository): Response
     {
-        $reservations = $reservationTransportRepository->findAll();
 
-        // Vérifier si la requête est AJAX
+        $reservations = $reservationTransportRepository->findByUserId(40);
+
         if ($request->isXmlHttpRequest()) {
             return $this->render('reservation_transport/_list.html.twig', [
                 'reservation_transports' => $reservations,
             ]);
         }
 
-        // Si ce n'est pas AJAX, charger la mise en page complète
         return $this->render('reservation_transport/index.html.twig', [
             'reservation_transports' => $reservations,
         ]);
@@ -49,11 +48,8 @@ final class ReservationTransportController extends AbstractController
 
         $user = $userRepository->find(40);  // Vous pouvez obtenir l'utilisateur actuellement connecté ici
         $reservationTransport->setUser($user);
-
         $reservationTransport->setStation($station);  // Lier la réservation à la station reçue
-
-        $reference = $this->generateReference($user);
-        $reservationTransport->setReference($reference);
+        $reservationTransport->setReference($this->generateReference($user));
         $reservationTransport->setStatut('en cours');
         $reservationTransport->setPrix(0);
 
@@ -64,6 +60,9 @@ final class ReservationTransportController extends AbstractController
             $entityManager->persist($reservationTransport);
             $entityManager->flush();
 
+            $nombreVeloReserve = $reservationTransport->getNombreVelo();
+            $stationRepository->decrementNbVelosDispo($station->getIdS(), $nombreVeloReserve);
+    
             return $this->redirectToRoute('app_reservation_transport_recap', [
                 'id' => $id,
                 'dateRes' => $reservationTransport->getDateRes()->format('Y-m-d H:i:s'),
@@ -150,10 +149,12 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_reservation_transport_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ReservationTransport $reservationTransport, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, ReservationTransport $reservationTransport, EntityManagerInterface $entityManager,StationRepository $stationRepository): Response
     {
         $form = $this->createForm(ReservationTransportType::class, $reservationTransport);
         $form->handleRequest($request);
+
+        $station = $stationRepository->find($reservationTransport->getStation()->getIdS());
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
@@ -164,6 +165,10 @@ final class ReservationTransportController extends AbstractController
         return $this->render('reservation_transport/edit.html.twig', [
             'reservation_transport' => $reservationTransport,
             'form' => $form,
+            'idS' => $station->getIdS(),
+            'nom' => $station->getNom(),
+            'prix' => $station->getPrixHeure(),
+            'nombreVelo' => $station->getNombreVelo(),
         ]);
     }
 

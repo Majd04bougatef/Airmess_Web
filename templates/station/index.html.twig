@@ -1,138 +1,417 @@
-{% extends 'base.html.twig' %}
+{% extends 'dashEntreprise/dashboardEntreprise.html.twig' %}
 
+{% block title %}Stations{% endblock %}
 
-{% block title %}Station index{% endblock %}
-{% block js %}
-
-
-<script src="../assets/js/core/popper.min.js"></script>
-  <script src="../assets/js/core/bootstrap.min.js"></script>
-  <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
-  <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
-  <script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-      var options = {
-        damping: '0.5'
-      }
-      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-  </script>
-  <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="../assets/js/argon-dashboard.min.js?v=2.1.0"></script>
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-
-{% endblock %}
 {% block stylesheets %}
-<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-  <!-- Nucleo Icons -->
-  <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css" rel="stylesheet" />
-  <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-svg.css" rel="stylesheet" />
-  <!-- Font Awesome Icons -->
-  <!-- CSS Files -->
-  <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+{{ parent() }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-search@3.0.2/dist/leaflet-search.src.css" />
 
-  {% endblock %}
+<style>
+  /* Ensure map container is visible */
+  #map {
+    height: 500px !important;
+    width: calc(100% - 30px) !important;
+    margin: 15px;
+    z-index: 1;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  /* Make sure Leaflet controls are above other elements */
+  .leaflet-control, .leaflet-pane {
+    z-index: 1000 !important;
+  }
+  
+  /* Custom popup styles */
+  .station-popup {
+    min-width: 250px;
+    padding: 5px;
+  }
+  
+  /* Status colors */
+  .text-success {
+    color: #4caf50 !important;
+  }
+  
+  .text-info {
+    color: #2196f3 !important;
+  }
+  
+  .text-danger {
+    color: #f44336 !important;
+  }
+  
+  /* Add a map stats section */
+  .map-stats {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    justify-content: space-around;
+  }
+  
+  .stat-card {
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin: 10px;
+    padding: 15px;
+    text-align: center;
+  }
+  
+  .stat-card h3 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  
+  .stat-card p {
+    color: #6c757d;
+    margin-bottom: 0;
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+</style>
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<!-- Marker Clustering -->
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<!-- Leaflet Search -->
+<script src="https://unpkg.com/leaflet-search@3.0.2/dist/leaflet-search.src.js"></script>
+
+<script>
+// Initialize the map when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(initMap, 200);
+});
+
+// This function will be called to initialize the map
+function initMap() {
+  console.log("Initializing map");
+  // Check if map container exists
+  var mapContainer = document.getElementById('map');
+  if (!mapContainer) {
+    console.log("Map container not found");
+    return;
+  }
+  
+  // Check if map is already initialized
+  if (window.stationMap) {
+    window.stationMap.remove();
+  }
+  
+  try {
+    // Initialize the map
+    var map = L.map('map').setView([36.8065, 10.1815], 6); // Centered on Tunisia
+    window.stationMap = map;
+    console.log("Map created");
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Create a marker cluster group
+    var markers = L.markerClusterGroup();
+    
+    // Debug info
+    console.log("Adding markers for stations");
+    
+    var hasValidStations = false;
+    
+    // Custom station icons based on type
+    var bikeIcons = {
+      'velo électrique': L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      }),
+      'velo urbain': L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      }),
+      'velo de route': L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      }),
+      'default': L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      })
+    };
+    
+    // Add markers for each station
+    {% for station in stations %}
+      console.log("Station: {{ station.nom }}, Lat: {{ station.latitude|default('undefined') }}, Long: {{ station.longitude|default('undefined') }}");
+      
+      {% if station.latitude is defined and station.longitude is defined and station.latitude is not null and station.longitude is not null %}
+        try {
+          var lat = {{ station.latitude }};
+          var lng = {{ station.longitude }};
+          
+          if (!isNaN(lat) && !isNaN(lng)) {
+            var icon = bikeIcons['{{ station.typeVelo|default('default') }}'] || bikeIcons['default'];
+            var marker = L.marker([lat, lng], {icon: icon});
+            
+            // Calculate availability status
+            var percentage = ({{ station.nombreVelo }} / {{ station.capacite }}) * 100;
+            var statusClass = percentage >= 80 ? 'text-success' : 
+                             percentage >= 30 ? 'text-info' : 'text-danger';
+            
+            // Create rich HTML content for popup
+            var popupContent = `
+              <div class="station-popup">
+                <h5 class="font-weight-bold mb-2">{{ station.nom }}</h5>
+                <div class="d-flex justify-content-between mb-1">
+                  <span>Disponibilité:</span>
+                  <span class="${statusClass}">{{ station.nombreVelo }}/{{ station.capacite }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span>Type:</span>
+                  <span>{{ station.typeVelo }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span>Prix:</span>
+                  <span>{{ station.prixHeure }} DT/heure</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                  <span>Pays:</span>
+                  <span>{{ station.pays }}</span>
+                </div>
+                <div class="text-center">
+                  <a href="{{ path('app_station_edit', {'idS': station.idS}) }}" class="btn btn-sm btn-info mr-1">Modifier</a>
+                  <form method="post" action="{{ path('app_station_delete', {'idS': station.idS}) }}" style="display:inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ station.idS) }}">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette station ?');">Supprimer</button>
+                  </form>
+                </div>
+              </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+            markers.addLayer(marker);
+            hasValidStations = true;
+            console.log("Added marker for {{ station.nom }} at " + lat + ", " + lng);
+          } else {
+            console.log("Invalid coordinates for {{ station.nom }}");
+          }
+        } catch (e) {
+          console.error("Error adding marker for {{ station.nom }}: " + e.message);
+        }
+      {% else %}
+        console.log("Missing coordinates for {{ station.nom }}");
+      {% endif %}
+    {% endfor %}
+    
+    // Add markers to map
+    map.addLayer(markers);
+    
+    if (!hasValidStations) {
+      // Add a default marker for demonstration
+      var marker = L.marker([36.8065, 10.1815], {icon: bikeIcons['default']}).addTo(map);
+      marker.bindPopup("<b>Default Location</b><br>Please add coordinates to your stations");
+      console.log("No valid stations found, added default marker");
+    }
+    
+    // Add a legend
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend');
+      div.innerHTML = `
+        <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+          <h5>Types de Vélos</h5>
+          <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png" height="25"> 
+            <span style="margin-left: 5px;">Vélo électrique</span>
+          </div>
+          <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png" height="25"> 
+            <span style="margin-left: 5px;">Vélo urbain</span>
+          </div>
+          <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png" height="25"> 
+            <span style="margin-left: 5px;">Vélo de route</span>
+          </div>
+          <div style="display: flex; align-items: center;">
+            <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png" height="25"> 
+            <span style="margin-left: 5px;">Autre/Défaut</span>
+          </div>
+        </div>
+      `;
+      return div;
+    };
+    legend.addTo(map);
+    
+    console.log("Map initialization complete");
+    
+    // Force a resize event to make sure the map renders properly
+    setTimeout(function() {
+      window.dispatchEvent(new Event('resize'));
+      if (map) map.invalidateSize();
+    }, 500);
+  } catch (e) {
+    console.error("Error initializing map: " + e.message);
+  }
+}
+</script>
+{% endblock %}
 
 {% block body %}
-
-
-    <div class="container-fluid py-4">
-        <div class="row">
-            <div class="col-12">
-                <div class="card mb-4">
-                    <div class="card-header pb-0">
-                        <h6>Stations</h6>
-                    </div>
+<div class="row">
+    <div class="col-12">
+        <!-- Statistics Cards -->
+        <div class="map-stats">
+            <div class="stat-card">
+                <div class="stat-icon text-info">
+                    <i class="fas fa-bicycle"></i>
+                </div>
+                <h3>{{ stations|length }}</h3>
+                <p>Stations totales</p>
+            </div>
+            
+            {% set totalCapacity = 0 %}
+            {% set totalBikes = 0 %}
+            {% for station in stations %}
+                {% set totalCapacity = totalCapacity + station.capacite %}
+                {% set totalBikes = totalBikes + station.nombreVelo %}
+            {% endfor %}
+            
+            <div class="stat-card">
+                <div class="stat-icon text-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>{{ totalBikes }}</h3>
+                <p>Vélos disponibles</p>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon text-warning">
+                    <i class="fas fa-battery-half"></i>
+                </div>
+                <h3>{{ ((totalBikes / totalCapacity) * 100)|round }}%</h3>
+                <p>Taux d'occupation</p>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                <h6>Stations</h6>
+                <a href="{{ path('app_station_new') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus-circle mr-1"></i> Ajouter une station
+                </a>
+            </div>
             <div class="card-body px-0 pt-0 pb-2">
-              <div class="table-responsive p-0">
-                <table class="table align-items-center justify-content-center mb-0">
-                  <thead>
-                    <tr>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Nom</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Capacite</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">NombreVelo</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">TypeVelo</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">PrixHeure</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Pays</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">pourcentage</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">actions</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  
-    
-                  <tbody>
-                  {% for station in stations %}
-                    <tr>
+                <div id="map"></div>
+                
+                <div class="table-responsive p-0">
+                    <table class="table align-items-center justify-content-center mb-0">
+                      <thead>
+                        <tr>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Nom</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Capacite</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">NombreVelo</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">TypeVelo</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">PrixHeure</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Pays</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">pourcentage</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">actions</th>
+                          <th></th>
+                        </tr>
+                      </thead>
                       
-                      <td>
-                        <p class="text-sm font-weight-bold mb-0">{{ station.nom }}</p>
-                      </td>
-                      <td>
-                        <span class="text-xs font-weight-bold">{{ station.capacite }}</span>
-                      </td>
-                      <td>
-                        <span class="text-xs font-weight-bold">{{ station.nombreVelo }}</span>
-                      </td>
+                      <tbody>
+                      {% for station in stations %}
+                        <tr>
+                          <td>
+                            <p class="text-sm font-weight-bold mb-0">{{ station.nom }}</p>
+                          </td>
+                          <td>
+                            <span class="text-xs font-weight-bold">{{ station.capacite }}</span>
+                          </td>
+                          <td>
+                            <span class="text-xs font-weight-bold">{{ station.nombreVelo }}</span>
+                          </td>
 
-                      <td>
-                        <span class="text-xs font-weight-bold">{{ station.typeVelo }}</span>
-                      </td>
+                          <td>
+                            <span class="text-xs font-weight-bold">{{ station.typeVelo }}</span>
+                          </td>
 
-                      <td>
-                        <span class="text-xs font-weight-bold">{{ station.prixHeure }}</span>
-                      </td>
-                      <td>
-                        <span class="text-xs font-weight-bold">{{ station.pays }}</span>
-                      </td>
+                          <td>
+                            <span class="text-xs font-weight-bold">{{ station.prixHeure }}</span>
+                          </td>
+                          <td>
+                            <span class="text-xs font-weight-bold">{{ station.pays }}</span>
+                          </td>
 
-                      <td class="align-middle text-center">
-                        <div class="d-flex align-items-center justify-content-center">
-                            {% set pourcentage = (station.nombreVelo / station.capacite) * 100 %}
-                            <span class="me-2 text-xs font-weight-bold">{{ pourcentage|round(2) }}%</span>
-                            <div>
-                                <div class="progress">
-                                    <div class="progress-bar 
-                                        {% if pourcentage >= 80 %} bg-gradient-success 
-                                        {% elseif pourcentage >= 30 %} bg-gradient-info 
-                                        {% else %} bg-gradient-danger {% endif %}" 
-                                        role="progressbar"  
-                                        aria-valuenow="{{ pourcentage|round(2) }}" 
-                                        aria-valuemin="0" 
-                                        aria-valuemax="100" 
-                                        style="width: {{ pourcentage|round(2) }}%;">
+                          <td class="align-middle text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                {% set pourcentage = (station.nombreVelo / station.capacite) * 100 %}
+                                <span class="me-2 text-xs font-weight-bold">{{ pourcentage|round(2) }}%</span>
+                                <div>
+                                    <div class="progress">
+                                        <div class="progress-bar 
+                                            {% if pourcentage >= 80 %} bg-gradient-success 
+                                            {% elseif pourcentage >= 30 %} bg-gradient-info 
+                                            {% else %} bg-gradient-danger {% endif %}" 
+                                            role="progressbar"  
+                                            aria-valuenow="{{ pourcentage|round(2) }}" 
+                                            aria-valuemin="0" 
+                                            aria-valuemax="100" 
+                                            style="width: {{ pourcentage|round(2) }}%;">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </td>
+                        </td>
 
-
-                      <td class="align-middle">
-    <a href="{{ path('app_station_edit', {'idS': station.idS}) }}" class="btn btn-sm btn-info">Modifier</a>
-  <!-- Formulaire de suppression -->
-  <form method="post" action="{{ path('app_station_delete', {'idS': station.idS}) }}" style="display:inline;">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ station.idS) }}">
-    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette station ?');">Supprimer</button>
-  </form>
-                    </tr>
-                    
-                   {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+                          <td class="align-middle">
+                            <a href="{{ path('app_station_edit', {'idS': station.idS}) }}" class="btn btn-sm btn-info">Modifier</a>
+                            <!-- Formulaire de suppression -->
+                            <form method="post" action="{{ path('app_station_delete', {'idS': station.idS}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ station.idS) }}">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette station ?');">Supprimer</button>
+                            </form>
+                          </td>
+                        </tr>
+                        
+                       {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-
-
-
-
+    </div>
+</div>
 {% endblock %}
 
 
