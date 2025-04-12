@@ -38,7 +38,7 @@ final class StationController extends AbstractController
             $entityManager->persist($station);
             $entityManager->flush();
 
-            return $this->render('dashEntreprise/dashboardEntreprise.html.twig');            
+            return $this->render('dashEntreprise/dashboardEntreprisePage.html.twig');            
         }
 
         return $this->render('station/new.html.twig', [
@@ -81,7 +81,7 @@ final class StationController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->render('dashEntreprise/dashboardEntreprise.html.twig');
+        return $this->render('dashEntreprise/dashboardEntreprisePage.html.twig');
     }
 
     
@@ -89,7 +89,7 @@ final class StationController extends AbstractController
     #[Route('/dashEntreprise', name: 'app_dashboard')]
     public function dashboard(): Response
     {
-        return $this->render('dashEntreprise/dashboardEntreprise.html.twig', [
+        return $this->render('dashEntreprise/dashboardEntreprisePage.html.twig', [
             'controller_name' => 'StationController',
         ]);
     }

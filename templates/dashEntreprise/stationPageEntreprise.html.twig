@@ -1,3 +1,7 @@
+{% extends 'dashEntreprise/dashboardEntreprise.html.twig' %}
+
+{% block stylesheets %}
+{{ parent() }}
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
@@ -78,7 +82,9 @@
 
 
 </style>
+{% endblock %}
 
+{% block body %}
 <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
       <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
@@ -278,3 +284,4 @@
         </div>
       </footer>
     </div>
+{% endblock %}
