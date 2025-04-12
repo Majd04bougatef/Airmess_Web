@@ -237,14 +237,12 @@ final class CommentaireController extends AbstractController
         }
         
         // Vérifier les mots interdits
-        if ($this->forbiddenWordsChecker) {
-            $forbiddenWords = $this->forbiddenWordsChecker->containsForbiddenWords($description);
-            if (!empty($forbiddenWords)) {
-                return $this->json([
-                    'success' => false,
-                    'error' => 'Votre commentaire contient des mots interdits: ' . implode(', ', $forbiddenWords)
-                ], 400);
-            }
+        $forbiddenWords = $this->forbiddenWordsChecker->containsForbiddenWords($description);
+        if (!empty($forbiddenWords)) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Votre commentaire contient des mots interdits: ' . implode(', ', $forbiddenWords)
+            ], 400);
         }
         
         try {
