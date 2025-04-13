@@ -1,6 +1,6 @@
 {% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
 
-{% block title %}Paiement de réservation{% endblock %}
+{% block title %}Confirmation de réservation{% endblock %}
 
 {% block body %}
 <style>
@@ -129,38 +129,35 @@
         color: #344767;
     }
     
-    /* Payment specific styles */
-    .payment-form {
+    /* Confirmation specific styles */
+    .confirmation-container {
         padding: 20px 40px;
+        text-align: center;
     }
     
-    .payment-card {
-        border: 1px solid #e9ecef;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
+    .success-icon {
+        font-size: 4rem;
+        color: #2dce89;
+        margin-bottom: 1.5rem;
     }
     
-    .card-header {
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 15px;
-        margin-bottom: 20px;
-        font-weight: 600;
+    .confirmation-message {
+        font-size: 1.2rem;
         color: #344767;
+        margin-bottom: 2rem;
     }
     
-    .form-check {
-        margin-bottom: 15px;
-    }
-    
-    .payment-details {
+    .reservation-details {
         background-color: #f8f9fa;
         border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 20px;
+        padding: 20px;
+        text-align: left;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+        border-left: 4px solid #2dce89;
     }
     
-    .recap-item {
+    .detail-item {
         display: flex;
         justify-content: space-between;
         margin-bottom: 15px;
@@ -168,19 +165,29 @@
         border-bottom: 1px dashed #e9ecef;
     }
     
-    .recap-label {
+    .detail-label {
         font-weight: 600;
         color: #344767;
     }
     
-    .recap-value {
+    .detail-value {
         font-weight: 500;
         color: #67748e;
     }
     
+    .qr-code {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto 2rem;
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+    }
+    
     /* Button Styles */
     .btnn {
-        width: 100%;
+        width: 80%;
+        max-width: 300px;
         border-radius: 7px;
         padding: 12px;
         color: #fff;
@@ -190,31 +197,27 @@
         font-weight: 600;
         letter-spacing: 0.5px;
         transition: all 0.3s ease;
-        margin-top: 15px;
+        margin: 15px auto;
         font-size: 16px;
         text-transform: uppercase;
+        display: inline-block;
+        text-decoration: none;
     }
     
     .btnn:hover {
         background-color: #324cdd;
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(94, 114, 228, 0.4);
+        color: #fff;
+        text-decoration: none;
     }
     
     .button-group {
-        display: flex;
-        gap: 15px;
         margin-top: 30px;
     }
     
-    .btn-back {
-        background-color: #67748e;
-        flex: 1;
-    }
-    
-    .btn-confirm {
-        background-color: #5e72e4;
-        flex: 2;
+    .btn-download {
+        background-color: #2dce89;
     }
 </style>
 
@@ -222,7 +225,7 @@
     <div class="contact-image">
         <img src="{{asset('images/signalisation (2).png')}}" alt="bike_icon"/>
     </div>
-    <h3>Paiement de votre réservation</h3>
+    <h3>Confirmation de réservation</h3>
 
     <div class="stepper">
         <div class="step completed">
@@ -233,88 +236,64 @@
             <div class="step-number">2</div>
             <div class="step-text">Récap</div>
         </div>
-        <div class="step active">
+        <div class="step completed">
             <div class="step-number">3</div>
             <div class="step-text">Paiement</div>
         </div>
-        <div class="step">
+        <div class="step active">
             <div class="step-number">4</div>
             <div class="step-text">Confirmation</div>
         </div>
     </div>
 
-    <div class="payment-form">
-        <div class="payment-details">
-            <div class="recap-item">
-                <div class="recap-label">Référence</div>
-                <div class="recap-value">{{ reservation.reference }}</div>
+    <div class="confirmation-container">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        
+        <div class="confirmation-message">
+            <h4>Votre réservation a été confirmée avec succès!</h4>
+            <p>Un e-mail de confirmation a été envoyé à votre adresse.</p>
+        </div>
+        
+        <div class="reservation-details">
+            <div class="detail-item">
+                <div class="detail-label">Référence</div>
+                <div class="detail-value">{{ reservation.reference }}</div>
             </div>
-            <div class="recap-item">
-                <div class="recap-label">Montant à payer</div>
-                <div class="recap-value">{{ reservation.prix }}€</div>
+            <div class="detail-item">
+                <div class="detail-label">Station</div>
+                <div class="detail-value">{{ reservation.station }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Date de réservation</div>
+                <div class="detail-value">{{ reservation.date|date("d/m/Y à H:i") }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Nombre de vélos</div>
+                <div class="detail-value">{{ reservation.nombreVelo }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Montant payé</div>
+                <div class="detail-value">{{ reservation.prix }}€</div>
             </div>
         </div>
         
-        <form method="post" action="{{ path('app_reservation_transport_process_payment') }}" id="payment-form">
-            <div class="payment-card">
-                <div class="card-header">Choisissez votre méthode de paiement</div>
-                
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
-                    <label class="form-check-label" for="creditCard">
-                        Carte bancaire
-                    </label>
-                </div>
-                
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="paymentMethod" id="paypal">
-                    <label class="form-check-label" for="paypal">
-                        PayPal
-                    </label>
-                </div>
-            </div>
-            
-            <!-- Formulaire de carte bancaire (exemple) -->
-            <div id="creditCardForm">
-                <div class="form-group">
-                    <label for="cardNumber">Numéro de carte</label>
-                    <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" required>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="expiryDate">Date d'expiration</label>
-                            <input type="text" class="form-control" id="expiryDate" name="expiryDate" placeholder="MM/AA" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="cvv">CVV</label>
-                            <input type="text" class="form-control" id="cvv" name="cvv" placeholder="123" required>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="cardHolder">Nom du titulaire</label>
-                    <input type="text" class="form-control" id="cardHolder" name="cardHolder" placeholder="NOM Prénom" required>
-                </div>
-            </div>
-            
-            <div class="button-group">
-                <a href="{{ path('app_reservation_transport_station') }}" class="btnn btn-back">Retour</a>
-                <button type="submit" class="btnn btn-confirm">Payer maintenant</button>
-            </div>
-            
-            <!-- Hidden fields to pass reservation data -->
-            <input type="hidden" name="user_id" value="{{ reservation.user.idU }}">
-            <input type="hidden" name="station_id" value="{{ reservation.station.idS }}">
-            <input type="hidden" name="date_res" value="{{ reservation.dateRes|date('Y-m-d H:i:s') }}">
-            <input type="hidden" name="date_fin" value="{{ reservation.dateFin|date('Y-m-d H:i:s') }}">
-            <input type="hidden" name="nombre_velo" value="{{ reservation.nombreVelo }}">
-            <input type="hidden" name="prix" value="{{ reservation.prix }}">
-        </form>
+        <div class="qr-code">
+            <img src="{{ asset('images/qr-code-example.png') }}" alt="QR Code" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ReservationBike{{ "now"|date("YmdHis") }}'; this.onerror='';">
+        </div>
+        
+        <p>Présentez ce QR code à la station pour récupérer vos vélos</p>
+        
+        <div class="button-group">
+            <a href="#" class="btnn btn-download" onclick="window.print()">
+                <i class="fas fa-download"></i> Télécharger le reçu
+            </a>
+            <br>
+            <a href="{{ path('app_reservation_transport_index') }}" class="btnn">
+                Mes réservations
+            </a>
+        </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %} 

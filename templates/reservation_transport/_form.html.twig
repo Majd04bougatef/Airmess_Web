@@ -1,39 +1,26 @@
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
 <style>
-/* Global Styles */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
-    padding: 20px 0;
-}
-
-/* Contact Form Card */
+/* Form Controls */
 .contact-form {
     background: #fff;
-    margin: 3% auto;
-    width: 90%;
-    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
     overflow: hidden;
     padding-bottom: 30px;
 }
 
-/* Form Controls */
 .contact-form .form-control {
     border-radius: 10px;
-    border: 1px solid #e1e1e1;
+    border: 1px solid #e9ecef;
     padding: 12px 15px;
     transition: all 0.3s ease;
     box-shadow: none;
 }
 
 .contact-form .form-control:focus {
-    border-color: #0062cc;
-    box-shadow: 0 0 0 0.2rem rgba(0, 98, 204, 0.25);
+    border-color: #5e72e4;
+    box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
 }
 
 /* Form Header */
@@ -41,7 +28,7 @@ body {
     margin: 25px 0;
     padding-bottom: 15px;
     text-align: center;
-    color: #0062cc;
+    color: #344767;
     font-weight: 600;
     position: relative;
     font-size: 28px;
@@ -55,7 +42,7 @@ body {
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background: #0062cc;
+    background: #5e72e4;
 }
 
 /* Logo Image */
@@ -75,7 +62,7 @@ body {
 
 /* Form Layout */
 .contact-form form {
-    padding: 5% 10%;
+    padding: 3% 5%;
 }
 
 .contact-form form .row {
@@ -85,7 +72,7 @@ body {
 /* Labels */
 .form-group label {
     font-weight: 500;
-    color: #555;
+    color: #344767;
     margin-bottom: 8px;
     display: inline-block;
 }
@@ -93,10 +80,10 @@ body {
 /* Button Styles */
 .btnn {
     width: 100%;
-    border-radius: 30px;
+    border-radius: 7px;
     padding: 12px;
     color: #fff;
-    background-color: #0062cc;
+    background-color: #5e72e4;
     border: none;
     cursor: pointer;
     font-weight: 600;
@@ -108,9 +95,9 @@ body {
 }
 
 .btnn:hover {
-    background-color: #004e9e;
+    background-color: #324cdd;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 98, 204, 0.4);
+    box-shadow: 0 5px 15px rgba(94, 114, 228, 0.4);
 }
 
 .btnn:active {
@@ -135,7 +122,7 @@ body {
     position: absolute;
     width: 80%;
     height: 4px;
-    background-color: #e1e1e1;
+    background-color: #e9ecef;
     top: 18px;
     left: 10%;
     z-index: 0;
@@ -153,7 +140,7 @@ body {
 .step-number {
     width: 36px;
     height: 36px;
-    background-color: #e1e1e1;
+    background-color: #e9ecef;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -168,30 +155,30 @@ body {
 
 /* Active and completed step styling */
 .step.active .step-number {
-    background-color: #28a745;
+    background-color: #5e72e4;
     transform: scale(1.1);
-    box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
 }
 
 .step.completed .step-number {
-    background-color: #28a745;
+    background-color: #5e72e4;
 }
 
 .step-text {
     margin-top: 10px;
     font-size: 14px;
     font-weight: 600;
-    color: #777;
+    color: #67748e;
     text-align: center;
     transition: all 0.3s ease;
 }
 
 .step.active .step-text {
-    color: #28a745;
+    color: #344767;
 }
 
 .step.completed .step-text {
-    color: #28a745;
+    color: #344767;
 }
 
 /* Information Display Styling */
@@ -200,12 +187,12 @@ body {
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 20px;
-    border-left: 4px solid #0062cc;
+    border-left: 4px solid #5e72e4;
 }
 
 .info-group label {
     font-weight: 500;
-    color: #444;
+    color: #344767;
     margin-bottom: 5px;
     display: block;
 }
@@ -213,8 +200,8 @@ body {
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .contact-form {
-        width: 95%;
-        margin: 5% auto;
+        width: 100%;
+        margin: 0 auto;
     }
     
     .contact-form form {
@@ -248,49 +235,61 @@ body {
         </div>
         <div class="step">
             <div class="step-number">4</div>
-            <div class="step-text">Succès</div>
+            <div class="step-text">Confirmation</div>
         </div>
     </div>
 
-{{ form_start(form, {
-    'action': path('app_reservation_transport_new_reservation', {'id': idS}),
-    'attr': {'novalidate': 'novalidate'}
-}) }}
-        <input type="hidden" name="station_id" value="{{ idS }}">    
-        <div class="row">
-            <!-- Affichage du prix en texte -->
-            <div class="col-12">
-                <div class="info-group">
-                    <label><strong>{{nom}}</strong></label>
-                    <label>Prix : <strong>{{prix}}$/h</strong></label>
-                    <label>Nombre Vélo disponibles : <strong>{{nombreVelo}}</strong></label>
+    <div class="container mt-4">
+        <div class="info-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Station: </label>
+                    <strong>{{ nom }}</strong>
+                </div>
+                <div class="col-md-6">
+                    <label>Prix par heure: </label>
+                    <strong>{{ prix }}€</strong>
                 </div>
             </div>
-
-            <div class="col-md-6">
-                <div class="form-group">
-                    {{ form_row(form.dateRes, {'attr': {'class': 'form-control'}}) }}
-                </div>
-                <div class="form-group">
-                    {{ form_row(form.nombreVelo, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.nombreVelo) }}
-
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    {{ form_row(form.dateFin, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.dateFin) }}
-
-                </div>
-            </div>
-            <div class="col-12">
-                <div class="form-group">
-                    <button type="submit" class="btnn">{{ button_label|default('Réserver') }}</button>
+            <div class="row mt-2">
+                <div class="col-md-12">
+                    <label>Vélos disponibles: </label>
+                    <strong>{{ nombreVelo }}</strong>
                 </div>
             </div>
         </div>
-    {{ form_end(form) }}
+
+        {{ form_start(form, {'attr': {'class': 'mt-4'}}) }}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{ form_label(form.dateRes, 'Date de début') }}
+                        {{ form_widget(form.dateRes, {'attr': {'class': 'form-control datepicker'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{ form_label(form.dateFin, 'Date de fin') }}
+                        {{ form_widget(form.dateFin, {'attr': {'class': 'form-control datepicker'}}) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(form.nombreVelo, 'Nombre de vélos') }}
+                        {{ form_widget(form.nombreVelo, {'attr': {'class': 'form-control', 'max': nombreVelo}}) }}
+                    </div>
+                </div>
+            </div>
+            {{ form_row(form._token) }}
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btnn">Continuer</button>
+                </div>
+            </div>
+        {{ form_end(form, {'render_rest': false}) }}
+    </div>
 </div>
 
 <script>
