@@ -159,16 +159,44 @@
         }
         
         .comment-bubble {
-            background-color: var(--light-bg);
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-            padding: 0.6rem 0.9rem;
+            background-color: #f8f9fa;
+            border-radius: 18px;
+            padding: 0.75rem 1.25rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .comment-bubble:hover {
+            background-color: #f2f4f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .comment-author-name {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .comment-text {
+            font-size: 0.95rem;
+            color: #2d3748;
+            line-height: 1.5;
         }
         
         .comment-entry {
-            animation: fadeIn 0.4s ease forwards;
-            animation-delay: calc(0.08s * var(--animation-order, 0));
             margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: calc(var(--animation-order) * 0.1s);
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .comments-section {
@@ -225,22 +253,33 @@
             position: absolute;
             right: 10px;
             bottom: 10px;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
-            background-color: var(--main-accent);
-            border-color: var(--main-accent);
-            box-shadow: 0 2px 5px rgba(74, 107, 218, 0.3);
+            background: linear-gradient(45deg, #5e72e4, #3f51b5);
+            border: none;
+            box-shadow: 0 3px 8px rgba(94, 114, 228, 0.4);
+            transition: all 0.3s ease;
         }
         
         .btn-send-comment:hover, 
         .btn-send-comment:focus {
-            background-color: var(--main-accent-hover);
-            border-color: var(--main-accent-hover);
-            transform: translateY(-1px);
+            background: linear-gradient(45deg, #4a6bda, #3949ab);
+            transform: translateY(-2px) rotate(15deg);
+            box-shadow: 0 5px 12px rgba(94, 114, 228, 0.5);
+        }
+        
+        .btn-send-comment i {
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-send-comment:hover i {
+            transform: scale(1.1);
         }
         
         .comment-action-link {
@@ -286,16 +325,21 @@
         
         .comment-input {
             border-radius: 20px;
-            padding-right: 40px;
+            padding: 0.8rem 3rem 0.8rem 1.25rem;
             resize: none;
             border: 1px solid #e0e4e8;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-            transition: all var(--transition-speed) ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            background-color: #f8fafd;
         }
         
         .comment-input:focus {
             border-color: #bdc9e7;
-            box-shadow: 0 0 0 3px rgba(74, 107, 218, 0.1);
+            box-shadow: 0 0 0 4px rgba(94, 114, 228, 0.15);
+            background-color: #fff;
+            outline: none;
         }
         
         .comment-author-name {
@@ -381,7 +425,14 @@
         }
         
         .add-comment-form-container {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .add-comment-form-container:hover .comment-author-img {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
         }
         
         .comment-input {
@@ -554,6 +605,73 @@
         .dislike-button:hover i, .dislike-button.active i {
             filter: drop-shadow(0px 0px 3px rgba(220, 53, 69, 0.5));
         }
+        
+        /* Style pour les boutons de like des commentaires */
+        .comment-action-link.comment-like-btn {
+            transition: all 0.3s ease;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        
+        .comment-action-link.comment-like-btn:hover,
+        .comment-action-link.comment-like-btn.active {
+            background-color: rgba(74, 107, 218, 0.1);
+            color: var(--main-accent) !important;
+        }
+        
+        .comment-action-link.comment-like-btn i {
+            transition: all 0.3s ease;
+        }
+        
+        .comment-action-link.comment-like-btn:hover i,
+        .comment-action-link.comment-like-btn.active i {
+            transform: scale(1.15);
+            color: var(--main-accent);
+        }
+        
+        .comment-like-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--main-accent);
+            background-color: rgba(74, 107, 218, 0.1);
+            border-radius: 10px;
+            padding: 0 6px;
+            min-width: 18px;
+            height: 18px;
+        }
+        
+        .comment-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .comment-action {
+            color: #718096;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .comment-action:hover {
+            color: #4a5568;
+            text-decoration: none;
+        }
+        
+        .comment-action i {
+            font-size: 0.85rem;
+        }
+        
+        .comment-action.liked {
+            color: #e53e3e;
+        }
     </style>
 {% endblock %}
 
@@ -617,68 +735,68 @@
                 {# Statistiques (Likes/Dislikes) - version simplifiée #}
                 <div class="post-stats d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center">
                             <span class="badge rounded-pill bg-primary me-2">
                                 <i class="fas fa-thumbs-up me-1"></i> {{ social_media.getLikee() }}
-                            </span>
+                                </span>
                             
                             <span class="badge rounded-pill bg-danger">
                                 <i class="fas fa-thumbs-down me-1"></i> {{ social_media.getDislike() }}
-                            </span>
-                        </div>
+                                </span>
+                            </div>
                     </div>
                     
                     <div>
                         <small class="text-muted d-flex align-items-center">
                             <i class="bi bi-chat-dots me-1"></i>
                             <span class="comments-count">{{ comments|length }}</span> commentaire{% if comments|length != 1 %}s{% endif %}
-                        </small>
+                     </small>
                     </div>
-                </div>
+                 </div>
 
-                {# Barre d'actions J'aime/Commenter/Modifier/Supprimer #}
+               {# Barre d'actions J'aime/Commenter/Modifier/Supprimer #}
                 <div class="post-actions d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-grow-1 mx-n1">
-                        {# Like Button (Form) #}
+                    {# Like Button (Form) #}
                         <form action="{{ path('app_social_media_like', {idEB: social_media.idEB}) }}" method="POST" class="d-inline m-0 flex-grow-1 px-1 like-form">
-                            <input type="hidden" name="_token" value="{{ csrf_token('like-post') }}">
-                            <button type="submit" class="btn btn-action w-100 text-muted like-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}active{% endif %}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('like-post') }}">
+                        <button type="submit" class="btn btn-action w-100 text-muted like-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}active{% endif %}">
                                 <i class="fas fa-thumbs-up me-1"></i> <span class="action-text">J'aime</span>
-                            </button>
-                        </form>
+                        </button>
+                    </form>
 
-                        {# Dislike Button (Form) #}
+                    {# Dislike Button (Form) #}
                         <form action="{{ path('app_social_media_dislike', {idEB: social_media.idEB}) }}" method="POST" class="d-inline m-0 flex-grow-1 px-1 dislike-form">
-                            <input type="hidden" name="_token" value="{{ csrf_token('dislike-post') }}">
-                            <button type="submit" class="btn btn-action w-100 text-muted dislike-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}active{% endif %}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('dislike-post') }}">
+                        <button type="submit" class="btn btn-action w-100 text-muted dislike-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}active{% endif %}">
                                 <i class="fas fa-thumbs-down me-1"></i> <span class="action-text">Je n'aime pas</span>
-                            </button>
-                        </form>
+    </button>
+                    </form>
 
-                        {# Comment Link/Button #}
+    {# Comment Link/Button #}
                         <a href="#comments-area" class="btn btn-action flex-grow-1 text-muted mx-1">
-                            <i class="bi bi-chat-dots me-1"></i> <span class="action-text">Commenter</span>
+                        <i class="bi bi-chat-dots me-1"></i> <span class="action-text">Commenter</span>
+    </a>
+
+                    {# Admin Actions #}
+    {% if post_author and post_author.getIdU() == default_user_id %}
+                            <div class="d-flex flex-grow-1">
+                        {# Edit Button #}
+                                <a href="{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}" class="btn btn-action flex-grow-1 text-muted mx-1">
+                            <i class="bi bi-pencil-square me-1"></i> <span class="action-text">Éditer</span>
                         </a>
 
-                        {# Admin Actions #}
-                        {% if post_author and post_author.getIdU() == default_user_id %}
-                            <div class="d-flex flex-grow-1">
-                                {# Edit Button #}
-                                <a href="{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}" class="btn btn-action flex-grow-1 text-muted mx-1">
-                                    <i class="bi bi-pencil-square me-1"></i> <span class="action-text">Éditer</span>
-                                </a>
-
-                                {# Delete Button #}
+                        {# Delete Button #}
                                 <form action="{{ path('app_social_media_delete', {idEB: social_media.idEB}) }}" method="POST" class="d-inline m-0 flex-grow-1 px-1" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
-                                    <button type="submit" class="btn btn-action w-100 text-danger">
-                                        <i class="bi bi-trash me-1"></i> <span class="action-text">Supprimer</span>
-                                    </button>
-                                </form>
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
+            <button type="submit" class="btn btn-action w-100 text-danger">
+                                <i class="bi bi-trash me-1"></i> <span class="action-text">Supprimer</span>
+            </button>
+        </form>
                             </div>
-                        {% endif %}
+    {% endif %}
                     </div>
-                </div>
+</div>
 
                 {# --- Section Commentaires intégrée --- #}
                 <div id="comments-area" class="comments-section p-3">
@@ -695,10 +813,10 @@
                      <div class="flex-grow-1">
                         <form name="{{ comment_form.vars.name }}" method="{{ comment_form.vars.method }}" action="{{ comment_form.vars.action }}" class="add-comment-form" id="comment-form">
                             <div class="position-relative">
-                                {{ form_widget(comment_form.description, {'attr': {'rows': 1, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control comment-input py-2 px-3', 'id': 'comment-input'}}) }}
+                                {{ form_widget(comment_form.description, {'attr': {'rows': 2, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control comment-input py-2 px-3', 'id': 'comment-input'}}) }}
                                 {{ form_errors(comment_form.description) }}
                                 <button type="submit" class="btn btn-primary btn-send-comment" id="submit-comment" aria-label="Publier le commentaire">
-                                    <i class="bi bi-send-fill"></i>
+                                    <i class="fas fa-paper-plane"></i>
                                 </button>
                             </div>
                             {{ form_rest(comment_form) }}
@@ -739,15 +857,16 @@
                                         <div class="comment-meta mt-1 ps-2 d-flex align-items-center flex-wrap">
                         {# Date #}
                                             <small class="text-muted me-3">
-                                                <i class="bi bi-clock"></i>
-                                                Commentaire #{{ commentaire.idC }}
+                                                <i class="fas fa-clock me-1"></i>
+                                                Il y a quelques instants
                         </small>
 
                                             {# Actions simplifiées #}
                                             <a href="#" 
                                                class="comment-action-link small me-3 comment-like-btn {% if app.session.get('user_comment_actions')[commentaire.idC] is defined and app.session.get('user_comment_actions')[commentaire.idC] == 'like' %}active text-primary{% endif %}"
+                                               onclick="event.preventDefault(); document.getElementById('like-comment-form-{{ commentaire.idC }}').submit();"
                                                data-comment-id="{{ commentaire.idC }}">
-                                                <i class="bi {% if app.session.get('user_comment_actions')[commentaire.idC] is defined and app.session.get('user_comment_actions')[commentaire.idC] == 'like' %}bi-heart-fill{% else %}bi-heart{% endif %}"></i> 
+                                                <i class="{% if app.session.get('user_comment_actions')[commentaire.idC] is defined and app.session.get('user_comment_actions')[commentaire.idC] == 'like' %}fas fa-heart{% else %}far fa-heart{% endif %}"></i> 
                                                 <span class="like-label">J'aime</span>
                                                 {% if commentaire.numberlike > 0 %}
                                                     <span class="comment-like-count">{{ commentaire.numberlike }}</span>
@@ -758,19 +877,19 @@
                                             </form>
                                             
                                             {% if comment_author and comment_author.getIdU() == default_user_id %}
-                                                <a href="#" class="comment-action-link small me-3 edit-comment-btn" data-comment-id="{{ commentaire.idC }}">
-        <i class="bi bi-pencil-square"></i> Modifier
-    </a>
+                                                <a href="{{ path('app_commentaire_edit', {'idC': commentaire.idC}) }}" class="comment-action-link small me-3">
+                                                    <i class="fas fa-pencil-alt"></i> Modifier
+                                                </a>
 
                                                 <a href="#" 
                                                    class="comment-action-link small text-danger"
                                                    onclick="event.preventDefault(); if(confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) { document.getElementById('delete-form-{{ commentaire.idC }}').submit(); }">
-                                                    <i class="bi bi-trash"></i> Supprimer
+                                                    <i class="fas fa-trash-alt"></i> Supprimer
                                                 </a>
                                                 <form id="delete-form-{{ commentaire.idC }}" action="{{ path('app_commentaire_delete', {'idC': commentaire.idC}) }}" method="POST" class="d-none">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commentaire.idC) }}">
-    </form>
-{% endif %}
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commentaire.idC) }}">
+                                                </form>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -883,20 +1002,19 @@
                 });
             }
             
-            // Activer les formulaires de like/dislike pour les commentaires
-            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
-            if (commentLikeButtons.length > 0) {
-                commentLikeButtons.forEach(button => {
-                    button.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const commentId = this.dataset.commentId;
-                        const form = document.getElementById('like-comment-form-' + commentId);
-                        if (form) {
-                            form.submit();
-                        }
-                    });
+            // Effets visuels simples pour les boutons J'aime
+            const likeButtons = document.querySelectorAll('.comment-like-btn');
+            likeButtons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
                 });
-            }
+                
+                button.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.backgroundColor = '';
+                    }
+                });
+            });
         });
     </script>
 {% endblock %}
