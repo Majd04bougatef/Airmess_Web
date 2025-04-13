@@ -1,0 +1,198 @@
+{% extends 'dashEntreprise/dashboardEntreprise.html.twig' %}
+
+{% block title %}Ajouter Station{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+<style>
+.alert {
+  font-size: 1.2em;
+  margin-top: 20px;
+}
+
+.get-in-touch {
+  max-width: 800px;
+  margin: 50px auto;
+  position: relative;
+}
+
+.get-in-touch .title {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 3.2em;
+  line-height: 48px;
+  padding-bottom: 48px;
+  color: #5543ca;
+  background: #5543ca;
+  background: -moz-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
+  background: -webkit-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
+  background: linear-gradient(to right,#f4524d  0%,#5543ca  100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.contact-form .form-field {
+  position: relative;
+  margin: 32px 0;
+}
+.contact-form .input-text {
+  display: block;
+  width: 100%;
+  height: 36px;
+  border-width: 0 0 2px 0;
+  border-color: #5543ca;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+}
+.contact-form .input-text:focus {
+  outline: none;
+}
+.contact-form .input-text:focus + .label,
+.contact-form .input-text.not-empty + .label {
+  -webkit-transform: translateY(-24px);
+          transform: translateY(-24px);
+}
+.contact-form .label {
+  position: absolute;
+  left: 20px;
+  bottom: 11px;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+  color: #5543ca;
+  cursor: text;
+  transition: -webkit-transform .2s ease-in-out;
+  transition: transform .2s ease-in-out;
+  transition: transform .2s ease-in-out, 
+  -webkit-transform .2s ease-in-out;
+}
+.contact-form .submit-btn {
+  display: inline-block;
+  background-color: #000;
+   background-image: linear-gradient(125deg,#a72879,#064497);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 16px;
+  padding: 8px 16px;
+  border: none;
+  width:200px;
+  cursor: pointer;
+}
+
+/* Map container */
+#map {
+  height: 500px !important;
+  width: 100% !important;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+</style>
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+// Initialize the map when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', initFormMap);
+
+// Run this immediately as well (for AJAX loading)
+setTimeout(initFormMap, 100);
+
+function initFormMap() {
+    // Check if map container exists
+    if (!document.getElementById('map')) return;
+    
+    // Check if map is already initialized
+    if (window.formMap) {
+        window.formMap.remove();
+    }
+    
+    // Initialize the map
+    var map = L.map('map').setView([36.8065, 10.1815], 13);
+    window.formMap = map;
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Add a marker that can be dragged
+    var marker = L.marker([36.8065, 10.1815], {
+        draggable: true
+    }).addTo(map);
+    
+    // Update form fields when marker is dragged
+    marker.on('dragend', function(e) {
+        var position = marker.getLatLng();
+        document.getElementById('latitude').value = position.lat.toFixed(6);
+        document.getElementById('longitude').value = position.lng.toFixed(6);
+    });
+    
+    // Update marker position when clicking on map
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        document.getElementById('latitude').value = e.latlng.lat.toFixed(6);
+        document.getElementById('longitude').value = e.latlng.lng.toFixed(6);
+    });
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header pb-0">
+                <h6>Ajouter/Modifier une Station</h6>
+            </div>
+            <div class="card-body px-4 pt-0 pb-2">
+                <div id="map"></div>
+                
+                <section class="get-in-touch">
+                    <h1 class="title">{{ button_label is defined ? 'Modifier' : 'Ajouter' }} une Station</h1>
+                    {{ form_start(form, {'method': 'POST', 'action': path('app_station_new'), 'attr': {'class': 'contact-form row','novalidate': 'novalidate'}}) }}
+                    <div class="row">
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.nom, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.capacite, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.nombreVelo, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.typeVelo, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.prixHeure, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.pays, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.longitude, {'attr': {'class': 'input-text', 'id': 'longitude'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.latitude, {'attr': {'class': 'input-text', 'id': 'latitude'}}) }}
+                        </div>
+                        
+                        <div class="form-field col-lg-12 text-center">
+                            <button class="submit-btn">{{ button_label|default('Ajouter') }}</button>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

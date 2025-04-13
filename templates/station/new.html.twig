@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ include('station/_form.html.twig') }}
+
+    <a href="{{ path('app_station_index') }}">back to list</a>
+{% endblock %}

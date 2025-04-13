@@ -1,0 +1,12 @@
+{{ form_start(form, {'attr': {'id': 'comment-form', 'novalidate': 'novalidate', 'autocomplete': 'off'}}) }}
+    <div class="form-group">
+        {{ form_widget(form.description, {
+            'attr': {
+                'class': 'form-control mb-2',
+                'placeholder': 'Ajouter un commentaire...'
+            }
+        }) }}
+        {{ form_errors(form.description, {'attr': {'class': 'error-message'}}) }}
+    </div>
+    <button type="submit" class="btn btn-primary">{{ button_label|default('Poster') }}</button>
+{{ form_end(form) }}

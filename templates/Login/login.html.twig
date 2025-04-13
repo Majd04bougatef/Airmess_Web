@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>{% block title %}Airmess{% endblock %}</title>
+    <link rel="icon" href="{{ asset('images/logo-airmess.png') }}" type="image/png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            /*background: -webkit-linear-gradient(left,rgba(219,138,222,1) 0%, rgba(246,191,159,1) 100%);*/
+            background-color:white;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 80%;
+            max-width: 1200px;
+        }
+        .login-left {
+            background: -webkit-linear-gradient(left, rgba(219,138,222,1) 0%, rgba(246,191,159,1) 100%);
+            color: #fff;
+            text-align: center;
+            border-top-left-radius: 10% 50%;
+            border-bottom-left-radius: 10% 50%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-left img {
+            width: 25%;
+            margin-bottom: 20px;
+            animation: mover 1s infinite alternate;
+        }
+        @keyframes mover {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-20px); }
+        }
+        .login-form {
+            padding: 40px;
+        }
+        .login-heading {
+            text-align: center;
+            color: #495057;
+            margin-bottom: 30px;
+        }
+        .btnLogin, .btnForgotPassword {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 1.5rem;
+            margin-top: 20px;
+        }
+        .btnLogin {
+            background: #0062cc;
+            color: #fff;
+        }
+        .btnLogin:hover {
+            background: #0056b3;
+        }
+        .btnForgotPassword {
+            background: #6c757d;
+            color: #fff;
+        }
+        .btnForgotPassword:hover {
+            background: #545b62;
+        }
+        .form-control {
+            border-radius: 1.5rem;
+            margin-bottom: 15px;
+        }
+        .password-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container login-container">
+        <div class="row">
+            <div class="col-md-4 login-left">
+                <img src="https://image.ibb.co/n7oTvU/logo_white.png" alt="Logo">
+                <h3>Welcome Back</h3>
+                <p>Login to continue earning your own money!</p>
+            </div>
+            <div class="col-md-8">
+                <div class="login-form">
+                    <h3 class="login-heading">Login to Your Account</h3>
+                    <form>
+                        <div class="form-group">
+                            <input type="email" class="form-control" placeholder="Your Email *" >
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" placeholder="Your Password *" >
+                        </div>
+                        <div class="password-actions">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">Remember me</label>
+                            </div>
+                        </div>
+                        
+
+                        <a href="{{path('app_dashVoyageurs')}}"class="btnLogin" >
+
+                        <input type="button" class="btnLogin" value="Login"></a>
+
+                        <input type="button" class="btnForgotPassword" value="Forgot Password">
+                    </form>
+                    <div class="register-link">
+                        <p>Don't have an account? <a href="{{path('app_signup')}}">Register Now</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Réserver Vélo - Airmess Dashboard{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    /* Reset all margins and padding */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5; /* Adding a background color to see the white navbar better */
+    }
+    
+    .navbar.station-nav {
+        display: flex;
+        background: #ffffff;
+        padding: 10px;
+        justify-content: center;
+        margin: 20px auto 0; /* Center horizontally and add top margin only */
+        gap: 20px;
+        width: 90%;
+        max-width: 1200px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar.station-nav a {
+        color: black;
+        text-decoration: none;
+        padding: 10px 15px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease; /* Smooth transition for hover effects */
+    }
+    
+    .navbar.station-nav .nav-link:hover {
+        color: #6c99bc;
+        border-bottom: 2px solid #6c99bc;
+    }
+    
+    /* Zone de contenu */
+    .content {
+        padding: 20px;
+        text-align: center;
+        margin: 0 auto;
+        width: 90%;
+        max-width: 1200px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Menu Horizontal with regular links -->
+<div class="navbar station-nav">
+    <a class="nav-link" href="{{ path('app_reservation_transport_station') }}">Réserver</a>
+    <a class="nav-link" href="{{ path('app_reservation_transport_index') }}">Mes Réservations</a>
+    <a class="nav-link" href="{{ path('app_reservation_transport_station') }}">Stations</a>
+    <a class="nav-link" href="{{ path('app_message_voyageurs') }}">Discussions</a>
+</div>
+
+<!-- Contenu -->
+<div class="content">
+    <p>Bienvenue dans la gestion des vélos. Sélectionnez une option dans le menu ci-dessus.</p>
+</div>
+{% endblock %}
