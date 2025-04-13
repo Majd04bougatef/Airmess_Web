@@ -381,4 +381,71 @@ final class ReservationTransportController extends AbstractController
 
         return $this->redirectToRoute('app_reservation_transport_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/{id}/chat', name: 'app_reservation_transport_chat', methods: ['GET'])]
+    public function chat(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager): Response
+    {
+        // Check if the user is the owner of the reservation
+        $currentUser = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
+        
+        if ($reservation->getUser()->getIdU() !== $currentUser->getIdU()) {
+            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à cette conversation.');
+        }
+        
+        // Get existing messages for this reservation
+        $messages = $entityManager->getRepository('App\Entity\Message')->findBy(
+            ['reservation' => $reservation],
+            ['dateM' => 'ASC']
+        );
+        
+        return $this->render('reservation_transport/reservation_chat.html.twig', [
+            'reservation' => $reservation,
+            'messages' => $messages
+        ]);
+    }
+
+    #[Route('/{id}/message/new', name: 'app_reservation_message_new', methods: ['POST'])]
+    public function newMessage(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    {
+        // Check if the user is the owner of the reservation
+        $currentUser = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
+        
+        if ($reservation->getUser()->getIdU() !== $currentUser->getIdU()) {
+            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à envoyer un message pour cette réservation.');
+        }
+        
+        // Get content from the request
+        $content = $request->request->get('content');
+        
+        if (empty($content)) {
+            $this->addFlash('error', 'Le message ne peut pas être vide.');
+            return $this->redirectToRoute('app_reservation_transport_chat', ['id' => $reservation->getId()]);
+        }
+        
+        // Get the station founder as the receiver
+        // We use the station's ID to find its founder
+        $station = $reservation->getStation();
+        
+        // Find the founder/owner of the station (assuming user with ID 1 is the founder)
+        // In a real system, you would have a proper relationship between stations and their founders
+        $receiverUser = $userRepository->find(1);
+        
+        if (!$receiverUser) {
+            throw new \Exception('Le fondateur de la station n\'a pas été trouvé.');
+        }
+        
+        // Create new message
+        $message = new \App\Entity\Message();
+        $message->setContent($content);
+        $message->setSender($currentUser);
+        $message->setReceiver($receiverUser); // Set the station founder as receiver
+        $message->setDateM(new \DateTime());
+        $message->setReservation($reservation);
+        
+        // Save to database
+        $entityManager->persist($message);
+        $entityManager->flush();
+        
+        return $this->redirectToRoute('app_reservation_transport_chat', ['id' => $reservation->getId()]);
+    }
 }
