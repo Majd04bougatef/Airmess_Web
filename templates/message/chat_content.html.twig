@@ -1,0 +1,21 @@
+{% if messages is defined %}
+    {% for message in messages %}
+        {% if message.sender.id == 40 %}
+            <div class="message user-message">
+                {{ message.content }}
+                <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
+            </div>
+        {% else %}
+            <div class="message admin-message">
+                {{ message.content }}
+                <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <!-- Message de bienvenue par défaut -->
+    <div class="message admin-message">
+        Bonjour ! Comment puis-je vous aider aujourd'hui concernant nos services de vélos ?
+        <div class="message-time">{{ "now"|date('H:i') }}</div>
+    </div>
+{% endif %}

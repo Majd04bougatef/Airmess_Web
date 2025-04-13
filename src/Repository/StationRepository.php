@@ -36,4 +36,27 @@ class StationRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    /**
+     * Décrémente le nombre de vélos disponibles pour une station donnée
+     */
+    public function decrementNbVelosDispo(int $stationId, int $nbVelos): void
+    {
+        $em = $this->getEntityManager();
+        
+        $station = $this->find($stationId);
+
+        if (!$station) {
+            throw new \InvalidArgumentException("Station avec ID $stationId non trouvée.");
+        }
+
+        $currentNbVelos = $station->getNombreVelo();
+        $newNbVelos = max(0, $currentNbVelos - $nbVelos); // Pour éviter les valeurs négatives
+
+        $station->setNombreVelo($newNbVelos);
+
+        $em->persist($station);
+        $em->flush();
+    }
+
 }

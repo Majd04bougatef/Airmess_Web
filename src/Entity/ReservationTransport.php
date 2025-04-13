@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ReservationTransportRepository;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: ReservationTransportRepository::class)]
 #[ORM\Table(name: "reservation_transport")]
@@ -24,13 +26,16 @@ class ReservationTransport
 
     public function __construct()
     {
-        $this->dateRes = new \DateTime(); // Définit la date actuelle par défaut
+        $this->dateRes = new \DateTime('-1 hour');
     }
 
     #[ORM\Column(name: "dateRes", type: "datetime")]
     private \DateTimeInterface $dateRes;
 
     #[ORM\Column(name: "dateFin", type: "datetime")]
+    #[Assert\NotBlank(message: "La date de fin est oblig")]
+    #[Assert\GreaterThan(propertyPath: "dateRes", message: "La date de fin doit être après la date de réservation.")]
+
     private \DateTimeInterface $dateFin;
 
     #[ORM\Column(name: "prix", type: "float")]
@@ -43,6 +48,8 @@ class ReservationTransport
     private string $reference;
 
     #[ORM\Column(name: "nombreVelo", type: "integer")]
+    #[Assert\NotBlank(message: "Le nombre de vélos est obligatoire")]
+    #[Assert\GreaterThan(value: 0, message: "Le nombre de vélos doit être supérieur à 0.")]
     private int $nombreVelo;
 
     // Getters et Setters

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 class VoyageursController extends AbstractController{
 
@@ -24,7 +25,6 @@ class VoyageursController extends AbstractController{
     #[Route('/StationVoyageursPage', name: 'stationVoyageurs_page')]
     public function stationVoyageursPage()
     {
-        // Vous pouvez ajouter ici des données à passer à la vue
         return $this->render('dashVoyageurs/stationPageVoyageurs.html.twig');
     }
 
@@ -47,6 +47,12 @@ class VoyageursController extends AbstractController{
     {
         // Vous pouvez ajouter ici des données à passer à la vue
         return $this->render('dashVoyageurs/socialPageVoyageurs.html.twig');
+    }
+    
+    #[Route('/OffreForm', name: 'offre_form')]
+    public function offreForm(): Response
+    {
+        return $this->render('dashVoyageurs/offreForm.html.twig');
     }
 }
 
