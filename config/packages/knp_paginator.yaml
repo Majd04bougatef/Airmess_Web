@@ -1,0 +1,13 @@
+knp_paginator:
+    page_range: 5                      # Nombre de pages affichées dans le navigateur de pagination
+    default_options:
+        page_name: page                # Nom du paramètre de page dans l'URL
+        sort_field_name: sort          # Nom du paramètre de tri dans l'URL
+        sort_direction_name: direction # Nom du paramètre de direction dans l'URL
+        distinct: true                 # Assurer des résultats distincts
+        filter_field_name: filterField # Nom du paramètre de champ de filtre
+        filter_value_name: filterValue # Nom du paramètre de valeur de filtre
+    template:
+        pagination: 'pagination/custom_pagination.html.twig'  # Template de pagination personnalisé
+        sortable: '@KnpPaginator/Pagination/bootstrap_v5_bi_sortable_link.html.twig'  # Template pour les liens de tri
+        filtration: '@KnpPaginator/Pagination/bootstrap_v5_filtration.html.twig'  # Template pour les filtres 

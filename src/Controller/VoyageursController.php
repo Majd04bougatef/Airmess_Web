@@ -5,7 +5,9 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use App\Repository\SocialMediaRepository;
+use Knp\Component\Pager\PaginatorInterface;
 
 class VoyageursController extends AbstractController{
 
@@ -44,20 +46,25 @@ class VoyageursController extends AbstractController{
     }
 
     #[Route('/SocialVoyageursPage', name: 'socialVoyageurs_page')]
-    public function socialVoyageursPage(SocialMediaRepository $socialMediaRepository)
+    public function socialVoyageursPage(Request $request, SocialMediaRepository $socialMediaRepository, PaginatorInterface $paginator)
     {
-        // Récupérer les 6 publications les plus récentes
-        $publications = $socialMediaRepository->createQueryBuilder('s')
+        // Récupérer toutes les publications
+        $query = $socialMediaRepository->createQueryBuilder('s')
             ->leftJoin('s.user', 'u')
             ->select('s', 'u')
             ->orderBy('s.publicationDate', 'DESC')
-            ->setMaxResults(6)
-            ->getQuery()
-            ->getResult();
+            ->getQuery();
             
-        // Passer les publications à la vue
+        // Paginer les résultats
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1), // Numéro de page, 1 par défaut
+            6 // Nombre d'éléments par page
+        );
+            
+        // Passer les publications paginées à la vue
         return $this->render('dashVoyageurs/socialPageVoyageurs.html.twig', [
-            'publications' => $publications
+            'publications' => $pagination
         ]);
     }
     
