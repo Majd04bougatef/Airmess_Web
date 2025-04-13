@@ -159,44 +159,16 @@
         }
         
         .comment-bubble {
-            background-color: #f8f9fa;
-            border-radius: 18px;
-            padding: 0.75rem 1.25rem;
-            position: relative;
-            margin-bottom: 0.5rem;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
-        }
-        
-        .comment-bubble:hover {
-            background-color: #f2f4f9;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-        }
-        
-        .comment-author-name {
-            font-size: 0.9rem;
-            color: #4a5568;
-        }
-        
-        .comment-text {
-            font-size: 0.95rem;
-            color: #2d3748;
-            line-height: 1.5;
+            background-color: var(--light-bg);
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            padding: 0.6rem 0.9rem;
         }
         
         .comment-entry {
+            animation: fadeIn 0.4s ease forwards;
+            animation-delay: calc(0.08s * var(--animation-order, 0));
             margin-bottom: 1rem;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: fadeInUp 0.5s ease forwards;
-            animation-delay: calc(var(--animation-order) * 0.1s);
-        }
-        
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
         
         .comments-section {
@@ -325,21 +297,16 @@
         
         .comment-input {
             border-radius: 20px;
-            padding: 0.8rem 3rem 0.8rem 1.25rem;
+            padding-right: 40px;
             resize: none;
             border: 1px solid #e0e4e8;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            background-color: #f8fafd;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: all var(--transition-speed) ease;
         }
         
         .comment-input:focus {
             border-color: #bdc9e7;
-            box-shadow: 0 0 0 4px rgba(94, 114, 228, 0.15);
-            background-color: #fff;
-            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 107, 218, 0.1);
         }
         
         .comment-author-name {
@@ -425,14 +392,7 @@
         }
         
         .add-comment-form-container {
-            margin-bottom: 1.5rem;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .add-comment-form-container:hover .comment-author-img {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            margin-bottom: 1rem;
         }
         
         .comment-input {
@@ -643,35 +603,6 @@
             min-width: 18px;
             height: 18px;
         }
-        
-        .comment-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-            font-size: 0.8rem;
-        }
-        
-        .comment-action {
-            color: #718096;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-        
-        .comment-action:hover {
-            color: #4a5568;
-            text-decoration: none;
-        }
-        
-        .comment-action i {
-            font-size: 0.85rem;
-        }
-        
-        .comment-action.liked {
-            color: #e53e3e;
-        }
     </style>
 {% endblock %}
 
@@ -722,8 +653,9 @@
                 {# Image du Post (si présente) #}
                 {% if social_media.getImagemedia() %}
                     <div class="post-image-container d-flex justify-content-center align-items-center bg-light">
-                        <img src="http://localhost/ImageSocialMedia/{{ social_media.getImagemedia() }}"
-                             alt="Image pour {{ social_media.getTitre() }}" class="img-fluid">
+                        <img src="{{ asset('http://localhost/ImageSocialMedia/' ~ social_media.getImagemedia()) }}"
+                             alt="Image pour {{ social_media.getTitre() }}" class="img-fluid"
+                             onerror="this.onerror=null; this.src='{{ asset('images/image-not-found.png') }}'; this.alt='Image non disponible';">
                     </div>
                 {% endif %}
 

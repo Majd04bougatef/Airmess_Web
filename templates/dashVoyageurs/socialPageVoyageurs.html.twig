@@ -619,9 +619,10 @@
                                         <div class="publication-card card h-100">
                                             <div class="card-img-container">
                                                 {% if publication.imagemedia %}
-                                                    <img src="http://localhost/ImageSocialMedia/{{ publication.imagemedia }}" class="card-img-top" alt="{{ publication.titre }}">
-                                                {% else %}
-                                                    <img src="{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}" class="card-img-top" alt="Publication image">
+                                                    <img src="http://localhost/ImageSocialMedia/{{ publication.imagemedia }}" 
+                                                         class="card-img-top" 
+                                                         alt="{{ publication.titre }}"
+                                                         onerror="this.onerror=null; this.src='{{ asset('img/image-placeholder.jpg') }}'; this.alt='Image non disponible';">
                                                 {% endif %}
                                             </div>
                                             <div class="card-body">

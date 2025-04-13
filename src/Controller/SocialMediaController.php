@@ -41,6 +41,10 @@ class SocialMediaController extends AbstractController
         private string $uploadsDirectory = 'C:/xampp/htdocs/ImageSocialMedia',
         private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker
     ) {
+        // Vérifier que le répertoire d'upload existe et est accessible
+        if (!file_exists($this->uploadsDirectory)) {
+            mkdir($this->uploadsDirectory, 0777, true);
+        }
     }
 
     private function getDefaultUser(): User
@@ -437,46 +441,98 @@ class SocialMediaController extends AbstractController
 
         return $isAjax
             ? $this->renderUpdatedIndex()
-            : $this->redirectToRoute('app_social_media_index', [], Response::HTTP_SEE_OTHER);
+            : $this->redirectToRoute('socialVoyageurs_page', [], Response::HTTP_SEE_OTHER);
     }
 
     private function handleImageUpload($form, SocialMedia $socialMedia, Request $request, ?string $originalImage = null): void
     {
         if (!$form->has('imagemedia')) {
+            $this->addFlash('error', 'Le champ imagemedia n\'existe pas dans le formulaire');
             return;
         }
+        
+        /** @var UploadedFile|null $imageFile */
         $imageFile = $form->get('imagemedia')->getData();
-
-        if ($imageFile instanceof UploadedFile) {
-            $newFilename = $this->uploadImage($imageFile);
-            $socialMedia->setImagemedia($newFilename);
-
-            if ($originalImage && $originalImage !== $newFilename) {
-                 @unlink($this->uploadsDirectory . '/' . $originalImage);
+        
+        // Debug information
+        if ($imageFile) {
+            $this->addFlash('info', 'Fichier détecté: ' . $imageFile->getClientOriginalName() . ' (' . $imageFile->getSize() . ' octets)');
+            
+            // Vérifier si le fichier est valide
+            if (!$imageFile->isValid()) {
+                $this->addFlash('error', 'Le fichier uploadé n\'est pas valide. Code d\'erreur: ' . $imageFile->getError());
+                return;
             }
-        } elseif ($request->request->get('remove_imagemedia')) { 
-             $this->handleImageDeletion($socialMedia);
-             $socialMedia->setImagemedia(null);
         } else {
-             if ($originalImage && !$socialMedia->getImagemedia() && !$request->files->has($form->get('imagemedia')->getName())) {
-                 $socialMedia->setImagemedia($originalImage);
-             }
+            $this->addFlash('warning', 'Aucun fichier n\'a été téléchargé');
+            if ($originalImage) {
+                $socialMedia->setImagemedia($originalImage);
+            }
+            return;
         }
-    }
-
-    private function uploadImage(UploadedFile $imageFile): string
-    {
-        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $this->slugger->slug($originalFilename);
-        $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-
+        
         try {
-            $imageFile->move($this->uploadsDirectory, $newFilename);
-        } catch (FileException $e) {
-            $this->addFlash('error', 'L\'upload de l\'image a échoué. Veuillez réessayer.');
-            throw $e;
+            // Vérifier que le répertoire d'upload existe et est accessible en écriture
+            if (!is_dir($this->uploadsDirectory)) {
+                $this->addFlash('error', 'Le répertoire d\'upload n\'existe pas: ' . $this->uploadsDirectory);
+                if (!mkdir($this->uploadsDirectory, 0777, true) && !is_dir($this->uploadsDirectory)) {
+                    throw new \Exception("Impossible de créer le répertoire d'upload: " . $this->uploadsDirectory);
+                }
+                $this->addFlash('info', 'Répertoire d\'upload créé: ' . $this->uploadsDirectory);
+            } elseif (!is_writable($this->uploadsDirectory)) {
+                throw new \Exception("Le répertoire d'upload n'est pas accessible en écriture: " . $this->uploadsDirectory);
+            } else {
+                $this->addFlash('info', 'Répertoire d\'upload valide et accessible: ' . $this->uploadsDirectory);
+            }
+            
+            // Informations sur le fichier
+            $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $this->slugger->slug($originalFilename);
+            $extension = $imageFile->getClientOriginalExtension();
+            
+            if (empty($extension)) {
+                $extension = $imageFile->guessExtension() ?: 'jpg';
+                $this->addFlash('info', 'Extension déterminée: ' . $extension);
+            }
+            
+            // Générer un nom de fichier unique
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $extension;
+            $fullPath = $this->uploadsDirectory . '/' . $newFilename;
+            
+            $this->addFlash('info', 'Tentative de déplacement du fichier vers: ' . $fullPath);
+            
+            // Déplacer le fichier
+            try {
+                $imageFile->move($this->uploadsDirectory, $newFilename);
+                $this->addFlash('success', 'Fichier déplacé avec succès: ' . $newFilename);
+            } catch (\Exception $e) {
+                throw new \Exception('Erreur lors du déplacement du fichier: ' . $e->getMessage());
+            }
+            
+            // Vérifier que le fichier a bien été déplacé et est accessible
+            if (!file_exists($fullPath)) {
+                throw new \Exception("Le fichier n'a pas été correctement déplacé vers " . $fullPath);
+            }
+            
+            // Mettre à jour l'entité avec le nouveau nom de fichier
+            $socialMedia->setImagemedia($newFilename);
+            
+            // Supprimer l'ancien fichier si nécessaire
+            if ($originalImage && $originalImage !== $newFilename) {
+                $oldPath = $this->uploadsDirectory . '/' . $originalImage;
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                    $this->addFlash('info', 'Ancien fichier supprimé: ' . $originalImage);
+                }
+            }
+            
+        } catch (\Exception $e) {
+            // En cas d'erreur, conserver l'image originale
+            if ($originalImage) {
+                $socialMedia->setImagemedia($originalImage);
+            }
+            $this->addFlash('error', 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage());
         }
-        return $newFilename;
     }
 
     private function handleImageDeletion(SocialMedia $socialMedia): void
@@ -498,7 +554,7 @@ class SocialMediaController extends AbstractController
 
         return $request->isXmlHttpRequest()
             ? $this->renderUpdatedIndex()
-            : $this->redirectToRoute('app_social_media_index', [], Response::HTTP_SEE_OTHER);
+            : $this->redirectToRoute('socialVoyageurs_page', [], Response::HTTP_SEE_OTHER);
     }
 
     private function renderUpdatedIndex(): Response
@@ -520,7 +576,7 @@ class SocialMediaController extends AbstractController
         ]);
     }
 
-    protected function renderCustomForm(Request $request, string $template, SocialMedia $socialMedia, $form, string $buttonLabel): Response
+    protected function renderCustomForm(Request $request, string $template, SocialMedia $socialMedia, $form, string $buttonLabel, array $forbiddenWords = []): Response
     {
         $usePartial = $request->isXmlHttpRequest();
         $view = $usePartial ? 'social_media/_form.html.twig' : $template;
@@ -533,6 +589,7 @@ class SocialMediaController extends AbstractController
             'social_media' => $socialMedia,
             'form' => $form->createView(),
             'button_label' => $buttonLabel,
+            'forbidden_words' => $forbiddenWords
         ], new Response(null, $status));
     }
 }

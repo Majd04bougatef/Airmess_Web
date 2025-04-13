@@ -1,5 +1,5 @@
 {# templates/social_media/index.html.twig #}
-{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Social Media Feed{% endblock %}
 
@@ -231,7 +231,10 @@
                     <div class="publication-card card h-100">
                         <div class="card-img-container">
                             {% if social_media.imagemedia %}
-                                <img src="http://localhost/ImageSocialMedia/{{ social_media.imagemedia }}" class="card-img-top" alt="{{ social_media.titre }}">
+                                <img src="http://localhost/ImageSocialMedia/{{ social_media.imagemedia }}" 
+                                     class="card-img-top" 
+                                     alt="{{ social_media.titre }}"
+                                     onerror="this.onerror=null; this.src='{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}'; this.alt='Image non disponible';">
                             {% else %}
                                 <img src="{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}" class="card-img-top" alt="Publication image">
                             {% endif %}

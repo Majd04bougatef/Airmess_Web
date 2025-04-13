@@ -58,8 +58,8 @@ class SocialMedia
     #[ORM\Column(type: "integer")]
     private int $dislike;
 
-    #[ORM\Column(type: "string", length: 500)]
-    private string $imagemedia = '';
+    #[ORM\Column(type: "string", length: 500, nullable: true)]
+    private ?string $imagemedia = null;
 
     // Getters et Setters...
 
@@ -145,12 +145,12 @@ class SocialMedia
         return $this;
     }
 
-    public function getImagemedia(): string
+    public function getImagemedia(): ?string
     {
         return $this->imagemedia;
     }
 
-    public function setImagemedia(string $imagemedia): self
+    public function setImagemedia(?string $imagemedia): self
     {
         $this->imagemedia = $imagemedia;
         return $this;

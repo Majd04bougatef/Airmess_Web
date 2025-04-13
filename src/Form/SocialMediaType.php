@@ -52,16 +52,32 @@ class SocialMediaType extends AbstractType
                 ]
             ])
             ->add('imagemedia', FileType::class, [
-                'label' => 'Image (JPG, PNG, GIF)',
+                'label' => 'Image/Vidéo',
                 'mapped' => false,
                 'required' => false,
+                'attr' => [
+                    'accept' => 'image/jpeg, image/jpg, image/png, image/gif, image/avif, video/x-msvideo, video/avi, video/msvideo, video/mpeg, video/mp4',
+                    'class' => 'form-control-file',
+                ],
                 'constraints' => [
                     new File([
-                        'maxSize' => '2048k',
-                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'],
-                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPG, PNG, GIF)',
+                        'maxSize' => '10M',
+                        'mimeTypes' => [
+                            'image/jpeg', 
+                            'image/jpg', 
+                            'image/png', 
+                            'image/gif',
+                            'image/avif',
+                            'video/x-msvideo', // AVI mime type
+                            'video/avi',
+                            'video/msvideo',
+                            'video/mpeg',
+                            'video/mp4'
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger une image/vidéo valide (JPG, PNG, GIF, AVIF, AVI, MP4)',
                     ])
                 ],
+                'help' => 'Formats acceptés: JPG, PNG, GIF, AVIF, AVI, MP4. Taille maximale: 10MB',
             ]);
     }
 
@@ -69,6 +85,9 @@ class SocialMediaType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => SocialMedia::class,
+            'attr' => [
+                'enctype' => 'multipart/form-data',
+            ],
         ]);
     }
 }
