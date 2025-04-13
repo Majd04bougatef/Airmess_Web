@@ -1,5 +1,6 @@
 {# Fichier : templates/social_media/show.html.twig #}
-{% extends 'base.html.twig' %} {# Hérite de votre base partagée #}
+{% extends 'base.html.twig'%} {# Hérite de votre base partagée #}
+
 
 {# Définit le titre de la page #}
 {% block title %}{{ social_media.getTitre() }} - Détails{% endblock %}
@@ -491,7 +492,7 @@
                 {# Image du Post (si présente) #}
                 {% if social_media.getImagemedia() %}
                     <div class="post-image-container">
-                        <img src="{{ asset('uploads/' ~ social_media.getImagemedia()) }}"
+                        <img src="{{ asset('http://localhost/ImageSocialMedia/{{ publication.imagemedia }}/' ~ social_media.getImagemedia()) }}"
                              alt="Image pour {{ social_media.getTitre() }}">
                     </div>
                 {% endif %}
@@ -550,7 +551,7 @@
                         <input type="hidden" name="_token" value="{{ csrf_token('dislike-post') }}">
                         <button type="submit" class="btn btn-action w-100 text-muted dislike-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}active{% endif %}">
                             <img src="{{ asset('images/icons/dislike-button.png') }}" alt="Je n'aime pas" width="16" height="16" class="me-1"> <span class="action-text">Je n'aime pas</span>
-                        </button>
+    </button>
                     </form>
 
     {# Comment Link/Button #}
@@ -654,8 +655,8 @@
                                             
                                             {% if comment_author and comment_author.getIdU() == default_user_id %}
                                                 <a href="#" class="comment-action-link small me-3 edit-comment-btn" data-comment-id="{{ commentaire.idC }}">
-                                                    <i class="bi bi-pencil-square"></i> Modifier
-                                                </a>
+        <i class="bi bi-pencil-square"></i> Modifier
+    </a>
 
                                                 <a href="#" 
                                                    class="comment-action-link small text-danger"
@@ -663,9 +664,9 @@
                                                     <i class="bi bi-trash"></i> Supprimer
                                                 </a>
                                                 <form id="delete-form-{{ commentaire.idC }}" action="{{ path('app_commentaire_delete', {'idC': commentaire.idC}) }}" method="POST" class="d-none">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commentaire.idC) }}">
-                                                </form>
-                                            {% endif %}
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commentaire.idC) }}">
+    </form>
+{% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -767,10 +768,10 @@
                             
                             // Envoyer la requête AJAX
                             fetch(`/commentaire/${commentId}/edit-ajax`, {
-                                method: 'POST',
+                            method: 'POST',
                                 body: formData,
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest'
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
                                 }
                             })
                             .then(response => {
@@ -1167,8 +1168,8 @@
                             console.error('Error:', error);
                             showNotification('Erreur de connexion avec le serveur: ' + error.message, 'danger');
                         });
-                    });
                 });
+            });
             } else {
                 console.log('No comment like buttons found on the page');
             }

@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use App\Repository\SocialMediaRepository;
 
 class VoyageursController extends AbstractController{
 
@@ -43,10 +44,21 @@ class VoyageursController extends AbstractController{
     }
 
     #[Route('/SocialVoyageursPage', name: 'socialVoyageurs_page')]
-    public function socialVoyageursPage()
+    public function socialVoyageursPage(SocialMediaRepository $socialMediaRepository)
     {
-        // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashVoyageurs/socialPageVoyageurs.html.twig');
+        // Récupérer les 6 publications les plus récentes
+        $publications = $socialMediaRepository->createQueryBuilder('s')
+            ->leftJoin('s.user', 'u')
+            ->select('s', 'u')
+            ->orderBy('s.publicationDate', 'DESC')
+            ->setMaxResults(6)
+            ->getQuery()
+            ->getResult();
+            
+        // Passer les publications à la vue
+        return $this->render('dashVoyageurs/socialPageVoyageurs.html.twig', [
+            'publications' => $publications
+        ]);
     }
     
     #[Route('/OffreForm', name: 'offre_form')]

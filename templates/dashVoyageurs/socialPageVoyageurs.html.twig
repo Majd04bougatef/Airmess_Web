@@ -2,21 +2,157 @@
 
 {% block title %}Social Media - Airmess Dashboard{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .publication-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .publication-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-img-top {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .card-text {
+            max-height: 4.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        
+        .location-badge {
+            background-color: #f8f9fa;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .location-badge i {
+            margin-right: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .card-footer {
+            background-color: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.75rem 1.25rem;
+        }
+        
+        .date-info {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .author-info {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .no-publications {
+            text-align: center;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
 <div class="container-fluid py-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4">
-        <div class="card-header pb-0">
-          <h6>Réseaux Sociaux</h6>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Réseaux Sociaux</h6>
+                    <div class="d-flex">
+                        <a href="{{ path('app_social_media_new') }}" class="btn btn-primary btn-sm me-2">
+                            <i class="fas fa-plus me-1"></i> Ajouter une publication
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="p-4">
+                        <!-- Section explicative -->
+                        <div class="alert alert-info mb-4">
+                            <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Publications récentes</h5>
+                            <p class="mb-0">Découvrez les dernières publications de notre communauté. Partagez vos expériences en créant une nouvelle publication.</p>
+                        </div>
+                        
+                        <!-- Grille de publications -->
+                        <div class="row g-4">
+                            {% if publications is empty %}
+                                <div class="col-12">
+                                    <div class="no-publications">
+                                        <i class="fas fa-newspaper fa-3x mb-3 text-muted"></i>
+                                        <h5>Aucune publication disponible</h5>
+                                        <p class="text-muted">Soyez le premier à partager une publication !</p>
+                                        <a href="{{ path('app_social_media_new') }}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-1"></i> Créer une publication
+                                        </a>
+                                    </div>
+                                </div>
+                            {% else %}
+                                {% for publication in publications %}
+                                    <div class="col-lg-4 col-md-6 mb-4">
+                                        <div class="publication-card card h-100">
+                                            <div class="card-img-container">
+                                                {% if publication.imagemedia %}
+                                                    <img src="http://localhost/ImageSocialMedia/{{ publication.imagemedia }}" class="card-img-top" alt="{{ publication.titre }}">
+                                                {% else %}
+                                                    <img src="{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}" class="card-img-top" alt="Publication image">
+                                                {% endif %}
+                                            </div>
+                                            <div class="card-body">
+                                                <span class="author-info">
+                                                    <i class="fas fa-user me-1"></i> {{ publication.user.name }} {{ publication.user.prenom }}
+                                                </span>
+                                                <span class="location-badge">
+                                                    <i class="fas fa-map-marker-alt"></i> {{ publication.lieu }}
+                                                </span>
+                                                <h5 class="card-title">{{ publication.titre }}</h5>
+                                                <p class="card-text">{{ publication.contenu }}</p>
+                                            </div>
+                                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                                <span class="date-info"><i class="far fa-calendar-alt me-1"></i> {{ publication.publicationDate|date("d/m/Y") }}</span>
+                                                <a href="{{ path('app_social_media_show', {'idEB': publication.idEB}) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i> Voir
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body px-0 pt-0 pb-2">
-          <div class="p-4">
-            <p>Contenu de la page réseaux sociaux en cours de développement...</p>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 {% endblock %}

@@ -38,7 +38,7 @@ class SocialMediaController extends AbstractController
         private UserRepository $userRepository,
         private SluggerInterface $slugger,
         private PaginatorInterface $paginator,
-        private string $uploadsDirectory = __DIR__.'/../../assets/imagemedia',
+        private string $uploadsDirectory = 'C:/xampp/htdocs/ImageSocialMedia',
         private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker
     ) {
     }
