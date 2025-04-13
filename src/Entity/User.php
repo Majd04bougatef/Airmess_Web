@@ -253,6 +253,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return '/uploads/user_photos/' . $this->getImagesU();
     }
 
+
+
+    
     /**
      * @return Collection<int, Station>
      */

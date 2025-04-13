@@ -1,145 +1,244 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>{% block title %}Airmess{% endblock %}</title>
+    <title>{% block title %}Airmess{% endblock %}</title>
     <link rel="icon" href="{{ asset('images/logo-airmess.png') }}" type="image/png">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
         body {
-            /*background: -webkit-linear-gradient(left,rgba(219,138,222,1) 0%, rgba(246,191,159,1) 100%);*/
-            background-color:white;
+            background: linear-gradient(to right, #a1c4fd, #fbc2eb);
             height: 100vh;
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .login-container {
-            background: #f8f9fa;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 80%;
-            max-width: 1200px;
+        .main-container {
+            background-color: white;
+            border-radius: 50px;
+            width: 1000px;
+            height: 600px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
-        .login-left {
-            background: -webkit-linear-gradient(left, rgba(219,138,222,1) 0%, rgba(246,191,159,1) 100%);
-            color: #fff;
-            text-align: center;
-            border-top-left-radius: 10% 50%;
-            border-bottom-left-radius: 10% 50%;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-left img {
-            width: 25%;
-            margin-bottom: 20px;
-            animation: mover 1s infinite alternate;
-        }
-        @keyframes mover {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-20px); }
+        .right-panel {
+            background-color: #f0f5f9;
+            border-radius: 50px;
+            height: 100%;
+            position: absolute;
+            right: 0;
+            width: 414px;
         }
         .login-form {
-            padding: 40px;
+            padding: 40px 60px;
+            max-width: 500px;
+            position: relative;
         }
         .login-heading {
-            text-align: center;
-            color: #495057;
+            font-size: 40px;
+            color: #406dab;
             margin-bottom: 30px;
+            font-weight: bold;
+            margin-top: 50px;
+            text-align: right;
+            padding-right: 70px;
         }
-        .btnLogin, .btnForgotPassword {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 1.5rem;
-            margin-top: 20px;
-        }
-        .btnLogin {
-            background: #0062cc;
-            color: #fff;
-        }
-        .btnLogin:hover {
-            background: #0056b3;
-        }
-        .btnForgotPassword {
-            background: #6c757d;
-            color: #fff;
-        }
-        .btnForgotPassword:hover {
-            background: #545b62;
+        .form-label {
+            color: #1b56a4;
+            font-weight: 500;
+            margin-bottom: 5px;
         }
         .form-control {
-            border-radius: 1.5rem;
-            margin-bottom: 15px;
+            background-color: #f0f5f9;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            padding: 12px 15px;
+            border: none;
+            height: 45px;
         }
-        .password-actions {
+        .password-field-container {
+            position: relative;
+        }
+        .password-toggle-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #9c9898;
+        }
+        .btnLogin {
+            width: 240px;
+            height: 45px;
+            border: none;
+            border-radius: 50px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
+            color: #fff;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .btnLogin:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .social-login {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .social-login a {
+            margin: 0 15px;
+            display: inline-block;
+        }
+        .social-login img {
+            width: 40px;
+            height: 40px;
         }
         .register-link {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 15px;
+            color: #9c9898;
         }
-        .alert {
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .forgot-password {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        .forgot-password a {
+            color: #9c9898;
+            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+        .register-link a {
+            color: palevioletred;
+            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+        .or-continue {
+            text-align: center;
+            color: #9c9898;
+            margin-top: 20px;
             margin-bottom: 20px;
-            border-radius: 1.5rem;
+        }
+        .logo-container {
+            position: absolute;
+            top: 14px;
+            left: 38px;
+        }
+        .logo-text {
+            position: absolute;
+            top: 41px;
+            left: 134px;
+        }
+        .character-image {
+            position: absolute;
+            right: 180px;
+            top: 53px;
+            height: 441px;
+            width: 310px;
+            object-fit: contain;
+        }
+        .right-character {
+            position: absolute;
+            left: 130px;
+            top: 49px;
+            height: 454px;
+            width: 185px;
+            object-fit: contain;
+        }
+        .field-error {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container login-container">
-        <div class="row">
-            <div class="col-md-4 login-left">
-                <img src="https://image.ibb.co/n7oTvU/logo_white.png" alt="Logo">
-                <h3>Welcome Back</h3>
-                <p>Login to continue earning your own money!</p>
-            </div>
-            <div class="col-md-8">
-                <div class="login-form">
-                    <h3 class="login-heading">Login to Your Account</h3>
-                    
-                    {% if error %}
-                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                    {% endif %}
+    <div class="main-container">
+        <div class="right-panel">
+            <img src="{{ asset('images/475494119_1136555244298328_1961476089771408060_n$$.png') }}" alt="3D character" class="right-character" 
+                 onerror="this.src='https://img.freepik.com/free-vector/3d-female-character-carrying-shopping-bags_23-2148938912.jpg?size=626&ext=jpg'">
+        </div>
+        
+        <div class="logo-container">
+            <img src="{{ asset('images/logo-airmess.png') }}" alt="Logo" width="50" height="50"
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/1830/1830844.png'">
+        </div>
+        
+        <div class="logo-text">
+            <img src="{{ asset('images/AirMess-text.png') }}" alt="Logo text" width="110" height="80"
+                 onerror="this.src='https://via.placeholder.com/200x150?text=AirMess'">
+        </div>
+        
+        <img src="{{ asset('images/3d-casual-life-young-man-holding-paper-map.png') }}" alt="Character" class="character-image"
+             onerror="this.src='https://img.freepik.com/free-vector/3d-cartoon-young-man-holding-map_438355-777.jpg'">
+        
+        <div class="login-form">
+            <h2 class="login-heading">S'identifier</h2>
+            
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
 
-                    {% for flash_message in app.flashes('success') %}
-                        <div class="alert alert-success">
-                            {{ flash_message }}
-                        </div>
-                    {% endfor %}
-                    
-                    <form action="{{ path('login') }}" method="post">
-                        <div class="form-group">
-                            <input type="email" name="email" class="form-control" placeholder="Your Email *" required autofocus value="{{ last_username|default('') }}">
-                        </div>
-                        <div class="form-group">
-                            <input type="password" name="password" class="form-control" placeholder="Your Password *" required>
-                        </div>
-                        <div class="password-actions">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="remember_me" name="_remember_me">
-                                <label class="form-check-label" for="remember_me">Remember me</label>
-                            </div>
-                            <a href="{{ path('app_forgot_password') }}">Forgot Password?</a>
-                        </div>
-                        
-                        <button type="submit" class="btnLogin">Login</button>
-                        
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                    </form>
-                    <div class="register-link">
-                        <p>Don't have an account? <a href="{{path('app_signup')}}">Register Now</a></p>
-                        <p>Already logged in? <a href="{{path('user_profile')}}">View Your Profile</a></p>
-                    </div>
+            {% for flash_message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ flash_message }}
                 </div>
+            {% endfor %}
+            
+            <form action="{{ path('login') }}" method="post" id="login-form" novalidate>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ last_username|default('') }}">
+                    <div id="email-error" class="field-error"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <div class="forgot-password">
+                        <a href="{{ path('app_forgot_password') }}">Mot de passe oublié ?</a>
+                    </div>
+                    <div class="password-field-container">
+                        <input type="password" name="password" id="password-field" class="form-control">
+                        <i class="password-toggle-icon fa fa-eye-slash" id="togglePassword"></i>
+                    </div>
+                    <div id="password-error" class="field-error"></div>
+                </div>
+                
+                <button type="submit" class="btnLogin">S'identifier</button>
+                
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            </form>
+
+            <div class="or-continue">ou continuer avec</div>
+            
+            <div class="social-login">
+                <a href="#"><img src="{{ asset('images/google-logo.svg') }}" alt="Google" 
+                   onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg'"></a>
+                <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook"></a>
+            </div>
+            
+            <div class="register-link">
+                <span>Vous n'avez pas encore de compte ?</span>
+                <a href="{{path('app_signup')}}">Inscrivez-vous gratuitement</a>
             </div>
         </div>
     </div>
@@ -147,5 +246,58 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        $(document).ready(function(){
+            // Toggle password visibility
+            $('#togglePassword').click(function(){
+                const passwordField = $('#password-field');
+                const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
+                passwordField.attr('type', type);
+                
+                // Toggle eye icon
+                $(this).toggleClass('fa-eye-slash fa-eye');
+            });
+            
+            // Helper function to show field error
+            function showFieldError(fieldName, message) {
+                const errorElement = $('#' + fieldName + '-error');
+                errorElement.text(message).show();
+            }
+            
+            // Clear all errors in the form
+            function clearFormErrors() {
+                $('.field-error').hide();
+            }
+            
+            // Form validation
+            $('#login-form').on('submit', function(e) {
+                let isValid = true;
+                
+                // Clear previous errors
+                clearFormErrors();
+                
+                const email = $('input[name="email"]').val().trim();
+                const password = $('#password-field').val();
+                
+                // Validate email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email) || email === '') {
+                    showFieldError('email', 'Veuillez entrer une adresse email valide');
+                    isValid = false;
+                }
+                
+                // Validate password
+                if (password === '') {
+                    showFieldError('password', 'Veuillez entrer votre mot de passe');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

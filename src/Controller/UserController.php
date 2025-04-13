@@ -102,10 +102,7 @@ final class UserController extends AbstractController
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        // Add a success message
-        $this->addFlash('success', 'Registration successful! You can now login.');
-
-        // Redirect to login page 
+        // Redirect directly to login page without success message
         return $this->redirectToRoute('login');
     }
 

@@ -1,0 +1,12 @@
+{% if app.user %}
+<div class="user-info-container d-flex align-items-center">
+    <div class="user-photo me-2">
+        <img src="{{ asset('uploads/user_photos/' ~ app.user.imagesU) }}" alt="Photo de profil" 
+             class="user-avatar rounded-circle"
+             onerror="this.src='{{ asset('uploads/user_photos/default.jpg') }}'">
+    </div>
+    <div class="user-name">
+        <span>{{ app.user.name }} {{ app.user.prenom }}</span>
+    </div>
+</div>
+{% endif %} 
