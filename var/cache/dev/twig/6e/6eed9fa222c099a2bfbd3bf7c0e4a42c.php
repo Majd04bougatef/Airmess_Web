@@ -224,13 +224,19 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
             margin-top: 5px;
             display: none;
         }
+        .field-error.d-block {
+            display: block;
+        }
+        .is-invalid {
+            border: 1px solid #dc3545 !important;
+        }
     </style>
 </head>
 <body>
     <div class=\"main-container\">
         <div class=\"right-panel\">
             <img src=\"";
-        // line 178
+        // line 184
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/475494119_1136555244298328_1961476089771408060_n\$\$.png"), "html", null, true);
         yield "\" alt=\"3D character\" class=\"right-character\" 
                  onerror=\"this.src='https://img.freepik.com/free-vector/3d-female-character-carrying-shopping-bags_23-2148938912.jpg?size=626&ext=jpg'\">
@@ -238,7 +244,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
         
         <div class=\"logo-container\">
             <img src=\"";
-        // line 183
+        // line 189
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-airmess.png"), "html", null, true);
         yield "\" alt=\"Logo\" width=\"50\" height=\"50\"
                  onerror=\"this.src='https://cdn-icons-png.flaticon.com/512/1830/1830844.png'\">
@@ -246,14 +252,14 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
         
         <div class=\"logo-text\">
             <img src=\"";
-        // line 188
+        // line 194
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/AirMess-text.png"), "html", null, true);
         yield "\" alt=\"Logo text\" width=\"110\" height=\"80\"
                  onerror=\"this.src='https://via.placeholder.com/200x150?text=AirMess'\">
         </div>
         
         <img src=\"";
-        // line 192
+        // line 198
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/3d-casual-life-young-man-holding-paper-map.png"), "html", null, true);
         yield "\" alt=\"Character\" class=\"character-image\"
              onerror=\"this.src='https://img.freepik.com/free-vector/3d-cartoon-young-man-holding-map_438355-777.jpg'\">
@@ -261,23 +267,58 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
         <div class=\"login-form\">
             <h2 class=\"login-heading\">S'identifier</h2>
             
+            ";
+        // line 204
+        if ((array_key_exists("error", $context) && (isset($context["error"]) || array_key_exists("error", $context) ? $context["error"] : (function () { throw new RuntimeError('Variable "error" does not exist.', 204, $this->source); })()))) {
+            // line 205
+            yield "                <div class=\"alert alert-danger\">
+                    ";
+            // line 206
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["error"]) || array_key_exists("error", $context) ? $context["error"] : (function () { throw new RuntimeError('Variable "error" does not exist.', 206, $this->source); })()), "html", null, true);
+            yield "
+                </div>
+            ";
+        }
+        // line 209
+        yield "            
+            ";
+        // line 210
+        $context['_parent'] = $context;
+        $context['_seq'] = CoreExtension::ensureTraversable(CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 210, $this->source); })()), "flashes", ["error"], "method", false, false, false, 210));
+        foreach ($context['_seq'] as $context["_key"] => $context["flash_error"]) {
+            // line 211
+            yield "                <div class=\"alert alert-danger\">
+                    ";
+            // line 212
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($context["flash_error"], "html", null, true);
+            yield "
+                </div>
+            ";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_key'], $context['flash_error'], $context['_parent']);
+        $context = array_intersect_key($context, $_parent) + $_parent;
+        // line 215
+        yield "            
             <form action=\"";
-        // line 198
+        // line 216
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("login");
         yield "\" method=\"post\" id=\"login-form\" novalidate>
                 <div class=\"form-group\">
                     <label class=\"form-label\">Email</label>
                     <input type=\"email\" name=\"email\" class=\"form-control\" value=\"";
-        // line 201
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("last_username", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["last_username"]) || array_key_exists("last_username", $context) ? $context["last_username"] : (function () { throw new RuntimeError('Variable "last_username" does not exist.', 201, $this->source); })()), "")) : ("")), "html", null, true);
+        // line 219
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("last_username", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["last_username"]) || array_key_exists("last_username", $context) ? $context["last_username"] : (function () { throw new RuntimeError('Variable "last_username" does not exist.', 219, $this->source); })()), "")) : ("")), "html", null, true);
         yield "\">
-                    <div id=\"email-error\" class=\"field-error\"></div>
+                    <div id=\"email-error\" class=\"field-error\">
+                        <!-- Client-side validation error will appear here -->
+                    </div>
                 </div>
                 <div class=\"form-group\">
                     <label class=\"form-label\">Mot de passe</label>
                     <div class=\"forgot-password\">
                         <a href=\"";
-        // line 207
+        // line 227
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("login");
         yield "\">Mot de passe oublié ?</a>
                     </div>
@@ -285,13 +326,15 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
                         <input type=\"password\" name=\"password\" id=\"password-field\" class=\"form-control\">
                         <i class=\"password-toggle-icon fa fa-eye-slash\" id=\"togglePassword\"></i>
                     </div>
-                    <div id=\"password-error\" class=\"field-error\"></div>
+                    <div id=\"password-error\" class=\"field-error\">
+                        <!-- Client-side validation error will appear here -->
+                    </div>
                 </div>
                 
                 <button type=\"submit\" class=\"btnLogin\">S'identifier</button>
                 
                 <input type=\"hidden\" name=\"_csrf_token\" value=\"";
-        // line 218
+        // line 240
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::default($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken("authenticate"), ""), "html", null, true);
         yield "\">
             </form>
@@ -300,7 +343,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
             
             <div class=\"social-login\">
                 <a href=\"#\"><img src=\"";
-        // line 224
+        // line 246
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/google-logo.svg"), "html", null, true);
         yield "\" alt=\"Google\" 
                    onerror=\"this.src='https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg'\"></a>
@@ -310,7 +353,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
             <div class=\"register-link\">
                 <span>Vous n'avez pas encore de compte ?</span>
                 <a href=\"";
-        // line 231
+        // line 253
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_signup");
         yield "\">Inscrivez-vous gratuitement</a>
             </div>
@@ -336,12 +379,14 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
             // Helper function to show field error
             function showFieldError(fieldName, message) {
                 const errorElement = \$('#' + fieldName + '-error');
-                errorElement.text(message).show();
+                errorElement.text(message).addClass('d-block');
+                \$('input[name=\"' + fieldName + '\"]').addClass('is-invalid');
             }
             
             // Clear all errors in the form
             function clearFormErrors() {
-                \$('.field-error').hide();
+                \$('.field-error').removeClass('d-block').text('');
+                \$('.form-control').removeClass('is-invalid');
             }
             
             // Form validation
@@ -355,15 +400,20 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
                 const password = \$('#password-field').val();
                 
                 // Validate email
-                const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+\$/;
-                if (!emailRegex.test(email)) {
-                    showFieldError('email', 'Veuillez entrer une adresse email valide.');
+                if (!email) {
+                    showFieldError('email', 'Veuillez entrer votre adresse email.');
                     isValid = false;
+                } else {
+                    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+\$/;
+                    if (!emailRegex.test(email)) {
+                        showFieldError('email', 'Veuillez entrer une adresse email valide.');
+                        isValid = false;
+                    }
                 }
                 
                 // Validate password
-                if (password.length < 6) {
-                    showFieldError('password', 'Le mot de passe doit comporter au moins 6 caractères.');
+                if (!password) {
+                    showFieldError('password', 'Veuillez entrer votre mot de passe.');
                     isValid = false;
                 }
                 
@@ -429,7 +479,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  389 => 6,  314 => 231,  304 => 224,  295 => 218,  281 => 207,  272 => 201,  266 => 198,  257 => 192,  250 => 188,  242 => 183,  234 => 178,  60 => 7,  56 => 6,  49 => 1,);
+        return array (  439 => 6,  357 => 253,  347 => 246,  338 => 240,  322 => 227,  311 => 219,  305 => 216,  302 => 215,  293 => 212,  290 => 211,  286 => 210,  283 => 209,  277 => 206,  274 => 205,  272 => 204,  263 => 198,  256 => 194,  248 => 189,  240 => 184,  60 => 7,  56 => 6,  49 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -606,6 +656,12 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
             margin-top: 5px;
             display: none;
         }
+        .field-error.d-block {
+            display: block;
+        }
+        .is-invalid {
+            border: 1px solid #dc3545 !important;
+        }
     </style>
 </head>
 <body>
@@ -631,11 +687,25 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
         <div class=\"login-form\">
             <h2 class=\"login-heading\">S'identifier</h2>
             
+            {% if error is defined and error %}
+                <div class=\"alert alert-danger\">
+                    {{ error }}
+                </div>
+            {% endif %}
+            
+            {% for flash_error in app.flashes('error') %}
+                <div class=\"alert alert-danger\">
+                    {{ flash_error }}
+                </div>
+            {% endfor %}
+            
             <form action=\"{{ path('login') }}\" method=\"post\" id=\"login-form\" novalidate>
                 <div class=\"form-group\">
                     <label class=\"form-label\">Email</label>
                     <input type=\"email\" name=\"email\" class=\"form-control\" value=\"{{ last_username|default('') }}\">
-                    <div id=\"email-error\" class=\"field-error\"></div>
+                    <div id=\"email-error\" class=\"field-error\">
+                        <!-- Client-side validation error will appear here -->
+                    </div>
                 </div>
                 <div class=\"form-group\">
                     <label class=\"form-label\">Mot de passe</label>
@@ -646,7 +716,9 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
                         <input type=\"password\" name=\"password\" id=\"password-field\" class=\"form-control\">
                         <i class=\"password-toggle-icon fa fa-eye-slash\" id=\"togglePassword\"></i>
                     </div>
-                    <div id=\"password-error\" class=\"field-error\"></div>
+                    <div id=\"password-error\" class=\"field-error\">
+                        <!-- Client-side validation error will appear here -->
+                    </div>
                 </div>
                 
                 <button type=\"submit\" class=\"btnLogin\">S'identifier</button>
@@ -688,12 +760,14 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
             // Helper function to show field error
             function showFieldError(fieldName, message) {
                 const errorElement = \$('#' + fieldName + '-error');
-                errorElement.text(message).show();
+                errorElement.text(message).addClass('d-block');
+                \$('input[name=\"' + fieldName + '\"]').addClass('is-invalid');
             }
             
             // Clear all errors in the form
             function clearFormErrors() {
-                \$('.field-error').hide();
+                \$('.field-error').removeClass('d-block').text('');
+                \$('.form-control').removeClass('is-invalid');
             }
             
             // Form validation
@@ -707,15 +781,20 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
                 const password = \$('#password-field').val();
                 
                 // Validate email
-                const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+\$/;
-                if (!emailRegex.test(email)) {
-                    showFieldError('email', 'Veuillez entrer une adresse email valide.');
+                if (!email) {
+                    showFieldError('email', 'Veuillez entrer votre adresse email.');
                     isValid = false;
+                } else {
+                    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+\$/;
+                    if (!emailRegex.test(email)) {
+                        showFieldError('email', 'Veuillez entrer une adresse email valide.');
+                        isValid = false;
+                    }
                 }
                 
                 // Validate password
-                if (password.length < 6) {
-                    showFieldError('password', 'Le mot de passe doit comporter au moins 6 caractères.');
+                if (!password) {
+                    showFieldError('password', 'Veuillez entrer votre mot de passe.');
                     isValid = false;
                 }
                 

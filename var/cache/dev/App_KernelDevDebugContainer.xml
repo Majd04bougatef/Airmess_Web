@@ -410,6 +410,13 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\CommentaireController"/>
       </call>
     </service>
+    <service id="App\Controller\DiagnosticController" class="App\Controller\DiagnosticController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\DiagnosticController"/>
+      </call>
+    </service>
     <service id="App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -560,7 +567,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.WWOZcyz"/>
+      <argument type="service" id=".service_locator.vO5Eeb_"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3541,7 +3548,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.WWOZcyz"/>
+      <argument type="service" id=".service_locator.vO5Eeb_"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -7370,6 +7377,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\CommentaireController" class="App\Controller\CommentaireController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\CommentaireController" class="App\Controller\CommentaireController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\CommentaireController" class="App\Controller\CommentaireController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\DiagnosticController" class="App\Controller\DiagnosticController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\DiagnosticController" class="App\Controller\DiagnosticController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\DiagnosticController" class="App\Controller\DiagnosticController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -7879,6 +7889,12 @@
         <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
+    <service id=".service_locator.kPUOGb8" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+      </argument>
+    </service>
     <service id=".service_locator.sLkGFte" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -7968,12 +7984,6 @@
         <argument key="reservation" type="service_closure" id=".errored..service_locator.wxzU4dO.App\Entity\ReservationTransport"/>
       </argument>
     </service>
-    <service id=".service_locator.kPUOGb8" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
-      </argument>
-    </service>
     <service id=".service_locator.4m6SajK" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8026,7 +8036,7 @@
         <argument key="user" type="service_closure" id=".errored..service_locator.rvMNZGh.App\Entity\User"/>
       </argument>
     </service>
-    <service id=".service_locator.WWOZcyz" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.vO5Eeb_" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminCreatorController::createAdmins" type="service_closure" id=".service_locator.CsMkqUa"/>
@@ -8038,6 +8048,7 @@
         <argument key="App\Controller\CommentaireController::likeCommentaire" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\CommentaireController::show" type="service_closure" id=".service_locator.ZfwS4tl"/>
+        <argument key="App\Controller\DiagnosticController::listUsers" type="service_closure" id=".service_locator.kPUOGb8"/>
         <argument key="App\Controller\MessageController::chatVoyageurs" type="service_closure" id=".service_locator.us3WAcN"/>
         <argument key="App\Controller\MessageController::delete" type="service_closure" id=".service_locator.SJArFDd"/>
         <argument key="App\Controller\MessageController::edit" type="service_closure" id=".service_locator.SJArFDd"/>
@@ -8086,6 +8097,7 @@
         <argument key="App\Controller\CommentaireController:likeCommentaire" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\CommentaireController:show" type="service_closure" id=".service_locator.ZfwS4tl"/>
+        <argument key="App\Controller\DiagnosticController:listUsers" type="service_closure" id=".service_locator.kPUOGb8"/>
         <argument key="App\Controller\MessageController:chatVoyageurs" type="service_closure" id=".service_locator.us3WAcN"/>
         <argument key="App\Controller\MessageController:delete" type="service_closure" id=".service_locator.SJArFDd"/>
         <argument key="App\Controller\MessageController:edit" type="service_closure" id=".service_locator.SJArFDd"/>
@@ -8766,6 +8778,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\DiagnosticController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\DiagnosticController"/>
+      <argument>App\Controller\DiagnosticController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\EntrepriseController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\EntrepriseController"/>
       <argument>App\Controller\EntrepriseController</argument>
@@ -9004,6 +9022,7 @@
           <argument>App\Controller\AdminCreatorController</argument>
           <argument>App\Controller\BaseController</argument>
           <argument>App\Controller\CommentaireController</argument>
+          <argument>App\Controller\DiagnosticController</argument>
           <argument>App\Controller\EntrepriseController</argument>
           <argument>App\Controller\MessageController</argument>
           <argument>App\Controller\RegistrationController</argument>
@@ -10455,7 +10474,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.WWOZcyz"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.vO5Eeb_"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
@@ -10489,7 +10508,7 @@
     <service id=".service_locator.DVR2LwI" alias=".service_locator.hvt4Me9"/>
     <service id=".service_locator.1dJfu2A" alias=".service_locator.phVsJul"/>
     <service id=".service_locator.R0Sb2kd" alias=".service_locator.rvMNZGh"/>
-    <service id=".service_locator.bdD4JBT" alias=".service_locator.WWOZcyz"/>
+    <service id=".service_locator.XA_WwAI" alias=".service_locator.vO5Eeb_"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.iu3Tr_u" alias=".service_locator.mLTyPdm"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -10520,6 +10539,7 @@
     <service id=".service_locator.M9rwfbv" alias=".service_locator.X_5wiI3"/>
     <service id=".service_locator.5.mGh0p" alias=".service_locator.ZfwS4tl"/>
     <service id=".service_locator.cSLnqKe" alias=".service_locator.HrDCg3Q"/>
+    <service id=".service_locator.025Wi8b" alias=".service_locator.kPUOGb8"/>
     <service id=".service_locator.22VUVOO" alias=".service_locator.sLkGFte"/>
     <service id=".service_locator.Lypa7j8" alias=".service_locator.O3A1vmO"/>
     <service id=".service_locator.IwBIoRa" alias=".service_locator.SJArFDd"/>
@@ -10533,7 +10553,6 @@
     <service id=".service_locator.NNzPwhv" alias=".service_locator.qCOaJRT"/>
     <service id=".service_locator.5aH53ud" alias=".service_locator.TGRHV_0"/>
     <service id=".service_locator.L25Xcgh" alias=".service_locator.wxzU4dO"/>
-    <service id=".service_locator.025Wi8b" alias=".service_locator.kPUOGb8"/>
     <service id=".service_locator.K0XJD4w" alias=".service_locator.4m6SajK"/>
     <service id=".service_locator.nxbNn8K" alias=".service_locator.hvt4Me9"/>
     <service id=".service_locator.heb0tpT" alias=".service_locator.AzHTDsT"/>

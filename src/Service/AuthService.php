@@ -18,21 +18,22 @@ class AuthService
     }
     
     /**
-     * Check if a user is currently authenticated
+     * Check if a user is authenticated
      */
     public function isAuthenticated(): bool
     {
         $session = $this->requestStack->getSession();
-        return $session->has('user_id');
+        return $session->has('user_id') && $session->get('user_id') !== null;
     }
     
     /**
-     * Get the currently authenticated user
+     * Get the authenticated user
      */
-    public function getUser(): ?User
+    public function getUser()
     {
         $session = $this->requestStack->getSession();
-        if (!$session->has('user_id')) {
+        
+        if (!$this->isAuthenticated()) {
             return null;
         }
         
@@ -41,12 +42,13 @@ class AuthService
     }
     
     /**
-     * Get the user's role
+     * Get user role from session
      */
     public function getUserRole(): ?string
     {
         $session = $this->requestStack->getSession();
-        if (!$session->has('user_role')) {
+        
+        if (!$this->isAuthenticated()) {
             return null;
         }
         

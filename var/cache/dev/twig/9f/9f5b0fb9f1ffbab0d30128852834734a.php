@@ -574,7 +574,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
               <div class=\"dropdown-divider\"></div>
               <a class=\"dropdown-item\" href=\"";
         // line 464
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_base");
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
         yield "\">Se déconnecter</a>
             </div>
           </div>
@@ -1289,7 +1289,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
               <a class=\"dropdown-item\" href=\"#\">Profile</a>
               <a class=\"dropdown-item\" href=\"#\">Settings</a>
               <div class=\"dropdown-divider\"></div>
-              <a class=\"dropdown-item\" href=\"{{path('app_base')}}\">Se déconnecter</a>
+              <a class=\"dropdown-item\" href=\"{{path('app_logout')}}\">Se déconnecter</a>
             </div>
           </div>
         </div>

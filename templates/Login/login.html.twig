@@ -170,6 +170,12 @@
             margin-top: 5px;
             display: none;
         }
+        .field-error.d-block {
+            display: block;
+        }
+        .is-invalid {
+            border: 1px solid #dc3545 !important;
+        }
     </style>
 </head>
 <body>
@@ -195,11 +201,25 @@
         <div class="login-form">
             <h2 class="login-heading">S'identifier</h2>
             
+            {% if error is defined and error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+            {% endif %}
+            
+            {% for flash_error in app.flashes('error') %}
+                <div class="alert alert-danger">
+                    {{ flash_error }}
+                </div>
+            {% endfor %}
+            
             <form action="{{ path('login') }}" method="post" id="login-form" novalidate>
                 <div class="form-group">
                     <label class="form-label">Email</label>
                     <input type="email" name="email" class="form-control" value="{{ last_username|default('') }}">
-                    <div id="email-error" class="field-error"></div>
+                    <div id="email-error" class="field-error">
+                        <!-- Client-side validation error will appear here -->
+                    </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Mot de passe</label>
@@ -210,7 +230,9 @@
                         <input type="password" name="password" id="password-field" class="form-control">
                         <i class="password-toggle-icon fa fa-eye-slash" id="togglePassword"></i>
                     </div>
-                    <div id="password-error" class="field-error"></div>
+                    <div id="password-error" class="field-error">
+                        <!-- Client-side validation error will appear here -->
+                    </div>
                 </div>
                 
                 <button type="submit" class="btnLogin">S'identifier</button>
@@ -252,12 +274,14 @@
             // Helper function to show field error
             function showFieldError(fieldName, message) {
                 const errorElement = $('#' + fieldName + '-error');
-                errorElement.text(message).show();
+                errorElement.text(message).addClass('d-block');
+                $('input[name="' + fieldName + '"]').addClass('is-invalid');
             }
             
             // Clear all errors in the form
             function clearFormErrors() {
-                $('.field-error').hide();
+                $('.field-error').removeClass('d-block').text('');
+                $('.form-control').removeClass('is-invalid');
             }
             
             // Form validation
@@ -271,15 +295,20 @@
                 const password = $('#password-field').val();
                 
                 // Validate email
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    showFieldError('email', 'Veuillez entrer une adresse email valide.');
+                if (!email) {
+                    showFieldError('email', 'Veuillez entrer votre adresse email.');
                     isValid = false;
+                } else {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        showFieldError('email', 'Veuillez entrer une adresse email valide.');
+                        isValid = false;
+                    }
                 }
                 
                 // Validate password
-                if (password.length < 6) {
-                    showFieldError('password', 'Le mot de passe doit comporter au moins 6 caractères.');
+                if (!password) {
+                    showFieldError('password', 'Veuillez entrer votre mot de passe.');
                     isValid = false;
                 }
                 

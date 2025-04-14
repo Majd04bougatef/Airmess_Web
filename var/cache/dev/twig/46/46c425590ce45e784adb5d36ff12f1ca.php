@@ -89,7 +89,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
             color: #406dab;
             margin-bottom: 30px;
             font-weight: bold;
-            text-align: center;
+    text-align: center;
         }
         
         .form-control {
@@ -123,7 +123,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
         
         .btn-register {
             background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
-            border: none;
+    border: none;
             border-radius: 10px;
             color: white;
             font-weight: 600;
@@ -146,7 +146,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
             padding: 12px 20px;
             width: 100%;
             text-align: center;
-            cursor: pointer;
+    cursor: pointer;
             margin-bottom: 20px;
         }
         
@@ -204,13 +204,13 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
             width: 60%;
             max-width: 200px;
             background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
-            border: none;
+    border: none;
             border-radius: 50px;
             padding: 10px 12px;
-            color: #fff;
+    color: #fff;
             text-align: center;
             cursor: pointer;
-            font-weight: 600;
+    font-weight: 600;
             transition: all 0.3s;
             margin: 0 auto;
         }
@@ -229,7 +229,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            cursor: pointer;
+    cursor: pointer;
             color: #9c9898;
         }
         
@@ -265,7 +265,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
 </head>
 <body>
     <div class=\"signup-container\">
-        <div class=\"row\">
+                <div class=\"row\">
             <div class=\"col-12\">
                 <div class=\"d-flex align-items-center justify-content-between mb-3\">
                     <img src=\"";
@@ -274,23 +274,23 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
         yield "\" alt=\"Airmess Logo\" class=\"logo\">
                     <a href=\"";
         // line 225
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_login");
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("login");
         yield "\" class=\"back-btn\">
                         <span>&larr;</span>
                     </a>
-                </div>
+                    </div>
                 <h1 class=\"form-title\">S'enregistrer</h1>
 
                 <ul class=\"nav nav-tabs mb-4\" id=\"myTab\" role=\"tablist\">
-                    <li class=\"nav-item\">
+                            <li class=\"nav-item\">
                         <a class=\"nav-link active btn-tab\" id=\"voyageur-tab\" data-toggle=\"tab\" href=\"#voyageur\" role=\"tab\" aria-controls=\"voyageur\" aria-selected=\"true\">voyageur</a>
-                    </li>
-                    <li class=\"nav-item\">
+                            </li>
+                            <li class=\"nav-item\">
                         <a class=\"nav-link btn-tab\" id=\"entreprise-tab\" data-toggle=\"tab\" href=\"#entreprise\" role=\"tab\" aria-controls=\"entreprise\" aria-selected=\"false\">entreprise</a>
-                    </li>
-                </ul>
+                            </li>
+                        </ul>
                 
-                <div class=\"tab-content\" id=\"myTabContent\">
+                        <div class=\"tab-content\" id=\"myTabContent\">
                     <!-- Flash Messages -->
                     ";
         // line 242
@@ -337,37 +337,37 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_register");
         yield "\" method=\"post\" enctype=\"multipart/form-data\" novalidate>
                             <div class=\"row\">
-                                <div class=\"col-md-6\">
-                                    <div class=\"form-group\">
+                                    <div class=\"col-md-6\">
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nom\" value=\"\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"prenom\" placeholder=\"Prénom\" value=\"\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email\" value=\"\">
                                     </div>
-                                </div>
+                                        </div>
                                 <div class=\"col-md-6\">
-                                    <div class=\"form-group\">
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"phoneNumber\" placeholder=\"Numéro de téléphone\" value=\"\" minlength=\"8\" maxlength=\"8\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <div class=\"password-field-container\">
                                             <input type=\"password\" class=\"form-control password-field\" name=\"password\" placeholder=\"Mot de passe\" value=\"\">
                                             <i class=\"password-toggle-icon fa fa-eye-slash\" data-target=\"password\"></i>
                                         </div>
                                     </div>
-                                    <div class=\"form-group\">
+                                        <div class=\"form-group\">
                                         <div class=\"password-field-container\">
                                             <input type=\"password\" class=\"form-control password-field\" name=\"password_confirm\" placeholder=\"Confirmer le mot de passe\" value=\"\">
                                             <i class=\"password-toggle-icon fa fa-eye-slash\" data-target=\"password_confirm\"></i>
                                         </div>
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <input type=\"date\" class=\"form-control\" name=\"dateNaiss\" placeholder=\"Date de naissance\">
                                     </div>
-                                </div>
+                                        </div>
                                 <div class=\"col-12\">
                                     <div class=\"photo-upload-container text-center\">
                                         <div id=\"voyageurPhotoPreview\" class=\"photo-preview\"></div>
@@ -395,31 +395,31 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_register");
         yield "\" method=\"post\" enctype=\"multipart/form-data\" novalidate>
                             <div class=\"row\">
-                                <div class=\"col-md-6\">
-                                    <div class=\"form-group\">
+                                    <div class=\"col-md-6\">
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nom de l'entreprise\" value=\"\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email professionnel\" value=\"\">
                                     </div>
-                                </div>
+                                        </div>
                                 <div class=\"col-md-6\">
-                                    <div class=\"form-group\">
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"phoneNumber\" placeholder=\"Numéro de téléphone\" value=\"\" minlength=\"8\" maxlength=\"8\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <div class=\"password-field-container\">
                                             <input type=\"password\" class=\"form-control password-field\" name=\"password\" placeholder=\"Mot de passe\" value=\"\">
                                             <i class=\"password-toggle-icon fa fa-eye-slash\" data-target=\"password\"></i>
                                         </div>
                                     </div>
-                                    <div class=\"form-group\">
+                                        <div class=\"form-group\">
                                         <div class=\"password-field-container\">
                                             <input type=\"password\" class=\"form-control password-field\" name=\"password_confirm\" placeholder=\"Confirmer le mot de passe\" value=\"\">
                                             <i class=\"password-toggle-icon fa fa-eye-slash\" data-target=\"password_confirm\"></i>
                                         </div>
-                                    </div>
-                                </div>
+                                        </div>
+                                        </div>
                                 <div class=\"col-12\">
                                     <div class=\"photo-upload-container text-center\">
                                         <div id=\"entreprisePhotoPreview\" class=\"photo-preview\"></div>
@@ -438,13 +438,13 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
                                 </div>
                             </div>
                         </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>                            
-    
-    <script type=\"text/javascript\">
+
+            <script type=\"text/javascript\">
         // Handle file selection and preview
         \$('.custom-file-input').on('change', function() {
             // Only show image preview
@@ -682,8 +682,8 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
         });
     </script>
     <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css\">
-</body>
-</html>";
+            </body>
+            </html>";
         
         $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
 
@@ -763,7 +763,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
             color: #406dab;
             margin-bottom: 30px;
             font-weight: bold;
-            text-align: center;
+    text-align: center;
         }
         
         .form-control {
@@ -797,7 +797,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
         
         .btn-register {
             background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
-            border: none;
+    border: none;
             border-radius: 10px;
             color: white;
             font-weight: 600;
@@ -820,7 +820,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
             padding: 12px 20px;
             width: 100%;
             text-align: center;
-            cursor: pointer;
+    cursor: pointer;
             margin-bottom: 20px;
         }
         
@@ -878,13 +878,13 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
             width: 60%;
             max-width: 200px;
             background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
-            border: none;
+    border: none;
             border-radius: 50px;
             padding: 10px 12px;
-            color: #fff;
+    color: #fff;
             text-align: center;
             cursor: pointer;
-            font-weight: 600;
+    font-weight: 600;
             transition: all 0.3s;
             margin: 0 auto;
         }
@@ -903,7 +903,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            cursor: pointer;
+    cursor: pointer;
             color: #9c9898;
         }
         
@@ -939,26 +939,26 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
 </head>
 <body>
     <div class=\"signup-container\">
-        <div class=\"row\">
+                <div class=\"row\">
             <div class=\"col-12\">
                 <div class=\"d-flex align-items-center justify-content-between mb-3\">
                     <img src=\"{{ asset('assets/images/logo-airmess.png') }}\" alt=\"Airmess Logo\" class=\"logo\">
-                    <a href=\"{{ path('app_login') }}\" class=\"back-btn\">
+                    <a href=\"{{ path('login') }}\" class=\"back-btn\">
                         <span>&larr;</span>
                     </a>
-                </div>
+                    </div>
                 <h1 class=\"form-title\">S'enregistrer</h1>
 
                 <ul class=\"nav nav-tabs mb-4\" id=\"myTab\" role=\"tablist\">
-                    <li class=\"nav-item\">
+                            <li class=\"nav-item\">
                         <a class=\"nav-link active btn-tab\" id=\"voyageur-tab\" data-toggle=\"tab\" href=\"#voyageur\" role=\"tab\" aria-controls=\"voyageur\" aria-selected=\"true\">voyageur</a>
-                    </li>
-                    <li class=\"nav-item\">
+                            </li>
+                            <li class=\"nav-item\">
                         <a class=\"nav-link btn-tab\" id=\"entreprise-tab\" data-toggle=\"tab\" href=\"#entreprise\" role=\"tab\" aria-controls=\"entreprise\" aria-selected=\"false\">entreprise</a>
-                    </li>
-                </ul>
+                            </li>
+                        </ul>
                 
-                <div class=\"tab-content\" id=\"myTabContent\">
+                        <div class=\"tab-content\" id=\"myTabContent\">
                     <!-- Flash Messages -->
                     {% for flash_message in app.flashes('success') %}
                         <div class=\"alert alert-success\">
@@ -976,37 +976,37 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
                     <div class=\"tab-pane fade show active\" id=\"voyageur\" role=\"tabpanel\" aria-labelledby=\"voyageur-tab\">
                         <form action=\"{{ path('app_register') }}\" method=\"post\" enctype=\"multipart/form-data\" novalidate>
                             <div class=\"row\">
-                                <div class=\"col-md-6\">
-                                    <div class=\"form-group\">
+                                    <div class=\"col-md-6\">
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nom\" value=\"\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"prenom\" placeholder=\"Prénom\" value=\"\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email\" value=\"\">
                                     </div>
-                                </div>
+                                        </div>
                                 <div class=\"col-md-6\">
-                                    <div class=\"form-group\">
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"phoneNumber\" placeholder=\"Numéro de téléphone\" value=\"\" minlength=\"8\" maxlength=\"8\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <div class=\"password-field-container\">
                                             <input type=\"password\" class=\"form-control password-field\" name=\"password\" placeholder=\"Mot de passe\" value=\"\">
                                             <i class=\"password-toggle-icon fa fa-eye-slash\" data-target=\"password\"></i>
                                         </div>
                                     </div>
-                                    <div class=\"form-group\">
+                                        <div class=\"form-group\">
                                         <div class=\"password-field-container\">
                                             <input type=\"password\" class=\"form-control password-field\" name=\"password_confirm\" placeholder=\"Confirmer le mot de passe\" value=\"\">
                                             <i class=\"password-toggle-icon fa fa-eye-slash\" data-target=\"password_confirm\"></i>
                                         </div>
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <input type=\"date\" class=\"form-control\" name=\"dateNaiss\" placeholder=\"Date de naissance\">
                                     </div>
-                                </div>
+                                        </div>
                                 <div class=\"col-12\">
                                     <div class=\"photo-upload-container text-center\">
                                         <div id=\"voyageurPhotoPreview\" class=\"photo-preview\"></div>
@@ -1031,31 +1031,31 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
                     <div class=\"tab-pane fade\" id=\"entreprise\" role=\"tabpanel\" aria-labelledby=\"entreprise-tab\">
                         <form action=\"{{ path('app_register') }}\" method=\"post\" enctype=\"multipart/form-data\" novalidate>
                             <div class=\"row\">
-                                <div class=\"col-md-6\">
-                                    <div class=\"form-group\">
+                                    <div class=\"col-md-6\">
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nom de l'entreprise\" value=\"\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email professionnel\" value=\"\">
                                     </div>
-                                </div>
+                                        </div>
                                 <div class=\"col-md-6\">
-                                    <div class=\"form-group\">
+                                        <div class=\"form-group\">
                                         <input type=\"text\" class=\"form-control\" name=\"phoneNumber\" placeholder=\"Numéro de téléphone\" value=\"\" minlength=\"8\" maxlength=\"8\">
-                                    </div>
-                                    <div class=\"form-group\">
+                                        </div>
+                                        <div class=\"form-group\">
                                         <div class=\"password-field-container\">
                                             <input type=\"password\" class=\"form-control password-field\" name=\"password\" placeholder=\"Mot de passe\" value=\"\">
                                             <i class=\"password-toggle-icon fa fa-eye-slash\" data-target=\"password\"></i>
                                         </div>
                                     </div>
-                                    <div class=\"form-group\">
+                                        <div class=\"form-group\">
                                         <div class=\"password-field-container\">
                                             <input type=\"password\" class=\"form-control password-field\" name=\"password_confirm\" placeholder=\"Confirmer le mot de passe\" value=\"\">
                                             <i class=\"password-toggle-icon fa fa-eye-slash\" data-target=\"password_confirm\"></i>
                                         </div>
-                                    </div>
-                                </div>
+                                        </div>
+                                        </div>
                                 <div class=\"col-12\">
                                     <div class=\"photo-upload-container text-center\">
                                         <div id=\"entreprisePhotoPreview\" class=\"photo-preview\"></div>
@@ -1074,13 +1074,13 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
                                 </div>
                             </div>
                         </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>                            
-    
-    <script type=\"text/javascript\">
+
+            <script type=\"text/javascript\">
         // Handle file selection and preview
         \$('.custom-file-input').on('change', function() {
             // Only show image preview
@@ -1318,7 +1318,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
         });
     </script>
     <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css\">
-</body>
-</html>", "login/sign-up.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\Login\\sign-up.html.twig");
+            </body>
+            </html>", "login/sign-up.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\Login\\sign-up.html.twig");
     }
 }

@@ -85,8 +85,9 @@ class RegistrationController extends AbstractController
                 $entityManager->persist($user);
                 $entityManager->flush();
                 
-                // Redirect directly to login page without a success message
-                return $this->redirectToRoute('app_login');
+                $this->addFlash('success', 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.');
+                
+                return $this->redirectToRoute('login');
                 
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de l\'inscription: ' . $e->getMessage());

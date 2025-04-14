@@ -230,7 +230,7 @@ class __TwigTemplate_4a7ecfe916917e68e2f3ba923780fea5 extends Template
       <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
       <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"";
         // line 122
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_base");
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
         yield "\" type=\"button\">Se déconnecter</a>
     </div>
   </aside>
@@ -712,7 +712,7 @@ class __TwigTemplate_4a7ecfe916917e68e2f3ba923780fea5 extends Template
         </div>
       </div>
       <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
-      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"{{path('app_base')}}\" type=\"button\">Se déconnecter</a>
+      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"{{path('app_logout')}}\" type=\"button\">Se déconnecter</a>
     </div>
   </aside>
   <main class=\"main-content position-relative border-radius-lg \">
