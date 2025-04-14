@@ -103,13 +103,13 @@
 
 .form-floating {
     position: relative;
-    margin-bottom: 0;
+    margin-bottom: 1rem;
 }
 
 .form-control {
     display: block;
     width: 100%;
-    padding: 0.5rem 0.75rem;
+    padding: 1rem 0.75rem;
     font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.5;
@@ -121,29 +121,36 @@
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+.form-label {
+    position: absolute;
+    top: 1rem;
+    left: 0.75rem;
+    padding: 0 0.25rem;
+    background-color: transparent;
+    color: #64748b;
+    font-size: 0.875rem;
+    transition: all 0.2s ease-in-out;
+    pointer-events: none;
+    transform-origin: 0 0;
+    line-height: 1;
+    height: auto;
+}
+
+.form-control:focus ~ .form-label,
+.form-control:not(:placeholder-shown) ~ .form-label {
+    transform: translateY(-1.5rem) scale(0.85);
+    color: #3b82f6;
+    background-color: #fff;
+    padding: 0 0.25rem;
+    height: auto;
+    line-height: 1;
+    margin-top: 0;
+}
+
 .form-control:focus {
     border-color: #3b82f6;
     outline: 0;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-label {
-    position: absolute;
-    top: 0.5rem;
-    left: 1rem;
-    padding: 0 0.25rem;
-    background-color: #fff;
-    color: #64748b;
-    font-size: 0.875rem;
-    transition: all 0.2s ease-in-out;
-}
-
-.form-control:focus + .form-label,
-.form-control:not(:placeholder-shown) + .form-label {
-    top: -0.5rem;
-    left: 0.75rem;
-    font-size: 0.75rem;
-    color: #3b82f6;
 }
 
 #map {
@@ -196,6 +203,37 @@
 .form-btn-outline:hover {
     background-color: #f8fafc;
     color: #1e293b;
+}
+
+/* Add styles for validation */
+.is-invalid {
+    border-color: #e2e8f0 !important;
+    background-image: none;
+    padding-right: 0.75rem;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+    padding-left: 0.25rem;
+}
+
+/* Error message styling */
+.form-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+    display: block;
+}
+
+.is-invalid {
+    border-color: #e2e8f0 !important;
+    background-image: none;
+    padding-right: 0.75rem;
 }
 </style>
 {% endblock %}
@@ -260,37 +298,55 @@ function initFormMap() {
         <div class="form-card-body">
             <div class="form-row">
                 <div class="form-floating">
-                    {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                    {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.nom.vars.errors|length ? ' is-invalid' : ''), 'placeholder': ' '}}) }}
                     {{ form_label(form.nom, null, {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.nom) }}
+                    </div>
                 </div>
                 
                 <div class="form-floating">
-                    {{ form_widget(form.capacite, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                    {{ form_widget(form.capacite, {'attr': {'class': 'form-control' ~ (form.capacite.vars.errors|length ? ' is-invalid' : ''), 'placeholder': ' '}}) }}
                     {{ form_label(form.capacite, null, {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.capacite) }}
+                    </div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-floating">
-                    {{ form_widget(form.nombreVelo, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                    {{ form_widget(form.nombreVelo, {'attr': {'class': 'form-control' ~ (form.nombreVelo.vars.errors|length ? ' is-invalid' : ''), 'placeholder': ' '}}) }}
                     {{ form_label(form.nombreVelo, null, {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.nombreVelo) }}
+                    </div>
                 </div>
                 
                 <div class="form-floating">
-                    {{ form_widget(form.typeVelo, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                    {{ form_widget(form.typeVelo, {'attr': {'class': 'form-control' ~ (form.typeVelo.vars.errors|length ? ' is-invalid' : ''), 'placeholder': ' '}}) }}
                     {{ form_label(form.typeVelo, null, {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.typeVelo) }}
+                    </div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-floating">
-                    {{ form_widget(form.prixHeure, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                    {{ form_widget(form.prixHeure, {'attr': {'class': 'form-control' ~ (form.prixHeure.vars.errors|length ? ' is-invalid' : ''), 'placeholder': ' '}}) }}
                     {{ form_label(form.prixHeure, null, {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.prixHeure) }}
+                    </div>
                 </div>
                 
                 <div class="form-floating">
-                    {{ form_widget(form.pays, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                    {{ form_widget(form.pays, {'attr': {'class': 'form-control' ~ (form.pays.vars.errors|length ? ' is-invalid' : ''), 'placeholder': ' '}}) }}
                     {{ form_label(form.pays, null, {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.pays) }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -306,7 +362,9 @@ function initFormMap() {
             <div id="map"></div>
             <p class="map-instructions">Cliquez sur la carte ou faites glisser le marqueur pour sélectionner l'emplacement de la station</p>
             {{ form_widget(form.latitude, {'attr': {'style': 'display: none'}}) }}
+            {{ form_errors(form.latitude) }}
             {{ form_widget(form.longitude, {'attr': {'style': 'display: none'}}) }}
+            {{ form_errors(form.longitude) }}
         </div>
     </div>
 

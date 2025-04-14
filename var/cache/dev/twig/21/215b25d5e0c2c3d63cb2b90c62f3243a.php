@@ -38,7 +38,7 @@ class __TwigTemplate_8c11ad0922391b19b12c78774052936c extends Template
     protected function doGetParent(array $context): bool|string|Template|TemplateWrapper
     {
         // line 1
-        return "base.html.twig";
+        return "dashVoyageurs/dashboardVoyageurs.html.twig";
     }
 
     protected function doDisplay(array $context, array $blocks = []): iterable
@@ -50,7 +50,7 @@ class __TwigTemplate_8c11ad0922391b19b12c78774052936c extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "reservation_transport/new.html.twig"));
 
-        $this->parent = $this->loadTemplate("base.html.twig", "reservation_transport/new.html.twig", 1);
+        $this->parent = $this->loadTemplate("dashVoyageurs/dashboardVoyageurs.html.twig", "reservation_transport/new.html.twig", 1);
         yield from $this->parent->unwrap()->yield($context, array_merge($this->blocks, $blocks));
         
         $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
@@ -73,7 +73,7 @@ class __TwigTemplate_8c11ad0922391b19b12c78774052936c extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "title"));
 
-        yield "New ReservationTransport";
+        yield "Réserver un vélo";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
 
@@ -97,95 +97,9 @@ class __TwigTemplate_8c11ad0922391b19b12c78774052936c extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
 
         // line 6
-        yield "
-<style>
-       body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        .navbar {
-            display: flex;
-            background: #ffffff;
-            padding: 10px;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px auto; /* Centrer la navbar */
-            width: 90%;
-            max-width: 1200px; /* Facultatif : limite la largeur maximale */
-            border-radius: 10px; /* Pour un effet arrondi si nécessaire */
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Ajoute une légère ombre pour un effet visuel */
-        }
-
-        .navbar a {
-            color: black; /* Couleur de texte initiale */
-            text-decoration: none;
-            padding: 10px 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .navbar .nav-link:hover {
-            color: #6c99bc;
-                border-bottom: 2px solid #6c99bc; /* Ajouter une ligne sous le lien */
-        }
-
-        /* Zone de contenu */
-        .content {
-            padding: 20px;
-            text-align: center;
-        }
-    </style>
-    <!-- Menu Horizontal -->
-     <div class=\"navbar\">
-        <a class=\"nav-link\" onclick=\"loadPage('";
-        // line 47
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_reservation_transport_station");
-        yield "')\">Réserver</a>
-        <a class=\"nav-link\" onclick=\"loadPage('";
-        // line 48
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_reservation_transport_index");
-        yield "')\">Mes Réservations</a>
-        <a class=\"nav-link\" onclick=\"loadPage('";
-        // line 49
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_reservation_transport_station");
-        yield "')\">Stations</a>
-        <a class=\"nav-link\" onclick=\"loadPage('";
-        // line 50
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_message_voyageurs");
-        yield "')\">Discussions</a>
-    </div>
-
-    <script>
-    function loadPage(url) {
-        fetch(url, { headers: { \"X-Requested-With\": \"XMLHttpRequest\" } })
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('pageContent').innerHTML = html;
-            })
-            .catch(error => console.error('Erreur lors du chargement:', error));
-    }
-
-    function submitForm(form) {
-        fetch(form.action, {
-            method: form.method,
-            body: new FormData(form),
-            headers: { \"X-Requested-With\": \"XMLHttpRequest\" }
-        })
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('pageContent').innerHTML = html;
-        })
-        .catch(error => console.error('Erreur lors de l'envoi du formulaire:', error));
-    }
-
-        
-    </script>
-    ";
-        // line 78
+        yield "    ";
         yield Twig\Extension\CoreExtension::include($this->env, $context, "reservation_transport/_form.html.twig");
         yield "
-
 ";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -217,91 +131,17 @@ class __TwigTemplate_8c11ad0922391b19b12c78774052936c extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  186 => 78,  155 => 50,  151 => 49,  147 => 48,  143 => 47,  100 => 6,  87 => 5,  64 => 3,  41 => 1,);
+        return array (  100 => 6,  87 => 5,  64 => 3,  41 => 1,);
     }
 
     public function getSourceContext(): Source
     {
-        return new Source("{% extends 'base.html.twig' %}
+        return new Source("{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
 
-{% block title %}New ReservationTransport{% endblock %}
+{% block title %}Réserver un vélo{% endblock %}
 
 {% block body %}
-
-<style>
-       body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        .navbar {
-            display: flex;
-            background: #ffffff;
-            padding: 10px;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px auto; /* Centrer la navbar */
-            width: 90%;
-            max-width: 1200px; /* Facultatif : limite la largeur maximale */
-            border-radius: 10px; /* Pour un effet arrondi si nécessaire */
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Ajoute une légère ombre pour un effet visuel */
-        }
-
-        .navbar a {
-            color: black; /* Couleur de texte initiale */
-            text-decoration: none;
-            padding: 10px 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .navbar .nav-link:hover {
-            color: #6c99bc;
-                border-bottom: 2px solid #6c99bc; /* Ajouter une ligne sous le lien */
-        }
-
-        /* Zone de contenu */
-        .content {
-            padding: 20px;
-            text-align: center;
-        }
-    </style>
-    <!-- Menu Horizontal -->
-     <div class=\"navbar\">
-        <a class=\"nav-link\" onclick=\"loadPage('{{ path('app_reservation_transport_station') }}')\">Réserver</a>
-        <a class=\"nav-link\" onclick=\"loadPage('{{ path('app_reservation_transport_index') }}')\">Mes Réservations</a>
-        <a class=\"nav-link\" onclick=\"loadPage('{{ path('app_reservation_transport_station') }}')\">Stations</a>
-        <a class=\"nav-link\" onclick=\"loadPage('{{ path('app_message_voyageurs') }}')\">Discussions</a>
-    </div>
-
-    <script>
-    function loadPage(url) {
-        fetch(url, { headers: { \"X-Requested-With\": \"XMLHttpRequest\" } })
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('pageContent').innerHTML = html;
-            })
-            .catch(error => console.error('Erreur lors du chargement:', error));
-    }
-
-    function submitForm(form) {
-        fetch(form.action, {
-            method: form.method,
-            body: new FormData(form),
-            headers: { \"X-Requested-With\": \"XMLHttpRequest\" }
-        })
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('pageContent').innerHTML = html;
-        })
-        .catch(error => console.error('Erreur lors de l'envoi du formulaire:', error));
-    }
-
-        
-    </script>
     {{ include('reservation_transport/_form.html.twig') }}
-
-{% endblock %}
-", "reservation_transport/new.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\reservation_transport\\new.html.twig");
+{% endblock %}", "reservation_transport/new.html.twig", "C:\\Users\\bouga\\Desktop\\Airmess_Web\\templates\\reservation_transport\\new.html.twig");
     }
 }

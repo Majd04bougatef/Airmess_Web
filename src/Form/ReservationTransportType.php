@@ -25,11 +25,10 @@ class ReservationTransportType extends AbstractType
                 'attr' => ['class' => 'form-control'],
                 'label_attr' => ['class' => 'label']
             ])      
-            ->add('nombreVelo',null,['attr' => ['class' => 'form-control'],
-                'label_attr' => ['class' => 'label']])
-
-               
-        ;
+            ->add('nombreVelo', null, [
+                'attr' => ['class' => 'form-control'],
+                'label_attr' => ['class' => 'label']
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

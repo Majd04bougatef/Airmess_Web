@@ -1206,6 +1206,6 @@ background-size: cover;\">
     </div>
   </footer>
 </div>
-{% endblock %}", "dashVoyageurs/dashboardVoyageursPage.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashVoyageurs\\dashboardVoyageursPage.html.twig");
+{% endblock %}", "dashVoyageurs/dashboardVoyageursPage.html.twig", "C:\\Users\\bouga\\Desktop\\Airmess_Web\\templates\\dashVoyageurs\\dashboardVoyageursPage.html.twig");
     }
 }
