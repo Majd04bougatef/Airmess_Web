@@ -318,7 +318,13 @@ function initMap() {
                 <div class="stat-icon text-warning">
                     <i class="fas fa-battery-half"></i>
                 </div>
-                <h3>{{ ((totalBikes / totalCapacity) * 100)|round }}%</h3>
+                <h3>
+                    {% if totalCapacity > 0 %}
+                        {{ ((totalBikes / totalCapacity) * 100)|round }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </h3>
                 <p>Taux d'occupation</p>
             </div>
         </div>
@@ -375,7 +381,7 @@ function initMap() {
 
                           <td class="align-middle text-center">
                             <div class="d-flex align-items-center justify-content-center">
-                                {% set pourcentage = (station.nombreVelo / station.capacite) * 100 %}
+                                {% set pourcentage = station.capacite > 0 ? (station.nombreVelo / station.capacite) * 100 : 0 %}
                                 <span class="me-2 text-xs font-weight-bold">{{ pourcentage|round(2) }}%</span>
                                 <div>
                                     <div class="progress">

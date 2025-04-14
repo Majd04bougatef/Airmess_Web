@@ -45,42 +45,29 @@ class __TwigTemplate_43e29fdcf448bcee9c0d79cc6e2e71bd extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "reservation_transport/_form.html.twig"));
 
         // line 1
-        yield "<link href=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" id=\"bootstrap-css\">
-<script src=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js\"></script>
-<script src=\"//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>
-
-<style>
-/* Global Styles */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
-    padding: 20px 0;
-}
-
-/* Contact Form Card */
+        yield "<style>
+/* Form Controls */
 .contact-form {
     background: #fff;
-    margin: 3% auto;
-    width: 90%;
-    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
     overflow: hidden;
     padding-bottom: 30px;
 }
 
-/* Form Controls */
 .contact-form .form-control {
     border-radius: 10px;
-    border: 1px solid #e1e1e1;
+    border: 1px solid #e9ecef;
     padding: 12px 15px;
     transition: all 0.3s ease;
     box-shadow: none;
 }
 
 .contact-form .form-control:focus {
-    border-color: #0062cc;
-    box-shadow: 0 0 0 0.2rem rgba(0, 98, 204, 0.25);
+    border-color: #5e72e4;
+    box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
 }
 
 /* Form Header */
@@ -88,7 +75,7 @@ body {
     margin: 25px 0;
     padding-bottom: 15px;
     text-align: center;
-    color: #0062cc;
+    color: #344767;
     font-weight: 600;
     position: relative;
     font-size: 28px;
@@ -102,7 +89,7 @@ body {
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background: #0062cc;
+    background: #5e72e4;
 }
 
 /* Logo Image */
@@ -122,7 +109,7 @@ body {
 
 /* Form Layout */
 .contact-form form {
-    padding: 5% 10%;
+    padding: 3% 5%;
 }
 
 .contact-form form .row {
@@ -132,7 +119,7 @@ body {
 /* Labels */
 .form-group label {
     font-weight: 500;
-    color: #555;
+    color: #344767;
     margin-bottom: 8px;
     display: inline-block;
 }
@@ -140,10 +127,10 @@ body {
 /* Button Styles */
 .btnn {
     width: 100%;
-    border-radius: 30px;
+    border-radius: 7px;
     padding: 12px;
     color: #fff;
-    background-color: #0062cc;
+    background-color: #5e72e4;
     border: none;
     cursor: pointer;
     font-weight: 600;
@@ -155,9 +142,9 @@ body {
 }
 
 .btnn:hover {
-    background-color: #004e9e;
+    background-color: #324cdd;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 98, 204, 0.4);
+    box-shadow: 0 5px 15px rgba(94, 114, 228, 0.4);
 }
 
 .btnn:active {
@@ -182,7 +169,7 @@ body {
     position: absolute;
     width: 80%;
     height: 4px;
-    background-color: #e1e1e1;
+    background-color: #e9ecef;
     top: 18px;
     left: 10%;
     z-index: 0;
@@ -200,7 +187,7 @@ body {
 .step-number {
     width: 36px;
     height: 36px;
-    background-color: #e1e1e1;
+    background-color: #e9ecef;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -215,30 +202,30 @@ body {
 
 /* Active and completed step styling */
 .step.active .step-number {
-    background-color: #28a745;
+    background-color: #5e72e4;
     transform: scale(1.1);
-    box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
 }
 
 .step.completed .step-number {
-    background-color: #28a745;
+    background-color: #5e72e4;
 }
 
 .step-text {
     margin-top: 10px;
     font-size: 14px;
     font-weight: 600;
-    color: #777;
+    color: #67748e;
     text-align: center;
     transition: all 0.3s ease;
 }
 
 .step.active .step-text {
-    color: #28a745;
+    color: #344767;
 }
 
 .step.completed .step-text {
-    color: #28a745;
+    color: #344767;
 }
 
 /* Information Display Styling */
@@ -247,12 +234,12 @@ body {
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 20px;
-    border-left: 4px solid #0062cc;
+    border-left: 4px solid #5e72e4;
 }
 
 .info-group label {
     font-weight: 500;
-    color: #444;
+    color: #344767;
     margin-bottom: 5px;
     display: block;
 }
@@ -260,8 +247,8 @@ body {
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .contact-form {
-        width: 95%;
-        margin: 5% auto;
+        width: 100%;
+        margin: 0 auto;
     }
     
     .contact-form form {
@@ -277,7 +264,7 @@ body {
 <div class=\"container contact-form\">
     <div class=\"contact-image\">
         <img src=\"";
-        // line 232
+        // line 219
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/signalisation (2).png"), "html", null, true);
         yield "\" alt=\"bike_icon\"/>
     </div>
@@ -298,84 +285,97 @@ body {
         </div>
         <div class=\"step\">
             <div class=\"step-number\">4</div>
-            <div class=\"step-text\">Succès</div>
+            <div class=\"step-text\">Confirmation</div>
         </div>
     </div>
 
-";
-        // line 255
-        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 255, $this->source); })()), 'form_start', ["action" => $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_reservation_transport_new_reservation", ["id" =>         // line 256
-(isset($context["idS"]) || array_key_exists("idS", $context) ? $context["idS"] : (function () { throw new RuntimeError('Variable "idS" does not exist.', 256, $this->source); })())]), "attr" => ["novalidate" => "novalidate"]]);
-        // line 258
-        yield "
-        <input type=\"hidden\" name=\"station_id\" value=\"";
-        // line 259
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["idS"]) || array_key_exists("idS", $context) ? $context["idS"] : (function () { throw new RuntimeError('Variable "idS" does not exist.', 259, $this->source); })()), "html", null, true);
-        yield "\">    
-        <div class=\"row\">
-            <!-- Affichage du prix en texte -->
-            <div class=\"col-12\">
-                <div class=\"info-group\">
-                    <label><strong>";
-        // line 264
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["nom"]) || array_key_exists("nom", $context) ? $context["nom"] : (function () { throw new RuntimeError('Variable "nom" does not exist.', 264, $this->source); })()), "html", null, true);
-        yield "</strong></label>
-                    <label>Prix : <strong>";
-        // line 265
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["prix"]) || array_key_exists("prix", $context) ? $context["prix"] : (function () { throw new RuntimeError('Variable "prix" does not exist.', 265, $this->source); })()), "html", null, true);
-        yield "\$/h</strong></label>
-                    <label>Nombre Vélo disponibles : <strong>";
-        // line 266
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["nombreVelo"]) || array_key_exists("nombreVelo", $context) ? $context["nombreVelo"] : (function () { throw new RuntimeError('Variable "nombreVelo" does not exist.', 266, $this->source); })()), "html", null, true);
-        yield "</strong></label>
+    <div class=\"container mt-4\">
+        <div class=\"info-group\">
+            <div class=\"row\">
+                <div class=\"col-md-6\">
+                    <label>Station: </label>
+                    <strong>";
+        // line 247
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["nom"]) || array_key_exists("nom", $context) ? $context["nom"] : (function () { throw new RuntimeError('Variable "nom" does not exist.', 247, $this->source); })()), "html", null, true);
+        yield "</strong>
+                </div>
+                <div class=\"col-md-6\">
+                    <label>Prix par heure: </label>
+                    <strong>";
+        // line 251
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["prix"]) || array_key_exists("prix", $context) ? $context["prix"] : (function () { throw new RuntimeError('Variable "prix" does not exist.', 251, $this->source); })()), "html", null, true);
+        yield "€</strong>
                 </div>
             </div>
-
-            <div class=\"col-md-6\">
-                <div class=\"form-group\">
-                    ";
-        // line 272
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 272, $this->source); })()), "dateRes", [], "any", false, false, false, 272), 'row', ["attr" => ["class" => "form-control"]]);
-        yield "
-                </div>
-                <div class=\"form-group\">
-                    ";
-        // line 275
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 275, $this->source); })()), "nombreVelo", [], "any", false, false, false, 275), 'row', ["attr" => ["class" => "form-control"]]);
-        yield "
-                        ";
-        // line 276
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 276, $this->source); })()), "nombreVelo", [], "any", false, false, false, 276), 'errors');
-        yield "
-
-                </div>
-            </div>
-            <div class=\"col-md-6\">
-                <div class=\"form-group\">
-                    ";
-        // line 282
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 282, $this->source); })()), "dateFin", [], "any", false, false, false, 282), 'row', ["attr" => ["class" => "form-control"]]);
-        yield "
-                        ";
-        // line 283
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 283, $this->source); })()), "dateFin", [], "any", false, false, false, 283), 'errors');
-        yield "
-
-                </div>
-            </div>
-            <div class=\"col-12\">
-                <div class=\"form-group\">
-                    <button type=\"submit\" class=\"btnn\">";
-        // line 289
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("button_label", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["button_label"]) || array_key_exists("button_label", $context) ? $context["button_label"] : (function () { throw new RuntimeError('Variable "button_label" does not exist.', 289, $this->source); })()), "Réserver")) : ("Réserver")), "html", null, true);
-        yield "</button>
+            <div class=\"row mt-2\">
+                <div class=\"col-md-12\">
+                    <label>Vélos disponibles: </label>
+                    <strong>";
+        // line 257
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["nombreVelo"]) || array_key_exists("nombreVelo", $context) ? $context["nombreVelo"] : (function () { throw new RuntimeError('Variable "nombreVelo" does not exist.', 257, $this->source); })()), "html", null, true);
+        yield "</strong>
                 </div>
             </div>
         </div>
-    ";
-        // line 293
-        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 293, $this->source); })()), 'form_end');
+
+        ";
+        // line 262
+        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 262, $this->source); })()), 'form_start', ["attr" => ["class" => "mt-4"]]);
         yield "
+            <div class=\"row\">
+                <div class=\"col-md-6\">
+                    <div class=\"form-group\">
+                        ";
+        // line 266
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 266, $this->source); })()), "dateRes", [], "any", false, false, false, 266), 'label', ["label" => "Date de début"]);
+        yield "
+                        ";
+        // line 267
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 267, $this->source); })()), "dateRes", [], "any", false, false, false, 267), 'widget', ["attr" => ["class" => "form-control datepicker"]]);
+        yield "
+                    </div>
+                </div>
+                <div class=\"col-md-6\">
+                    <div class=\"form-group\">
+                        ";
+        // line 272
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 272, $this->source); })()), "dateFin", [], "any", false, false, false, 272), 'label', ["label" => "Date de fin"]);
+        yield "
+                        ";
+        // line 273
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 273, $this->source); })()), "dateFin", [], "any", false, false, false, 273), 'widget', ["attr" => ["class" => "form-control datepicker"]]);
+        yield "
+                    </div>
+                </div>
+            </div>
+            <div class=\"row\">
+                <div class=\"col-md-12\">
+                    <div class=\"form-group\">
+                        ";
+        // line 280
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 280, $this->source); })()), "nombreVelo", [], "any", false, false, false, 280), 'label', ["label" => "Nombre de vélos"]);
+        yield "
+                        ";
+        // line 281
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 281, $this->source); })()), "nombreVelo", [], "any", false, false, false, 281), 'widget', ["attr" => ["class" => "form-control", "max" => (isset($context["nombreVelo"]) || array_key_exists("nombreVelo", $context) ? $context["nombreVelo"] : (function () { throw new RuntimeError('Variable "nombreVelo" does not exist.', 281, $this->source); })())]]);
+        yield "
+                    </div>
+                </div>
+            </div>
+            ";
+        // line 285
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 285, $this->source); })()), "_token", [], "any", false, false, false, 285), 'row');
+        yield "
+            <div class=\"row\">
+                <div class=\"col-md-12 text-center\">
+                    <button type=\"submit\" class=\"btnn\">Continuer</button>
+                </div>
+            </div>
+        ";
+        // line 291
+        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 291, $this->source); })()), 'form_end', ["render_rest" => false]);
+        yield "
+    </div>
 </div>
 
 <script>
@@ -387,8 +387,7 @@ body {
             })
             .catch(error => console.error('Erreur lors du chargement:', error));
     }
-</script>
-";
+</script>";
         
         $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
 
@@ -419,47 +418,34 @@ body {
      */
     public function getDebugInfo(): array
     {
-        return array (  377 => 293,  370 => 289,  361 => 283,  357 => 282,  348 => 276,  344 => 275,  338 => 272,  329 => 266,  325 => 265,  321 => 264,  313 => 259,  310 => 258,  308 => 256,  307 => 255,  281 => 232,  48 => 1,);
+        return array (  376 => 291,  367 => 285,  360 => 281,  356 => 280,  346 => 273,  342 => 272,  334 => 267,  330 => 266,  323 => 262,  315 => 257,  306 => 251,  299 => 247,  268 => 219,  48 => 1,);
     }
 
     public function getSourceContext(): Source
     {
-        return new Source("<link href=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" id=\"bootstrap-css\">
-<script src=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js\"></script>
-<script src=\"//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>
-
-<style>
-/* Global Styles */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
-    padding: 20px 0;
-}
-
-/* Contact Form Card */
+        return new Source("<style>
+/* Form Controls */
 .contact-form {
     background: #fff;
-    margin: 3% auto;
-    width: 90%;
-    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
     overflow: hidden;
     padding-bottom: 30px;
 }
 
-/* Form Controls */
 .contact-form .form-control {
     border-radius: 10px;
-    border: 1px solid #e1e1e1;
+    border: 1px solid #e9ecef;
     padding: 12px 15px;
     transition: all 0.3s ease;
     box-shadow: none;
 }
 
 .contact-form .form-control:focus {
-    border-color: #0062cc;
-    box-shadow: 0 0 0 0.2rem rgba(0, 98, 204, 0.25);
+    border-color: #5e72e4;
+    box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
 }
 
 /* Form Header */
@@ -467,7 +453,7 @@ body {
     margin: 25px 0;
     padding-bottom: 15px;
     text-align: center;
-    color: #0062cc;
+    color: #344767;
     font-weight: 600;
     position: relative;
     font-size: 28px;
@@ -481,7 +467,7 @@ body {
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background: #0062cc;
+    background: #5e72e4;
 }
 
 /* Logo Image */
@@ -501,7 +487,7 @@ body {
 
 /* Form Layout */
 .contact-form form {
-    padding: 5% 10%;
+    padding: 3% 5%;
 }
 
 .contact-form form .row {
@@ -511,7 +497,7 @@ body {
 /* Labels */
 .form-group label {
     font-weight: 500;
-    color: #555;
+    color: #344767;
     margin-bottom: 8px;
     display: inline-block;
 }
@@ -519,10 +505,10 @@ body {
 /* Button Styles */
 .btnn {
     width: 100%;
-    border-radius: 30px;
+    border-radius: 7px;
     padding: 12px;
     color: #fff;
-    background-color: #0062cc;
+    background-color: #5e72e4;
     border: none;
     cursor: pointer;
     font-weight: 600;
@@ -534,9 +520,9 @@ body {
 }
 
 .btnn:hover {
-    background-color: #004e9e;
+    background-color: #324cdd;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 98, 204, 0.4);
+    box-shadow: 0 5px 15px rgba(94, 114, 228, 0.4);
 }
 
 .btnn:active {
@@ -561,7 +547,7 @@ body {
     position: absolute;
     width: 80%;
     height: 4px;
-    background-color: #e1e1e1;
+    background-color: #e9ecef;
     top: 18px;
     left: 10%;
     z-index: 0;
@@ -579,7 +565,7 @@ body {
 .step-number {
     width: 36px;
     height: 36px;
-    background-color: #e1e1e1;
+    background-color: #e9ecef;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -594,30 +580,30 @@ body {
 
 /* Active and completed step styling */
 .step.active .step-number {
-    background-color: #28a745;
+    background-color: #5e72e4;
     transform: scale(1.1);
-    box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
 }
 
 .step.completed .step-number {
-    background-color: #28a745;
+    background-color: #5e72e4;
 }
 
 .step-text {
     margin-top: 10px;
     font-size: 14px;
     font-weight: 600;
-    color: #777;
+    color: #67748e;
     text-align: center;
     transition: all 0.3s ease;
 }
 
 .step.active .step-text {
-    color: #28a745;
+    color: #344767;
 }
 
 .step.completed .step-text {
-    color: #28a745;
+    color: #344767;
 }
 
 /* Information Display Styling */
@@ -626,12 +612,12 @@ body {
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 20px;
-    border-left: 4px solid #0062cc;
+    border-left: 4px solid #5e72e4;
 }
 
 .info-group label {
     font-weight: 500;
-    color: #444;
+    color: #344767;
     margin-bottom: 5px;
     display: block;
 }
@@ -639,8 +625,8 @@ body {
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .contact-form {
-        width: 95%;
-        margin: 5% auto;
+        width: 100%;
+        margin: 0 auto;
     }
     
     .contact-form form {
@@ -674,49 +660,61 @@ body {
         </div>
         <div class=\"step\">
             <div class=\"step-number\">4</div>
-            <div class=\"step-text\">Succès</div>
+            <div class=\"step-text\">Confirmation</div>
         </div>
     </div>
 
-{{ form_start(form, {
-    'action': path('app_reservation_transport_new_reservation', {'id': idS}),
-    'attr': {'novalidate': 'novalidate'}
-}) }}
-        <input type=\"hidden\" name=\"station_id\" value=\"{{ idS }}\">    
-        <div class=\"row\">
-            <!-- Affichage du prix en texte -->
-            <div class=\"col-12\">
-                <div class=\"info-group\">
-                    <label><strong>{{nom}}</strong></label>
-                    <label>Prix : <strong>{{prix}}\$/h</strong></label>
-                    <label>Nombre Vélo disponibles : <strong>{{nombreVelo}}</strong></label>
+    <div class=\"container mt-4\">
+        <div class=\"info-group\">
+            <div class=\"row\">
+                <div class=\"col-md-6\">
+                    <label>Station: </label>
+                    <strong>{{ nom }}</strong>
+                </div>
+                <div class=\"col-md-6\">
+                    <label>Prix par heure: </label>
+                    <strong>{{ prix }}€</strong>
                 </div>
             </div>
-
-            <div class=\"col-md-6\">
-                <div class=\"form-group\">
-                    {{ form_row(form.dateRes, {'attr': {'class': 'form-control'}}) }}
-                </div>
-                <div class=\"form-group\">
-                    {{ form_row(form.nombreVelo, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.nombreVelo) }}
-
-                </div>
-            </div>
-            <div class=\"col-md-6\">
-                <div class=\"form-group\">
-                    {{ form_row(form.dateFin, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.dateFin) }}
-
-                </div>
-            </div>
-            <div class=\"col-12\">
-                <div class=\"form-group\">
-                    <button type=\"submit\" class=\"btnn\">{{ button_label|default('Réserver') }}</button>
+            <div class=\"row mt-2\">
+                <div class=\"col-md-12\">
+                    <label>Vélos disponibles: </label>
+                    <strong>{{ nombreVelo }}</strong>
                 </div>
             </div>
         </div>
-    {{ form_end(form) }}
+
+        {{ form_start(form, {'attr': {'class': 'mt-4'}}) }}
+            <div class=\"row\">
+                <div class=\"col-md-6\">
+                    <div class=\"form-group\">
+                        {{ form_label(form.dateRes, 'Date de début') }}
+                        {{ form_widget(form.dateRes, {'attr': {'class': 'form-control datepicker'}}) }}
+                    </div>
+                </div>
+                <div class=\"col-md-6\">
+                    <div class=\"form-group\">
+                        {{ form_label(form.dateFin, 'Date de fin') }}
+                        {{ form_widget(form.dateFin, {'attr': {'class': 'form-control datepicker'}}) }}
+                    </div>
+                </div>
+            </div>
+            <div class=\"row\">
+                <div class=\"col-md-12\">
+                    <div class=\"form-group\">
+                        {{ form_label(form.nombreVelo, 'Nombre de vélos') }}
+                        {{ form_widget(form.nombreVelo, {'attr': {'class': 'form-control', 'max': nombreVelo}}) }}
+                    </div>
+                </div>
+            </div>
+            {{ form_row(form._token) }}
+            <div class=\"row\">
+                <div class=\"col-md-12 text-center\">
+                    <button type=\"submit\" class=\"btnn\">Continuer</button>
+                </div>
+            </div>
+        {{ form_end(form, {'render_rest': false}) }}
+    </div>
 </div>
 
 <script>
@@ -728,7 +726,6 @@ body {
             })
             .catch(error => console.error('Erreur lors du chargement:', error));
     }
-</script>
-", "reservation_transport/_form.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\reservation_transport\\_form.html.twig");
+</script>", "reservation_transport/_form.html.twig", "C:\\Users\\bouga\\Desktop\\Airmess_Web\\templates\\reservation_transport\\_form.html.twig");
     }
 }

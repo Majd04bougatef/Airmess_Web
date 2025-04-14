@@ -6,19 +6,45 @@ use App\Entity\Station;
 use App\Entity\Reservation;
 use App\Repository\StationRepository;
 use App\Repository\ReservationRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AnalyticsController extends AbstractController
 {
     #[Route('/entreprise/analytics', name: 'app_entreprise_analytics')]
-    public function index(StationRepository $stationRepository, ReservationRepository $reservationRepository): Response
+    public function index(
+        StationRepository $stationRepository, 
+        ReservationRepository $reservationRepository,
+        SessionInterface $session,
+        UserRepository $userRepository
+    ): Response
     {
-        $stations = $stationRepository->findAll();
-        $reservations = $reservationRepository->findAll();
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        $userRole = $session->get('user_role');
+
+        // Get stations based on user role
+        $stations = ($userRole === 'Admin') 
+            ? $stationRepository->findAll()
+            : $stationRepository->findBy(['user' => $user]);
+
+        // Get reservations for the user's stations
+        $reservations = [];
+        foreach ($stations as $station) {
+            $stationReservations = $reservationRepository->findBy(['station' => $station]);
+            $reservations = array_merge($reservations, $stationReservations);
+        }
 
         // Calculate key metrics
         $totalRevenue = $this->calculateTotalRevenue($reservations);
@@ -35,20 +61,61 @@ class AnalyticsController extends AbstractController
             'bikeUtilization' => $bikeUtilization,
             'averageRideDuration' => $averageRideDuration,
             'stationPerformance' => $stationPerformance,
+            'user' => $user,
         ]);
     }
 
     #[Route('/entreprise/analytics/usage', name: 'app_entreprise_analytics_usage')]
-    public function getUsageData(ReservationRepository $reservationRepository): JsonResponse
+    public function getUsageData(
+        ReservationRepository $reservationRepository,
+        StationRepository $stationRepository,
+        SessionInterface $session,
+        UserRepository $userRepository
+    ): JsonResponse
     {
-        $usageData = $this->calculateUsageTrends($reservationRepository);
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return new JsonResponse(['error' => 'Not authenticated'], 401);
+        }
+
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        $userRole = $session->get('user_role');
+
+        // Get stations based on user role
+        $stations = ($userRole === 'Admin') 
+            ? $stationRepository->findAll()
+            : $stationRepository->findBy(['user' => $user]);
+
+        $usageData = $this->calculateUsageTrends($reservationRepository, $stations);
         return new JsonResponse($usageData);
     }
 
     #[Route('/entreprise/analytics/revenue', name: 'app_entreprise_analytics_revenue')]
-    public function getRevenueData(ReservationRepository $reservationRepository): JsonResponse
+    public function getRevenueData(
+        ReservationRepository $reservationRepository,
+        StationRepository $stationRepository,
+        SessionInterface $session,
+        UserRepository $userRepository
+    ): JsonResponse
     {
-        $revenueData = $this->calculateRevenueData($reservationRepository);
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return new JsonResponse(['error' => 'Not authenticated'], 401);
+        }
+
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        $userRole = $session->get('user_role');
+
+        // Get stations based on user role
+        $stations = ($userRole === 'Admin') 
+            ? $stationRepository->findAll()
+            : $stationRepository->findBy(['user' => $user]);
+
+        $revenueData = $this->calculateRevenueData($reservationRepository, $stations);
         return new JsonResponse($revenueData);
     }
 
@@ -171,13 +238,17 @@ class AnalyticsController extends AbstractController
         return $total;
     }
 
-    private function calculateUsageTrends(ReservationRepository $reservationRepository): array
+    private function calculateUsageTrends(ReservationRepository $reservationRepository, array $stations): array
     {
         // Get reservations for the last 6 months
         $endDate = new \DateTime();
         $startDate = (clone $endDate)->modify('-6 months');
 
-        $reservations = $reservationRepository->findByDateRange($startDate, $endDate);
+        $reservations = [];
+        foreach ($stations as $station) {
+            $stationReservations = $reservationRepository->findByDateRangeAndStation($startDate, $endDate, $station);
+            $reservations = array_merge($reservations, $stationReservations);
+        }
 
         // Group by month
         $monthlyData = [];
@@ -200,13 +271,17 @@ class AnalyticsController extends AbstractController
         ];
     }
 
-    private function calculateRevenueData(ReservationRepository $reservationRepository): array
+    private function calculateRevenueData(ReservationRepository $reservationRepository, array $stations): array
     {
         // Get reservations for the last week
         $endDate = new \DateTime();
         $startDate = (clone $endDate)->modify('-7 days');
 
-        $reservations = $reservationRepository->findByDateRange($startDate, $endDate);
+        $reservations = [];
+        foreach ($stations as $station) {
+            $stationReservations = $reservationRepository->findByDateRangeAndStation($startDate, $endDate, $station);
+            $reservations = array_merge($reservations, $stationReservations);
+        }
 
         // Group by day
         $dailyData = [];

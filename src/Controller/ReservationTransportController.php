@@ -12,22 +12,29 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/reservation/transport')]
 final class ReservationTransportController extends AbstractController
 {
     #[Route(name: 'app_reservation_transport_index', methods: ['GET'])]
-    public function index(Request $request, ReservationTransportRepository $reservationTransportRepository): Response
+    public function index(ReservationTransportRepository $reservationTransportRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
-
-        $reservations = $reservationTransportRepository->findByUserId(40);
-
-        if ($request->isXmlHttpRequest()) {
-            return $this->render('reservation_transport/_list.html.twig', [
-                'reservation_transports' => $reservations,
-            ]);
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
         }
+        
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        $userRole = $session->get('user_role');
+        
+        // Get reservations based on user role
+        $reservations = ($userRole === 'Admin') 
+            ? $reservationTransportRepository->findAll()
+            : $reservationTransportRepository->findByUserId($userId);
 
         return $this->render('reservation_transport/index.html.twig', [
             'reservation_transports' => $reservations,
@@ -35,8 +42,17 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/new/{id}', name: 'app_reservation_transport_new_reservation', methods: ['GET', 'POST'])]
-    public function new(Request $request, $id, EntityManagerInterface $entityManager, UserRepository $userRepository, StationRepository $stationRepository): Response
+    public function new(Request $request, $id, EntityManagerInterface $entityManager, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+
         // Récupérer la station avec l'ID reçu
         $station = $stationRepository->find($id);
         
@@ -45,10 +61,8 @@ final class ReservationTransportController extends AbstractController
         }
 
         $reservationTransport = new ReservationTransport();
-
-        $user = $userRepository->find(40);  // Vous pouvez obtenir l'utilisateur actuellement connecté ici
         $reservationTransport->setUser($user);
-        $reservationTransport->setStation($station);  // Lier la réservation à la station reçue
+        $reservationTransport->setStation($station);
         $reservationTransport->setReference($this->generateReference($user));
         $reservationTransport->setStatut('en cours');
         $reservationTransport->setPrix(0);
@@ -69,7 +83,6 @@ final class ReservationTransportController extends AbstractController
                 'dateFin' => $reservationTransport->getDateFin()->format('Y-m-d H:i:s'),
                 'nombreVelo' => $reservationTransport->getNombreVelo(),
             ]);
-            
         }
 
         return $this->render('reservation_transport/new.html.twig', [
@@ -83,8 +96,15 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/new2', name: 'app_reservation_transport_new', methods: ['GET', 'POST'])]
-    public function new2(Request $request,  EntityManagerInterface $entityManager, UserRepository $userRepository, StationRepository $stationRepository): Response
+    public function new2(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository, StationRepository $stationRepository): Response
     {
+        // Get the current user from the session
+        $user = $this->getUser();
+        
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
         // Récupérer la station avec l'ID reçu
         $station = $stationRepository->find(40);
         
@@ -93,14 +113,9 @@ final class ReservationTransportController extends AbstractController
         }
 
         $reservationTransport = new ReservationTransport();
-
-        $user = $userRepository->find(40);  // Vous pouvez obtenir l'utilisateur actuellement connecté ici
         $reservationTransport->setUser($user);
-
-        $reservationTransport->setStation($station);  // Lier la réservation à la station reçue
-
-        $reference = $this->generateReference($user);
-        $reservationTransport->setReference($reference);
+        $reservationTransport->setStation($station);
+        $reservationTransport->setReference($this->generateReference($user));
         $reservationTransport->setStatut('en cours');
         $reservationTransport->setPrix(0);
 
@@ -120,8 +135,6 @@ final class ReservationTransportController extends AbstractController
         ]);
     }
 
-
-
     private function generateReference(User $user): string
     {
         $dateRes = new \DateTime(); 
@@ -138,7 +151,6 @@ final class ReservationTransportController extends AbstractController
             $userId
         );
     }
-
 
     #[Route('/show/{id}', name: 'app_reservation_transport_show', methods: ['GET'])]
     public function show(ReservationTransport $reservationTransport): Response
@@ -174,22 +186,29 @@ final class ReservationTransportController extends AbstractController
 
     #[Route('/process-payment', name: 'app_reservation_transport_process_payment', methods: ['POST'])]
     public function processPayment(Request $request, EntityManagerInterface $entityManager, 
-                                StationRepository $stationRepository, UserRepository $userRepository): Response
+                                StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+
         // Récupérer les données du formulaire
-        $userId = $request->request->get('user_id');
         $stationId = $request->request->get('station_id');
         $dateRes = $request->request->get('date_res');
         $dateFin = $request->request->get('date_fin');
         $nombreVelo = $request->request->get('nombre_velo');
         $prix = $request->request->get('prix');
         
-        // Récupérer les données
+        // Récupérer la station
         $station = $stationRepository->find($stationId);
-        $user = $userRepository->find($userId);
         
-        if (!$station || !$user) {
-            throw $this->createNotFoundException('Station ou utilisateur non trouvé');
+        if (!$station) {
+            throw $this->createNotFoundException('Station non trouvée');
         }
         
         // Création de la réservation dans la base de données après paiement réussi

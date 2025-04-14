@@ -556,10 +556,22 @@ function initMap() {
                 <div class=\"stat-icon text-warning\">
                     <i class=\"fas fa-battery-half\"></i>
                 </div>
-                <h3>";
-        // line 321
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::round((((isset($context["totalBikes"]) || array_key_exists("totalBikes", $context) ? $context["totalBikes"] : (function () { throw new RuntimeError('Variable "totalBikes" does not exist.', 321, $this->source); })()) / (isset($context["totalCapacity"]) || array_key_exists("totalCapacity", $context) ? $context["totalCapacity"] : (function () { throw new RuntimeError('Variable "totalCapacity" does not exist.', 321, $this->source); })())) * 100)), "html", null, true);
-        yield "%</h3>
+                <h3>
+                    ";
+        // line 322
+        if (((isset($context["totalCapacity"]) || array_key_exists("totalCapacity", $context) ? $context["totalCapacity"] : (function () { throw new RuntimeError('Variable "totalCapacity" does not exist.', 322, $this->source); })()) > 0)) {
+            // line 323
+            yield "                        ";
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::round((((isset($context["totalBikes"]) || array_key_exists("totalBikes", $context) ? $context["totalBikes"] : (function () { throw new RuntimeError('Variable "totalBikes" does not exist.', 323, $this->source); })()) / (isset($context["totalCapacity"]) || array_key_exists("totalCapacity", $context) ? $context["totalCapacity"] : (function () { throw new RuntimeError('Variable "totalCapacity" does not exist.', 323, $this->source); })())) * 100)), "html", null, true);
+            yield "%
+                    ";
+        } else {
+            // line 325
+            yield "                        0%
+                    ";
+        }
+        // line 327
+        yield "                </h3>
                 <p>Taux d'occupation</p>
             </div>
         </div>
@@ -568,7 +580,7 @@ function initMap() {
             <div class=\"card-header pb-0 d-flex justify-content-between align-items-center\">
                 <h6>Stations</h6>
                 <a href=\"";
-        // line 329
+        // line 335
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_station_new");
         yield "\" class=\"btn btn-sm btn-primary\">
                     <i class=\"fas fa-plus-circle mr-1\"></i> Ajouter une station
@@ -595,87 +607,87 @@ function initMap() {
                       
                       <tbody>
                       ";
-        // line 353
+        // line 359
         $context['_parent'] = $context;
-        $context['_seq'] = CoreExtension::ensureTraversable((isset($context["stations"]) || array_key_exists("stations", $context) ? $context["stations"] : (function () { throw new RuntimeError('Variable "stations" does not exist.', 353, $this->source); })()));
+        $context['_seq'] = CoreExtension::ensureTraversable((isset($context["stations"]) || array_key_exists("stations", $context) ? $context["stations"] : (function () { throw new RuntimeError('Variable "stations" does not exist.', 359, $this->source); })()));
         foreach ($context['_seq'] as $context["_key"] => $context["station"]) {
-            // line 354
+            // line 360
             yield "                        <tr>
                           <td>
                             <p class=\"text-sm font-weight-bold mb-0\">";
-            // line 356
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "nom", [], "any", false, false, false, 356), "html", null, true);
+            // line 362
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "nom", [], "any", false, false, false, 362), "html", null, true);
             yield "</p>
                           </td>
                           <td>
                             <span class=\"text-xs font-weight-bold\">";
-            // line 359
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "capacite", [], "any", false, false, false, 359), "html", null, true);
+            // line 365
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "capacite", [], "any", false, false, false, 365), "html", null, true);
             yield "</span>
                           </td>
                           <td>
                             <span class=\"text-xs font-weight-bold\">";
-            // line 362
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "nombreVelo", [], "any", false, false, false, 362), "html", null, true);
-            yield "</span>
-                          </td>
-
-                          <td>
-                            <span class=\"text-xs font-weight-bold\">";
-            // line 366
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "typeVelo", [], "any", false, false, false, 366), "html", null, true);
+            // line 368
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "nombreVelo", [], "any", false, false, false, 368), "html", null, true);
             yield "</span>
                           </td>
 
                           <td>
                             <span class=\"text-xs font-weight-bold\">";
-            // line 370
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "prixHeure", [], "any", false, false, false, 370), "html", null, true);
+            // line 372
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "typeVelo", [], "any", false, false, false, 372), "html", null, true);
+            yield "</span>
+                          </td>
+
+                          <td>
+                            <span class=\"text-xs font-weight-bold\">";
+            // line 376
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "prixHeure", [], "any", false, false, false, 376), "html", null, true);
             yield "</span>
                           </td>
                           <td>
                             <span class=\"text-xs font-weight-bold\">";
-            // line 373
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "pays", [], "any", false, false, false, 373), "html", null, true);
+            // line 379
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["station"], "pays", [], "any", false, false, false, 379), "html", null, true);
             yield "</span>
                           </td>
 
                           <td class=\"align-middle text-center\">
                             <div class=\"d-flex align-items-center justify-content-center\">
                                 ";
-            // line 378
-            $context["pourcentage"] = ((CoreExtension::getAttribute($this->env, $this->source, $context["station"], "nombreVelo", [], "any", false, false, false, 378) / CoreExtension::getAttribute($this->env, $this->source, $context["station"], "capacite", [], "any", false, false, false, 378)) * 100);
-            // line 379
+            // line 384
+            $context["pourcentage"] = (((CoreExtension::getAttribute($this->env, $this->source, $context["station"], "capacite", [], "any", false, false, false, 384) > 0)) ? (((CoreExtension::getAttribute($this->env, $this->source, $context["station"], "nombreVelo", [], "any", false, false, false, 384) / CoreExtension::getAttribute($this->env, $this->source, $context["station"], "capacite", [], "any", false, false, false, 384)) * 100)) : (0));
+            // line 385
             yield "                                <span class=\"me-2 text-xs font-weight-bold\">";
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::round((isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 379, $this->source); })()), 2), "html", null, true);
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::round((isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 385, $this->source); })()), 2), "html", null, true);
             yield "%</span>
                                 <div>
                                     <div class=\"progress\">
                                         <div class=\"progress-bar 
                                             ";
-            // line 383
-            if (((isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 383, $this->source); })()) >= 80)) {
+            // line 389
+            if (((isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 389, $this->source); })()) >= 80)) {
                 yield " bg-gradient-success 
                                             ";
-            } elseif ((            // line 384
-(isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 384, $this->source); })()) >= 30)) {
+            } elseif ((            // line 390
+(isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 390, $this->source); })()) >= 30)) {
                 yield " bg-gradient-info 
                                             ";
             } else {
-                // line 385
+                // line 391
                 yield " bg-gradient-danger ";
             }
             yield "\" 
                                             role=\"progressbar\"  
                                             aria-valuenow=\"";
-            // line 387
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::round((isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 387, $this->source); })()), 2), "html", null, true);
+            // line 393
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::round((isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 393, $this->source); })()), 2), "html", null, true);
             yield "\" 
                                             aria-valuemin=\"0\" 
                                             aria-valuemax=\"100\" 
                                             style=\"width: ";
-            // line 390
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::round((isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 390, $this->source); })()), 2), "html", null, true);
+            // line 396
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::round((isset($context["pourcentage"]) || array_key_exists("pourcentage", $context) ? $context["pourcentage"] : (function () { throw new RuntimeError('Variable "pourcentage" does not exist.', 396, $this->source); })()), 2), "html", null, true);
             yield "%;\">
                                         </div>
                                     </div>
@@ -685,17 +697,17 @@ function initMap() {
 
                           <td class=\"align-middle\">
                             <a href=\"";
-            // line 398
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_station_edit", ["idS" => CoreExtension::getAttribute($this->env, $this->source, $context["station"], "idS", [], "any", false, false, false, 398)]), "html", null, true);
+            // line 404
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_station_edit", ["idS" => CoreExtension::getAttribute($this->env, $this->source, $context["station"], "idS", [], "any", false, false, false, 404)]), "html", null, true);
             yield "\" class=\"btn btn-sm btn-info\">Modifier</a>
                             <!-- Formulaire de suppression -->
                             <form method=\"post\" action=\"";
-            // line 400
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_station_delete", ["idS" => CoreExtension::getAttribute($this->env, $this->source, $context["station"], "idS", [], "any", false, false, false, 400)]), "html", null, true);
+            // line 406
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_station_delete", ["idS" => CoreExtension::getAttribute($this->env, $this->source, $context["station"], "idS", [], "any", false, false, false, 406)]), "html", null, true);
             yield "\" style=\"display:inline;\">
                                 <input type=\"hidden\" name=\"_token\" value=\"";
-            // line 401
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("delete" . CoreExtension::getAttribute($this->env, $this->source, $context["station"], "idS", [], "any", false, false, false, 401))), "html", null, true);
+            // line 407
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("delete" . CoreExtension::getAttribute($this->env, $this->source, $context["station"], "idS", [], "any", false, false, false, 407))), "html", null, true);
             yield "\">
                                 <button type=\"submit\" class=\"btn btn-sm btn-danger\" onclick=\"return confirm('Êtes-vous sûr de vouloir supprimer cette station ?');\">Supprimer</button>
                             </form>
@@ -707,7 +719,7 @@ function initMap() {
         $_parent = $context['_parent'];
         unset($context['_seq'], $context['_key'], $context['station'], $context['_parent']);
         $context = array_intersect_key($context, $_parent) + $_parent;
-        // line 408
+        // line 414
         yield "                      </tbody>
                     </table>
                 </div>
@@ -746,7 +758,7 @@ function initMap() {
      */
     public function getDebugInfo(): array
     {
-        return array (  711 => 408,  698 => 401,  694 => 400,  689 => 398,  678 => 390,  672 => 387,  666 => 385,  661 => 384,  657 => 383,  649 => 379,  647 => 378,  639 => 373,  633 => 370,  626 => 366,  619 => 362,  613 => 359,  607 => 356,  603 => 354,  599 => 353,  572 => 329,  561 => 321,  550 => 313,  543 => 308,  537 => 307,  534 => 306,  531 => 305,  526 => 304,  523 => 303,  521 => 302,  514 => 298,  504 => 290,  491 => 289,  428 => 235,  422 => 234,  416 => 232,  410 => 229,  404 => 226,  399 => 224,  386 => 214,  382 => 213,  378 => 212,  372 => 209,  365 => 205,  358 => 201,  349 => 197,  343 => 194,  331 => 187,  324 => 183,  318 => 180,  314 => 179,  311 => 178,  309 => 177,  299 => 175,  295 => 174,  207 => 89,  194 => 88,  102 => 6,  89 => 5,  66 => 3,  43 => 1,);
+        return array (  723 => 414,  710 => 407,  706 => 406,  701 => 404,  690 => 396,  684 => 393,  678 => 391,  673 => 390,  669 => 389,  661 => 385,  659 => 384,  651 => 379,  645 => 376,  638 => 372,  631 => 368,  625 => 365,  619 => 362,  615 => 360,  611 => 359,  584 => 335,  574 => 327,  570 => 325,  564 => 323,  562 => 322,  550 => 313,  543 => 308,  537 => 307,  534 => 306,  531 => 305,  526 => 304,  523 => 303,  521 => 302,  514 => 298,  504 => 290,  491 => 289,  428 => 235,  422 => 234,  416 => 232,  410 => 229,  404 => 226,  399 => 224,  386 => 214,  382 => 213,  378 => 212,  372 => 209,  365 => 205,  358 => 201,  349 => 197,  343 => 194,  331 => 187,  324 => 183,  318 => 180,  314 => 179,  311 => 178,  309 => 177,  299 => 175,  295 => 174,  207 => 89,  194 => 88,  102 => 6,  89 => 5,  66 => 3,  43 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -1071,7 +1083,13 @@ function initMap() {
                 <div class=\"stat-icon text-warning\">
                     <i class=\"fas fa-battery-half\"></i>
                 </div>
-                <h3>{{ ((totalBikes / totalCapacity) * 100)|round }}%</h3>
+                <h3>
+                    {% if totalCapacity > 0 %}
+                        {{ ((totalBikes / totalCapacity) * 100)|round }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </h3>
                 <p>Taux d'occupation</p>
             </div>
         </div>
@@ -1128,7 +1146,7 @@ function initMap() {
 
                           <td class=\"align-middle text-center\">
                             <div class=\"d-flex align-items-center justify-content-center\">
-                                {% set pourcentage = (station.nombreVelo / station.capacite) * 100 %}
+                                {% set pourcentage = station.capacite > 0 ? (station.nombreVelo / station.capacite) * 100 : 0 %}
                                 <span class=\"me-2 text-xs font-weight-bold\">{{ pourcentage|round(2) }}%</span>
                                 <div>
                                     <div class=\"progress\">
@@ -1168,6 +1186,6 @@ function initMap() {
 {% endblock %}
 
 
-", "station/index.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\station\\index.html.twig");
+", "station/index.html.twig", "C:\\Users\\bouga\\Desktop\\Airmess_Web\\templates\\station\\index.html.twig");
     }
 }

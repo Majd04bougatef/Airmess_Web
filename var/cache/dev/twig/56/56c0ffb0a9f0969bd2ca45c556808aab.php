@@ -157,6 +157,6 @@ class __TwigTemplate_1c6b3d1c1182f17c9ed42a6fcee1cd3f extends Template
     <a href=\"{{ path('app_station_index') }}\">back to list</a>
 
 {% endblock %}
-", "station/edit.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\station\\edit.html.twig");
+", "station/edit.html.twig", "C:\\Users\\bouga\\Desktop\\Airmess_Web\\templates\\station\\edit.html.twig");
     }
 }

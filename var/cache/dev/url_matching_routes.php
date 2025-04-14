@@ -48,6 +48,7 @@ return [
         '/logout' => [[['_route' => 'app_logout', '_controller' => 'App\\Controller\\SecurityController::logout'], null, null, null, false, false, null]],
         '/social/media' => [[['_route' => 'app_social_media_index', '_controller' => 'App\\Controller\\SocialMediaController::index'], null, ['GET' => 0], null, false, false, null]],
         '/social/media/new' => [[['_route' => 'app_social_media_new', '_controller' => 'App\\Controller\\SocialMediaController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/station/dashEntreprise' => [[['_route' => 'app_dashboard', '_controller' => 'App\\Controller\\StationController::dashboard'], null, ['GET' => 0], null, false, false, null]],
         '/station' => [[['_route' => 'app_station_index', '_controller' => 'App\\Controller\\StationController::index'], null, ['GET' => 0], null, false, false, null]],
         '/station/new' => [[['_route' => 'app_station_new', '_controller' => 'App\\Controller\\StationController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/user' => [[['_route' => 'app_user_index', '_controller' => 'App\\Controller\\UserController::index'], null, ['GET' => 0], null, false, false, null]],
@@ -126,19 +127,16 @@ return [
                         .'|(\\d+)/commentaire(*:682)'
                         .'|(\\d+)(*:695)'
                     .')'
-                    .'|tation/(?'
-                        .'|([^/]++)(?'
-                            .'|(*:725)'
-                            .'|/edit(*:738)'
-                            .'|(*:746)'
-                        .')'
-                        .'|dashEntreprise(*:769)'
+                    .'|tation/([^/]++)(?'
+                        .'|(*:722)'
+                        .'|/edit(*:735)'
+                        .'|(*:743)'
                     .')'
                 .')'
                 .'|/user/([^/]++)(?'
-                    .'|(*:796)'
-                    .'|/edit(*:809)'
-                    .'|(*:817)'
+                    .'|(*:770)'
+                    .'|/edit(*:783)'
+                    .'|(*:791)'
                 .')'
             .')/?$}sDu',
     ],
@@ -174,13 +172,12 @@ return [
         657 => [[['_route' => 'app_social_media_dislike', '_controller' => 'App\\Controller\\SocialMediaController::dislike'], ['idEB'], ['POST' => 0], null, false, false, null]],
         682 => [[['_route' => 'app_social_media_ajouter_commentaire', '_controller' => 'App\\Controller\\SocialMediaController::ajouterCommentaire'], ['idEB'], ['POST' => 0], null, false, false, null]],
         695 => [[['_route' => 'app_social_media_delete', '_controller' => 'App\\Controller\\SocialMediaController::delete'], ['idEB'], ['POST' => 0], null, false, true, null]],
-        725 => [[['_route' => 'app_station_show', '_controller' => 'App\\Controller\\StationController::show'], ['idS'], ['GET' => 0], null, false, true, null]],
-        738 => [[['_route' => 'app_station_edit', '_controller' => 'App\\Controller\\StationController::edit'], ['idS'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        746 => [[['_route' => 'app_station_delete', '_controller' => 'App\\Controller\\StationController::delete'], ['idS'], ['POST' => 0], null, false, true, null]],
-        769 => [[['_route' => 'app_dashboard', '_controller' => 'App\\Controller\\StationController::dashboard'], [], null, null, false, false, null]],
-        796 => [[['_route' => 'app_user_show', '_controller' => 'App\\Controller\\UserController::show'], ['id_U'], ['GET' => 0], null, false, true, null]],
-        809 => [[['_route' => 'app_user_edit', '_controller' => 'App\\Controller\\UserController::edit'], ['id_U'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        817 => [
+        722 => [[['_route' => 'app_station_show', '_controller' => 'App\\Controller\\StationController::show'], ['idS'], ['GET' => 0], null, false, true, null]],
+        735 => [[['_route' => 'app_station_edit', '_controller' => 'App\\Controller\\StationController::edit'], ['idS'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        743 => [[['_route' => 'app_station_delete', '_controller' => 'App\\Controller\\StationController::delete'], ['idS'], ['POST' => 0], null, false, true, null]],
+        770 => [[['_route' => 'app_user_show', '_controller' => 'App\\Controller\\UserController::show'], ['id_U'], ['GET' => 0], null, false, true, null]],
+        783 => [[['_route' => 'app_user_edit', '_controller' => 'App\\Controller\\UserController::edit'], ['id_U'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        791 => [
             [['_route' => 'app_user_delete', '_controller' => 'App\\Controller\\UserController::delete'], ['id_U'], ['POST' => 0], null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
