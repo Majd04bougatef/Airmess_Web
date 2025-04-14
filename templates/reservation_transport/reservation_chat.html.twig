@@ -1,0 +1,361 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Assistance Réservation{% endblock %}
+
+{% block body %}
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 1rem;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+        font-size: 1rem;
+        color: #67748e;
+    }
+
+    .reservation-info {
+        background-color: #fff;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .reservation-info h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 1rem;
+    }
+
+    .reservation-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .detail-item {
+        margin-bottom: 0.75rem;
+    }
+
+    .detail-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #8392ab;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #344767;
+    }
+
+    /* Chat Container */
+    .chat-container {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 500px;
+    }
+    
+    /* Chat Header */
+    .chat-header {
+        background-color: #5e72e4;
+        color: white;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .chat-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .chat-status {
+        display: flex;
+        align-items: center;
+        font-size: 0.75rem;
+    }
+
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+    }
+
+    .online {
+        background-color: #2dce89;
+    }
+
+    .offline {
+        background-color: #f5365c;
+    }
+    
+    /* Messages Area */
+    .messages-area {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        background-color: #f8f9fa;
+    }
+    
+    /* Message Bubbles */
+    .message {
+        max-width: 75%;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        position: relative;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    .user-message {
+        background-color: #5e72e4;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 0.25rem;
+    }
+    
+    .company-message {
+        background-color: white;
+        color: #344767;
+        align-self: flex-start;
+        border-bottom-left-radius: 0.25rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .message-time {
+        font-size: 0.7rem;
+        opacity: 0.8;
+        margin-top: 0.25rem;
+        text-align: right;
+    }
+
+    .message-sender {
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* Message Form */
+    .message-form {
+        display: flex;
+        padding: 1rem;
+        background-color: white;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .message-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 1.5rem;
+        outline: none;
+        font-size: 0.875rem;
+        resize: none;
+        max-height: 100px;
+        transition: all 0.2s ease;
+    }
+
+    .message-input:focus {
+        border-color: #5e72e4;
+        box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.15);
+    }
+    
+    .send-button {
+        background-color: #5e72e4;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    
+    .send-button:hover {
+        background-color: #324cdd;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(94, 114, 228, 0.25);
+    }
+
+    .send-button i {
+        font-size: 1rem;
+    }
+
+    .file-button {
+        background-color: #f8f9fa;
+        color: #67748e;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-right: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .file-button:hover {
+        background-color: #e9ecef;
+    }
+
+    .message-actions {
+        display: flex;
+        align-items: center;
+    }
+</style>
+
+<div class="page-header">
+    <h2 class="page-title">Assistance Réservation</h2>
+    <p class="page-subtitle">Discutez avec notre équipe à propos de votre réservation</p>
+</div>
+
+<!-- Reservation Information -->
+<div class="reservation-info">
+    <h3>Détails de la réservation</h3>
+    <div class="reservation-details">
+        <div class="detail-item">
+            <div class="detail-label">Référence</div>
+            <div class="detail-value">{{ reservation.reference }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Station</div>
+            <div class="detail-value">{{ reservation.station.nom }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Date de début</div>
+            <div class="detail-value">{{ reservation.dateRes|date('d/m/Y à H:i') }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Date de fin</div>
+            <div class="detail-value">{{ reservation.dateFin|date('d/m/Y à H:i') }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Nombre de vélos</div>
+            <div class="detail-value">{{ reservation.nombreVelo }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Statut</div>
+            <div class="detail-value">
+                <span class="badge {% if reservation.statut == 'confirmé' %}badge-success{% elseif reservation.statut == 'en cours' %}badge-warning{% else %}badge-info{% endif %}">
+                    {{ reservation.statut }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chat Container -->
+<div class="chat-container">
+    <div class="chat-header">
+        <h3>Conversation avec le service client</h3>
+        <div class="chat-status">
+            <div class="status-indicator online"></div>
+            <span>Agent en ligne</span>
+        </div>
+    </div>
+    
+    <div class="messages-area" id="messages">
+        <!-- Default welcome message -->
+        <div class="message company-message">
+            <div class="message-sender">Service Client</div>
+            Bonjour ! Je suis là pour vous aider avec votre réservation (Réf: {{ reservation.reference }}). Comment puis-je vous aider aujourd'hui ?
+            <div class="message-time">{{ "now"|date('H:i') }}</div>
+        </div>
+        
+        <!-- Messages will be loaded here -->
+        {% if messages is defined %}
+            {% for message in messages %}
+                {% if message.sender.idU == reservation.user.idU %}
+                    <div class="message user-message">
+                        {{ message.content }}
+                        <div class="message-time">{{ message.dateM|date('H:i') }}</div>
+                    </div>
+                {% else %}
+                    <div class="message company-message">
+                        <div class="message-sender">Service Client</div>
+                        {{ message.content }}
+                        <div class="message-time">{{ message.dateM|date('H:i') }}</div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    <div class="message-form">
+        <button type="button" class="file-button">
+            <i class="fas fa-paperclip"></i>
+        </button>
+        
+        <form method="POST" action="{{ path('app_reservation_message_new', {'id': reservation.id}) }}" id="message-form" class="flex-grow-1 d-flex">
+            <textarea class="message-input" name="content" placeholder="Écrivez votre message..." rows="1" required></textarea>
+            
+            <div class="message-actions">
+                <button type="submit" class="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-scroll to bottom of messages
+        const messagesArea = document.getElementById('messages');
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+        
+        // Adjust textarea height based on content
+        const messageInput = document.querySelector('.message-input');
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+        
+        // Submit form with Enter key (Shift+Enter for new line)
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('message-form').submit();
+            }
+        });
+        
+        // Real-time message updates (simplified, would need WebSocket in production)
+        function checkForNewMessages() {
+            // This would be a fetch request to an endpoint that returns new messages
+            // For demonstration purposes, we'll just log to console
+            console.log('Checking for new messages...');
+        }
+        
+        // Check for new messages every 10 seconds
+        setInterval(checkForNewMessages, 10000);
+    });
+</script>
+{% endblock %} 
