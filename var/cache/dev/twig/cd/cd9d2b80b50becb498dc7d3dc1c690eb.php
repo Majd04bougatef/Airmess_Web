@@ -243,7 +243,7 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
 
       <a class=\"btn-getstarted\" href=\"";
         // line 74
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_login");
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("login");
         yield "\">Se Connecter</a>
 
     </div>
@@ -1635,7 +1635,7 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
         <i class=\"mobile-nav-toggle d-xl-none bi bi-list\"></i>
       </nav>
 
-      <a class=\"btn-getstarted\" href=\"{{path('app_login')}}\">Se Connecter</a>
+      <a class=\"btn-getstarted\" href=\"{{path('login')}}\">Se Connecter</a>
 
     </div>
   </header>

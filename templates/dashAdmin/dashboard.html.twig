@@ -28,6 +28,13 @@
         <img src="{{asset('images/logo-airmess.png')}}" width="40px" height="45px" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">Airmess</span>
       </a>
+      <div class="user-info mt-3 d-flex align-items-center ps-3">
+        <img src="{{ asset('uploads/users/' ~ app.session.get('user_image')) }}" alt="{{ app.session.get('user_name') }}" class="rounded-circle" width="40" height="40" onerror="this.src='{{ asset('images/user-avatar.svg') }}';">
+        <div class="ms-2">
+          <span class="font-weight-bold text-sm">{{ app.session.get('user_name') }}</span>
+          <small class="d-block text-secondary">{{ app.session.get('user_role') }}</small>
+        </div>
+      </div>
     </div>
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">

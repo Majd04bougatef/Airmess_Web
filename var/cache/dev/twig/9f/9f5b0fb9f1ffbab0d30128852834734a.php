@@ -564,8 +564,10 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
           <div class=\"user-profile\">
             <img src=\"";
         // line 459
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/marie.jpg"), "html", null, true);
-        yield "\" alt=\"User\" class=\"user-img\" id=\"userDropdown\" onerror=\"this.src='";
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/users/" . CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 459, $this->source); })()), "session", [], "any", false, false, false, 459), "get", ["user_image"], "method", false, false, false, 459))), "html", null, true);
+        yield "\" alt=\"";
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 459, $this->source); })()), "session", [], "any", false, false, false, 459), "get", ["user_name"], "method", false, false, false, 459), "html", null, true);
+        yield "\" class=\"user-img\" id=\"userDropdown\" onerror=\"this.src='";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/user-avatar.svg"), "html", null, true);
         yield "'; this.onerror='';\">
             <div class=\"dropdown-menu\" id=\"userMenu\">
@@ -821,7 +823,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  782 => 477,  759 => 8,  663 => 535,  615 => 490,  611 => 489,  607 => 488,  595 => 478,  593 => 477,  577 => 464,  567 => 459,  554 => 451,  549 => 449,  538 => 443,  525 => 435,  520 => 433,  509 => 427,  504 => 425,  493 => 419,  488 => 417,  477 => 411,  472 => 409,  458 => 398,  73 => 16,  63 => 9,  59 => 8,  50 => 1,);
+        return array (  784 => 477,  761 => 8,  665 => 535,  617 => 490,  613 => 489,  609 => 488,  597 => 478,  595 => 477,  579 => 464,  567 => 459,  554 => 451,  549 => 449,  538 => 443,  525 => 435,  520 => 433,  509 => 427,  504 => 425,  493 => 419,  488 => 417,  477 => 411,  472 => 409,  458 => 398,  73 => 16,  63 => 9,  59 => 8,  50 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -1284,7 +1286,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
           </ul>
           
           <div class=\"user-profile\">
-            <img src=\"{{ asset('img/marie.jpg') }}\" alt=\"User\" class=\"user-img\" id=\"userDropdown\" onerror=\"this.src='{{ asset('images/user-avatar.svg') }}'; this.onerror='';\">
+            <img src=\"{{ asset('uploads/users/' ~ app.session.get('user_image')) }}\" alt=\"{{ app.session.get('user_name') }}\" class=\"user-img\" id=\"userDropdown\" onerror=\"this.src='{{ asset('images/user-avatar.svg') }}'; this.onerror='';\">
             <div class=\"dropdown-menu\" id=\"userMenu\">
               <a class=\"dropdown-item\" href=\"#\">Profile</a>
               <a class=\"dropdown-item\" href=\"#\">Settings</a>

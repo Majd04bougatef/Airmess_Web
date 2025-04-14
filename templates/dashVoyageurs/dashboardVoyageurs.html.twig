@@ -456,7 +456,7 @@
           </ul>
           
           <div class="user-profile">
-            <img src="{{ asset('img/marie.jpg') }}" alt="User" class="user-img" id="userDropdown" onerror="this.src='{{ asset('images/user-avatar.svg') }}'; this.onerror='';">
+            <img src="{{ asset('uploads/users/' ~ app.session.get('user_image')) }}" alt="{{ app.session.get('user_name') }}" class="user-img" id="userDropdown" onerror="this.src='{{ asset('images/user-avatar.svg') }}'; this.onerror='';">
             <div class="dropdown-menu" id="userMenu">
               <a class="dropdown-item" href="#">Profile</a>
               <a class="dropdown-item" href="#">Settings</a>
