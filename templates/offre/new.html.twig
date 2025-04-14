@@ -1,217 +1,127 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer une Nouvelle Offre</title>
-    <style>
-        /* Reset all margins and padding */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-        }
-        
-        .navbar {
-            display: flex;
-            background: #ffffff;
-            padding: 10px;
-            justify-content: center;
-            margin: 20px auto 0;
-            gap: 20px;
-            width: 90%;
-            max-width: 1200px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .navbar a {
-            color: black;
-            text-decoration: none;
-            padding: 10px 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .navbar .nav-link:hover {
-            color: #6c99bc;
-            border-bottom: 2px solid #6c99bc;
-        }
-        
-        .content {
-            padding: 20px;
-            text-align: center;
-            margin: 0 auto;
-            width: 90%;
-            max-width: 1200px;
-        }
+{% extends 'dashEntreprise/dashboardEntreprise.html.twig' %}
 
-        .form-container {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin: 20px auto;
-            text-align: left;
-        }
+{% block title %}Créer une Nouvelle Offre{% endblock %}
 
-        .form-container h1 {
-            margin-bottom: 20px;
-        }
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .get-in-touch {
+        max-width: 800px;
+        margin: 50px auto;
+        position: relative;
+    }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+    .get-in-touch .title {
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 3.2em;
+        line-height: 48px;
+        padding-bottom: 48px;
+        color: #5543ca;
+        background: #5543ca;
+        background: -moz-linear-gradient(left, #f4524d 0%, #5543ca 100%) !important;
+        background: -webkit-linear-gradient(left, #f4524d 0%, #5543ca 100%) !important;
+        background: linear-gradient(to right, #f4524d 0%, #5543ca 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
 
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+    .contact-form .form-field {
+        position: relative;
+        margin: 32px 0;
+    }
 
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+    .contact-form .input-text {
+        display: block;
+        width: 100%;
+        height: 36px;
+        border-width: 0 0 2px 0;
+        border-color: #5543ca;
+        font-size: 18px;
+        line-height: 26px;
+        font-weight: 400;
+    }
 
-        .form-group button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    .contact-form .input-text:focus {
+        outline: none;
+    }
 
-        .form-group button:hover {
-            background-color: #0056b3;
-        }
+    .contact-form .label {
+        position: absolute;
+        left: 20px;
+        bottom: 11px;
+        font-size: 18px;
+        line-height: 26px;
+        font-weight: 400;
+        color: #5543ca;
+        cursor: text;
+        transition: transform 0.2s ease-in-out;
+    }
 
-        .btn-back {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
+    .contact-form .submit-btn {
+        display: inline-block;
+        background-color: #000;
+        background-image: linear-gradient(125deg, #a72879, #064497);
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 16px;
+        padding: 8px 16px;
+        border: none;
+        width: 200px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
 
-        .btn-back:hover {
-            background-color: #5a6268;
-        }
-
-        .form-error {
-            color: red;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        .global-error {
-            color: red;
-            font-size: 1em;
-            margin-top: 20px;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <!-- Menu Horizontal -->
-    <div class="navbar">
-        <a class="nav-link" href="{{ path('app_offre_index') }}">Offres</a>
-        <a class="nav-link" href="{{ path('app_reservation_transport_index') }}">Mes Réservations</a>
-        <a class="nav-link" href="{{ path('app_reservation_transport_station') }}">Stations</a>
-        <a class="nav-link" href="{{ path('app_message_voyageurs') }}">Discussions</a>
-    </div>
-    
-    <!-- Contenu Dynamique -->
-    <div class="content">
-        <div class="form-container">
-            <h1>Créer une Nouvelle Offre</h1>
-
-            {{ form_start(form) }}
-                {{ form_errors(form) }}
-
-                <div class="form-group">
-                    {{ form_label(form.place) }}
-                    {{ form_widget(form.place) }}
-                    <div class="form-error">
-                        {{ form_errors(form.place) }}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header pb-0">
+                <h6>Créer une Nouvelle Offre</h6>
+            </div>
+            <div class="card-body px-4 pt-0 pb-2">
+                <section class="get-in-touch">
+                    <h1 class="title">Créer une Nouvelle Offre</h1>
+                    {{ form_start(form, {'method': 'POST', 'attr': {'class': 'contact-form row', 'novalidate': 'novalidate'}}) }}
+                    <div class="row">
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.place, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.priceInit, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.priceAfter, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.startDate, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.endDate, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.description, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.imagePath, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.numberLimit, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-6">
+                            {{ form_row(form.aidesc, {'attr': {'class': 'input-text'}}) }}
+                        </div>
+                        <div class="form-field col-lg-12 text-center">
+                            <button class="submit-btn">Créer</button>
+                        </div>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    {{ form_label(form.priceInit) }}
-                    {{ form_widget(form.priceInit) }}
-                    <div class="form-error">
-                        {{ form_errors(form.priceInit) }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    {{ form_label(form.priceAfter) }}
-                    {{ form_widget(form.priceAfter) }}
-                    <div class="form-error">
-                        {{ form_errors(form.priceAfter) }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    {{ form_label(form.startDate) }}
-                    {{ form_widget(form.startDate) }}
-                    <div class="form-error">
-                        {{ form_errors(form.startDate) }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    {{ form_label(form.endDate) }}
-                    {{ form_widget(form.endDate) }}
-                    <div class="form-error">
-                        {{ form_errors(form.endDate) }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    {{ form_label(form.description) }}
-                    {{ form_widget(form.description) }}
-                    <div class="form-error">
-                        {{ form_errors(form.description) }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    {{ form_label(form.imagePath) }}
-                    {{ form_widget(form.imagePath) }}
-                    <div class="form-error">
-                        {{ form_errors(form.imagePath) }}
-                    </div>
-                </div>
-
-                <button type="submit">Créer</button>
-            {{ form_end(form) }}
-
-            <a href="{{ path('app_offre_index') }}" class="btn-back">Retour à la liste</a>
-
-            <!-- Message global d'erreur -->
-            {% if not form.vars.valid and form.isSubmitted %}
-                <div class="global-error">
-                    Tous les champs sont obligatoires.
-                </div>
-            {% endif %}
+                    {{ form_end(form) }}
+                </section>
+            </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

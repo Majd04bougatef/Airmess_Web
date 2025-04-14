@@ -22,7 +22,7 @@ final class OffreController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_offre_new', methods: ['GET', 'POST'])]
+    #[Route('/offre/new', name: 'app_offre_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $offre = new Offre();
@@ -33,12 +33,13 @@ final class OffreController extends AbstractController
             $entityManager->persist($offre);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_offre_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Nouvelle offre créée avec succès.');
+
+            return $this->redirectToRoute('offreEntreprise_page');
         }
 
-        return $this->render('dashVoyageurs/new.html.twig', [
-            'offre' => $offre,
-            'form' => $form,
+        return $this->render('offre/new.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 
