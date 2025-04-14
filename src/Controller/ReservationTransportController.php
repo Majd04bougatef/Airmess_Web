@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/reservation/transport')]
 final class ReservationTransportController extends AbstractController
@@ -77,12 +78,32 @@ final class ReservationTransportController extends AbstractController
             $nombreVeloReserve = $reservationTransport->getNombreVelo();
             $stationRepository->decrementNbVelosDispo($station->getIdS(), $nombreVeloReserve);
     
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'success' => true,
+                    'redirect' => $this->generateUrl('app_reservation_transport_recap', [
+                        'id' => $id,
+                        'dateRes' => $reservationTransport->getDateRes()->format('Y-m-d H:i:s'),
+                        'dateFin' => $reservationTransport->getDateFin()->format('Y-m-d H:i:s'),
+                        'nombreVelo' => $reservationTransport->getNombreVelo(),
+                    ])
+                ]);
+            }
+
             return $this->redirectToRoute('app_reservation_transport_recap', [
                 'id' => $id,
                 'dateRes' => $reservationTransport->getDateRes()->format('Y-m-d H:i:s'),
                 'dateFin' => $reservationTransport->getDateFin()->format('Y-m-d H:i:s'),
                 'nombreVelo' => $reservationTransport->getNombreVelo(),
             ]);
+        }
+
+        if ($form->isSubmitted() && !$form->isValid() && $request->isXmlHttpRequest()) {
+            $errors = [];
+            foreach ($form->getErrors(true) as $error) {
+                $errors[$error->getOrigin()->getName()] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errors], 400);
         }
 
         return $this->render('reservation_transport/new.html.twig', [
