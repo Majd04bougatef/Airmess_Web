@@ -209,6 +209,28 @@
     font-size: 0.875em;
     margin-top: 0.25rem;
 }
+
+/* Error message styling */
+.form-error {
+    color: #ff0000;
+    font-size: 0.9em;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    display: block;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #ff0000;
+    font-size: 0.9em;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+/* Remove validation styling */
+.is-invalid {
+    border-color: #e2e8f0 !important;
+}
 </style>
 {% endblock %}
 
@@ -274,11 +296,13 @@ function initFormMap() {
                 <div class="form-floating">
                     {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                     {{ form_label(form.nom, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_errors(form.nom) }}
                 </div>
                 
                 <div class="form-floating">
                     {{ form_widget(form.capacite, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                     {{ form_label(form.capacite, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_errors(form.capacite) }}
                 </div>
             </div>
 
@@ -286,11 +310,13 @@ function initFormMap() {
                 <div class="form-floating">
                     {{ form_widget(form.nombreVelo, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                     {{ form_label(form.nombreVelo, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_errors(form.nombreVelo) }}
                 </div>
                 
                 <div class="form-floating">
                     {{ form_widget(form.typeVelo, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                     {{ form_label(form.typeVelo, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_errors(form.typeVelo) }}
                 </div>
             </div>
 
@@ -298,11 +324,13 @@ function initFormMap() {
                 <div class="form-floating">
                     {{ form_widget(form.prixHeure, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                     {{ form_label(form.prixHeure, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_errors(form.prixHeure) }}
                 </div>
                 
                 <div class="form-floating">
                     {{ form_widget(form.pays, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                     {{ form_label(form.pays, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_errors(form.pays) }}
                 </div>
             </div>
         </div>
@@ -318,7 +346,9 @@ function initFormMap() {
             <div id="map"></div>
             <p class="map-instructions">Cliquez sur la carte ou faites glisser le marqueur pour sélectionner l'emplacement de la station</p>
             {{ form_widget(form.latitude, {'attr': {'style': 'display: none'}}) }}
+            {{ form_errors(form.latitude) }}
             {{ form_widget(form.longitude, {'attr': {'style': 'display: none'}}) }}
+            {{ form_errors(form.longitude) }}
         </div>
     </div>
 
