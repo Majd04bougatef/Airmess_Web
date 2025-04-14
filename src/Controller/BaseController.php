@@ -14,12 +14,13 @@ class BaseController extends AbstractController
         return $this->render('base.html.twig');
     }
 
-    #[Route('/login', name: 'app_login')]
-    public function login(): Response
-    {
-        return $this->render('login/login.html.twig');
-    }
-
+    // Removing duplicate login route that conflicts with SecurityController
+    // #[Route('/login', name: 'app_login')] 
+    // public function login(): Response
+    // {
+    //     return $this->render('login/login.html.twig');
+    // }
+    
     
 
 }

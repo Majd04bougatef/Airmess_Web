@@ -1,0 +1,923 @@
+<?php
+
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Extension\CoreExtension;
+use Twig\Extension\SandboxExtension;
+use Twig\Markup;
+use Twig\Sandbox\SecurityError;
+use Twig\Sandbox\SecurityNotAllowedTagError;
+use Twig\Sandbox\SecurityNotAllowedFilterError;
+use Twig\Sandbox\SecurityNotAllowedFunctionError;
+use Twig\Source;
+use Twig\Template;
+use Twig\TemplateWrapper;
+
+/* dashEntreprise/dashboardEntreprise.html.twig */
+class __TwigTemplate_4a7ecfe916917e68e2f3ba923780fea5 extends Template
+{
+    private Source $source;
+    /**
+     * @var array<string, Template>
+     */
+    private array $macros = [];
+
+    public function __construct(Environment $env)
+    {
+        parent::__construct($env);
+
+        $this->source = $this->getSourceContext();
+
+        $this->parent = false;
+
+        $this->blocks = [
+            'title' => [$this, 'block_title'],
+            'stylesheets' => [$this, 'block_stylesheets'],
+            'body' => [$this, 'block_body'],
+            'js' => [$this, 'block_js'],
+        ];
+    }
+
+    protected function doDisplay(array $context, array $blocks = []): iterable
+    {
+        $macros = $this->macros;
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "dashEntreprise/dashboardEntreprise.html.twig"));
+
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "dashEntreprise/dashboardEntreprise.html.twig"));
+
+        // line 1
+        yield "<!DOCTYPE html>
+<html lang=\"en\">
+
+<head>
+  <meta charset=\"utf-8\" />
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">
+  
+  <title>";
+        // line 8
+        yield from $this->unwrap()->yieldBlock('title', $context, $blocks);
+        yield "</title>
+  <link rel=\"icon\" href=\"";
+        // line 9
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-airmess.png"), "html", null, true);
+        yield "\" type=\"image/png\">
+
+  <!--     Fonts and icons     -->
+  <link href=\"https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700\" rel=\"stylesheet\" />
+  <!-- Nucleo Icons -->
+  <link href=\"https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css\" rel=\"stylesheet\" />
+  <link href=\"https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-svg.css\" rel=\"stylesheet\" />
+  <!-- Font Awesome Icons -->
+  <script src=\"https://kit.fontawesome.com/42d5adcbca.js\" crossorigin=\"anonymous\"></script>
+  <!-- CSS Files -->
+  <link id=\"pagestyle\" href=\"";
+        // line 19
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("css/argon-dashboard.css"), "html", null, true);
+        yield "\" rel=\"stylesheet\" />
+  
+  ";
+        // line 21
+        yield from $this->unwrap()->yieldBlock('stylesheets', $context, $blocks);
+        // line 24
+        yield "</head>
+
+<body class=\"g-sidenav-show bg-gray-100\">
+  <div class=\"min-height-300 bg-dark position-absolute w-100\"></div>
+  <aside class=\"sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 \" id=\"sidenav-main\">
+    <div class=\"sidenav-header\">
+      <i class=\"fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none\" aria-hidden=\"true\" id=\"iconSidenav\"></i>
+      <a class=\"navbar-brand m-0\" href=\"";
+        // line 31
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_base");
+        yield "\" target=\"_blank\">
+        <img src=\"";
+        // line 32
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-airmess.png"), "html", null, true);
+        yield "\" width=\"40px\" height=\"45px\" class=\"navbar-brand-img h-100\" alt=\"main_logo\">
+        <span class=\"ms-1 font-weight-bold\">Airmess</span>
+      </a>
+    </div>
+    <hr class=\"horizontal dark mt-0\">
+    <div class=\"collapse navbar-collapse  w-auto \" id=\"sidenav-collapse-main\">
+      <ul class=\"navbar-nav\">
+        <li class=\"nav-item\">
+          <a class=\"nav-link active\" href=\"";
+        // line 40
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("dashboardEntreprise_page");
+        yield "\" id=\"dashboard-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <i class=\"ni ni-tv-2 text-dark text-sm opacity-10\"></i>
+            </div>
+            <span class=\"nav-link-text ms-1\">Dashboard</span>
+          </a>
+        </li>
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"";
+        // line 48
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("userEntreprise_page");
+        yield "\" id=\"user-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"";
+        // line 50
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/user-icon.png"), "html", null, true);
+        yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Utilisateurs</span>
+          </a>
+        </li>
+
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"";
+        // line 57
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_station_new");
+        yield "\" id=\"station-button-ajouter\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"";
+        // line 59
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/ajouter-un-bouton.png"), "html", null, true);
+        yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Ajouter Stations</span>
+          </a>
+        </li>
+
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"";
+        // line 66
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_station_index");
+        yield "\" id=\"station-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"";
+        // line 68
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/station-icon.png"), "html", null, true);
+        yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Stations</span>
+          </a>
+        </li>
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"";
+        // line 74
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("bonplanEntreprise_page");
+        yield "\" id=\"bonplan-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"";
+        // line 76
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/bonplan-icon.png"), "html", null, true);
+        yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />            </div>
+            <span class=\"nav-link-text ms-1\">Bon Plan</span>
+          </a>
+        </li>
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"";
+        // line 81
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("offreEntreprise_page");
+        yield "\" id=\"offre-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"";
+        // line 83
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/offre-icon.png"), "html", null, true);
+        yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Offres</span>
+          </a>
+        </li>
+
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"";
+        // line 90
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("socialEntreprise_page");
+        yield "\" id=\"social-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"";
+        // line 92
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/social-icon.png"), "html", null, true);
+        yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Social Media</span>
+          </a>
+        </li>
+        <li class=\"nav-item mt-3\">
+          <h6 class=\"ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6\">Account pages</h6>
+        </li>
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"#\" id=\"profile-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <i class=\"ni ni-single-02 text-dark text-sm opacity-10\"></i>
+            </div>
+            <span class=\"nav-link-text ms-1\">Profile</span>
+          </a>
+        </li>
+      
+      </ul>
+    </div>
+    <div class=\"sidenav-footer mx-3 \">
+      <div class=\"card card-plain shadow-none\" id=\"sidenavCard\">
+        <img class=\"w-50 mx-auto\" src=\"";
+        // line 113
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/illustrations/icon-documentation.svg"), "html", null, true);
+        yield "\" alt=\"sidebar_illustration\">
+        <div class=\"card-body text-center p-3 w-100 pt-0\">
+          <div class=\"docs-info\">
+            <h6 class=\"mb-0\">Need help?</h6>
+            <p class=\"text-xs font-weight-bold mb-0\">Please check our docs</p>
+          </div>
+        </div>
+      </div>
+      <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
+      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"";
+        // line 122
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
+        yield "\" type=\"button\">Se déconnecter</a>
+    </div>
+  </aside>
+  <main class=\"main-content position-relative border-radius-lg \">
+
+   
+<nav class=\"navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl \" id=\"navbarBlur\" data-scroll=\"false\">
+      <div class=\"container-fluid py-1 px-3\">
+        <nav aria-label=\"breadcrumb\">
+          <ol class=\"breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5\">
+            <li class=\"breadcrumb-item text-sm\"><a class=\"opacity-5 text-white\" href=\"javascript:;\">Pages</a></li>
+            <li class=\"breadcrumb-item text-sm text-white active\" aria-current=\"page\">Dashboard</li>
+          </ol>
+          <h6 class=\"font-weight-bolder text-white mb-0\">Dashboard</h6>
+        </nav>
+        <div class=\"collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4\" id=\"navbar\">
+          <div class=\"ms-md-auto pe-md-3 d-flex align-items-center\">
+            <div class=\"input-group\">
+              <span class=\"input-group-text text-body\"><i class=\"fas fa-search\" aria-hidden=\"true\"></i></span>
+              <input type=\"text\" class=\"form-control\" placeholder=\"Type here...\">
+            </div>
+          </div>
+          <ul class=\"navbar-nav  justify-content-end\">
+            <li class=\"nav-item d-flex align-items-center\">
+              <a href=\"javascript:;\" class=\"nav-link text-white font-weight-bold px-0\">
+                <i class=\"fa fa-user me-sm-1\"></i>
+                <span class=\"d-sm-inline d-none\">Sign In</span>
+              </a>
+            </li>
+            <li class=\"nav-item d-xl-none ps-3 d-flex align-items-center\">
+              <a href=\"javascript:;\" class=\"nav-link text-white p-0\" id=\"iconNavbarSidenav\">
+                <div class=\"sidenav-toggler-inner\">
+                  <i class=\"sidenav-toggler-line bg-white\"></i>
+                  <i class=\"sidenav-toggler-line bg-white\"></i>
+                  <i class=\"sidenav-toggler-line bg-white\"></i>
+                </div>
+              </a>
+            </li>
+            <li class=\"nav-item px-3 d-flex align-items-center\">
+              <a href=\"javascript:;\" class=\"nav-link text-white p-0\">
+                <i class=\"fa fa-cog fixed-plugin-button-nav cursor-pointer\"></i>
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class=\"container-fluid py-4\">
+      ";
+        // line 171
+        yield from $this->unwrap()->yieldBlock('body', $context, $blocks);
+        // line 192
+        yield "    </div>
+  </main>
+  <div class=\"fixed-plugin\">
+    <a class=\"fixed-plugin-button text-dark position-fixed px-3 py-2\">
+      <i class=\"fa fa-cog py-2\"> </i>
+    </a>
+    <div class=\"card shadow-lg\">
+      <div class=\"card-header pb-0 pt-3 \">
+        <div class=\"float-start\">
+          <h5 class=\"mt-3 mb-0\">Argon Configurator</h5>
+          <p>See our dashboard options.</p>
+        </div>
+        <div class=\"float-end mt-4\">
+          <button class=\"btn btn-link text-dark p-0 fixed-plugin-close-button\">
+            <i class=\"fa fa-close\"></i>
+          </button>
+        </div>
+        <!-- End Toggle Button -->
+      </div>
+      <hr class=\"horizontal dark my-1\">
+      <div class=\"card-body pt-sm-3 pt-0 overflow-auto\">
+        <!-- Sidebar Backgrounds -->
+        <div>
+          <h6 class=\"mb-0\">Sidebar Colors</h6>
+        </div>
+        <a href=\"javascript:void(0)\" class=\"switch-trigger background-color\">
+          <div class=\"badge-colors my-2 text-start\">
+            <span class=\"badge filter bg-gradient-primary active\" data-color=\"primary\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-dark\" data-color=\"dark\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-info\" data-color=\"info\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-success\" data-color=\"success\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-warning\" data-color=\"warning\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-danger\" data-color=\"danger\" onclick=\"sidebarColor(this)\"></span>
+          </div>
+        </a>
+        <!-- Sidenav Type -->
+        <div class=\"mt-3\">
+          <h6 class=\"mb-0\">Sidenav Type</h6>
+          <p class=\"text-sm\">Choose between 2 different sidenav types.</p>
+        </div>
+        <div class=\"d-flex\">
+          <button class=\"btn bg-gradient-primary w-100 px-3 mb-2 active me-2\" data-class=\"bg-white\" onclick=\"sidebarType(this)\">White</button>
+          <button class=\"btn bg-gradient-primary w-100 px-3 mb-2\" data-class=\"bg-default\" onclick=\"sidebarType(this)\">Dark</button>
+        </div>
+        <p class=\"text-sm d-xl-none d-block mt-2\">You can change the sidenav type just on desktop view.</p>
+        <!-- Navbar Fixed -->
+        <div class=\"d-flex my-3\">
+          <h6 class=\"mb-0\">Navbar Fixed</h6>
+          <div class=\"form-check form-switch ps-0 ms-auto my-auto\">
+            <input class=\"form-check-input mt-1 ms-auto\" type=\"checkbox\" id=\"navbarFixed\" onclick=\"navbarFixed(this)\">
+          </div>
+        </div>
+        <hr class=\"horizontal dark my-sm-4\">
+        <div class=\"mt-2 mb-5 d-flex\">
+          <h6 class=\"mb-0\">Light / Dark</h6>
+          <div class=\"form-check form-switch ps-0 ms-auto my-auto\">
+            <input class=\"form-check-input mt-1 ms-auto\" type=\"checkbox\" id=\"dark-version\" onclick=\"darkMode(this)\">
+          </div>
+        </div>
+        <a class=\"btn bg-gradient-dark w-100\" href=\"https://www.creative-tim.com/product/argon-dashboard\">Free Download</a>
+        <a class=\"btn btn-outline-dark w-100\" href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\">View documentation</a>
+        <div class=\"w-100 text-center\">
+          <a class=\"github-button\" href=\"https://github.com/creativetimofficial/argon-dashboard\" data-icon=\"octicon-star\" data-size=\"large\" data-show-count=\"true\" aria-label=\"Star creativetimofficial/argon-dashboard on GitHub\">Star</a>
+          <h6 class=\"mt-3\">Thank you for sharing!</h6>
+          <a href=\"https://twitter.com/intent/tweet?text=Check%20Argon%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fargon-dashboard\" class=\"btn btn-dark mb-0 me-2\" target=\"_blank\">
+            <i class=\"fab fa-twitter me-1\" aria-hidden=\"true\"></i> Tweet
+          </a>
+          <a href=\"https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/argon-dashboard\" class=\"btn btn-dark mb-0 me-2\" target=\"_blank\">
+            <i class=\"fab fa-facebook-square me-1\" aria-hidden=\"true\"></i> Share
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Core JS Files -->
+  <script src=\"";
+        // line 268
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core/popper.min.js"), "html", null, true);
+        yield "\"></script>
+  <script src=\"";
+        // line 269
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core/bootstrap.min.js"), "html", null, true);
+        yield "\"></script>
+  <script src=\"";
+        // line 270
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/plugins/perfect-scrollbar.min.js"), "html", null, true);
+        yield "\"></script>
+  <script src=\"";
+        // line 271
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/plugins/smooth-scrollbar.min.js"), "html", null, true);
+        yield "\"></script>
+  <script src=\"";
+        // line 272
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/plugins/chartjs.min.js"), "html", null, true);
+        yield "\"></script>
+  
+  ";
+        // line 274
+        yield from $this->unwrap()->yieldBlock('js', $context, $blocks);
+        // line 277
+        yield "  
+  <script>
+    document.addEventListener(\"DOMContentLoaded\", function() {
+      // Mark the current page as active
+      markActiveLink();
+    });
+    
+    function markActiveLink() {
+      // Get the current URL
+      var currentUrl = window.location.pathname;
+      
+      // Find all navigation links
+      var navLinks = document.querySelectorAll('.nav-link');
+      
+      // Loop through links and check if the href matches the current URL
+      navLinks.forEach(function(link) {
+        var linkUrl = link.getAttribute('href');
+        
+        // Check if the current URL contains the link URL
+        if (linkUrl && currentUrl.includes(linkUrl) && linkUrl !== '#') {
+          // Remove active class from all links
+          navLinks.forEach(function(l) {
+            l.classList.remove('active');
+          });
+          
+          // Add active class to matching link
+          link.classList.add('active');
+          
+          // Update breadcrumb
+          var pageName = link.querySelector('.nav-link-text').innerText;
+          document.querySelector('.breadcrumb-item.active').innerText = pageName;
+          document.querySelector('.font-weight-bolder.text-white.mb-0').innerText = pageName;
+        }
+      });
+    }
+
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  
+  <!-- Github buttons -->
+  <script async defer src=\"https://buttons.github.io/buttons.js\"></script>
+  <!-- Control Center for Dashboard -->
+  <script src=\"";
+        // line 325
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/argon-dashboard.min.js"), "html", null, true);
+        yield "\"></script>
+</body>
+
+</html>";
+        
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
+
+        
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
+
+        yield from [];
+    }
+
+    // line 8
+    /**
+     * @return iterable<null|scalar|\Stringable>
+     */
+    public function block_title(array $context, array $blocks = []): iterable
+    {
+        $macros = $this->macros;
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "title"));
+
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "title"));
+
+        yield "Airmess Dashboard";
+        
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
+
+        
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
+
+        yield from [];
+    }
+
+    // line 21
+    /**
+     * @return iterable<null|scalar|\Stringable>
+     */
+    public function block_stylesheets(array $context, array $blocks = []): iterable
+    {
+        $macros = $this->macros;
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "stylesheets"));
+
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "stylesheets"));
+
+        // line 22
+        yield "  <!-- Additional stylesheets can be added here -->
+  ";
+        
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
+
+        
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
+
+        yield from [];
+    }
+
+    // line 171
+    /**
+     * @return iterable<null|scalar|\Stringable>
+     */
+    public function block_body(array $context, array $blocks = []): iterable
+    {
+        $macros = $this->macros;
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
+
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
+
+        // line 172
+        yield "      <div class=\"row\">
+        <div class=\"col-12\">
+          <div class=\"card mb-4\">
+            <div class=\"card-header pb-0\">
+              <h6>Bienvenue sur le tableau de bord d'Airmess</h6>
+            </div>
+            <div class=\"card-body px-0 pt-0 pb-2\">
+              <div class=\"p-4\">
+                <p>Chargement du contenu en cours...</p>
+                <div class=\"text-center\">
+                  <div class=\"spinner-border text-primary\" role=\"status\">
+                    <span class=\"visually-hidden\">Loading...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      ";
+        
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
+
+        
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
+
+        yield from [];
+    }
+
+    // line 274
+    /**
+     * @return iterable<null|scalar|\Stringable>
+     */
+    public function block_js(array $context, array $blocks = []): iterable
+    {
+        $macros = $this->macros;
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "js"));
+
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "js"));
+
+        // line 275
+        yield "  <!-- Additional scripts can be added here -->
+  ";
+        
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
+
+        
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
+
+        yield from [];
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function getTemplateName(): string
+    {
+        return "dashEntreprise/dashboardEntreprise.html.twig";
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function isTraitable(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function getDebugInfo(): array
+    {
+        return array (  557 => 275,  544 => 274,  514 => 172,  501 => 171,  489 => 22,  476 => 21,  453 => 8,  438 => 325,  388 => 277,  386 => 274,  381 => 272,  377 => 271,  373 => 270,  369 => 269,  365 => 268,  287 => 192,  285 => 171,  233 => 122,  221 => 113,  197 => 92,  192 => 90,  182 => 83,  177 => 81,  169 => 76,  164 => 74,  155 => 68,  150 => 66,  140 => 59,  135 => 57,  125 => 50,  120 => 48,  109 => 40,  98 => 32,  94 => 31,  85 => 24,  83 => 21,  78 => 19,  65 => 9,  61 => 8,  52 => 1,);
+    }
+
+    public function getSourceContext(): Source
+    {
+        return new Source("<!DOCTYPE html>
+<html lang=\"en\">
+
+<head>
+  <meta charset=\"utf-8\" />
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">
+  
+  <title>{% block title %}Airmess Dashboard{% endblock %}</title>
+  <link rel=\"icon\" href=\"{{ asset('images/logo-airmess.png') }}\" type=\"image/png\">
+
+  <!--     Fonts and icons     -->
+  <link href=\"https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700\" rel=\"stylesheet\" />
+  <!-- Nucleo Icons -->
+  <link href=\"https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css\" rel=\"stylesheet\" />
+  <link href=\"https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-svg.css\" rel=\"stylesheet\" />
+  <!-- Font Awesome Icons -->
+  <script src=\"https://kit.fontawesome.com/42d5adcbca.js\" crossorigin=\"anonymous\"></script>
+  <!-- CSS Files -->
+  <link id=\"pagestyle\" href=\"{{asset('css/argon-dashboard.css')}}\" rel=\"stylesheet\" />
+  
+  {% block stylesheets %}
+  <!-- Additional stylesheets can be added here -->
+  {% endblock %}
+</head>
+
+<body class=\"g-sidenav-show bg-gray-100\">
+  <div class=\"min-height-300 bg-dark position-absolute w-100\"></div>
+  <aside class=\"sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 \" id=\"sidenav-main\">
+    <div class=\"sidenav-header\">
+      <i class=\"fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none\" aria-hidden=\"true\" id=\"iconSidenav\"></i>
+      <a class=\"navbar-brand m-0\" href=\"{{ path('app_base') }}\" target=\"_blank\">
+        <img src=\"{{asset('images/logo-airmess.png')}}\" width=\"40px\" height=\"45px\" class=\"navbar-brand-img h-100\" alt=\"main_logo\">
+        <span class=\"ms-1 font-weight-bold\">Airmess</span>
+      </a>
+    </div>
+    <hr class=\"horizontal dark mt-0\">
+    <div class=\"collapse navbar-collapse  w-auto \" id=\"sidenav-collapse-main\">
+      <ul class=\"navbar-nav\">
+        <li class=\"nav-item\">
+          <a class=\"nav-link active\" href=\"{{ path('dashboardEntreprise_page') }}\" id=\"dashboard-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <i class=\"ni ni-tv-2 text-dark text-sm opacity-10\"></i>
+            </div>
+            <span class=\"nav-link-text ms-1\">Dashboard</span>
+          </a>
+        </li>
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"{{ path('userEntreprise_page') }}\" id=\"user-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"{{ asset('images/user-icon.png') }}\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Utilisateurs</span>
+          </a>
+        </li>
+
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"{{ path('app_station_new') }}\" id=\"station-button-ajouter\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"{{ asset('images/ajouter-un-bouton.png') }}\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Ajouter Stations</span>
+          </a>
+        </li>
+
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"{{ path('app_station_index') }}\" id=\"station-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"{{ asset('images/station-icon.png') }}\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Stations</span>
+          </a>
+        </li>
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"{{ path('bonplanEntreprise_page') }}\" id=\"bonplan-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"{{ asset('images/bonplan-icon.png') }}\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />            </div>
+            <span class=\"nav-link-text ms-1\">Bon Plan</span>
+          </a>
+        </li>
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"{{ path('offreEntreprise_page') }}\" id=\"offre-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"{{ asset('images/offre-icon.png') }}\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Offres</span>
+          </a>
+        </li>
+
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"{{ path('socialEntreprise_page') }}\" id=\"social-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <img src=\"{{ asset('images/social-icon.png') }}\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
+            </div>
+            <span class=\"nav-link-text ms-1\">Social Media</span>
+          </a>
+        </li>
+        <li class=\"nav-item mt-3\">
+          <h6 class=\"ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6\">Account pages</h6>
+        </li>
+        <li class=\"nav-item\">
+          <a class=\"nav-link\" href=\"#\" id=\"profile-button\">
+            <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
+              <i class=\"ni ni-single-02 text-dark text-sm opacity-10\"></i>
+            </div>
+            <span class=\"nav-link-text ms-1\">Profile</span>
+          </a>
+        </li>
+      
+      </ul>
+    </div>
+    <div class=\"sidenav-footer mx-3 \">
+      <div class=\"card card-plain shadow-none\" id=\"sidenavCard\">
+        <img class=\"w-50 mx-auto\" src=\"{{asset('img/illustrations/icon-documentation.svg')}}\" alt=\"sidebar_illustration\">
+        <div class=\"card-body text-center p-3 w-100 pt-0\">
+          <div class=\"docs-info\">
+            <h6 class=\"mb-0\">Need help?</h6>
+            <p class=\"text-xs font-weight-bold mb-0\">Please check our docs</p>
+          </div>
+        </div>
+      </div>
+      <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
+      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"{{path('app_logout')}}\" type=\"button\">Se déconnecter</a>
+    </div>
+  </aside>
+  <main class=\"main-content position-relative border-radius-lg \">
+
+   
+<nav class=\"navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl \" id=\"navbarBlur\" data-scroll=\"false\">
+      <div class=\"container-fluid py-1 px-3\">
+        <nav aria-label=\"breadcrumb\">
+          <ol class=\"breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5\">
+            <li class=\"breadcrumb-item text-sm\"><a class=\"opacity-5 text-white\" href=\"javascript:;\">Pages</a></li>
+            <li class=\"breadcrumb-item text-sm text-white active\" aria-current=\"page\">Dashboard</li>
+          </ol>
+          <h6 class=\"font-weight-bolder text-white mb-0\">Dashboard</h6>
+        </nav>
+        <div class=\"collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4\" id=\"navbar\">
+          <div class=\"ms-md-auto pe-md-3 d-flex align-items-center\">
+            <div class=\"input-group\">
+              <span class=\"input-group-text text-body\"><i class=\"fas fa-search\" aria-hidden=\"true\"></i></span>
+              <input type=\"text\" class=\"form-control\" placeholder=\"Type here...\">
+            </div>
+          </div>
+          <ul class=\"navbar-nav  justify-content-end\">
+            <li class=\"nav-item d-flex align-items-center\">
+              <a href=\"javascript:;\" class=\"nav-link text-white font-weight-bold px-0\">
+                <i class=\"fa fa-user me-sm-1\"></i>
+                <span class=\"d-sm-inline d-none\">Sign In</span>
+              </a>
+            </li>
+            <li class=\"nav-item d-xl-none ps-3 d-flex align-items-center\">
+              <a href=\"javascript:;\" class=\"nav-link text-white p-0\" id=\"iconNavbarSidenav\">
+                <div class=\"sidenav-toggler-inner\">
+                  <i class=\"sidenav-toggler-line bg-white\"></i>
+                  <i class=\"sidenav-toggler-line bg-white\"></i>
+                  <i class=\"sidenav-toggler-line bg-white\"></i>
+                </div>
+              </a>
+            </li>
+            <li class=\"nav-item px-3 d-flex align-items-center\">
+              <a href=\"javascript:;\" class=\"nav-link text-white p-0\">
+                <i class=\"fa fa-cog fixed-plugin-button-nav cursor-pointer\"></i>
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class=\"container-fluid py-4\">
+      {% block body %}
+      <div class=\"row\">
+        <div class=\"col-12\">
+          <div class=\"card mb-4\">
+            <div class=\"card-header pb-0\">
+              <h6>Bienvenue sur le tableau de bord d'Airmess</h6>
+            </div>
+            <div class=\"card-body px-0 pt-0 pb-2\">
+              <div class=\"p-4\">
+                <p>Chargement du contenu en cours...</p>
+                <div class=\"text-center\">
+                  <div class=\"spinner-border text-primary\" role=\"status\">
+                    <span class=\"visually-hidden\">Loading...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endblock %}
+    </div>
+  </main>
+  <div class=\"fixed-plugin\">
+    <a class=\"fixed-plugin-button text-dark position-fixed px-3 py-2\">
+      <i class=\"fa fa-cog py-2\"> </i>
+    </a>
+    <div class=\"card shadow-lg\">
+      <div class=\"card-header pb-0 pt-3 \">
+        <div class=\"float-start\">
+          <h5 class=\"mt-3 mb-0\">Argon Configurator</h5>
+          <p>See our dashboard options.</p>
+        </div>
+        <div class=\"float-end mt-4\">
+          <button class=\"btn btn-link text-dark p-0 fixed-plugin-close-button\">
+            <i class=\"fa fa-close\"></i>
+          </button>
+        </div>
+        <!-- End Toggle Button -->
+      </div>
+      <hr class=\"horizontal dark my-1\">
+      <div class=\"card-body pt-sm-3 pt-0 overflow-auto\">
+        <!-- Sidebar Backgrounds -->
+        <div>
+          <h6 class=\"mb-0\">Sidebar Colors</h6>
+        </div>
+        <a href=\"javascript:void(0)\" class=\"switch-trigger background-color\">
+          <div class=\"badge-colors my-2 text-start\">
+            <span class=\"badge filter bg-gradient-primary active\" data-color=\"primary\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-dark\" data-color=\"dark\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-info\" data-color=\"info\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-success\" data-color=\"success\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-warning\" data-color=\"warning\" onclick=\"sidebarColor(this)\"></span>
+            <span class=\"badge filter bg-gradient-danger\" data-color=\"danger\" onclick=\"sidebarColor(this)\"></span>
+          </div>
+        </a>
+        <!-- Sidenav Type -->
+        <div class=\"mt-3\">
+          <h6 class=\"mb-0\">Sidenav Type</h6>
+          <p class=\"text-sm\">Choose between 2 different sidenav types.</p>
+        </div>
+        <div class=\"d-flex\">
+          <button class=\"btn bg-gradient-primary w-100 px-3 mb-2 active me-2\" data-class=\"bg-white\" onclick=\"sidebarType(this)\">White</button>
+          <button class=\"btn bg-gradient-primary w-100 px-3 mb-2\" data-class=\"bg-default\" onclick=\"sidebarType(this)\">Dark</button>
+        </div>
+        <p class=\"text-sm d-xl-none d-block mt-2\">You can change the sidenav type just on desktop view.</p>
+        <!-- Navbar Fixed -->
+        <div class=\"d-flex my-3\">
+          <h6 class=\"mb-0\">Navbar Fixed</h6>
+          <div class=\"form-check form-switch ps-0 ms-auto my-auto\">
+            <input class=\"form-check-input mt-1 ms-auto\" type=\"checkbox\" id=\"navbarFixed\" onclick=\"navbarFixed(this)\">
+          </div>
+        </div>
+        <hr class=\"horizontal dark my-sm-4\">
+        <div class=\"mt-2 mb-5 d-flex\">
+          <h6 class=\"mb-0\">Light / Dark</h6>
+          <div class=\"form-check form-switch ps-0 ms-auto my-auto\">
+            <input class=\"form-check-input mt-1 ms-auto\" type=\"checkbox\" id=\"dark-version\" onclick=\"darkMode(this)\">
+          </div>
+        </div>
+        <a class=\"btn bg-gradient-dark w-100\" href=\"https://www.creative-tim.com/product/argon-dashboard\">Free Download</a>
+        <a class=\"btn btn-outline-dark w-100\" href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\">View documentation</a>
+        <div class=\"w-100 text-center\">
+          <a class=\"github-button\" href=\"https://github.com/creativetimofficial/argon-dashboard\" data-icon=\"octicon-star\" data-size=\"large\" data-show-count=\"true\" aria-label=\"Star creativetimofficial/argon-dashboard on GitHub\">Star</a>
+          <h6 class=\"mt-3\">Thank you for sharing!</h6>
+          <a href=\"https://twitter.com/intent/tweet?text=Check%20Argon%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fargon-dashboard\" class=\"btn btn-dark mb-0 me-2\" target=\"_blank\">
+            <i class=\"fab fa-twitter me-1\" aria-hidden=\"true\"></i> Tweet
+          </a>
+          <a href=\"https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/argon-dashboard\" class=\"btn btn-dark mb-0 me-2\" target=\"_blank\">
+            <i class=\"fab fa-facebook-square me-1\" aria-hidden=\"true\"></i> Share
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Core JS Files -->
+  <script src=\"{{asset('js/core/popper.min.js')}}\"></script>
+  <script src=\"{{asset('js/core/bootstrap.min.js')}}\"></script>
+  <script src=\"{{asset('js/plugins/perfect-scrollbar.min.js')}}\"></script>
+  <script src=\"{{asset('js/plugins/smooth-scrollbar.min.js')}}\"></script>
+  <script src=\"{{asset('js/plugins/chartjs.min.js')}}\"></script>
+  
+  {% block js %}
+  <!-- Additional scripts can be added here -->
+  {% endblock %}
+  
+  <script>
+    document.addEventListener(\"DOMContentLoaded\", function() {
+      // Mark the current page as active
+      markActiveLink();
+    });
+    
+    function markActiveLink() {
+      // Get the current URL
+      var currentUrl = window.location.pathname;
+      
+      // Find all navigation links
+      var navLinks = document.querySelectorAll('.nav-link');
+      
+      // Loop through links and check if the href matches the current URL
+      navLinks.forEach(function(link) {
+        var linkUrl = link.getAttribute('href');
+        
+        // Check if the current URL contains the link URL
+        if (linkUrl && currentUrl.includes(linkUrl) && linkUrl !== '#') {
+          // Remove active class from all links
+          navLinks.forEach(function(l) {
+            l.classList.remove('active');
+          });
+          
+          // Add active class to matching link
+          link.classList.add('active');
+          
+          // Update breadcrumb
+          var pageName = link.querySelector('.nav-link-text').innerText;
+          document.querySelector('.breadcrumb-item.active').innerText = pageName;
+          document.querySelector('.font-weight-bolder.text-white.mb-0').innerText = pageName;
+        }
+      });
+    }
+
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  
+  <!-- Github buttons -->
+  <script async defer src=\"https://buttons.github.io/buttons.js\"></script>
+  <!-- Control Center for Dashboard -->
+  <script src=\"{{asset('js/argon-dashboard.min.js')}}\"></script>
+</body>
+
+</html>", "dashEntreprise/dashboardEntreprise.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashEntreprise\\dashboardEntreprise.html.twig");
+    }
+}
