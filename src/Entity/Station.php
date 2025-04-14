@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 use App\Entity\User;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\ReservationTransport;
 use App\Repository\StationRepository;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: StationRepository::class)]
 #[ORM\Table(name: "station")]
@@ -26,6 +27,8 @@ class Station
     private Collection $reservations;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: "Le nom de la station est obligatpooire")]
+    #[Assert\Length(max: 255, maxMessage: "Le nom de la station ne peut pas dépasser {{ limit }} caractères.")]
     private string $nom;
 
     #[ORM\Column(type: "float")]
@@ -35,24 +38,33 @@ class Station
     private float $longitude;
 
     #[ORM\Column(type: "integer")]
+    #[Assert\GreaterThan(value: 10, message: "La capacité doit être supérieure à 10.")]
+    #[Assert\NotBlank(message: "La capacité est obligatoire")]
     private int $capacite;
 
     #[ORM\Column(name: "nombreVelo",type: "integer")]
+    #[Assert\LessThanOrEqual(propertyPath: "capacite", message: "Le nombre de vélos ne peut pas être supérieur à la capacité.")]
+    #[Assert\NotBlank(message: "Le nombre de vélos est obligatoire")]
     private int $nombreVelo;
 
     #[ORM\Column(name: "typeVelo",type: "string", length: 255)]
+    #[Assert\NotBlank(message: "Le type de vélo est obligatoire")]
+    #[Assert\Choice(
+        choices: ['velo électrique', 'velo urbain', 'velo de route'],
+        message: "Le type de vélo doit être l'un des suivants : {{ choices|join(', ') }}."
+    )]
+    #[Assert\Length(max: 255, maxMessage: "Le type de vélo ne peut pas dépasser {{ limit }} caractères.")]    
     private string $typeVelo;
 
     #[ORM\Column(name: "prixHeure",type: "float")]
+    #[Assert\NotBlank(message: "Le prix à l'heure est oblig")]
+    #[Assert\GreaterThan(value: 1, message: "Le prix à l'heure doit être supérieur à 0")]
     private float $prixHeure;
 
     #[ORM\Column(name: "pays",type: "string", length: 50)]
+    #[Assert\NotBlank(message: "Le pays est oblig")]
+    #[Assert\Length(max: 50, maxMessage: "Le nom du pays ne peut pas dépasser {{ limit }} caractères.")]
     private string $pays;
-
-    public function __construct()
-    {
-        $this->reservations = new ArrayCollection();
-    }
 
     // Getters et Setters
 

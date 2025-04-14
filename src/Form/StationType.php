@@ -8,6 +8,9 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Intl\Countries;
+
 
 class StationType extends AbstractType
 {
@@ -16,36 +19,38 @@ class StationType extends AbstractType
         $builder
     ->add('nom', null, [
         'attr' => ['class' => 'input-text'],
-        'label_attr' => ['class' => 'label']
     ])
     ->add('latitude', null, [
         'attr' => ['class' => 'input-text'],
-        'label_attr' => ['class' => 'label']
     ])
     ->add('longitude', null, [
         'attr' => ['class' => 'input-text'],
-        'label_attr' => ['class' => 'label']
     ])
     ->add('capacite', null, [
         'attr' => ['class' => 'input-text'],
-        'label_attr' => ['class' => 'label']
     ])
     ->add('nombreVelo', null, [
         'attr' => ['class' => 'input-text'],
-        'label_attr' => ['class' => 'label']
     ])
-    ->add('typeVelo', null, [
+    ->add('typeVelo', ChoiceType::class, [
+        'choices' => [
+            'Vélo électrique' => 'velo électrique',
+            'Vélo urbain' => 'velo urbain',
+            'Vélo de route' => 'velo de route',
+        ],
         'attr' => ['class' => 'input-text'],
-        'label_attr' => ['class' => 'label']
+        'expanded' => false, // Afficher sous forme de boutons radio
+        'multiple' => false, // Permettre un seul choix
     ])
     ->add('prixHeure', null, [
         'attr' => ['class' => 'input-text'],
-        'label_attr' => ['class' => 'label']
     ])
-    ->add('pays', null, [
+    ->add('pays', ChoiceType::class, [
+        'choices' => $this->getCountryList(),
         'attr' => ['class' => 'input-text'],
-        'label_attr' => ['class' => 'label']
-    ])
+        'expanded' => false,
+        'multiple' => false,
+    ]);
 
    ;
     }
@@ -55,5 +60,10 @@ class StationType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Station::class,
         ]);
+    }
+
+    private function getCountryList(): array
+    {
+        return Countries::getNames();
     }
 }

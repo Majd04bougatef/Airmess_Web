@@ -1,99 +1,86 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des vélos</title>
-    <style>
-        /* Reset all margins and padding */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5; /* Adding a background color to see the white navbar better */
-        }
-        
-        .navbar {
-            display: flex;
-            background: #ffffff;
-            padding: 10px;
-            justify-content: center;
-            margin: 20px auto 0; /* Center horizontally and add top margin only */
-            gap: 20px;
-            width: 90%;
-            max-width: 1200px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .navbar a {
-            color: black;
-            text-decoration: none;
-            padding: 10px 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease; /* Smooth transition for hover effects */
-        }
-        
-        .navbar .nav-link:hover {
-            color: #6c99bc;
-            border-bottom: 2px solid #6c99bc;
-        }
-        
-        /* Zone de contenu */
-        .content {
-            padding: 20px;
-            text-align: center;
-            margin: 0 auto;
-            width: 90%;
-            max-width: 1200px;
-        }
-    </style>
-</head>
-<body>
-    <!-- Menu Horizontal -->
-    <div class="navbar">
-        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Réserver</a>
-        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_index') }}')">Mes Réservations</a>
-        <a class="nav-link" onclick="loadPage('{{ path('app_reservation_transport_station') }}')">Stations</a>
-        <a class="nav-link" onclick="loadPage('{{ path('app_message_voyageurs') }}')">Discussions</a>
-    </div>
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Réserver Vélo - Airmess Dashboard{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    /* Reset all margins and padding */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
     
-    <!-- Contenu Dynamique -->
-    <div class="content" id="pageContent">
-        <p>Bienvenue dans la gestion des vélos. Sélectionnez une option.</p>
-    </div>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+    }
     
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            loadPage("{{ path('app_reservation_transport_station') }}");
-        });
-        
-        function loadPage(url) {
-            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('pageContent').innerHTML = html;
-                })
-                .catch(error => console.error('Erreur lors du chargement:', error));
-        }
-        
-        function submitForm(form) {
-            fetch(form.action, {
-                method: form.method,
-                body: new FormData(form),
-                headers: { "X-Requested-With": "XMLHttpRequest" }
-            })
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('pageContent').innerHTML = html;
-            })
-            .catch(error => console.error('Erreur lors de l\'envoi du formulaire:', error));
-        }
-    </script>
-</body>
-</html>
+    .navbar.station-nav {
+        display: flex;
+        background: #ffffff;
+        padding: 15px;
+        justify-content: space-around;
+        margin: 20px auto 0;
+        width: 90%;
+        max-width: 1200px;
+        border-radius: 15px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .navbar.station-nav a {
+        color: #3a4a5d;
+        text-decoration: none;
+        padding: 12px 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+    
+    .navbar.station-nav .nav-link:hover {
+        color: #6c99bc;
+        background-color: #f0f6ff;
+    }
+    
+    .navbar.station-nav .nav-link.active {
+        color: #ffffff;
+        background-color: #6c99bc;
+    }
+    
+    /* Zone de contenu */
+    .content {
+        padding: 30px;
+        text-align: center;
+        margin: 20px auto 0;
+        width: 90%;
+        max-width: 1200px;
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .content p {
+        color: #555;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Menu Horizontal with regular links -->
+<div class="navbar station-nav">
+    <a class="nav-link {% if app.request.get('_route') starts with 'app_reservation_transport_station' and app.request.get('_route') != 'app_reservation_transport_index' %}active{% endif %}" href="{{ path('app_reservation_transport_station') }}">Réserver</a>
+    <a class="nav-link {% if app.request.get('_route') == 'app_reservation_transport_index' %}active{% endif %}" href="{{ path('app_reservation_transport_index') }}">Mes Réservations</a>
+    <a class="nav-link {% if app.request.get('_route') == 'app_reservation_transport_station' %}active{% endif %}" href="{{ path('app_reservation_transport_station') }}">Stations</a>
+    <a class="nav-link {% if app.request.get('_route') == 'app_message_voyageurs' %}active{% endif %}" href="{{ path('app_message_voyageurs') }}">Discussions</a>
+</div>
+
+<!-- Contenu -->
+<div class="content">
+    <p>Bienvenue dans la gestion des vélos. Sélectionnez une option dans le menu à gauche.</p>
+</div>
+{% endblock %}
