@@ -14,6 +14,7 @@ class OffreType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('place')
             ->add('priceInit')
             ->add('priceAfter')
             ->add('startDate', null, [
@@ -22,13 +23,11 @@ class OffreType extends AbstractType
             ->add('endDate', null, [
                 'widget' => 'single_text',
             ])
-            ->add('numberLimit')
             ->add('description')
-            ->add('place')
             ->add('imagePath')
-            ->add('aidesc')
-           
-        ;
+            ->add('number_limit', null, [
+                'label' => 'Nombre Limite',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

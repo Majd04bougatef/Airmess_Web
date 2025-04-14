@@ -50,32 +50,39 @@ final class OffreController extends AbstractController
         ]);
     }
 
-    #[Route('/{idO}/edit', name: 'app_offre_edit', methods: ['GET', 'POST'])]
+    #[Route('/offre/{idO}/edit', name: 'app_offre_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Offre $offre, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(OffreType::class, $offre);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Enregistre les modifications dans la base de données
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_offre_index', [], Response::HTTP_SEE_OTHER);
+            // Ajoute un message de succès
+            $this->addFlash('success', 'Les modifications ont été enregistrées avec succès.');
+
+            // Redirige vers la page offrePageEntreprise
+            return $this->redirectToRoute('offreEntreprise_page');
         }
 
-        return $this->render('dashVoyageurs/edit.html.twig', [
+        return $this->render('offre/edit.html.twig', [
             'offre' => $offre,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/{idO}', name: 'app_offre_delete', methods: ['POST'])]
+    #[Route('/offre/{idO}/delete', name: 'app_offre_delete', methods: ['POST'])]
     public function delete(Request $request, Offre $offre, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$offre->getIdO(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $offre->getIdO(), $request->request->get('_token'))) {
             $entityManager->remove($offre);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Offre supprimée avec succès.');
         }
 
-        return $this->redirectToRoute('app_offre_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('offreEntreprise_page');
     }
 }

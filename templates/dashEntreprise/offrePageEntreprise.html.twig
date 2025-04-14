@@ -7,13 +7,101 @@
   <div class="row">
     <div class="col-12">
       <div class="card mb-4">
-        <div class="card-header pb-0">
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
           <h6>Gestion des Offres</h6>
+          <!-- Bouton pour ouvrir le modal -->
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOfferModal">
+            Nouvelle Offre
+          </button>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
-          <div class="p-4">
-            <p>Contenu de la page offres en cours de développement...</p>
+          <div class="table-responsive p-4">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Image</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lieu</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix Initial</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix Après Réduction</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de Début</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de Fin</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre Limite</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for offre in offres %}
+                  <tr>
+                    <td>
+                      {% if offre.imagePath %}
+                        <img src="{{ asset(offre.imagePath) }}" alt="Image de l'offre" class="img-fluid" style="max-width: 100px; max-height: 100px;">
+                      {% else %}
+                        <p class="text-xs font-weight-bold mb-0">Aucune image</p>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.place }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.priceInit }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.priceAfter }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.startDate ? offre.startDate|date('Y-m-d H:i:s') : '' }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.endDate ? offre.endDate|date('Y-m-d H:i:s') : '' }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.numberLimit }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.description }}</p>
+                    </td>
+                    <td class="align-middle">
+                      <!-- Bouton Modifier -->
+                      <a href="{{ path('app_offre_edit', {'idO': offre.idO}) }}" class="btn btn-info btn-xs" title="Modifier" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                        Modifier
+                      </a>
+
+                      <!-- Bouton Supprimer -->
+                      <form action="{{ path('app_offre_delete', {'idO': offre.idO}) }}" method="post" style="display: inline-block;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ offre.idO) }}">
+                        <button type="submit" class="btn btn-danger btn-xs" title="Supprimer" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+                          Supprimer
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="9" class="text-center">Aucune offre trouvée.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour la création d'une nouvelle offre -->
+  <div class="modal fade" id="createOfferModal" tabindex="-1" aria-labelledby="createOfferModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createOfferModalLabel">Créer une Nouvelle Offre</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn btn-primary">Créer</button>
+          {{ form_end(form) }}
         </div>
       </div>
     </div>
