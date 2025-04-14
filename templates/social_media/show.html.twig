@@ -125,6 +125,7 @@
         
         .like-button:hover, .like-button.active {
             color: var(--main-accent) !important;
+            background-color: rgba(74, 107, 218, 0.1);
         }
         
         /* Style pour l'icône Flaticon du bouton like */
@@ -139,9 +140,9 @@
             filter: drop-shadow(0px 0px 3px rgba(74, 107, 218, 0.5));
         }
         
-        .dislike-button:hover img, .dislike-button.active img {
-            transform: scale(1.15);
-            filter: drop-shadow(0px 0px 3px rgba(220, 53, 69, 0.5));
+        .dislike-button:hover, .dislike-button.active {
+            color: var(--danger-color) !important;
+            background-color: rgba(220, 53, 69, 0.1);
         }
         
         .like-count-badge img {
@@ -603,6 +604,37 @@
             min-width: 18px;
             height: 18px;
         }
+        
+        .like-button.active {
+            color: var(--main-accent) !important;
+            background-color: rgba(74, 107, 218, 0.15) !important;
+            font-weight: 500;
+        }
+        
+        .like-button.active i {
+            transform: scale(1.15);
+        }
+        
+        .dislike-button.active {
+            color: var(--danger-color) !important;
+            background-color: rgba(220, 53, 69, 0.15) !important;
+            font-weight: 500;
+        }
+        
+        .dislike-button.active i {
+            transform: scale(1.15);
+        }
+        
+        /* Styles inline pour forcer la coloration des boutons actifs */
+        button.like-button.active {
+            color: #4a6bda !important;
+            background-color: rgba(74, 107, 218, 0.15) !important;
+        }
+        
+        button.dislike-button.active {
+            color: #dc3545 !important;
+            background-color: rgba(220, 53, 69, 0.15) !important;
+        }
     </style>
 {% endblock %}
 
@@ -692,17 +724,35 @@
                     {# Like Button (Form) #}
                         <form action="{{ path('app_social_media_like', {idEB: social_media.idEB}) }}" method="POST" class="d-inline m-0 flex-grow-1 px-1 like-form">
                         <input type="hidden" name="_token" value="{{ csrf_token('like-post') }}">
-                        <button type="submit" class="btn btn-action w-100 text-muted like-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}active{% endif %}">
-                                <i class="fas fa-thumbs-up me-1"></i> <span class="action-text">J'aime</span>
+                        <button type="submit" 
+                               class="btn btn-action w-100 text-muted like-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}active{% endif %}"
+                               {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}
+                                  style="color: #4a6bda !important; background-color: rgba(74, 107, 218, 0.15) !important; font-weight: 500;"
+                               {% endif %}
+                        >
+                                <i class="fas fa-thumbs-up me-1" 
+                                   {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}
+                                       style="transform: scale(1.15);"
+                                   {% endif %}
+                                ></i> <span class="action-text">J'aime</span>
                         </button>
                     </form>
 
                     {# Dislike Button (Form) #}
                         <form action="{{ path('app_social_media_dislike', {idEB: social_media.idEB}) }}" method="POST" class="d-inline m-0 flex-grow-1 px-1 dislike-form">
                         <input type="hidden" name="_token" value="{{ csrf_token('dislike-post') }}">
-                        <button type="submit" class="btn btn-action w-100 text-muted dislike-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}active{% endif %}">
-                                <i class="fas fa-thumbs-down me-1"></i> <span class="action-text">Je n'aime pas</span>
-    </button>
+                        <button type="submit" 
+                                class="btn btn-action w-100 text-muted dislike-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}active{% endif %}"
+                                {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}
+                                   style="color: #dc3545 !important; background-color: rgba(220, 53, 69, 0.15) !important; font-weight: 500;"
+                                {% endif %}
+                        >
+                                <i class="fas fa-thumbs-down me-1"
+                                   {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}
+                                       style="transform: scale(1.15);"
+                                   {% endif %}
+                                ></i> <span class="action-text">Je n'aime pas</span>
+                        </button>
                     </form>
 
     {# Comment Link/Button #}
@@ -734,6 +784,26 @@
                 <div id="comments-area" class="comments-section p-3">
                     <h3 class="section-title fs-5">Commentaires</h3>
 
+                    {# Affichage des erreurs basé sur les paramètres d'URL #}
+                    {% if app.request.query.get('error') %}
+                        {% set error_type = app.request.query.get('error') %}
+                        <div class="alert alert-danger mb-3">
+                            {% if error_type == 'empty_comment' %}
+                                <strong>Erreur :</strong> Le commentaire ne peut pas être vide.
+                            {% elseif error_type == 'validation_failed' %}
+                                <strong>Erreur :</strong> {{ app.request.query.get('message', 'Erreur de validation du formulaire.') }}
+                            {% elseif error_type == 'forbidden_words' %}
+                                <strong>Erreur :</strong> Votre commentaire contient des mots interdits: {{ app.request.query.get('words') }}
+                            {% elseif error_type == 'database_error' %}
+                                <strong>Erreur :</strong> Une erreur s'est produite lors de l'enregistrement du commentaire.
+                            {% elseif error_type == 'form_not_submitted' %}
+                                <strong>Erreur :</strong> Le formulaire n'a pas été soumis correctement.
+                            {% else %}
+                                <strong>Erreur :</strong> Une erreur est survenue.
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
                 {# Formulaire Ajout Commentaire #}
                     <div class="add-comment-form-container d-flex align-items-start">
                         {% set current_user = app.user %}
@@ -743,16 +813,22 @@
                                 class="comment-author-img rounded-circle" width="32" height="32">
                      </div>
                      <div class="flex-grow-1">
-                        <form name="{{ comment_form.vars.name }}" method="{{ comment_form.vars.method }}" action="{{ comment_form.vars.action }}" class="add-comment-form" id="comment-form">
+                        {# Noter que la route 'ajouter_commentaire' est dépréciée. Utiliser 'app_social_media_ajouter_commentaire' à la place #}
+                        <form name="{{ comment_form.vars.name }}" method="{{ comment_form.vars.method }}" action="{{ comment_form.vars.action }}" class="add-comment-form" id="comment-form" novalidate>
                             <div class="position-relative">
-                                {{ form_widget(comment_form.description, {'attr': {'rows': 2, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control comment-input py-2 px-3', 'id': 'comment-input'}}) }}
+                                {{ form_widget(comment_form.description, {'attr': {'rows': 2, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control comment-input py-2 px-3', 'id': 'comment-input', 'required': 'required', 'minlength': '5'}}) }}
                                 {{ form_errors(comment_form.description) }}
+                                <div id="empty-comment-error" class="alert alert-danger mt-2" style="display: none;">Le commentaire ne peut pas être vide.</div>
                                 <button type="submit" class="btn btn-primary btn-send-comment" id="submit-comment" aria-label="Publier le commentaire">
                                     <i class="fas fa-paper-plane"></i>
                                 </button>
                             </div>
                             {{ form_rest(comment_form) }}
                             <input type="hidden" name="_token" value="{{ csrf_token('comment_token') }}">
+                            <div class="d-none">
+                                <p>DEBUG - Nom du formulaire: {{ comment_form.vars.name }}</p>
+                                <p>DEBUG - Nom du champ description: {{ comment_form.description.vars.full_name }}</p>
+                            </div>
                         </form>
                      </div>
                 </div>
@@ -854,89 +930,159 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Animation au chargement de la page
-            const postCard = document.querySelector('.post-card');
-            if (postCard) {
-                setTimeout(() => {
-                    postCard.style.opacity = '1';
-                    postCard.style.transform = 'translateY(0)';
-                }, 100);
+            // Force style des boutons actifs (like/dislike)
+            function applyActiveStyles() {
+                // Gestion du bouton like
+                const likeButton = document.querySelector('.like-button');
+                if (likeButton && likeButton.classList.contains('active')) {
+                    likeButton.style.color = '#4a6bda';
+                    likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
+                    likeButton.style.fontWeight = '500';
+                    const icon = likeButton.querySelector('i');
+                    if (icon) icon.style.transform = 'scale(1.15)';
+                }
+                
+                // Gestion du bouton dislike
+                const dislikeButton = document.querySelector('.dislike-button');
+                if (dislikeButton && dislikeButton.classList.contains('active')) {
+                    dislikeButton.style.color = '#dc3545';
+                    dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
+                    dislikeButton.style.fontWeight = '500';
+                    const icon = dislikeButton.querySelector('i');
+                    if (icon) icon.style.transform = 'scale(1.15)';
+                }
             }
             
-            // Animation des images
+            // Appliquer les styles immédiatement
+            applyActiveStyles();
+            
+            // Appliquer les styles à nouveau après un court délai (pour être sûr que le DOM est entièrement chargé)
+            setTimeout(applyActiveStyles, 100);
+            
+            // -------------------- GESTION DES LIKES/DISLIKES --------------------
+            const likeButton = document.querySelector('.like-button');
+            const dislikeButton = document.querySelector('.dislike-button');
+            
+            // Mettre en évidence les boutons actifs
+            if (likeButton && likeButton.classList.contains('active')) {
+                likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
+                likeButton.style.color = '#4a6bda';
+                const icon = likeButton.querySelector('i');
+                if (icon) icon.style.transform = 'scale(1.15)';
+            }
+            
+            if (dislikeButton && dislikeButton.classList.contains('active')) {
+                dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
+                dislikeButton.style.color = '#dc3545';
+                const icon = dislikeButton.querySelector('i');
+                if (icon) icon.style.transform = 'scale(1.15)';
+            }
+            
+            // Effets au survol
+            if (likeButton) {
+                likeButton.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '#4a6bda';
+                        this.style.backgroundColor = 'rgba(74, 107, 218, 0.05)';
+                    }
+                });
+                
+                likeButton.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '';
+                        this.style.backgroundColor = '';
+                    }
+                });
+            }
+            
+            if (dislikeButton) {
+                dislikeButton.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '#dc3545';
+                        this.style.backgroundColor = 'rgba(220, 53, 69, 0.05)';
+                    }
+                });
+                
+                dislikeButton.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '';
+                        this.style.backgroundColor = '';
+                    }
+                });
+            }
+            
+            // -------------------- VALIDATION DES COMMENTAIRES --------------------
+            const commentForm = document.getElementById('comment-form');
+            const commentInput = document.getElementById('comment-input');
+            const errorMessage = document.getElementById('empty-comment-error');
+            
+            if (commentForm && commentInput && errorMessage) {
+                // Fonction de validation
+                function validateComment() {
+                    const content = commentInput.value.trim();
+                    
+                    if (!content) {
+                        commentInput.classList.add('is-invalid');
+                        errorMessage.textContent = 'Le commentaire ne peut pas être vide.';
+                        errorMessage.style.display = 'block';
+                        return false;
+                    } else if (content.length < 5) {
+                        commentInput.classList.add('is-invalid');
+                        errorMessage.textContent = 'Le commentaire doit contenir au moins 5 caractères.';
+                        errorMessage.style.display = 'block';
+                        return false;
+                    } else {
+                        commentInput.classList.remove('is-invalid');
+                        errorMessage.style.display = 'none';
+                        return true;
+                    }
+                }
+                
+                // Validation en temps réel
+                commentInput.addEventListener('input', validateComment);
+                
+                // Validation à la soumission
+                commentForm.addEventListener('submit', function(e) {
+                    if (!validateComment()) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    return true;
+                });
+            }
+            
+            // -------------------- ANIMATIONS --------------------
+            // Animation image de publication
             const postImage = document.querySelector('.post-image-container img');
             if (postImage) {
-                // Appliquer un effet initial
                 postImage.style.opacity = '0';
-                postImage.style.filter = 'blur(3px)';
-                postImage.style.transform = 'scale(0.98)';
-                
-                // Fonction pour animer l'image
-                const animateImage = () => {
+                setTimeout(() => {
                     postImage.style.opacity = '1';
-                    postImage.style.filter = 'blur(0)';
-                    postImage.style.transform = 'scale(1)';
-                };
-                
-                // Déclencher l'animation après chargement
-                postImage.onload = function() {
-                    setTimeout(animateImage, 300);
-                };
-                
-                // Si l'image est déjà chargée
-                if (postImage.complete) {
-                    setTimeout(animateImage, 300);
-                }
-                
-                // Ajouter effet de brillance au survol
-                const imageContainer = document.querySelector('.post-image-container');
-                if (imageContainer) {
-                    imageContainer.addEventListener('mouseenter', function() {
-                        postImage.style.transform = 'scale(1.03)';
-                    });
-                    
-                    imageContainer.addEventListener('mouseleave', function() {
-                        postImage.style.transform = 'scale(1)';
-                    });
-                }
+                }, 300);
             }
             
-            // Animation du bouton de retour
+            // Animation bouton retour
             const backButton = document.querySelector('.btn-back');
             if (backButton) {
-                backButton.addEventListener('mouseenter', function() {
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = 'translateX(-3px)';
-                    }
-                });
-                
-                backButton.addEventListener('mouseleave', function() {
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = 'translateX(0)';
-                    }
-                });
-                
-                // Animation de transition en douceur lors du retour
                 backButton.addEventListener('click', function(e) {
                     e.preventDefault();
                     const href = this.getAttribute('href');
                     
-                    // Effet de sortie
-                    postCard.style.opacity = '0';
-                    postCard.style.transform = 'translateY(20px)';
+                    document.querySelector('.post-card').style.opacity = '0';
                     
-                    // Redirection après l'animation
                     setTimeout(() => {
                         window.location.href = href;
                     }, 300);
                 });
             }
             
-            // Effets visuels simples pour les boutons J'aime
-            const likeButtons = document.querySelectorAll('.comment-like-btn');
-            likeButtons.forEach(button => {
+            // Animation des boutons like des commentaires
+            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
+            commentLikeButtons.forEach(button => {
+                if (button.classList.contains('active')) {
+                    button.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
+                }
+                
                 button.addEventListener('mouseenter', function() {
                     this.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
                 });

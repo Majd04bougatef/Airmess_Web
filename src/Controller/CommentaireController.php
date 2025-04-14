@@ -13,6 +13,14 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\SocialMediaRepository;
 use App\Service\ForbiddenWordsChecker;
 
+/**
+ * Contrôleur pour la gestion des commentaires
+ * 
+ * Note: Pour ajouter des commentaires à une publication, utilisez préférentiellement la méthode 
+ * ajouterCommentaire du SocialMediaController (route: app_social_media_ajouter_commentaire)
+ * La méthode ajouterCommentaire de ce contrôleur est maintenue pour compatibilité mais redirige
+ * vers la méthode principale.
+ */
 #[Route('/commentaire')]
 final class CommentaireController extends AbstractController
 {
@@ -47,46 +55,6 @@ final class CommentaireController extends AbstractController
             'commentaire' => $commentaire,
             'form' => $form,
         ]);
-    }
-
-    #[Route('/ajouter/{idEB}', name: 'ajouter_commentaire', methods: ['POST'])]
-    public function ajouterCommentaire(Request $request, SocialMediaRepository $smRepo, EntityManagerInterface $em, int $idEB): Response
-    {
-        $socialMedia = $smRepo->find($idEB);
-
-        if (!$socialMedia) {
-            throw $this->createNotFoundException("Publication non trouvée.");
-        }
-
-        $content = $request->request->get('description');
-        if (empty($content)) {
-            $this->addFlash('error', 'Le commentaire ne peut pas être vide.');
-            return $this->redirectToRoute('app_social_media_show', ['idEB' => $idEB]);
-        }
-
-        if ($this->forbiddenWordsChecker->containsForbiddenWords($content)) {
-            $this->addFlash('error', 'Le commentaire contient des mots interdits.');
-            return $this->redirectToRoute('app_social_media_show', ['idEB' => $idEB]);
-        }
-
-        $commentaire = new Commentaire();
-        $commentaire->setDescription($content);
-        $commentaire->setSocialMedia($socialMedia);
-        $commentaire->setUser($this->getUser());
-        $commentaire->setNumberlike(0);
-        $commentaire->setNumberdislike(0);
-
-        $em->persist($commentaire);
-        $em->flush();
-
-        if ($request->isXmlHttpRequest()) {
-            return $this->render('commentaire/_commentaire.html.twig', [
-                'commentaire' => $commentaire
-            ]);
-        }
-
-        $this->addFlash('success', 'Commentaire ajouté avec succès !');
-        return $this->redirectToRoute('app_social_media_show', ['idEB' => $idEB]);
     }
 
     #[Route('/{idC}', name: 'app_commentaire_show', methods: ['GET'])]

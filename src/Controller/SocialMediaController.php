@@ -353,44 +353,101 @@ class SocialMediaController extends AbstractController
         }
     }
 
+    /**
+     * Ajoute un commentaire à une publication sociale
+     * 
+     * Cette méthode est la méthode principale pour l'ajout de commentaires dans l'application.
+     * Elle remplace complètement la méthode équivalente qui était dans CommentaireController.
+     *
+     * @param Request $request La requête HTTP
+     * @param SocialMedia $socialMedia L'objet publication sociale auquel ajouter le commentaire
+     * @return RedirectResponse
+     */
     #[Route('/{idEB}/commentaire', name: 'app_social_media_ajouter_commentaire', methods: ['POST'], requirements: ['idEB' => '\d+'])]
     public function ajouterCommentaire(Request $request, SocialMedia $socialMedia): RedirectResponse
     {
+        // Vérification du token CSRF
         $submittedToken = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('comment_token', $submittedToken)) {
-            $this->addFlash('error', 'Token CSRF invalide pour la soumission du commentaire.');
+            $this->addFlash('danger', 'Token CSRF invalide pour la soumission du commentaire.');
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
         }
         
+        // Debug: Afficher toutes les données de la requête pour comprendre la structure
+        $allRequestData = $request->request->all();
+        
+        // Récupérer les données du formulaire
         $commentaire = new Commentaire();
         $form = $this->createForm(CommentaireType::class, $commentaire);
         $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+        
+        // Vérification directe des données brutes pour les commentaires vides
+        $formName = $form->getName();
+        $descriptionKey = $formName ? $formName . '[description]' : 'description';
+        $rawDescription = $request->request->get($descriptionKey) ?? 
+                         ($allRequestData[$formName]['description'] ?? '');
+        
+        if (empty(trim($rawDescription))) {
+            // Redirection sans message flash pour éviter la confusion
+            return $this->redirectToRoute('app_social_media_show', [
+                'idEB' => $socialMedia->getIdEB(),
+                'error' => 'empty_comment' // Paramètre d'URL pour indiquer l'erreur au template
+            ]);
+        }
+        
+        if ($form->isSubmitted()) {
+            if (!$form->isValid()) {
+                $errorMessage = 'Erreur de validation du formulaire.';
+                foreach ($form->getErrors(true) as $error) {
+                    $errorMessage = $error->getMessage();
+                    break; // On prend juste la première erreur
+                }
+                return $this->redirectToRoute('app_social_media_show', [
+                    'idEB' => $socialMedia->getIdEB(), 
+                    'error' => 'validation_failed',
+                    'message' => $errorMessage
+                ]);
+            }
+            
+            // Vérification supplémentaire du contenu après validation du formulaire
+            if (empty(trim($commentaire->getDescription() ?? ''))) {
+                return $this->redirectToRoute('app_social_media_show', [
+                    'idEB' => $socialMedia->getIdEB(),
+                    'error' => 'empty_comment'
+                ]);
+            }
+            
+            // Si on arrive ici, le formulaire est valide
+            // Préparation du commentaire
             $defaultUser = $this->getDefaultUser();
             $commentaire->setUser($defaultUser);
             $commentaire->setSocialMedia($socialMedia);
             $commentaire->setNumberlike(0);
             $commentaire->setNumberdislike(0);
             
-            // Vérifier si le contenu du commentaire est vide
-            if (empty(trim($commentaire->getDescription()))) {
-                $this->addFlash('error', 'Le commentaire ne peut pas être vide.');
-                return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
-            }
-            
             // Vérifier les mots interdits
             $forbiddenWords = $this->forbiddenWordsChecker->containsForbiddenWords($commentaire->getDescription());
             if (!empty($forbiddenWords)) {
-                $this->addFlash('error', 'Votre commentaire contient des mots interdits: ' . implode(', ', $forbiddenWords));
-                return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+                return $this->redirectToRoute('app_social_media_show', [
+                    'idEB' => $socialMedia->getIdEB(),
+                    'error' => 'forbidden_words',
+                    'words' => implode(', ', $forbiddenWords)
+                ]);
             }
-
-            $this->entityManager->persist($commentaire);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Commentaire ajouté avec succès !');
             
+            // Enregistrement du commentaire
+            try {
+                $this->entityManager->persist($commentaire);
+                $this->entityManager->flush();
+                $this->addFlash('success', 'Commentaire ajouté avec succès !');
+            } catch (\Exception $e) {
+                return $this->redirectToRoute('app_social_media_show', [
+                    'idEB' => $socialMedia->getIdEB(),
+                    'error' => 'database_error'
+                ]);
+            }
+            
+            // Gestion de la réponse AJAX si nécessaire
             if ($request->isXmlHttpRequest()) {
                 return $this->json([
                     'success' => true,
@@ -399,14 +456,13 @@ class SocialMediaController extends AbstractController
                 ]);
             }
         } else {
-            foreach ($form->getErrors(true) as $error) {
-                $this->addFlash('error', $error->getMessage());
-            }
-            if (!$form->isSubmitted()) { 
-                $this->addFlash('error', 'Impossible d\'ajouter le commentaire (non soumis).');
-            }
+            return $this->redirectToRoute('app_social_media_show', [
+                'idEB' => $socialMedia->getIdEB(),
+                'error' => 'form_not_submitted'
+            ]);
         }
-
+        
+        // Redirection
         return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
     }
 
@@ -591,5 +647,36 @@ class SocialMediaController extends AbstractController
             'button_label' => $buttonLabel,
             'forbidden_words' => $forbiddenWords
         ], new Response(null, $status));
+    }
+
+    #[Route('/random-publications', name: 'app_social_media_random', methods: ['GET'])]
+    public function randomPublications(Request $request, SocialMediaRepository $socialMediaRepository, int $limit = 4): Response
+    {
+        // Try to get most liked publications first
+        $mostLiked = $socialMediaRepository->findMostLiked($limit);
+        
+        // If we don't have enough, get some random ones
+        if (count($mostLiked) < $limit) {
+            $random = $socialMediaRepository->findRandom($limit - count($mostLiked));
+            $publications = array_merge($mostLiked, $random);
+            
+            // Prevent duplicates
+            $uniquePublications = [];
+            foreach ($publications as $pub) {
+                $uniquePublications[$pub->getIdEB()] = $pub;
+                if (count($uniquePublications) >= $limit) {
+                    break;
+                }
+            }
+            $publications = array_values($uniquePublications);
+        } else {
+            // Shuffle to get random ones from the most liked
+            shuffle($mostLiked);
+            $publications = array_slice($mostLiked, 0, $limit);
+        }
+        
+        return $this->render('social_media/_random_publications.html.twig', [
+            'publications' => $publications,
+        ]);
     }
 }
