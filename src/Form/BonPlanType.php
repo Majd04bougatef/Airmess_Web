@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\File;
 
@@ -19,6 +20,8 @@ class BonPlanType extends AbstractType
             ->add('id_U')
             ->add('nomplace')
             ->add('localisation')
+            ->add('latitude', HiddenType::class)
+            ->add('longitude', HiddenType::class)
             ->add('description')
             ->add('typePlace')
             ->add('imageBP', FileType::class, [

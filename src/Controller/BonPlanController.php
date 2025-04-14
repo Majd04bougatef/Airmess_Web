@@ -106,4 +106,97 @@ final class BonPlanController extends AbstractController
 
         return $this->redirectToRoute('app_bonplan_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/api/add', name: 'api_bonplan_add', methods: ['POST'])]
+    public function apiAdd(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    {
+        try {
+            // Récupérer les données du formulaire
+            $nomplace = $request->request->get('nomplace');
+            $typePlace = $request->request->get('typePlace');
+            $description = $request->request->get('description');
+            $id_U = $request->request->get('id_U');
+            $localisation = $request->request->get('localisation');
+            
+            // Vérification des données obligatoires
+            if (!$nomplace || !$typePlace || !$description || !$id_U || !$localisation) {
+                return $this->json(['success' => false, 'message' => 'Tous les champs obligatoires doivent être remplis'], 400);
+            }
+            
+            // Traiter la localisation (format: "latitude,longitude")
+            $coordonnees = explode(',', $localisation);
+            if (count($coordonnees) !== 2) {
+                return $this->json(['success' => false, 'message' => 'Format de localisation invalide'], 400);
+            }
+            
+            $latitude = floatval(trim($coordonnees[0]));
+            $longitude = floatval(trim($coordonnees[1]));
+            
+            // Traiter l'image
+            $imageFile = $request->files->get('image');
+            if (!$imageFile) {
+                error_log("Aucun fichier d'image n'a été reçu. Files: " . print_r($request->files->all(), true));
+                return $this->json(['success' => false, 'message' => 'L\'image est obligatoire'], 400);
+            }
+            
+            error_log("Fichier reçu: " . $imageFile->getClientOriginalName() . ", taille: " . $imageFile->getSize() . " octets, type: " . $imageFile->getMimeType());
+            
+            // Créer un nom de fichier unique
+            $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+            
+            // S'assurer que le répertoire d'uploads existe
+            $uploadsDirectory = $this->getParameter('bonplan_uploads_directory');
+            if (!file_exists($uploadsDirectory)) {
+                mkdir($uploadsDirectory, 0777, true);
+            }
+            
+            // Déplacer le fichier dans le répertoire des uploads
+            try {
+                $imageFile->move(
+                    $uploadsDirectory,
+                    $newFilename
+                );
+                
+                // Log du succès (pour débogage)
+                error_log("Image téléchargée avec succès: " . $newFilename . " dans " . $uploadsDirectory);
+            } catch (FileException $e) {
+                // Log détaillé de l'erreur
+                error_log("Erreur lors de l'upload de l'image: " . $e->getMessage() . " - Trace: " . $e->getTraceAsString());
+                
+                return $this->json([
+                    'success' => false, 
+                    'message' => 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage(),
+                    'directory' => $uploadsDirectory
+                ], 500);
+            }
+            
+            // Créer et enregistrer le bon plan
+            $bonPlan = new BonPlan();
+            $bonPlan->setNomplace($nomplace);
+            $bonPlan->setTypePlace($typePlace);
+            $bonPlan->setDescription($description);
+            $bonPlan->setIdU(intval($id_U));
+            $bonPlan->setLocalisation($localisation);
+            $bonPlan->setLatitude($latitude);
+            $bonPlan->setLongitude($longitude);
+            $bonPlan->setImageBP($newFilename);
+            
+            $entityManager->persist($bonPlan);
+            $entityManager->flush();
+            
+            return $this->json([
+                'success' => true, 
+                'message' => 'Bon plan ajouté avec succès', 
+                'id' => $bonPlan->getId()
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false, 
+                'message' => 'Une erreur est survenue: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

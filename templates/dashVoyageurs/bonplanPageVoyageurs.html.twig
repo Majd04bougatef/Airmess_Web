@@ -7,16 +7,117 @@
   <div class="row">
     <div class="col-12">
       <div class="card mb-4">
-        <div class="card-header pb-0">
-          <h6>Bons Plans</h6>
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+          <h6>{% if app.request.query.get('action') == 'add' %}Ajouter un bon plan{% else %}Bons Plans{% endif %}</h6>
+          {% if app.request.query.get('action') != 'add' %}
+          <a href="{{ path('bonplanVoyageurs_page') }}?action=add" class="btn btn-primary btn-sm">Ajouter un bon plan</a>
+          {% endif %}
         </div>
         <div class="card-body px-0 pt-0 pb-2">
-          <div class="p-4">
-            <p>Contenu de la page bons plans en cours de développement...</p>
+          {% if app.request.query.get('action') == 'add' %}
+          <div id="bonplan-form-container">
+            <!-- Le formulaire sera chargé ici -->
+            {% include 'dashVoyageurs/bonplanForm.html.twig' %}
           </div>
+          {% else %}
+          <div class="p-4">
+            <p>Liste des bons plans disponibles:</p>
+            <!-- Liste des bons plans sera affichée ici -->
+            <div class="table-responsive">
+              <table class="table align-items-center mb-0">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lieu</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Type</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Localisation</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if bonplans is defined and bonplans|length > 0 %}
+                    {% for bonplan in bonplans %}
+                      <tr>
+                        <td>
+                          <div class="d-flex px-2 py-1">
+                            <div>
+                              <img src="{{ asset('uploads/' ~ bonplan.imageBP) }}" class="avatar avatar-sm me-3" alt="bonplan image" onerror="this.src='{{ asset('uploads/default.jpg') }}';">
+                            </div>
+                            <div class="d-flex flex-column justify-content-center">
+                              <h6 class="mb-0 text-sm">{{ bonplan.nomplace }}</h6>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <p class="text-xs font-weight-bold mb-0">{{ bonplan.typePlace }}</p>
+                        </td>
+                        <td>
+                          <p class="text-xs text-secondary mb-0">{{ bonplan.localisation }}</p>
+                        </td>
+                        <td class="align-middle">
+                          <a href="#" class="text-secondary font-weight-bold text-xs">
+                            Voir
+                          </a>
+                          <a href="#" class="text-secondary font-weight-bold text-xs ms-2">
+                            Modifier
+                          </a>
+                          <a href="#" class="text-danger font-weight-bold text-xs ms-2">
+                            Supprimer
+                          </a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="4" class="text-center py-4">
+                        <p class="text-muted mb-0">Aucun bon plan n'a été ajouté.</p>
+                      </td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
+
+{% if app.request.query.get('action') == 'add' %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Setup form submission
+    const bonplanForm = document.getElementById('bonplan-form');
+    if (bonplanForm) {
+      bonplanForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Create FormData object to handle file uploads
+        const formData = new FormData(bonplanForm);
+        
+        // Submit form using fetch API
+        fetch('{{ path('bonplan_add') }}', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Bon plan ajouté avec succès!');
+            // Redirect to the bons plans list page
+            window.location.href = '{{ path('bonplanVoyageurs_page') }}';
+          } else {
+            alert('Erreur: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+          alert('Une erreur est survenue lors de l\'ajout du bon plan.');
+        });
+      });
+    }
+  });
+</script>
+{% endif %}
 {% endblock %}

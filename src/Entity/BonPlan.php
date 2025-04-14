@@ -15,62 +15,43 @@ class BonPlan
     #[ORM\Column(name: 'idP', type: 'integer')]
     private ?int $idP = null;
 
-    #[ORM\Column(type: 'integer')]
-    #[Assert\NotNull(message: "L'utilisateur est requis.")]
-    #[Assert\Positive(message: "L'identifiant de l'utilisateur doit être un nombre positif.")]
-    private ?int $id_U = null;
+    #[ORM\Column(name: 'id_u', type: 'integer')]
+    private ?int $id_u = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\NotBlank(message: "Le nom de la place est requis.")]
-    #[Assert\Length(
-        min: 3,
-        max: 255,
-        minMessage: "Le nom doit contenir au moins {{ limit }} caractères.",
-        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères."
-    )]
+    #[ORM\Column(name: 'nomplace', type: 'string', length: 255)]
     private ?string $nomplace = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\NotBlank(message: "La localisation est requise.")]
-    #[Assert\Length(
-        max: 255,
-        maxMessage: "La localisation ne peut pas dépasser {{ limit }} caractères."
-    )]
+    #[ORM\Column(name: 'localisation', type: 'string', length: 255, nullable: true)]
     private ?string $localisation = null;
 
-    #[ORM\Column(type: 'text')]
-    #[Assert\NotBlank(message: "La description est requise.")]
-    #[Assert\Length(
-        max: 1000,
-        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères."
-    )]
+    #[ORM\Column(name: 'description', type: 'text', nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(name: 'typePlace', type: 'string', length: 20)]
-    #[Assert\NotBlank(message: "Le type de place est requis.")]
-    #[Assert\Choice(
-        choices: ['restaurant', 'hôtel', 'activité', 'autre'],
-        message: "Choisissez un type valide : restaurant, hôtel, activité ou autre."
-    )]
+    #[ORM\Column(name: 'typePlace', type: 'string', length: 255, nullable: true)]
     private ?string $typePlace = null;
 
-    #[ORM\Column(name: 'imageBP', type: 'string', length: 500)]
-        private ?string $imageBP = null;
+    #[ORM\Column(name: 'imageBP', type: 'string', length: 500, nullable: true)]
+    private ?string $imageBP = null;
 
-    // Getters et Setters
+    // Getters and setters
     public function getId(): ?int
+    {
+        return $this->idP;
+    }
+
+    public function getIdP(): ?int
     {
         return $this->idP;
     }
 
     public function getIdU(): ?int
     {
-        return $this->id_U;
+        return $this->id_u;
     }
 
-    public function setIdU(int $id_U): self
+    public function setIdU(int $id_u): self
     {
-        $this->id_U = $id_U;
+        $this->id_u = $id_u;
         return $this;
     }
 
@@ -90,7 +71,7 @@ class BonPlan
         return $this->localisation;
     }
 
-    public function setLocalisation(string $localisation): self
+    public function setLocalisation(?string $localisation): self
     {
         $this->localisation = $localisation;
         return $this;
@@ -101,7 +82,7 @@ class BonPlan
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;
@@ -112,7 +93,7 @@ class BonPlan
         return $this->typePlace;
     }
 
-    public function setTypePlace(string $typePlace): self
+    public function setTypePlace(?string $typePlace): self
     {
         $this->typePlace = $typePlace;
         return $this;
@@ -123,7 +104,7 @@ class BonPlan
         return $this->imageBP;
     }
 
-    public function setImageBP(string $imageBP): self
+    public function setImageBP(?string $imageBP): self
     {
         $this->imageBP = $imageBP;
         return $this;
