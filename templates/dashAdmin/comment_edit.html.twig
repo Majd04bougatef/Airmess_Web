@@ -1,0 +1,98 @@
+{% extends 'dashAdmin/dashboard.html.twig' %}
+
+{% block title %}Modifier un commentaire{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
+  <div class="container-fluid py-1 px-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="{{ path('social_page') }}">Réseaux Sociaux</a></li>
+        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="{{ path('admin_social_media_comments', {'idEB': social_media.idEB}) }}">Commentaires</a></li>
+        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Modifier un commentaire</li>
+      </ol>
+      <h6 class="font-weight-bolder text-white mb-0">Modifier un commentaire</h6>
+    </nav>
+  </div>
+</nav>
+<!-- End Navbar -->
+
+<div class="container-fluid py-4">
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+          <h6>Modifier un commentaire</h6>
+          <div>
+            <a href="{{ path('admin_social_media_comments', {'idEB': social_media.idEB}) }}" class="btn btn-sm btn-outline-secondary">
+              <i class="fas fa-arrow-left me-2"></i>Retour aux commentaires
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+          
+          <div class="form-group mb-3">
+            <h6 class="mb-2">Auteur</h6>
+            <div class="d-flex align-items-center p-3 border rounded mb-3">
+              <div class="avatar avatar-sm bg-gradient-primary border-radius-md p-2 me-2">
+                <i class="fas fa-user text-white"></i>
+              </div>
+              <span>{{ commentaire.user ? commentaire.user.name ~ ' ' ~ commentaire.user.prenom : 'Utilisateur inconnu' }}</span>
+            </div>
+          </div>
+          
+          <div class="form-group mb-3">
+            <h6 class="mb-2">Publication</h6>
+            <div class="p-3 border rounded mb-3">
+              <h6>{{ social_media.titre }}</h6>
+              <p class="small text-muted mb-0">{{ social_media.contenu|slice(0, 150) }}{% if social_media.contenu|length > 150 %}...{% endif %}</p>
+            </div>
+          </div>
+          
+          <div class="form-group mb-3">
+            <h6 class="mb-2">Statistiques</h6>
+            <div class="d-flex p-3 border rounded mb-3">
+              <div class="me-4">
+                <span class="badge bg-success me-1"><i class="fas fa-thumbs-up"></i></span>
+                <span class="font-weight-bold">{{ commentaire.numberlike }}</span>
+              </div>
+              <div>
+                <span class="badge bg-danger me-1"><i class="fas fa-thumbs-down"></i></span>
+                <span class="font-weight-bold">{{ commentaire.numberdislike }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group mb-4">
+            {{ form_label(form.description, null, {'label_attr': {'class': 'form-control-label'}}) }}
+            {{ form_widget(form.description) }}
+            {{ form_errors(form.description) }}
+            <small class="form-text text-muted">Modifiez le contenu du commentaire en respectant les règles de la communauté.</small>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            <a href="{{ path('admin_social_media_comments', {'idEB': social_media.idEB}) }}" class="btn btn-outline-secondary">
+              Annuler
+            </a>
+            <button type="submit" class="btn bg-gradient-primary">
+              <i class="fas fa-save me-2"></i>Enregistrer les modifications
+            </button>
+          </div>
+          
+          {{ form_end(form) }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
