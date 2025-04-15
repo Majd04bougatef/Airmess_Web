@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Reservation;
+use App\Entity\Offre;
 use App\Form\ReservationType;
 use App\Repository\ReservationRepository;
 use App\Repository\OffreRepository;
@@ -10,10 +11,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/reservation')]
-final class ReservationController extends AbstractController
+class ReservationController extends AbstractController
 {
     #[Route(name: 'app_reservation_index', methods: ['GET'])]
     public function index(ReservationRepository $reservationRepository): Response
@@ -23,23 +24,28 @@ final class ReservationController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_reservation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new/{idO}', name: 'app_reservation_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager, Offre $offre): Response
     {
         $reservation = new Reservation();
-        $form = $this->createForm(ReservationType::class, $reservation);
+        $reservation->setOffre($offre);
+        $reservation->setUser($this->getUser()); // Utilisateur connecté
+
+        $form = $this->createForm(\App\Form\ReservationType::class, $reservation);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $reservation->setDateRes(new \DateTime()); // Date actuelle si nécessaire
             $entityManager->persist($reservation);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+            // Rediriger vers la phase suivante (par exemple, récapitulatif)
+            return $this->redirectToRoute('app_reservation_recap', ['idR' => $reservation->getIdR()]);
         }
 
         return $this->render('reservation/new.html.twig', [
-            'reservation' => $reservation,
-            'form' => $form,
+            'form' => $form->createView(),
+            'offre' => $offre,
         ]);
     }
 
@@ -80,19 +86,27 @@ final class ReservationController extends AbstractController
         return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/reservation/new/{idO}', name: 'app_reservation_new')]
-    public function newReservation(int $idO, OffreRepository $offreRepository): Response
+    #[Route('/recap/{idR}', name: 'app_reservation_recap', methods: ['GET'])]
+    public function recap(Reservation $reservation): Response
     {
-        $offre = $offreRepository->find($idO);
+        return $this->render('reservation/recap.html.twig', [
+            'reservation' => $reservation,
+        ]);
+    }
 
-        if (!$offre) {
-            throw $this->createNotFoundException('Offre non trouvée.');
-        }
+    #[Route('/payment/{idR}', name: 'app_reservation_payment', methods: ['GET', 'POST'])]
+    public function payment(Reservation $reservation): Response
+    {
+        return $this->render('reservation/payment.html.twig', [
+            'reservation' => $reservation,
+        ]);
+    }
 
-        // Logique pour créer une réservation...
-
-        return $this->render('reservation/new.html.twig', [
-            'offre' => $offre,
+    #[Route('/confirmation/{idR}', name: 'app_reservation_confirmation', methods: ['GET'])]
+    public function confirmation(Reservation $reservation): Response
+    {
+        return $this->render('reservation/confirmation.html.twig', [
+            'reservation' => $reservation,
         ]);
     }
 }

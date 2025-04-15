@@ -1,0 +1,13 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Paiement{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Paiement</h2>
+    <p>Montant à payer : {{ reservation.offre.priceAfter }} €</p>
+    <form method="post" action="{{ path('app_reservation_confirmation', {'idR': reservation.idR}) }}">
+        <button type="submit" class="btn btn-success">Confirmer le paiement</button>
+    </form>
+</div>
+{% endblock %}
