@@ -485,13 +485,17 @@
                 <a class="nav-submenu-item" href="{{ path('app_reservation_transport_index') }}" id="reservations-button" data-section="reservations-section">Mes reservations</a>
               </div>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path('bonplanVoyageurs_page') }}" id="bonplan-button" data-section="bonplan-section">
+            <li class="nav-item nav-item-dropdown">
+              <a class="nav-link" href="#" id="bonplan-button">
                 <span class="nav-link-icon">
                   <img src="{{ asset('images/bonplan-icon.png') }}" alt="Good Plan" onerror="this.src='{{ asset('images/bonplan-icon.svg') }}'; this.onerror='';">
                 </span>
                 Bon Plan
               </a>
+              <div class="nav-submenu">
+                <a class="nav-submenu-item" href="{{ path('bonplanVoyageurs_page') }}?action=add" id="add-bonplan-button" data-section="add-bonplan-section">Ajouter un bon plan</a>
+                <a class="nav-submenu-item" href="{{ path('bonplanVoyageurs_page') }}" id="view-bonplan-button" data-section="view-bonplan-section">Voir les bons plans</a>
+              </div>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#" id="offre-button" data-section="offre-section">

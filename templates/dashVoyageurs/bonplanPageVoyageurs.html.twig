@@ -7,16 +7,193 @@
   <div class="row">
     <div class="col-12">
       <div class="card mb-4">
-        <div class="card-header pb-0">
-          <h6>Bons Plans</h6>
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+          <h6>{% if app.request.query.get('action') == 'add' %}Ajouter un bon plan{% else %}Bons Plans{% endif %}</h6>
+          {% if app.request.query.get('action') != 'add' %}
+          <a href="{{ path('bonplanVoyageurs_page') }}?action=add" class="btn btn-primary btn-sm">Ajouter un bon plan</a>
+          {% endif %}
         </div>
         <div class="card-body px-0 pt-0 pb-2">
-          <div class="p-4">
-            <p>Contenu de la page bons plans en cours de développement...</p>
+          {% if app.request.query.get('action') == 'add' %}
+          <div id="bonplan-form-container">
+            <!-- Le formulaire sera chargé ici -->
+            {% include 'dashVoyageurs/bonplanForm.html.twig' %}
           </div>
+          {% else %}
+          <div class="p-4">
+            <p>Liste des bons plans disponibles:</p>
+            <!-- Liste des bons plans sous forme de cards -->
+            <div class="row g-3">
+              {% if bonplans is defined and bonplans|length > 0 %}
+                {% for bonplan in bonplans %}
+                  <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 card-bonplan">
+                      <div class="card-img-top-container">
+                        <img src="{{ asset('uploads/' ~ bonplan.imageBP) }}" class="card-img-top" alt="{{ bonplan.nomplace }}" onerror="this.src='{{ asset('uploads/espagne-67f714bee028d.jpg') }}';">
+                        <div class="card-img-overlay card-actions">
+                          <div class="d-flex justify-content-between">
+                            <span class="badge bg-{{ bonplan.typePlace == 'resto' ? 'danger' : (bonplan.typePlace == 'cafe' ? 'success' : (bonplan.typePlace == 'coworkingspace' ? 'primary' : 'warning')) }}">
+                              {{ bonplan.typePlace }}
+                            </span>
+                            <div class="action-buttons">
+                              <a href="{{ path('bonplan_edit_form', {'idP': bonplan.idP}) }}" class="btn btn-sm btn-light">
+                                <i class="fas fa-edit"></i>
+                              </a>
+                              <button class="btn btn-sm btn-light delete-bonplan ms-1" data-id="{{ bonplan.idP }}">
+                                <i class="fas fa-trash"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-body" data-bs-toggle="modal" data-bs-target="#viewModal{{ bonplan.idP }}" style="cursor: pointer;">
+                        <h5 class="card-title">{{ bonplan.nomplace }}</h5>
+                        <p class="card-text small text-muted">
+                          <i class="fas fa-map-marker-alt me-1"></i> {{ bonplan.localisation }}
+                        </p>
+                        <p class="card-text description-text">
+                          {{ bonplan.description|slice(0, 100) }}{% if bonplan.description|length > 100 %}...{% endif %}
+                        </p>
+                        <div class="rating-container mt-2">
+                          <div class="stars-outer">
+                            <div class="stars-inner" style="width: {{ (ratings[bonplan.idP] * 20) }}%"></div>
+                          </div>
+                          <span class="rating-text">{{ ratings[bonplan.idP] }} <small>({{ reviewsCount[bonplan.idP] }} avis)</small></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="col-12 text-center py-5">
+                  <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> Aucun bon plan n'a été ajouté.
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
+
+{% if app.request.query.get('action') == 'add' %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Setup form submission
+    const bonplanForm = document.getElementById('bonplan-form');
+    if (bonplanForm) {
+      bonplanForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Create FormData object to handle file uploads
+        const formData = new FormData(bonplanForm);
+        
+        // Submit form using fetch API
+        fetch('{{ path('bonplan_add') }}', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Bon plan ajouté avec succès!');
+            // Redirect to the bons plans list page
+            window.location.href = '{{ path('bonplanVoyageurs_page') }}';
+          } else {
+            alert('Erreur: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+          alert('Une erreur est survenue lors de l\'ajout du bon plan.');
+        });
+      });
+    }
+  });
+</script>
+{% endif %}
+
+<!-- Modals de vue détaillée -->
+{% if bonplans is defined and bonplans|length > 0 %}
+  {% for bonplan in bonplans %}
+    <div class="modal fade" id="viewModal{{ bonplan.idP }}" tabindex="-1" aria-labelledby="viewModalLabel{{ bonplan.idP }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="viewModalLabel{{ bonplan.idP }}">{{ bonplan.nomplace }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-4">
+              <img src="{{ asset('uploads/' ~ bonplan.imageBP) }}" class="img-fluid rounded" style="max-height: 200px;" alt="{{ bonplan.nomplace }}" onerror="this.src='{{ asset('uploads/espagne-67f714bee028d.jpg') }}';">
+            </div>
+            
+            <div class="mb-3">
+              <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Type</h6>
+              <p>{{ bonplan.typePlace }}</p>
+            </div>
+            
+            <div class="mb-3">
+              <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Localisation</h6>
+              <p>{{ bonplan.localisation }}</p>
+            </div>
+            
+            <div class="mb-3">
+              <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Description</h6>
+              <p>{{ bonplan.description }}</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            <a href="{{ path('bonplan_edit_form', {'idP': bonplan.idP}) }}" class="btn btn-primary">Modifier</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Script pour la gestion des suppressions -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Gestion de la suppression
+  const deleteButtons = document.querySelectorAll('.delete-bonplan');
+  
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const idP = this.getAttribute('data-id');
+      
+      if (confirm('Êtes-vous sûr de vouloir supprimer ce bon plan ?')) {
+        // Envoyer la requête de suppression
+        fetch('{{ path('bonplan_delete', {'idP': 'PLACEHOLDER'}) }}'.replace('PLACEHOLDER', idP), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Bon plan supprimé avec succès !');
+            // Recharger la page pour mettre à jour la liste
+            window.location.reload();
+          } else {
+            alert('Erreur: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+          alert('Une erreur est survenue lors de la suppression du bon plan.');
+        });
+      }
+    });
+  });
+});
+</script>
 {% endblock %}
