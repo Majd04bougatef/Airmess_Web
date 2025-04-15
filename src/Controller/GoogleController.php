@@ -70,6 +70,8 @@ class GoogleController extends AbstractController
                 // User exists - log them in
                 $request->getSession()->set('user_id', $existingUser->getIdU());
                 $request->getSession()->set('user_role', $existingUser->getRoleUser());
+                $request->getSession()->set('user_name', $existingUser->getName() . ($existingUser->getPrenom() ? ' ' . $existingUser->getPrenom() : ''));
+                $request->getSession()->set('user_image', $existingUser->getImagesU());
                 
                 $this->addFlash('success', 'Bienvenue ' . $existingUser->getName() . '! Vous êtes connecté avec Google.');
                 
@@ -96,6 +98,7 @@ class GoogleController extends AbstractController
                     $newUser->setPrenom($firstName);
                 } else {
                     $newUser->setName($name);
+                    $newUser->setPrenom(''); // Set an empty string as default
                 }
                 
                 // Set default values for required fields
@@ -114,9 +117,11 @@ class GoogleController extends AbstractController
                 
                 // Log them in
                 $request->getSession()->set('user_id', $newUser->getIdU());
-                $request->getSession()->set('user_role', $newUser->getRoleUser());
+                $request->getSession()->set('user_role', 'Voyageurs'); // Make sure role is set correctly
+                $request->getSession()->set('user_name', $newUser->getName() . ($newUser->getPrenom() ? ' ' . $newUser->getPrenom() : ''));
+                $request->getSession()->set('user_image', $newUser->getImagesU());
                 
-                $this->addFlash('success', 'Bienvenue ' . $newUser->getName() . '! Votre compte a été créé avec Google.');
+                $this->addFlash('success', 'Bienvenue ' . $newUser->getName() . '! Votre compte Voyageur a été créé avec Google.');
                 
                 // Redirect to voyageur home since that's the default role
                 return $this->redirectToRoute('app_dashVoyageurs');

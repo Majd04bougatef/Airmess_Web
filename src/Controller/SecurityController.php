@@ -43,7 +43,7 @@ class SecurityController extends AbstractController
                     // Successful login - Store user data in session
                     $session->set('user_id', $user->getIdU());
                     $session->set('user_role', $user->getRoleUser());
-                    $session->set('user_name', $user->getName() . ' ' . $user->getPrenom());
+                    $session->set('user_name', $user->getName() . ($user->getPrenom() ? ' ' . $user->getPrenom() : ''));
                     $session->set('user_image', $user->getImagesU());
                     
                     // Force session write
