@@ -20,7 +20,7 @@ class User
     private string $name;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $prenom;
+    private ?string $prenom = null;
 
     #[ORM\Column(type: "string", length: 255, unique: true)]
     private string $email;
@@ -87,12 +87,12 @@ class User
         return $this;
     }
 
-    public function getPrenom(): string
+    public function getPrenom(): ?string
     {
         return $this->prenom;
     }
 
-    public function setPrenom(string $prenom): self
+    public function setPrenom(?string $prenom): self
     {
         $this->prenom = $prenom;
         return $this;

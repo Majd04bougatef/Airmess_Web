@@ -444,6 +444,58 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
         text-align: center;
       }
     }
+    
+    /* Submenu Styles */
+    .nav-item-dropdown {
+      position: relative;
+    }
+    
+    .nav-submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 0.5rem 0;
+      min-width: 180px;
+      z-index: 10;
+    }
+    
+    .nav-item-dropdown:hover .nav-submenu {
+      display: block;
+    }
+    
+    .nav-submenu-item {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #67748e;
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-submenu-item:hover {
+      background-color: rgba(94, 114, 228, 0.08);
+      color: #344767;
+    }
+    
+    @media (max-width: 992px) {
+      .nav-submenu {
+        position: static;
+        display: none;
+        background-color: #f8f9fa;
+        box-shadow: none;
+        padding: 0.5rem 1rem;
+        margin-left: 2rem;
+        border-radius: 8px;
+      }
+      
+      .nav-item-dropdown.active .nav-submenu {
+        display: block;
+      }
+    }
   </style>
 </head>
 
@@ -454,7 +506,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
       <div class=\"nav-container\">
         <a class=\"navbar-brand\" href=\"#\">
           <img src=\"";
-        // line 398
+        // line 450
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-airmess.png"), "html", null, true);
         yield "\" width=\"36\" height=\"36\" alt=\"Airmess\">
           <span>Airmess</span>
@@ -468,12 +520,12 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
           <ul class=\"nav-menu\">
             <li class=\"nav-item\">
               <a class=\"nav-link\" href=\"";
-        // line 409
+        // line 461
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("dashboardVoyageurs_page");
         yield "\" id=\"dashboard-button\" data-section=\"dashboard-section\">
                 <span class=\"nav-link-icon\">
                   <img src=\"";
-        // line 411
+        // line 463
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/dashboard-icon.png"), "html", null, true);
         yield "\" alt=\"Dashboard\" onerror=\"this.src='";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/dashboard-icon.svg"), "html", null, true);
@@ -484,12 +536,12 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
             </li>
             <li class=\"nav-item\">
               <a class=\"nav-link\" href=\"";
-        // line 417
+        // line 469
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("userVoyageurs_page");
         yield "\" id=\"user-button\" data-section=\"user-section\">
                 <span class=\"nav-link-icon\">
                   <img src=\"";
-        // line 419
+        // line 471
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/user-icon.png"), "html", null, true);
         yield "\" alt=\"Users\" onerror=\"this.src='";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/user-icon.svg"), "html", null, true);
@@ -498,14 +550,11 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
                 Utilisateurs
               </a>
             </li>
-            <li class=\"nav-item\">
-              <a class=\"nav-link\" href=\"";
-        // line 425
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("stationVoyageurs_page");
-        yield "\" id=\"station-button\" data-section=\"station-section\">
+            <li class=\"nav-item nav-item-dropdown\">
+              <a class=\"nav-link\" href=\"#\" id=\"velo-button\">
                 <span class=\"nav-link-icon\">
                   <img src=\"";
-        // line 427
+        // line 479
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/station-icon.png"), "html", null, true);
         yield "\" alt=\"Bike\" onerror=\"this.src='";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/station-icon.svg"), "html", null, true);
@@ -513,15 +562,25 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
                 </span>
                 Réserver Vélo
               </a>
+              <div class=\"nav-submenu\">
+                <a class=\"nav-submenu-item\" href=\"";
+        // line 484
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_reservation_transport_station");
+        yield "\" id=\"reserver-button\" data-section=\"station-section\">Reserver</a>
+                <a class=\"nav-submenu-item\" href=\"";
+        // line 485
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_reservation_transport_index");
+        yield "\" id=\"reservations-button\" data-section=\"reservations-section\">Mes reservations</a>
+              </div>
             </li>
             <li class=\"nav-item\">
               <a class=\"nav-link\" href=\"";
-        // line 433
+        // line 489
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("bonplanVoyageurs_page");
         yield "\" id=\"bonplan-button\" data-section=\"bonplan-section\">
                 <span class=\"nav-link-icon\">
                   <img src=\"";
-        // line 435
+        // line 491
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/bonplan-icon.png"), "html", null, true);
         yield "\" alt=\"Good Plan\" onerror=\"this.src='";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/bonplan-icon.svg"), "html", null, true);
@@ -534,7 +593,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
               <a class=\"nav-link\" href=\"#\" id=\"offre-button\" data-section=\"offre-section\">
                 <span class=\"nav-link-icon\">
                   <img src=\"";
-        // line 443
+        // line 499
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/offre-icon.png"), "html", null, true);
         yield "\" alt=\"Offers\" onerror=\"this.src='";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/offre-icon.svg"), "html", null, true);
@@ -545,12 +604,12 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
             </li>
             <li class=\"nav-item\">
               <a class=\"nav-link\" href=\"";
-        // line 449
+        // line 505
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("socialVoyageurs_page");
         yield "\" id=\"social-button\" data-section=\"social-section\">
                 <span class=\"nav-link-icon\">
                   <img src=\"";
-        // line 451
+        // line 507
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/social-icon.png"), "html", null, true);
         yield "\" alt=\"Social\" onerror=\"this.src='";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/social-icon.svg"), "html", null, true);
@@ -563,10 +622,10 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
           
           <div class=\"user-profile\">
             <img src=\"";
-        // line 459
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/users/" . CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 459, $this->source); })()), "session", [], "any", false, false, false, 459), "get", ["user_image"], "method", false, false, false, 459))), "html", null, true);
+        // line 515
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/users/" . CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 515, $this->source); })()), "session", [], "any", false, false, false, 515), "get", ["user_image"], "method", false, false, false, 515))), "html", null, true);
         yield "\" alt=\"";
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 459, $this->source); })()), "session", [], "any", false, false, false, 459), "get", ["user_name"], "method", false, false, false, 459), "html", null, true);
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 515, $this->source); })()), "session", [], "any", false, false, false, 515), "get", ["user_name"], "method", false, false, false, 515), "html", null, true);
         yield "\" class=\"user-img\" id=\"userDropdown\" onerror=\"this.src='";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/user-avatar.svg"), "html", null, true);
         yield "'; this.onerror='';\">
@@ -575,8 +634,8 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
               <a class=\"dropdown-item\" href=\"#\">Settings</a>
               <div class=\"dropdown-divider\"></div>
               <a class=\"dropdown-item\" href=\"";
-        // line 464
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
+        // line 520
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_base");
         yield "\">Se déconnecter</a>
             </div>
           </div>
@@ -587,13 +646,13 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
 
   <!-- Main Content -->
   <main class=\"main-content\">
-    <div class=\"container\">
+    <div class=\"container\" style=\"width: 90%; max-width: 90%;\">
       <!-- Regular Content Card - For normal pages -->
       <div class=\"content-card content-section\" id=\"default-section\">
         ";
-        // line 477
+        // line 533
         yield from $this->unwrap()->yieldBlock('body', $context, $blocks);
-        // line 478
+        // line 534
         yield "      </div>
 
       <!-- Form Container - Will be populated dynamically -->
@@ -605,15 +664,15 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
 
   <!-- Scripts -->
   <script src=\"";
-        // line 488
+        // line 544
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core/popper.min.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 489
+        // line 545
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core/bootstrap.min.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 490
+        // line 546
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/plugins/perfect-scrollbar.min.js"), "html", null, true);
         yield "\"></script>
   <script>
@@ -661,7 +720,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
       // Function to load the form template
       function loadForm() {
         fetch('";
-        // line 535
+        // line 591
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("offre_form");
         yield "')
           .then(response => response.text())
@@ -728,22 +787,36 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
         }
       }
       
-      // User dropdown functionality
+      // Toggle user dropdown menu
       const userDropdown = document.getElementById('userDropdown');
       const userMenu = document.getElementById('userMenu');
       
-      userDropdown.addEventListener('click', function() {
-        userMenu.classList.toggle('show');
-      });
-      
-      // Close the dropdown if clicked outside
-      window.addEventListener('click', function(event) {
-        if (!event.target.matches('.user-img')) {
-          if (userMenu.classList.contains('show')) {
+      if (userDropdown && userMenu) {
+        userDropdown.addEventListener('click', function() {
+          userMenu.classList.toggle('show');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!userDropdown.contains(e.target)) {
             userMenu.classList.remove('show');
           }
-        }
-      });
+        });
+      }
+      
+      // Mobile submenu toggle
+      const dropdowns = document.querySelectorAll('.nav-item-dropdown');
+      
+      if (window.innerWidth <= 992) {
+        dropdowns.forEach(dropdown => {
+          const link = dropdown.querySelector('.nav-link');
+          
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            dropdown.classList.toggle('active');
+          });
+        });
+      }
     });
   </script>
 </body>
@@ -780,7 +853,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
         yield from [];
     }
 
-    // line 477
+    // line 533
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -823,7 +896,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  784 => 477,  761 => 8,  665 => 535,  617 => 490,  613 => 489,  609 => 488,  597 => 478,  595 => 477,  579 => 464,  567 => 459,  554 => 451,  549 => 449,  538 => 443,  525 => 435,  520 => 433,  509 => 427,  504 => 425,  493 => 419,  488 => 417,  477 => 411,  472 => 409,  458 => 398,  73 => 16,  63 => 9,  59 => 8,  50 => 1,);
+        return array (  857 => 533,  834 => 8,  724 => 591,  676 => 546,  672 => 545,  668 => 544,  656 => 534,  654 => 533,  638 => 520,  626 => 515,  613 => 507,  608 => 505,  597 => 499,  584 => 491,  579 => 489,  572 => 485,  568 => 484,  558 => 479,  545 => 471,  540 => 469,  529 => 463,  524 => 461,  510 => 450,  73 => 16,  63 => 9,  59 => 8,  50 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -1216,6 +1289,58 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
         text-align: center;
       }
     }
+    
+    /* Submenu Styles */
+    .nav-item-dropdown {
+      position: relative;
+    }
+    
+    .nav-submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 0.5rem 0;
+      min-width: 180px;
+      z-index: 10;
+    }
+    
+    .nav-item-dropdown:hover .nav-submenu {
+      display: block;
+    }
+    
+    .nav-submenu-item {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #67748e;
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-submenu-item:hover {
+      background-color: rgba(94, 114, 228, 0.08);
+      color: #344767;
+    }
+    
+    @media (max-width: 992px) {
+      .nav-submenu {
+        position: static;
+        display: none;
+        background-color: #f8f9fa;
+        box-shadow: none;
+        padding: 0.5rem 1rem;
+        margin-left: 2rem;
+        border-radius: 8px;
+      }
+      
+      .nav-item-dropdown.active .nav-submenu {
+        display: block;
+      }
+    }
   </style>
 </head>
 
@@ -1251,13 +1376,17 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
                 Utilisateurs
               </a>
             </li>
-            <li class=\"nav-item\">
-              <a class=\"nav-link\" href=\"{{ path('stationVoyageurs_page') }}\" id=\"station-button\" data-section=\"station-section\">
+            <li class=\"nav-item nav-item-dropdown\">
+              <a class=\"nav-link\" href=\"#\" id=\"velo-button\">
                 <span class=\"nav-link-icon\">
                   <img src=\"{{ asset('images/station-icon.png') }}\" alt=\"Bike\" onerror=\"this.src='{{ asset('images/station-icon.svg') }}'; this.onerror='';\">
                 </span>
                 Réserver Vélo
               </a>
+              <div class=\"nav-submenu\">
+                <a class=\"nav-submenu-item\" href=\"{{ path('app_reservation_transport_station') }}\" id=\"reserver-button\" data-section=\"station-section\">Reserver</a>
+                <a class=\"nav-submenu-item\" href=\"{{ path('app_reservation_transport_index') }}\" id=\"reservations-button\" data-section=\"reservations-section\">Mes reservations</a>
+              </div>
             </li>
             <li class=\"nav-item\">
               <a class=\"nav-link\" href=\"{{ path('bonplanVoyageurs_page') }}\" id=\"bonplan-button\" data-section=\"bonplan-section\">
@@ -1291,7 +1420,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
               <a class=\"dropdown-item\" href=\"#\">Profile</a>
               <a class=\"dropdown-item\" href=\"#\">Settings</a>
               <div class=\"dropdown-divider\"></div>
-              <a class=\"dropdown-item\" href=\"{{path('app_logout')}}\">Se déconnecter</a>
+              <a class=\"dropdown-item\" href=\"{{path('app_base')}}\">Se déconnecter</a>
             </div>
           </div>
         </div>
@@ -1301,7 +1430,7 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
 
   <!-- Main Content -->
   <main class=\"main-content\">
-    <div class=\"container\">
+    <div class=\"container\" style=\"width: 90%; max-width: 90%;\">
       <!-- Regular Content Card - For normal pages -->
       <div class=\"content-card content-section\" id=\"default-section\">
         {% block body %}{% endblock %}
@@ -1427,22 +1556,36 @@ class __TwigTemplate_f39587b003285237b3f59b05494233e1 extends Template
         }
       }
       
-      // User dropdown functionality
+      // Toggle user dropdown menu
       const userDropdown = document.getElementById('userDropdown');
       const userMenu = document.getElementById('userMenu');
       
-      userDropdown.addEventListener('click', function() {
-        userMenu.classList.toggle('show');
-      });
-      
-      // Close the dropdown if clicked outside
-      window.addEventListener('click', function(event) {
-        if (!event.target.matches('.user-img')) {
-          if (userMenu.classList.contains('show')) {
+      if (userDropdown && userMenu) {
+        userDropdown.addEventListener('click', function() {
+          userMenu.classList.toggle('show');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!userDropdown.contains(e.target)) {
             userMenu.classList.remove('show');
           }
-        }
-      });
+        });
+      }
+      
+      // Mobile submenu toggle
+      const dropdowns = document.querySelectorAll('.nav-item-dropdown');
+      
+      if (window.innerWidth <= 992) {
+        dropdowns.forEach(dropdown => {
+          const link = dropdown.querySelector('.nav-link');
+          
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            dropdown.classList.toggle('active');
+          });
+        });
+      }
     });
   </script>
 </body>

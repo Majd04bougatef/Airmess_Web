@@ -370,15 +370,15 @@
     <service id="App\Entity" class="App\Entity" abstract="true">
       <tag name="container.excluded" source="in &quot;config/services.yaml&quot;"/>
     </service>
-    <service id="App\Command\CreateAdminUsersCommand" class="App\Command\CreateAdminUsersCommand" autowire="true" autoconfigure="true">
+    <service id="App\Command\TestEmailCommand" class="App\Command\TestEmailCommand" autowire="true" autoconfigure="true">
       <tag name="console.command"/>
       <tag name="container.no_preload"/>
-      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="mailer.mailer"/>
       <call method="setName">
-        <argument>app:create-admin-users</argument>
+        <argument>app:test-email</argument>
       </call>
       <call method="setDescription">
-        <argument>Creates 5 admin users with predefined names</argument>
+        <argument>Tests email sending functionality</argument>
       </call>
     </service>
     <service id="App\Controller\AdminController" class="App\Controller\AdminController" public="true" autowire="true" autoconfigure="true">
@@ -386,13 +386,6 @@
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\AdminController"/>
-      </call>
-    </service>
-    <service id="App\Controller\AdminCreatorController" class="App\Controller\AdminCreatorController" public="true" autowire="true" autoconfigure="true">
-      <tag name="controller.service_arguments"/>
-      <tag name="container.service_subscriber"/>
-      <call method="setContainer">
-        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\AdminCreatorController"/>
       </call>
     </service>
     <service id="App\Controller\BaseController" class="App\Controller\BaseController" public="true" autowire="true" autoconfigure="true">
@@ -410,11 +403,11 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\CommentaireController"/>
       </call>
     </service>
-    <service id="App\Controller\DiagnosticController" class="App\Controller\DiagnosticController" public="true" autowire="true" autoconfigure="true">
+    <service id="App\Controller\DashEntreprise\AnalyticsController" class="App\Controller\DashEntreprise\AnalyticsController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\DiagnosticController"/>
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\DashEntreprise\AnalyticsController"/>
       </call>
     </service>
     <service id="App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" public="true" autowire="true" autoconfigure="true">
@@ -434,6 +427,7 @@
     <service id="App\Controller\RegistrationController" class="App\Controller\RegistrationController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
+      <argument type="service" id="App\Service\EmailService"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\RegistrationController"/>
       </call>
@@ -520,6 +514,10 @@
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
     </service>
+    <service id="App\Repository\ReservationRepository" class="App\Repository\ReservationRepository" autowire="true" autoconfigure="true">
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
+    </service>
     <service id="App\Repository\ReservationTransportRepository" class="App\Repository\ReservationTransportRepository" autowire="true" autoconfigure="true">
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
@@ -539,6 +537,10 @@
     <service id="App\Service\AuthService" class="App\Service\AuthService" autowire="true" autoconfigure="true">
       <argument type="service" id="request_stack"/>
       <argument type="service" id="App\Repository\UserRepository"/>
+    </service>
+    <service id="App\Service\EmailService" class="App\Service\EmailService" autowire="true" autoconfigure="true">
+      <argument type="service" id="mailer.mailer"/>
+      <argument type="service" id="monolog.logger"/>
     </service>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
     <service id="argument_resolver.backed_enum_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">
@@ -567,7 +569,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.vO5Eeb_"/>
+      <argument type="service" id=".service_locator.oOWK0Hn"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1191,6 +1193,7 @@
       <argument type="collection">
         <argument>async</argument>
         <argument>failed</argument>
+        <argument>sync</argument>
       </argument>
       <call method="setName">
         <argument>messenger:setup-transports</argument>
@@ -1323,6 +1326,7 @@
       <argument type="collection">
         <argument>async</argument>
         <argument>failed</argument>
+        <argument>sync</argument>
       </argument>
       <call method="setName">
         <argument>messenger:stats</argument>
@@ -3548,7 +3552,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.vO5Eeb_"/>
+      <argument type="service" id=".service_locator.oOWK0Hn"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -4475,7 +4479,7 @@
     <service id="messenger.senders_locator" class="Symfony\Component\Messenger\Transport\Sender\SendersLocator">
       <argument type="collection">
         <argument key="Symfony\Component\Mailer\Messenger\SendEmailMessage" type="collection">
-          <argument>async</argument>
+          <argument>sync</argument>
         </argument>
         <argument key="Symfony\Component\Notifier\Message\ChatMessage" type="collection">
           <argument>async</argument>
@@ -4484,7 +4488,7 @@
           <argument>async</argument>
         </argument>
       </argument>
-      <argument type="service" id=".service_locator.c7f47p7"/>
+      <argument type="service" id=".service_locator.NZdAz3P"/>
     </service>
     <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware" abstract="true">
       <tag name="monolog.logger" channel="messenger"/>
@@ -4530,6 +4534,8 @@
         <argument key="failed" type="service_closure" id="messenger.transport.failed"/>
         <argument key="messenger.transport.async" type="service_closure" id="messenger.transport.async"/>
         <argument key="messenger.transport.failed" type="service_closure" id="messenger.transport.failed"/>
+        <argument key="messenger.transport.sync" type="service_closure" id="messenger.transport.sync"/>
+        <argument key="sync" type="service_closure" id="messenger.transport.sync"/>
       </argument>
     </service>
     <service id="messenger.transport_factory" class="Symfony\Component\Messenger\Transport\TransportFactory">
@@ -4556,6 +4562,7 @@
       <argument type="collection">
         <argument key="async" type="service_closure" id="messenger.retry.multiplier_retry_strategy.async"/>
         <argument key="failed" type="service_closure" id="messenger.retry.multiplier_retry_strategy.failed"/>
+        <argument key="sync" type="service_closure" id="messenger.retry.multiplier_retry_strategy.sync"/>
       </argument>
     </service>
     <service id="messenger.retry.abstract_multiplier_retry_strategy" class="Symfony\Component\Messenger\Retry\MultiplierRetryStrategy" abstract="true">
@@ -4567,7 +4574,7 @@
     <service id="messenger.retry.send_failed_message_for_retry_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener">
       <tag name="monolog.logger" channel="messenger"/>
       <tag name="kernel.event_subscriber"/>
-      <argument type="service" id=".service_locator.c7f47p7"/>
+      <argument type="service" id=".service_locator.NZdAz3P"/>
       <argument type="service" id="messenger.retry_strategy_locator"/>
       <argument type="service" id="monolog.logger.messenger" on-invalid="ignore"/>
       <argument type="service" id="debug.event_dispatcher"/>
@@ -4578,7 +4585,7 @@
     <service id="messenger.failure.send_failed_message_to_failure_transport_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener">
       <tag name="monolog.logger" channel="messenger"/>
       <tag name="kernel.event_subscriber"/>
-      <argument type="service" id=".service_locator._wyX1Dp"/>
+      <argument type="service" id=".service_locator.v4buNEb"/>
       <argument type="service" id="monolog.logger.messenger" on-invalid="ignore"/>
     </service>
     <service id="messenger.listener.dispatch_pcntl_signal_listener" class="Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener">
@@ -4642,20 +4649,38 @@
       <argument>2</argument>
       <argument>0</argument>
     </service>
-    <service id=".service_locator.c7f47p7" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id="messenger.transport.sync" class="Symfony\Component\Messenger\Transport\TransportInterface">
+      <tag name="messenger.receiver" alias="sync" is_failure_transport="" is_consumable=""/>
+      <argument>sync://</argument>
+      <argument type="collection">
+        <argument key="transport_name">sync</argument>
+      </argument>
+      <argument type="service" id="messenger.transport.native_php_serializer"/>
+      <factory service="messenger.transport_factory" method="createTransport"/>
+    </service>
+    <service id="messenger.retry.multiplier_retry_strategy.sync" class="Symfony\Component\Messenger\Retry\MultiplierRetryStrategy">
+      <argument>3</argument>
+      <argument>1000</argument>
+      <argument>2</argument>
+      <argument>0</argument>
+    </service>
+    <service id=".service_locator.NZdAz3P" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="async" type="service_closure" id="messenger.transport.async"/>
         <argument key="failed" type="service_closure" id="messenger.transport.failed"/>
         <argument key="messenger.transport.async" type="service_closure" id="messenger.transport.async"/>
         <argument key="messenger.transport.failed" type="service_closure" id="messenger.transport.failed"/>
+        <argument key="messenger.transport.sync" type="service_closure" id="messenger.transport.sync"/>
+        <argument key="sync" type="service_closure" id="messenger.transport.sync"/>
       </argument>
     </service>
-    <service id=".service_locator._wyX1Dp" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.v4buNEb" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="async" type="service_closure" id="messenger.transport.failed"/>
         <argument key="failed" type="service_closure" id="messenger.transport.failed"/>
+        <argument key="sync" type="service_closure" id="messenger.transport.failed"/>
       </argument>
     </service>
     <service id="notifier" class="Symfony\Component\Notifier\Notifier">
@@ -5300,7 +5325,7 @@
     <service id="doctrine.orm.configuration" class="Doctrine\ORM\Configuration" abstract="true"/>
     <service id="doctrine.orm.entity_manager.abstract" class="Doctrine\ORM\EntityManager" lazy="true" abstract="true"/>
     <service id="doctrine.orm.container_repository_factory" class="Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory">
-      <argument type="service" id=".service_locator.uY7hb84"/>
+      <argument type="service" id=".service_locator.wff11tj"/>
     </service>
     <service id="doctrine.orm.manager_configurator.abstract" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator" abstract="true">
       <argument type="collection"/>
@@ -7363,23 +7388,20 @@
       <argument>page</argument>
       <argument>false</argument>
     </service>
-    <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\CreateAdminUsersCommand" class="App\Command\CreateAdminUsersCommand" autowire="true" abstract="true"/>
-    <service id=".abstract.instanceof.App\Command\CreateAdminUsersCommand" class="App\Command\CreateAdminUsersCommand" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\TestEmailCommand" class="App\Command\TestEmailCommand" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Command\TestEmailCommand" class="App\Command\TestEmailCommand" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AdminController" class="App\Controller\AdminController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AdminController" class="App\Controller\AdminController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AdminController" class="App\Controller\AdminController" autowire="true" autoconfigure="true" abstract="true"/>
-    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AdminCreatorController" class="App\Controller\AdminCreatorController" autowire="true" abstract="true"/>
-    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AdminCreatorController" class="App\Controller\AdminCreatorController" autowire="true" abstract="true"/>
-    <service id=".abstract.instanceof.App\Controller\AdminCreatorController" class="App\Controller\AdminCreatorController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\BaseController" class="App\Controller\BaseController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\BaseController" class="App\Controller\BaseController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\BaseController" class="App\Controller\BaseController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\CommentaireController" class="App\Controller\CommentaireController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\CommentaireController" class="App\Controller\CommentaireController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\CommentaireController" class="App\Controller\CommentaireController" autowire="true" autoconfigure="true" abstract="true"/>
-    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\DiagnosticController" class="App\Controller\DiagnosticController" autowire="true" abstract="true"/>
-    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\DiagnosticController" class="App\Controller\DiagnosticController" autowire="true" abstract="true"/>
-    <service id=".abstract.instanceof.App\Controller\DiagnosticController" class="App\Controller\DiagnosticController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\DashEntreprise\AnalyticsController" class="App\Controller\DashEntreprise\AnalyticsController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\DashEntreprise\AnalyticsController" class="App\Controller\DashEntreprise\AnalyticsController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\DashEntreprise\AnalyticsController" class="App\Controller\DashEntreprise\AnalyticsController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -7426,6 +7448,8 @@
     <service id=".abstract.instanceof.App\Repository\CommentaireRepository" class="App\Repository\CommentaireRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\MessageRepository" class="App\Repository\MessageRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\MessageRepository" class="App\Repository\MessageRepository" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\ReservationRepository" class="App\Repository\ReservationRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\ReservationRepository" class="App\Repository\ReservationRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\ReservationTransportRepository" class="App\Repository\ReservationTransportRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\ReservationTransportRepository" class="App\Repository\ReservationTransportRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\SocialMediaRepository" class="App\Repository\SocialMediaRepository" autowire="true" abstract="true"/>
@@ -7857,16 +7881,16 @@
         <argument key="loader" type="service_closure" id=".errored..service_locator.y4_Zrx..Symfony\Component\Config\Loader\LoaderInterface"/>
       </argument>
     </service>
-    <service id=".service_locator.CsMkqUa" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-      </argument>
-    </service>
     <service id=".service_locator.uJ0s0sI" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="commentaireRepository" type="service_closure" id="App\Repository\CommentaireRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.CsMkqUa" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
     <service id=".service_locator.X_5wiI3" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -7889,10 +7913,17 @@
         <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.kPUOGb8" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.hsYjguD" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+        <argument key="reservationRepository" type="service_closure" id="App\Repository\ReservationRepository"/>
+        <argument key="stationRepository" type="service_closure" id="App\Repository\StationRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.caJHb8S" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="reservationRepository" type="service_closure" id="App\Repository\ReservationRepository"/>
       </argument>
     </service>
     <service id=".service_locator.sLkGFte" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -7958,17 +7989,11 @@
         <argument key="stationRepository" type="service_closure" id="App\Repository\StationRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.7jf0haM" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="reservationTransport" type="service_closure" id=".errored..service_locator.7jf0haM.App\Entity\ReservationTransport"/>
-      </argument>
-    </service>
-    <service id=".service_locator.qCOaJRT" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.WHu4pRc" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="stationRepository" type="service_closure" id="App\Repository\StationRepository"/>
+        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
       </argument>
     </service>
     <service id=".service_locator.TGRHV_0" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -7978,10 +8003,38 @@
         <argument key="stationRepository" type="service_closure" id="App\Repository\StationRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.wxzU4dO" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.qCOaJRT" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="reservation" type="service_closure" id=".errored..service_locator.wxzU4dO.App\Entity\ReservationTransport"/>
+        <argument key="stationRepository" type="service_closure" id="App\Repository\StationRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.7jf0haM" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="reservationTransport" type="service_closure" id=".errored..service_locator.7jf0haM.App\Entity\ReservationTransport"/>
+      </argument>
+    </service>
+    <service id=".service_locator.wLT9ipV" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="reservation" type="service_closure" id=".errored..service_locator.wLT9ipV.App\Entity\ReservationTransport"/>
+      </argument>
+    </service>
+    <service id=".service_locator.gQpJNsQ" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="reservation" type="service_closure" id=".errored..service_locator.gQpJNsQ.App\Entity\ReservationTransport"/>
+        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.kPUOGb8" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
       </argument>
     </service>
     <service id=".service_locator.4m6SajK" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -8036,10 +8089,9 @@
         <argument key="user" type="service_closure" id=".errored..service_locator.rvMNZGh.App\Entity\User"/>
       </argument>
     </service>
-    <service id=".service_locator.vO5Eeb_" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.oOWK0Hn" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="App\Controller\AdminCreatorController::createAdmins" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\CommentaireController::ajouterCommentaire" type="service_closure" id=".service_locator.X_5wiI3"/>
         <argument key="App\Controller\CommentaireController::delete" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController::edit" type="service_closure" id=".service_locator.HrDCg3Q"/>
@@ -8048,7 +8100,9 @@
         <argument key="App\Controller\CommentaireController::likeCommentaire" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\CommentaireController::show" type="service_closure" id=".service_locator.ZfwS4tl"/>
-        <argument key="App\Controller\DiagnosticController::listUsers" type="service_closure" id=".service_locator.kPUOGb8"/>
+        <argument key="App\Controller\DashEntreprise\AnalyticsController::getRevenueData" type="service_closure" id=".service_locator.caJHb8S"/>
+        <argument key="App\Controller\DashEntreprise\AnalyticsController::getUsageData" type="service_closure" id=".service_locator.caJHb8S"/>
+        <argument key="App\Controller\DashEntreprise\AnalyticsController::index" type="service_closure" id=".service_locator.hsYjguD"/>
         <argument key="App\Controller\MessageController::chatVoyageurs" type="service_closure" id=".service_locator.us3WAcN"/>
         <argument key="App\Controller\MessageController::delete" type="service_closure" id=".service_locator.SJArFDd"/>
         <argument key="App\Controller\MessageController::edit" type="service_closure" id=".service_locator.SJArFDd"/>
@@ -8057,13 +8111,16 @@
         <argument key="App\Controller\MessageController::show" type="service_closure" id=".service_locator.O3A1vmO"/>
         <argument key="App\Controller\RegistrationController::register" type="service_closure" id=".service_locator.8_0lB_e"/>
         <argument key="App\Controller\ReservationTransportController::cardStation" type="service_closure" id=".service_locator.qCOaJRT"/>
+        <argument key="App\Controller\ReservationTransportController::chat" type="service_closure" id=".service_locator.wLT9ipV"/>
         <argument key="App\Controller\ReservationTransportController::confirm" type="service_closure" id=".service_locator.iVzJol."/>
         <argument key="App\Controller\ReservationTransportController::delete" type="service_closure" id=".service_locator.7jf0haM"/>
         <argument key="App\Controller\ReservationTransportController::edit" type="service_closure" id=".service_locator.cvvzvb5"/>
         <argument key="App\Controller\ReservationTransportController::index" type="service_closure" id=".service_locator.WtTOPxF"/>
         <argument key="App\Controller\ReservationTransportController::new" type="service_closure" id=".service_locator.iVzJol."/>
         <argument key="App\Controller\ReservationTransportController::new2" type="service_closure" id=".service_locator.iVzJol."/>
-        <argument key="App\Controller\ReservationTransportController::payment" type="service_closure" id=".service_locator.wxzU4dO"/>
+        <argument key="App\Controller\ReservationTransportController::newMessage" type="service_closure" id=".service_locator.gQpJNsQ"/>
+        <argument key="App\Controller\ReservationTransportController::payment" type="service_closure" id=".service_locator.WHu4pRc"/>
+        <argument key="App\Controller\ReservationTransportController::processPayment" type="service_closure" id=".service_locator.iVzJol."/>
         <argument key="App\Controller\ReservationTransportController::recap" type="service_closure" id=".service_locator.TGRHV_0"/>
         <argument key="App\Controller\ReservationTransportController::show" type="service_closure" id=".service_locator.C8OlVt9"/>
         <argument key="App\Controller\SecurityController::login" type="service_closure" id=".service_locator.kPUOGb8"/>
@@ -8088,7 +8145,6 @@
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
-        <argument key="App\Controller\AdminCreatorController:createAdmins" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\CommentaireController:ajouterCommentaire" type="service_closure" id=".service_locator.X_5wiI3"/>
         <argument key="App\Controller\CommentaireController:delete" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController:edit" type="service_closure" id=".service_locator.HrDCg3Q"/>
@@ -8097,7 +8153,9 @@
         <argument key="App\Controller\CommentaireController:likeCommentaire" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\CommentaireController:show" type="service_closure" id=".service_locator.ZfwS4tl"/>
-        <argument key="App\Controller\DiagnosticController:listUsers" type="service_closure" id=".service_locator.kPUOGb8"/>
+        <argument key="App\Controller\DashEntreprise\AnalyticsController:getRevenueData" type="service_closure" id=".service_locator.caJHb8S"/>
+        <argument key="App\Controller\DashEntreprise\AnalyticsController:getUsageData" type="service_closure" id=".service_locator.caJHb8S"/>
+        <argument key="App\Controller\DashEntreprise\AnalyticsController:index" type="service_closure" id=".service_locator.hsYjguD"/>
         <argument key="App\Controller\MessageController:chatVoyageurs" type="service_closure" id=".service_locator.us3WAcN"/>
         <argument key="App\Controller\MessageController:delete" type="service_closure" id=".service_locator.SJArFDd"/>
         <argument key="App\Controller\MessageController:edit" type="service_closure" id=".service_locator.SJArFDd"/>
@@ -8106,13 +8164,16 @@
         <argument key="App\Controller\MessageController:show" type="service_closure" id=".service_locator.O3A1vmO"/>
         <argument key="App\Controller\RegistrationController:register" type="service_closure" id=".service_locator.8_0lB_e"/>
         <argument key="App\Controller\ReservationTransportController:cardStation" type="service_closure" id=".service_locator.qCOaJRT"/>
+        <argument key="App\Controller\ReservationTransportController:chat" type="service_closure" id=".service_locator.wLT9ipV"/>
         <argument key="App\Controller\ReservationTransportController:confirm" type="service_closure" id=".service_locator.iVzJol."/>
         <argument key="App\Controller\ReservationTransportController:delete" type="service_closure" id=".service_locator.7jf0haM"/>
         <argument key="App\Controller\ReservationTransportController:edit" type="service_closure" id=".service_locator.cvvzvb5"/>
         <argument key="App\Controller\ReservationTransportController:index" type="service_closure" id=".service_locator.WtTOPxF"/>
         <argument key="App\Controller\ReservationTransportController:new" type="service_closure" id=".service_locator.iVzJol."/>
         <argument key="App\Controller\ReservationTransportController:new2" type="service_closure" id=".service_locator.iVzJol."/>
-        <argument key="App\Controller\ReservationTransportController:payment" type="service_closure" id=".service_locator.wxzU4dO"/>
+        <argument key="App\Controller\ReservationTransportController:newMessage" type="service_closure" id=".service_locator.gQpJNsQ"/>
+        <argument key="App\Controller\ReservationTransportController:payment" type="service_closure" id=".service_locator.WHu4pRc"/>
+        <argument key="App\Controller\ReservationTransportController:processPayment" type="service_closure" id=".service_locator.iVzJol."/>
         <argument key="App\Controller\ReservationTransportController:recap" type="service_closure" id=".service_locator.TGRHV_0"/>
         <argument key="App\Controller\ReservationTransportController:show" type="service_closure" id=".service_locator.C8OlVt9"/>
         <argument key="App\Controller\SecurityController:login" type="service_closure" id=".service_locator.kPUOGb8"/>
@@ -8428,11 +8489,12 @@
         <argument key="turbo.doctrine.event_listener" type="service_closure" id="turbo.doctrine.event_listener"/>
       </argument>
     </service>
-    <service id=".service_locator.uY7hb84" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.wff11tj" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Repository\CommentaireRepository" type="service_closure" id="App\Repository\CommentaireRepository"/>
         <argument key="App\Repository\MessageRepository" type="service_closure" id="App\Repository\MessageRepository"/>
+        <argument key="App\Repository\ReservationRepository" type="service_closure" id="App\Repository\ReservationRepository"/>
         <argument key="App\Repository\ReservationTransportRepository" type="service_closure" id="App\Repository\ReservationTransportRepository"/>
         <argument key="App\Repository\SocialMediaRepository" type="service_closure" id="App\Repository\SocialMediaRepository"/>
         <argument key="App\Repository\StationRepository" type="service_closure" id="App\Repository\StationRepository"/>
@@ -8760,12 +8822,6 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
-    <service id=".service_locator.O2p6Lk7.App\Controller\AdminCreatorController" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator_context" id="App\Controller\AdminCreatorController"/>
-      <argument>App\Controller\AdminCreatorController</argument>
-      <argument type="service" id="service_container"/>
-      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
-    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\BaseController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\BaseController"/>
       <argument>App\Controller\BaseController</argument>
@@ -8778,9 +8834,9 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
-    <service id=".service_locator.O2p6Lk7.App\Controller\DiagnosticController" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator_context" id="App\Controller\DiagnosticController"/>
-      <argument>App\Controller\DiagnosticController</argument>
+    <service id=".service_locator.O2p6Lk7.App\Controller\DashEntreprise\AnalyticsController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\DashEntreprise\AnalyticsController"/>
+      <argument>App\Controller\DashEntreprise\AnalyticsController</argument>
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
@@ -9019,10 +9075,9 @@
         <argument type="collection">
           <argument>App\Kernel</argument>
           <argument>App\Controller\AdminController</argument>
-          <argument>App\Controller\AdminCreatorController</argument>
           <argument>App\Controller\BaseController</argument>
           <argument>App\Controller\CommentaireController</argument>
-          <argument>App\Controller\DiagnosticController</argument>
+          <argument>App\Controller\DashEntreprise\AnalyticsController</argument>
           <argument>App\Controller\EntrepriseController</argument>
           <argument>App\Controller\MessageController</argument>
           <argument>App\Controller\RegistrationController</argument>
@@ -9255,8 +9310,11 @@
     <service id=".errored..service_locator.7jf0haM.App\Entity\ReservationTransport" class="App\Entity\ReservationTransport">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.7jf0haM&quot;: it needs an instance of &quot;App\Entity\ReservationTransport&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
-    <service id=".errored..service_locator.wxzU4dO.App\Entity\ReservationTransport" class="App\Entity\ReservationTransport">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.wxzU4dO&quot;: it needs an instance of &quot;App\Entity\ReservationTransport&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    <service id=".errored..service_locator.wLT9ipV.App\Entity\ReservationTransport" class="App\Entity\ReservationTransport">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.wLT9ipV&quot;: it needs an instance of &quot;App\Entity\ReservationTransport&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.gQpJNsQ.App\Entity\ReservationTransport" class="App\Entity\ReservationTransport">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.gQpJNsQ&quot;: it needs an instance of &quot;App\Entity\ReservationTransport&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".errored..service_locator.hvt4Me9.App\Entity\SocialMedia" class="App\Entity\SocialMedia">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.hvt4Me9&quot;: it needs an instance of &quot;App\Entity\SocialMedia&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
@@ -9276,12 +9334,12 @@
     <service id=".errored..service_locator.rvMNZGh.App\Entity\User" class="App\Entity\User">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.rvMNZGh&quot;: it needs an instance of &quot;App\Entity\User&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
-    <service id=".App\Command\CreateAdminUsersCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
-      <argument>app:create-admin-users</argument>
+    <service id=".App\Command\TestEmailCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>app:test-email</argument>
       <argument type="collection"/>
-      <argument>Creates 5 admin users with predefined names</argument>
+      <argument>Tests email sending functionality</argument>
       <argument>false</argument>
-      <argument type="service_closure" id="App\Command\CreateAdminUsersCommand"/>
+      <argument type="service_closure" id="App\Command\TestEmailCommand"/>
     </service>
     <service id=".console.command.about.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>about</argument>
@@ -9962,9 +10020,9 @@
     </service>
     <service id="console.command_loader" class="Symfony\Component\Console\CommandLoader\ContainerCommandLoader" public="true">
       <tag name="container.no_preload"/>
-      <argument type="service" id=".service_locator.USTD8FL"/>
+      <argument type="service" id=".service_locator.UsuW9dO"/>
       <argument type="collection">
-        <argument key="app:create-admin-users">App\Command\CreateAdminUsersCommand</argument>
+        <argument key="app:test-email">App\Command\TestEmailCommand</argument>
         <argument key="about">console.command.about</argument>
         <argument key="assets:install">console.command.assets_install</argument>
         <argument key="cache:clear">console.command.cache_clear</argument>
@@ -10082,10 +10140,10 @@
         <argument key="make:webhook">maker.auto_command.make_webhook</argument>
       </argument>
     </service>
-    <service id=".service_locator.USTD8FL" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.UsuW9dO" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="App\Command\CreateAdminUsersCommand" type="service_closure" id=".App\Command\CreateAdminUsersCommand.lazy"/>
+        <argument key="App\Command\TestEmailCommand" type="service_closure" id=".App\Command\TestEmailCommand.lazy"/>
         <argument key="console.command.about" type="service_closure" id=".console.command.about.lazy"/>
         <argument key="console.command.assets_install" type="service_closure" id=".console.command.assets_install.lazy"/>
         <argument key="console.command.cache_clear" type="service_closure" id=".console.command.cache_clear.lazy"/>
@@ -10474,7 +10532,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.vO5Eeb_"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.oOWK0Hn"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
@@ -10495,20 +10553,24 @@
     <service id="Psr\Log\LoggerInterface $debugLogger" alias="monolog.logger.debug"/>
     <service id="Psr\Log\LoggerInterface $securityLogger" alias="monolog.logger.security"/>
     <service id="Psr\Log\LoggerInterface $deprecationLogger" alias="monolog.logger.deprecation"/>
-    <service id=".service_locator.80edgLI" alias="messenger.receiver_locator"/>
-    <service id=".service_locator.h8Jkkd2" alias="messenger.retry_strategy_locator"/>
+    <service id=".service_locator.GsIjbjK" alias="messenger.receiver_locator"/>
+    <service id=".service_locator.Q7if2wv" alias="messenger.retry_strategy_locator"/>
+    <service id=".service_locator.ZBZXtOS" alias=".service_locator.NZdAz3P"/>
     <service id=".service_locator.bJ.4HC5" alias=".service_locator.w7.f4fT"/>
     <service id=".service_locator.FSYDRZL" alias=".service_locator.X_5wiI3"/>
+    <service id=".service_locator.a_J36us" alias=".service_locator.hsYjguD"/>
     <service id=".service_locator.NmFzssJ" alias=".service_locator.SJArFDd"/>
     <service id=".service_locator.orhBUuF" alias=".service_locator.us3WAcN"/>
     <service id=".service_locator.H7hrCl." alias=".service_locator.8_0lB_e"/>
     <service id=".service_locator.Br26kqD" alias=".service_locator.iVzJol."/>
     <service id=".service_locator.K9RNdf8" alias=".service_locator.cvvzvb5"/>
     <service id=".service_locator.UPoZUVc" alias=".service_locator.7jf0haM"/>
+    <service id=".service_locator.uajK6SR" alias=".service_locator.wLT9ipV"/>
+    <service id=".service_locator.UuCU7Lh" alias=".service_locator.gQpJNsQ"/>
     <service id=".service_locator.DVR2LwI" alias=".service_locator.hvt4Me9"/>
     <service id=".service_locator.1dJfu2A" alias=".service_locator.phVsJul"/>
     <service id=".service_locator.R0Sb2kd" alias=".service_locator.rvMNZGh"/>
-    <service id=".service_locator.XA_WwAI" alias=".service_locator.vO5Eeb_"/>
+    <service id=".service_locator.oTS0HCQ" alias=".service_locator.oOWK0Hn"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.iu3Tr_u" alias=".service_locator.mLTyPdm"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -10534,12 +10596,13 @@
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id="security.event_dispatcher.main" alias="debug.security.event_dispatcher.main"/>
     <service id=".service_locator.gFlme_s" alias=".service_locator.y4_Zrx."/>
-    <service id=".service_locator.9e2t_lq" alias=".service_locator.CsMkqUa"/>
     <service id=".service_locator.yORP_vM" alias=".service_locator.uJ0s0sI"/>
+    <service id=".service_locator.9e2t_lq" alias=".service_locator.CsMkqUa"/>
     <service id=".service_locator.M9rwfbv" alias=".service_locator.X_5wiI3"/>
     <service id=".service_locator.5.mGh0p" alias=".service_locator.ZfwS4tl"/>
     <service id=".service_locator.cSLnqKe" alias=".service_locator.HrDCg3Q"/>
-    <service id=".service_locator.025Wi8b" alias=".service_locator.kPUOGb8"/>
+    <service id=".service_locator.6.UxcNi" alias=".service_locator.hsYjguD"/>
+    <service id=".service_locator.LuS44bc" alias=".service_locator.caJHb8S"/>
     <service id=".service_locator.22VUVOO" alias=".service_locator.sLkGFte"/>
     <service id=".service_locator.Lypa7j8" alias=".service_locator.O3A1vmO"/>
     <service id=".service_locator.IwBIoRa" alias=".service_locator.SJArFDd"/>
@@ -10549,10 +10612,13 @@
     <service id=".service_locator.adFHrwS" alias=".service_locator.iVzJol."/>
     <service id=".service_locator.6fjXhkD" alias=".service_locator.C8OlVt9"/>
     <service id=".service_locator.aDeSxXj" alias=".service_locator.cvvzvb5"/>
-    <service id=".service_locator.AR1xoo5" alias=".service_locator.7jf0haM"/>
-    <service id=".service_locator.NNzPwhv" alias=".service_locator.qCOaJRT"/>
+    <service id=".service_locator.6sz3lv7" alias=".service_locator.WHu4pRc"/>
     <service id=".service_locator.5aH53ud" alias=".service_locator.TGRHV_0"/>
-    <service id=".service_locator.L25Xcgh" alias=".service_locator.wxzU4dO"/>
+    <service id=".service_locator.NNzPwhv" alias=".service_locator.qCOaJRT"/>
+    <service id=".service_locator.AR1xoo5" alias=".service_locator.7jf0haM"/>
+    <service id=".service_locator.ng8grpY" alias=".service_locator.wLT9ipV"/>
+    <service id=".service_locator.xzQLFQp" alias=".service_locator.gQpJNsQ"/>
+    <service id=".service_locator.025Wi8b" alias=".service_locator.kPUOGb8"/>
     <service id=".service_locator.K0XJD4w" alias=".service_locator.4m6SajK"/>
     <service id=".service_locator.nxbNn8K" alias=".service_locator.hvt4Me9"/>
     <service id=".service_locator.heb0tpT" alias=".service_locator.AzHTDsT"/>

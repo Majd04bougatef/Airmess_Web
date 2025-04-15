@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -14,6 +15,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class RegistrationController extends AbstractController
 {
+    private $emailService;
+
+    public function __construct(EmailService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request, 
@@ -34,7 +42,7 @@ class RegistrationController extends AbstractController
                 if ($request->request->get('roleUser') === 'Voyageurs') {
                     $user->setPrenom($request->request->get('prenom'));
                 } else {
-                    $user->setPrenom(''); // For entreprise, set empty string
+                    $user->setPrenom(null); // For entreprise, set null instead of empty string
                 }
                 
                 $user->setEmail($request->request->get('email'));
@@ -85,7 +93,14 @@ class RegistrationController extends AbstractController
                 $entityManager->persist($user);
                 $entityManager->flush();
                 
-                $this->addFlash('success', 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.');
+                // Send welcome email
+                $emailSent = $this->emailService->sendWelcomeEmail($user);
+                
+                if ($emailSent) {
+                    $this->addFlash('success', 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter. Un email de bienvenue a été envoyé à votre adresse email.');
+                } else {
+                    $this->addFlash('success', 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter. Nous n\'avons pas pu vous envoyer un email de bienvenue, mais vous pouvez toujours utiliser votre compte.');
+                }
                 
                 return $this->redirectToRoute('login');
                 

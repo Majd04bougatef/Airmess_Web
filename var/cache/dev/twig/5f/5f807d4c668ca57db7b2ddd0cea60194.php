@@ -170,7 +170,6 @@ class __TwigTemplate_d1ccf58cb8996beebb0b18868aa02325 extends Template
     </div>
   </div>
 </div>
-{% endblock %}
-", "dashVoyageurs/bonplanPageVoyageurs.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashVoyageurs\\bonplanPageVoyageurs.html.twig");
+{% endblock %}", "dashVoyageurs/bonplanPageVoyageurs.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashVoyageurs\\bonplanPageVoyageurs.html.twig");
     }
 }

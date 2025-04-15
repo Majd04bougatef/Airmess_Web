@@ -136,7 +136,7 @@ class __TwigTemplate_cadb5bab28ef861eb2bbea0ce9aa2e7b extends Template
             yield "</td>
                 <td>";
             // line 31
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["user"], "prenom", [], "any", false, false, false, 31), "html", null, true);
+            yield (((CoreExtension::getAttribute($this->env, $this->source, $context["user"], "prenom", [], "any", true, true, false, 31) &&  !(null === CoreExtension::getAttribute($this->env, $this->source, $context["user"], "prenom", [], "any", false, false, false, 31)))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["user"], "prenom", [], "any", false, false, false, 31), "html", null, true)) : (""));
             yield "</td>
                 <td>";
             // line 32
@@ -273,7 +273,7 @@ class __TwigTemplate_cadb5bab28ef861eb2bbea0ce9aa2e7b extends Template
             <tr>
                 <td>{{ user.idU }}</td>
                 <td>{{ user.name }}</td>
-                <td>{{ user.prenom }}</td>
+                <td>{{ user.prenom ?? '' }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.password }}</td>
                 <td>{{ user.roleUser }}</td>

@@ -499,6 +499,7 @@ class __TwigTemplate_7553ba2c65a37b69b4ea0b32ffa0599f extends Template
         </div>
       </footer>
     </div>
+
 ";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -946,6 +947,7 @@ class __TwigTemplate_7553ba2c65a37b69b4ea0b32ffa0599f extends Template
         </div>
       </footer>
     </div>
+
 {% endblock %}", "dashEntreprise/dashboardEntreprisePage.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashEntreprise\\dashboardEntreprisePage.html.twig");
     }
 }
