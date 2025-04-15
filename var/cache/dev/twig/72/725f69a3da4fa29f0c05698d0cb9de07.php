@@ -89,6 +89,26 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
         yield "\" width=\"40px\" height=\"45px\" class=\"navbar-brand-img h-100\" alt=\"main_logo\">
         <span class=\"ms-1 font-weight-bold\">Airmess</span>
       </a>
+      <div class=\"user-info mt-3 d-flex align-items-center ps-3\">
+        <img src=\"";
+        // line 32
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/users/" . CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 32, $this->source); })()), "session", [], "any", false, false, false, 32), "get", ["user_image"], "method", false, false, false, 32))), "html", null, true);
+        yield "\" alt=\"";
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 32, $this->source); })()), "session", [], "any", false, false, false, 32), "get", ["user_name"], "method", false, false, false, 32), "html", null, true);
+        yield "\" class=\"rounded-circle\" width=\"40\" height=\"40\" onerror=\"this.src='";
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/user-avatar.svg"), "html", null, true);
+        yield "';\">
+        <div class=\"ms-2\">
+          <span class=\"font-weight-bold text-sm\">";
+        // line 34
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 34, $this->source); })()), "session", [], "any", false, false, false, 34), "get", ["user_name"], "method", false, false, false, 34), "html", null, true);
+        yield "</span>
+          <small class=\"d-block text-secondary\">";
+        // line 35
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 35, $this->source); })()), "session", [], "any", false, false, false, 35), "get", ["user_role"], "method", false, false, false, 35), "html", null, true);
+        yield "</small>
+        </div>
+      </div>
     </div>
     <hr class=\"horizontal dark mt-0\">
     <div class=\"collapse navbar-collapse  w-auto \" id=\"sidenav-collapse-main\">
@@ -105,7 +125,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
           <a class=\"nav-link\" href=\"#\" id=\"user-button\">
             <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
               <img src=\"";
-        // line 46
+        // line 53
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/user-icon.png"), "html", null, true);
         yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
             </div>
@@ -118,7 +138,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
           <a class=\"nav-link \"  href=\"#\" id=\"station-button\">
             <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
               <img src=\"";
-        // line 56
+        // line 63
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/station-icon.png"), "html", null, true);
         yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
             </div>
@@ -129,7 +149,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
           <a class=\"nav-link \"  href=\"#\" id=\"bonplan-button\">
             <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
               <img src=\"";
-        // line 64
+        // line 71
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/bonplan-icon.png"), "html", null, true);
         yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />            </div>
             <span class=\"nav-link-text ms-1\">Bon Plan</span>
@@ -139,7 +159,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
           <a class=\"nav-link \"  href=\"#\" id=\"offre-button\">
             <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
               <img src=\"";
-        // line 71
+        // line 78
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/offre-icon.png"), "html", null, true);
         yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
             </div>
@@ -151,7 +171,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
           <a class=\"nav-link \"  href=\"#\" id=\"social-button\">
             <div class=\"icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center\">
               <img src=\"";
-        // line 80
+        // line 87
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/social-icon.png"), "html", null, true);
         yield "\" alt=\"Icon\" class=\"img\" style=\"width: 25px; height: 25px;\" />
             </div>
@@ -175,7 +195,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
     <div class=\"sidenav-footer mx-3 \">
       <div class=\"card card-plain shadow-none\" id=\"sidenavCard\">
         <img class=\"w-50 mx-auto\" src=\"";
-        // line 101
+        // line 108
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/illustrations/icon-documentation.svg"), "html", null, true);
         yield "\" alt=\"sidebar_illustration\">
         <div class=\"card-body text-center p-3 w-100 pt-0\">
@@ -187,17 +207,17 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
       </div>
       <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
       <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"";
-        // line 110
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
+        // line 117
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_base");
         yield "\" type=\"button\">Se déconnecter</a>
     </div>
   </aside>
   <main class=\"main-content position-relative border-radius-lg \" id=\"content\">
     <!-- Navbar -->
     ";
-        // line 115
+        // line 122
         yield from $this->unwrap()->yieldBlock('content', $context, $blocks);
-        // line 116
+        // line 123
         yield "  </main>
   <div class=\"fixed-plugin\">
     <a class=\"fixed-plugin-button text-dark position-fixed px-3 py-2\">
@@ -273,23 +293,23 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
   </div>
   <!--   Core JS Files   -->
   <script src=\"";
-        // line 190
+        // line 197
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core/popper.min.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 191
+        // line 198
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core/bootstrap.min.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 192
+        // line 199
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/plugins/perfect-scrollbar.min.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 193
+        // line 200
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/plugins/smooth-scrollbar.min.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 194
+        // line 201
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/plugins/chartjs.min.js"), "html", null, true);
         yield "\"></script>
   <script>
@@ -308,7 +328,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
       document.getElementById(\"dashboard-button\").addEventListener(\"click\", function(e) {
         e.preventDefault();
         window.location.href = \"";
-        // line 210
+        // line 217
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("dashboard_page");
         yield "\";
       });
@@ -316,7 +336,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
       document.getElementById(\"user-button\").addEventListener(\"click\", function(e) {
         e.preventDefault();
         window.location.href = \"";
-        // line 215
+        // line 222
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("user_page");
         yield "\";
       });
@@ -324,7 +344,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
       document.getElementById(\"station-button\").addEventListener(\"click\", function(e) {
         e.preventDefault();
         window.location.href = \"";
-        // line 220
+        // line 227
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("station_page");
         yield "\";
       });
@@ -332,7 +352,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
       document.getElementById(\"bonplan-button\").addEventListener(\"click\", function(e) {
         e.preventDefault();
         window.location.href = \"";
-        // line 225
+        // line 232
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("bonplan_page");
         yield "\";
       });
@@ -340,7 +360,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
       document.getElementById(\"offre-button\").addEventListener(\"click\", function(e) {
         e.preventDefault();
         window.location.href = \"";
-        // line 230
+        // line 237
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("offre_page");
         yield "\";
       });
@@ -348,7 +368,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
       document.getElementById(\"social-button\").addEventListener(\"click\", function(e) {
         e.preventDefault();
         window.location.href = \"";
-        // line 235
+        // line 242
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("social_page");
         yield "\";
       });
@@ -359,7 +379,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
   <script async defer src=\"https://buttons.github.io/buttons.js\"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src=\"";
-        // line 243
+        // line 250
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/argon-dashboard.min.js"), "html", null, true);
         yield "\"></script>
 </body>
@@ -397,7 +417,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
         yield from [];
     }
 
-    // line 115
+    // line 122
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -440,7 +460,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  401 => 115,  378 => 8,  363 => 243,  352 => 235,  344 => 230,  336 => 225,  328 => 220,  320 => 215,  312 => 210,  293 => 194,  289 => 193,  285 => 192,  281 => 191,  277 => 190,  201 => 116,  199 => 115,  191 => 110,  179 => 101,  155 => 80,  143 => 71,  133 => 64,  122 => 56,  109 => 46,  88 => 28,  76 => 19,  63 => 9,  59 => 8,  50 => 1,);
+        return array (  421 => 122,  398 => 8,  383 => 250,  372 => 242,  364 => 237,  356 => 232,  348 => 227,  340 => 222,  332 => 217,  313 => 201,  309 => 200,  305 => 199,  301 => 198,  297 => 197,  221 => 123,  219 => 122,  211 => 117,  199 => 108,  175 => 87,  163 => 78,  153 => 71,  142 => 63,  129 => 53,  108 => 35,  104 => 34,  95 => 32,  88 => 28,  76 => 19,  63 => 9,  59 => 8,  50 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -475,6 +495,13 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
         <img src=\"{{asset('images/logo-airmess.png')}}\" width=\"40px\" height=\"45px\" class=\"navbar-brand-img h-100\" alt=\"main_logo\">
         <span class=\"ms-1 font-weight-bold\">Airmess</span>
       </a>
+      <div class=\"user-info mt-3 d-flex align-items-center ps-3\">
+        <img src=\"{{ asset('uploads/users/' ~ app.session.get('user_image')) }}\" alt=\"{{ app.session.get('user_name') }}\" class=\"rounded-circle\" width=\"40\" height=\"40\" onerror=\"this.src='{{ asset('images/user-avatar.svg') }}';\">
+        <div class=\"ms-2\">
+          <span class=\"font-weight-bold text-sm\">{{ app.session.get('user_name') }}</span>
+          <small class=\"d-block text-secondary\">{{ app.session.get('user_role') }}</small>
+        </div>
+      </div>
     </div>
     <hr class=\"horizontal dark mt-0\">
     <div class=\"collapse navbar-collapse  w-auto \" id=\"sidenav-collapse-main\">
@@ -554,7 +581,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
         </div>
       </div>
       <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
-      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"{{path('app_logout')}}\" type=\"button\">Se déconnecter</a>
+      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"{{path('app_base')}}\" type=\"button\">Se déconnecter</a>
     </div>
   </aside>
   <main class=\"main-content position-relative border-radius-lg \" id=\"content\">

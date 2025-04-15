@@ -282,7 +282,6 @@ class __TwigTemplate_9f1264e5946fcc35f00b4a9795b5cee9 extends Template
     </div>
   </div>
 </div>
-{% endblock %}
-", "dashAdmin/socialPage.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashAdmin\\socialPage.html.twig");
+{% endblock %}", "dashAdmin/socialPage.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashAdmin\\socialPage.html.twig");
     }
 }

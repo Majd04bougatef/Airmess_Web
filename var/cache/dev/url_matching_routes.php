@@ -50,6 +50,8 @@ return [
         '/station/new' => [[['_route' => 'app_station_new', '_controller' => 'App\\Controller\\StationController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/user' => [[['_route' => 'app_user_index', '_controller' => 'App\\Controller\\UserController::index'], null, ['GET' => 0], null, false, false, null]],
         '/user/new' => [[['_route' => 'app_user_new', '_controller' => 'App\\Controller\\UserController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/verify' => [[['_route' => 'app_verify', '_controller' => 'App\\Controller\\VerificationController::verify'], null, null, null, false, false, null]],
+        '/resend-code' => [[['_route' => 'app_resend_code', '_controller' => 'App\\Controller\\VerificationController::resendCode'], null, null, null, false, false, null]],
         '/dashboardVoyageursPage' => [[['_route' => 'dashboardVoyageurs_page', '_controller' => 'App\\Controller\\VoyageursController::dashboardVoyageursPage'], null, null, null, false, false, null]],
         '/UserVoyageursPage' => [[['_route' => 'userVoyageurs_page', '_controller' => 'App\\Controller\\VoyageursController::UserVoyageursPage'], null, null, null, false, false, null]],
         '/StationVoyageursPage' => [[['_route' => 'stationVoyageurs_page', '_controller' => 'App\\Controller\\VoyageursController::stationVoyageursPage'], null, null, null, false, false, null]],

@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Service\EmailService;
+use App\Service\VerificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -16,93 +18,52 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class RegistrationController extends AbstractController
 {
     private $emailService;
+    private $verificationService;
 
-    public function __construct(EmailService $emailService)
-    {
+    public function __construct(
+        EmailService $emailService,
+        VerificationService $verificationService
+    ) {
         $this->emailService = $emailService;
+        $this->verificationService = $verificationService;
     }
 
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request, 
-        EntityManagerInterface $entityManager, 
         SluggerInterface $slugger,
-        UserPasswordHasherInterface $passwordHasher
+        SessionInterface $session
     ): Response
     {
         if ($request->isMethod('POST')) {
             try {
-                // Create a new user
-                $user = new User();
+                // Validate form data
+                $errors = $this->validateFormData($request);
                 
-                // Set basic user data
-                $user->setName($request->request->get('name'));
-                
-                // Prenom is only for voyageurs
-                if ($request->request->get('roleUser') === 'Voyageurs') {
-                    $user->setPrenom($request->request->get('prenom'));
-                } else {
-                    $user->setPrenom(null); // For entreprise, set null instead of empty string
-                }
-                
-                $user->setEmail($request->request->get('email'));
-                
-                // Hash the password using bcrypt
-                $plainPassword = $request->request->get('password');
-                // Using password_hash directly because UserPasswordHasherInterface requires the User to implement UserInterface
-                $hashedPassword = password_hash($plainPassword, PASSWORD_BCRYPT);
-                $user->setPassword($hashedPassword);
-                
-                $user->setRoleUser($request->request->get('roleUser'));
-                $user->setPhoneNumber($request->request->get('phoneNumber'));
-                $user->setStatut($request->request->get('statut', 'active'));
-                $user->setDiamond((int)$request->request->get('diamond', 0));
-                $user->setDeleteFlag((int)$request->request->get('deleteFlag', 0));
-                
-                // Handle date of birth
-                if ($request->request->get('roleUser') === 'Voyageurs' && $request->request->get('dateNaiss')) {
-                    $user->setDateNaiss(new \DateTime($request->request->get('dateNaiss')));
-                } else {
-                    $user->setDateNaiss(new \DateTime()); // Default to current date for entreprise
-                }
-                
-                // Handle file upload
-                $photoFile = $request->files->get('photo');
-                if ($photoFile) {
-                    $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    $safeFilename = $slugger->slug($originalFilename);
-                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $photoFile->guessExtension();
-                    
-                    try {
-                        $photoFile->move(
-                            $this->getParameter('uploads_directory'),
-                            $newFilename
-                        );
-                    } catch (FileException $e) {
-                        // Handle exception
-                        $this->addFlash('error', 'Erreur lors du téléchargement de la photo.');
-                        return $this->redirectToRoute('app_signup');
+                if (!empty($errors)) {
+                    foreach ($errors as $error) {
+                        $this->addFlash('error', $error);
                     }
-                    
-                    $user->setImagesU($newFilename);
-                } else {
-                    $user->setImagesU('default-avatar.jpg'); // Default image
+                    return $this->redirectToRoute('app_signup');
                 }
                 
-                // Save the user to the database
-                $entityManager->persist($user);
-                $entityManager->flush();
+                // Process and store form data in session
+                $userData = $this->processFormData($request, $slugger);
+                $session->set('temp_user_data', $userData);
                 
-                // Send welcome email
-                $emailSent = $this->emailService->sendWelcomeEmail($user);
+                // Generate verification code
+                $code = $this->verificationService->generateCode($userData['email']);
                 
-                if ($emailSent) {
-                    $this->addFlash('success', 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter. Un email de bienvenue a été envoyé à votre adresse email.');
-                } else {
-                    $this->addFlash('success', 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter. Nous n\'avons pas pu vous envoyer un email de bienvenue, mais vous pouvez toujours utiliser votre compte.');
+                // Send verification code
+                $emailSent = $this->verificationService->sendVerificationCode($userData['email'], $code);
+                
+                if (!$emailSent) {
+                    $this->addFlash('error', 'Nous n\'avons pas pu envoyer le code de vérification. Veuillez réessayer.');
+                    return $this->redirectToRoute('app_signup');
                 }
                 
-                return $this->redirectToRoute('login');
+                // Redirect to verification page
+                return $this->redirectToRoute('app_verify');
                 
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de l\'inscription: ' . $e->getMessage());
@@ -112,5 +73,111 @@ class RegistrationController extends AbstractController
         
         // If not a POST request, redirect to signup page
         return $this->redirectToRoute('app_signup');
+    }
+
+    private function validateFormData(Request $request): array
+    {
+        $errors = [];
+        
+        // Name validation
+        $name = $request->request->get('name');
+        if (empty($name) || strlen($name) < 2) {
+            $errors[] = 'Le nom doit contenir au moins 2 caractères.';
+        }
+        
+        // Email validation
+        $email = $request->request->get('email');
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Veuillez fournir une adresse email valide.';
+        }
+        
+        // Password validation
+        $password = $request->request->get('password');
+        $confirmPassword = $request->request->get('password_confirm');
+        
+        if (empty($password) || strlen($password) < 6) {
+            $errors[] = 'Le mot de passe doit contenir au moins 6 caractères.';
+        } elseif ($password !== $confirmPassword) {
+            $errors[] = 'Les mots de passe ne correspondent pas.';
+        }
+        
+        // Phone validation
+        $phone = $request->request->get('phoneNumber');
+        if (empty($phone) || !preg_match('/^[0-9]{8}$/', $phone)) {
+            $errors[] = 'Le numéro de téléphone doit contenir exactement 8 chiffres.';
+        }
+        
+        // Photo validation
+        $photoFile = $request->files->get('photo');
+        if (!$photoFile) {
+            $errors[] = 'Veuillez télécharger une photo.';
+        }
+        
+        // Date of birth validation for Voyageurs
+        if ($request->request->get('roleUser') === 'Voyageurs') {
+            $dateNaiss = $request->request->get('dateNaiss');
+            if (empty($dateNaiss)) {
+                $errors[] = 'Veuillez entrer votre date de naissance.';
+            } else {
+                $birthDate = new \DateTime($dateNaiss);
+                $today = new \DateTime();
+                $age = $today->diff($birthDate)->y;
+                
+                if ($age < 15) {
+                    $errors[] = 'Vous devez avoir au moins 15 ans pour vous inscrire.';
+                }
+            }
+            
+            // Prenom validation for Voyageurs
+            $prenom = $request->request->get('prenom');
+            if (empty($prenom) || strlen($prenom) < 2) {
+                $errors[] = 'Le prénom doit contenir au moins 2 caractères.';
+            }
+        }
+        
+        return $errors;
+    }
+    
+    private function processFormData(Request $request, SluggerInterface $slugger): array
+    {
+        $userData = [
+            'name' => $request->request->get('name'),
+            'email' => $request->request->get('email'),
+            'password' => password_hash($request->request->get('password'), PASSWORD_BCRYPT),
+            'roleUser' => $request->request->get('roleUser'),
+            'phoneNumber' => $request->request->get('phoneNumber'),
+            'statut' => 'active',
+            'diamond' => 0,
+            'deleteFlag' => 0
+        ];
+        
+        // Add prenom for Voyageurs
+        if ($request->request->get('roleUser') === 'Voyageurs') {
+            $userData['prenom'] = $request->request->get('prenom');
+            $userData['dateNaiss'] = $request->request->get('dateNaiss');
+        }
+        
+        // Process photo upload
+        $photoFile = $request->files->get('photo');
+        if ($photoFile) {
+            $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $photoFile->guessExtension();
+            
+            try {
+                $photoFile->move(
+                    $this->getParameter('uploads_directory'),
+                    $newFilename
+                );
+                $userData['imagesU'] = $newFilename;
+            } catch (FileException $e) {
+                // If file upload fails, set default image
+                $userData['imagesU'] = 'default-avatar.jpg';
+            }
+        } else {
+            $userData['imagesU'] = 'default-avatar.jpg';
+        }
+        
+        return $userData;
     }
 } 

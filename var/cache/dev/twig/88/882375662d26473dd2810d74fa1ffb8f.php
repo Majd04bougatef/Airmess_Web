@@ -170,7 +170,6 @@ class __TwigTemplate_0ffde386cdee9dc0dde12b7dfe5febdd extends Template
     </div>
   </div>
 </div>
-{% endblock %}
-", "dashEntreprise/socialPageEntreprise.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashEntreprise\\socialPageEntreprise.html.twig");
+{% endblock %}", "dashEntreprise/socialPageEntreprise.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashEntreprise\\socialPageEntreprise.html.twig");
     }
 }
