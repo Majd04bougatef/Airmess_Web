@@ -39,7 +39,7 @@ class __TwigTemplate_fe0996c2003cf9454708419c89ef4a62 extends Template
     protected function doGetParent(array $context): bool|string|Template|TemplateWrapper
     {
         // line 1
-        return "base.html.twig";
+        return "dashVoyageurs/dashboardVoyageurs.html.twig";
     }
 
     protected function doDisplay(array $context, array $blocks = []): iterable
@@ -51,7 +51,7 @@ class __TwigTemplate_fe0996c2003cf9454708419c89ef4a62 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "social_media/_form.html.twig"));
 
-        $this->parent = $this->loadTemplate("base.html.twig", "social_media/_form.html.twig", 1);
+        $this->parent = $this->loadTemplate("dashVoyageurs/dashboardVoyageurs.html.twig", "social_media/_form.html.twig", 1);
         yield from $this->parent->unwrap()->yield($context, array_merge($this->blocks, $blocks));
         
         $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
@@ -84,11 +84,11 @@ class __TwigTemplate_fe0996c2003cf9454708419c89ef4a62 extends Template
     const forbiddenWords = {
         title: ";
         // line 12
-        yield json_encode(((CoreExtension::getAttribute($this->env, $this->source, ($context["forbidden_words"] ?? null), "title", [], "any", true, true, false, 12)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 12, $this->source); })()), "title", [], "any", false, false, false, 12), [])) : ([])));
+        yield ((CoreExtension::getAttribute($this->env, $this->source, ($context["forbidden_words"] ?? null), "title", [], "any", true, true, false, 12)) ? (json_encode(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 12, $this->source); })()), "title", [], "any", false, false, false, 12))) : ("[]"));
         yield ",
         content: ";
         // line 13
-        yield json_encode(((CoreExtension::getAttribute($this->env, $this->source, ($context["forbidden_words"] ?? null), "content", [], "any", true, true, false, 13)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 13, $this->source); })()), "content", [], "any", false, false, false, 13), [])) : ([])));
+        yield ((CoreExtension::getAttribute($this->env, $this->source, ($context["forbidden_words"] ?? null), "content", [], "any", true, true, false, 13)) ? (json_encode(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 13, $this->source); })()), "content", [], "any", false, false, false, 13))) : ("[]"));
         yield "
     };
 
@@ -149,7 +149,7 @@ class __TwigTemplate_fe0996c2003cf9454708419c89ef4a62 extends Template
         // line 51
         yield "<link href=\"https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css\" rel=\"stylesheet\" />
 <link href=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" id=\"bootstrap-css\">
-
+<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css\">
 ";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -160,7 +160,7 @@ class __TwigTemplate_fe0996c2003cf9454708419c89ef4a62 extends Template
         yield from [];
     }
 
-    // line 57
+    // line 56
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -173,277 +173,595 @@ class __TwigTemplate_fe0996c2003cf9454708419c89ef4a62 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
 
-        // line 58
+        // line 57
         yield "<div class=\"container-fluid py-4\">
     <div class=\"row\">
         <div class=\"col-12\">
-            <div class=\"card mb-4\">
-                <div class=\"card-header pb-0\">
-                    ";
-        // line 64
-        yield "                    <h6>Nouvelle Publication</h6>
+            <div class=\"content-card content-section active\" id=\"social-media-section\">
+                <div class=\"form-header\">
+                    <h2 class=\"form-title\">Nouvelle Publication</h2>
+                    <p class=\"form-subtitle\">Complétez les informations ci-dessous pour créer une nouvelle publication sur les réseaux sociaux.</p>
                 </div>
-                <div class=\"card-body px-lg-5 pt-0 pb-2\"> ";
-        // line 67
-        yield "                    ";
+
+                ";
+        // line 66
+        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 66, $this->source); })()), 'form_start', ["method" => "POST", "attr" => ["class" => "social-media-form", "novalidate" => "novalidate", "enctype" => "multipart/form-data"]]);
+        yield "
+                    
+                    ";
         // line 68
-        yield "                    ";
-        // line 69
-        yield "
-                    <section class=\"get-in-touch\">
-                        ";
-        // line 72
-        yield "                        <h1 class=\"title\">Ajouter une publication</h1>
-
-                        ";
-        // line 75
-        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 75, $this->source); })()), 'form_start', ["method" => "POST", "attr" => ["class" => "contact-form", "novalidate" => "novalidate"]]);
-        yield "
+        if ((array_key_exists("forbidden_words", $context) && ((CoreExtension::getAttribute($this->env, $this->source,         // line 69
+($context["forbidden_words"] ?? null), "title", [], "any", true, true, false, 69) &&  !Twig\Extension\CoreExtension::testEmpty(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 69, $this->source); })()), "title", [], "any", false, false, false, 69))) || (CoreExtension::getAttribute($this->env, $this->source,         // line 70
+($context["forbidden_words"] ?? null), "content", [], "any", true, true, false, 70) &&  !Twig\Extension\CoreExtension::testEmpty(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 70, $this->source); })()), "content", [], "any", false, false, false, 70)))))) {
+            // line 71
+            yield "                        <div class=\"alert alert-danger forbidden-words-alert\">
+                            <h5>Mots interdits détectés:</h5>
                             ";
-        // line 77
-        yield "                            ";
-        if ((array_key_exists("forbidden_words", $context) && ( !Twig\Extension\CoreExtension::testEmpty(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 77, $this->source); })()), "title", [], "any", false, false, false, 77)) ||  !Twig\Extension\CoreExtension::testEmpty(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 77, $this->source); })()), "content", [], "any", false, false, false, 77))))) {
-            // line 78
-            yield "                                <div class=\"alert alert-danger forbidden-words-alert\">
-                                    <h5>Mots interdits détectés:</h5>
-                                    ";
-            // line 80
-            if ( !Twig\Extension\CoreExtension::testEmpty(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 80, $this->source); })()), "title", [], "any", false, false, false, 80))) {
-                // line 81
-                yield "                                        <p><strong>Titre:</strong> ";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::join(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 81, $this->source); })()), "title", [], "any", false, false, false, 81), ", "), "html", null, true);
+            // line 73
+            if ((CoreExtension::getAttribute($this->env, $this->source, ($context["forbidden_words"] ?? null), "title", [], "any", true, true, false, 73) &&  !Twig\Extension\CoreExtension::testEmpty(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 73, $this->source); })()), "title", [], "any", false, false, false, 73)))) {
+                // line 74
+                yield "                                <p><strong>Titre:</strong> ";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::join(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 74, $this->source); })()), "title", [], "any", false, false, false, 74), ", "), "html", null, true);
                 yield "</p>
-                                    ";
-            }
-            // line 83
-            yield "                                    ";
-            if ( !Twig\Extension\CoreExtension::testEmpty(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 83, $this->source); })()), "content", [], "any", false, false, false, 83))) {
-                // line 84
-                yield "                                        <p><strong>Contenu:</strong> ";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::join(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 84, $this->source); })()), "content", [], "any", false, false, false, 84), ", "), "html", null, true);
-                yield "</p>
-                                    ";
-            }
-            // line 86
-            yield "                                </div>
                             ";
+            }
+            // line 76
+            yield "                            ";
+            if ((CoreExtension::getAttribute($this->env, $this->source, ($context["forbidden_words"] ?? null), "content", [], "any", true, true, false, 76) &&  !Twig\Extension\CoreExtension::testEmpty(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 76, $this->source); })()), "content", [], "any", false, false, false, 76)))) {
+                // line 77
+                yield "                                <p><strong>Contenu:</strong> ";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::join(CoreExtension::getAttribute($this->env, $this->source, (isset($context["forbidden_words"]) || array_key_exists("forbidden_words", $context) ? $context["forbidden_words"] : (function () { throw new RuntimeError('Variable "forbidden_words" does not exist.', 77, $this->source); })()), "content", [], "any", false, false, false, 77), ", "), "html", null, true);
+                yield "</p>
+                            ";
+            }
+            // line 79
+            yield "                        </div>
+                    ";
         }
-        // line 88
-        yield "                            
-                            ";
-        // line 90
-        yield "                            <div class=\"row\">
-
-                                ";
+        // line 81
+        yield "                    
+                    <!-- Basic Info Card -->
+                    <div class=\"form-card card-info\">
+                        <div class=\"form-card-header\">
+                            <i class=\"fas fa-info-circle form-card-icon\"></i>
+                            <h3 class=\"form-card-title\">Informations de base</h3>
+                        </div>
+                        <div class=\"form-card-body\">
+                            <div class=\"form-row\">
+                                <div class=\"form-col form-col-md-6\">
+                                    <div class=\"form-floating\">
+                                        ";
+        // line 92
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 92, $this->source); })()), "titre", [], "any", false, false, false, 92), 'widget', ["attr" => ["class" => "form-control", "placeholder" => " "]]);
+        yield "
+                                        ";
         // line 93
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 93, $this->source); })()), "titre", [], "any", false, false, false, 93), 'label');
         yield "
-                                <div class=\"form-field col-lg-6\">
-                                    ";
-        // line 96
-        yield "                                    ";
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 96, $this->source); })()), "titre", [], "any", false, false, false, 96), 'row', ["attr" => ["class" => "input-text"]]);
+                                        ";
+        // line 94
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 94, $this->source); })()), "titre", [], "any", false, false, false, 94), 'errors');
         yield "
+                                    </div>
                                 </div>
-                                <div class=\"form-field col-lg-6\">
-                                    ";
-        // line 99
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 99, $this->source); })()), "lieu", [], "any", false, false, false, 99), 'row', ["attr" => ["class" => "input-text"]]);
+                                
+                                <div class=\"form-col form-col-md-6\">
+                                    <div class=\"form-floating\">
+                                        ";
+        // line 100
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 100, $this->source); })()), "lieu", [], "any", false, false, false, 100), 'widget', ["attr" => ["class" => "form-control", "placeholder" => " "]]);
         yield "
-                                </div>
-                                <div class=\"form-field col-lg-12\"> ";
+                                        ";
+        // line 101
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 101, $this->source); })()), "lieu", [], "any", false, false, false, 101), 'label');
+        yield "
+                                        ";
         // line 102
-        yield "                                     ";
-        // line 103
-        yield "                                    ";
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 103, $this->source); })()), "contenu", [], "any", false, false, false, 103), 'row', ["attr" => ["class" => "input-text"]]);
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 102, $this->source); })()), "lieu", [], "any", false, false, false, 102), 'errors');
         yield "
+                                    </div>
                                 </div>
-                                <div class=\"form-field col-lg-12\"> ";
-        // line 106
-        yield "                                     ";
-        // line 107
-        yield "                                     ";
-        // line 108
-        yield "                                    ";
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 108, $this->source); })()), "imagemedia", [], "any", false, false, false, 108), 'row', ["attr" => ["class" => "input-text"]]);
-        yield "
-                                </div>
+                            </div>
 
+                            <div class=\"form-spacer\"></div>
+                            
+                            <div class=\"form-floating\">
+                                ";
+        // line 110
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 110, $this->source); })()), "contenu", [], "any", false, false, false, 110), 'widget', ["attr" => ["class" => "form-control", "style" => "height: 120px", "placeholder" => " "]]);
+        yield "
+                                ";
+        // line 111
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 111, $this->source); })()), "contenu", [], "any", false, false, false, 111), 'label');
+        yield "
                                 ";
         // line 112
-        yield "                                <div class=\"form-field col-lg-12 text-center\">
-                                    <button type=\"submit\" class=\"submit-btn\">";
-        // line 113
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("button_label", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["button_label"]) || array_key_exists("button_label", $context) ? $context["button_label"] : (function () { throw new RuntimeError('Variable "button_label" does not exist.', 113, $this->source); })()), "Ajouter")) : ("Ajouter")), "html", null, true);
-        yield "</button>
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 112, $this->source); })()), "contenu", [], "any", false, false, false, 112), 'errors');
+        yield "
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Media Card -->
+                    <div class=\"form-card card-media\">
+                        <div class=\"form-card-header\">
+                            <i class=\"fas fa-photo-video form-card-icon\"></i>
+                            <h3 class=\"form-card-title\">Média</h3>
+                        </div>
+                        <div class=\"form-card-body\">
+                            <div class=\"form-image-upload\">
+                                <h4>Télécharger une image ou une vidéo</h4>
+                                ";
+        // line 126
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 126, $this->source); })()), "imagemedia", [], "any", false, false, false, 126), 'label');
+        yield "
+                                ";
+        // line 127
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 127, $this->source); })()), "imagemedia", [], "any", false, false, false, 127), 'widget', ["attr" => ["class" => "form-control-file", "accept" => "image/jpeg, image/jpg, image/png, image/gif, image/avif, video/x-msvideo, video/avi, video/msvideo, video/mpeg, video/mp4"]]);
+        // line 132
+        yield "
+                                <small class=\"form-image-hint\">";
+        // line 133
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 133, $this->source); })()), "imagemedia", [], "any", false, false, false, 133), 'help');
+        yield "</small>
+                                <div class=\"invalid-feedback\">
+                                    ";
+        // line 135
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 135, $this->source); })()), "imagemedia", [], "any", false, false, false, 135), 'errors');
+        yield "
                                 </div>
-                            </div> ";
-        // line 116
-        yield "                        ";
-        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 116, $this->source); })()), 'form_end');
-        yield "
-                    </section>
+                            </div>
+                        </div>
+                    </div>
 
-                </div> ";
-        // line 120
-        yield "            </div> ";
-        // line 121
-        yield "        </div> ";
-        // line 122
-        yield "    </div> ";
-        // line 123
+                    <div class=\"form-actions\">
+                        <a href=\"";
+        // line 142
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("socialVoyageurs_page");
+        yield "\" class=\"form-btn-outline\">Annuler</a>
+                        <button type=\"submit\" class=\"form-btn\">";
+        // line 143
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("button_label", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["button_label"]) || array_key_exists("button_label", $context) ? $context["button_label"] : (function () { throw new RuntimeError('Variable "button_label" does not exist.', 143, $this->source); })()), "Publier")) : ("Publier")), "html", null, true);
+        yield "</button>
+                    </div>
+                ";
+        // line 145
+        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 145, $this->source); })()), 'form_end');
         yield "
-    ";
-        // line 125
-        yield "    <footer class=\"footer pt-3  \">
+            </div>
+        </div>
+    </div>
+
+    <footer class=\"footer pt-3\">
         <div class=\"container-fluid\">
-          <div class=\"row align-items-center justify-content-lg-between\">
-            <div class=\"col-lg-6 mb-lg-0 mb-4\">
-              <div class=\"copyright text-center text-sm text-muted text-lg-start\">
-                © <script>
-                  document.write(new Date().getFullYear())
-                </script>,
-                made with <i class=\"fa fa-heart\"></i> by
-                <a href=\"https://www.creative-tim.com\" class=\"font-weight-bold\" target=\"_blank\">Creative Tim</a>
-                for a better web.
-              </div>
+            <div class=\"row align-items-center justify-content-lg-between\">
+                <div class=\"col-lg-6 mb-lg-0 mb-4\">
+                    <div class=\"copyright text-center text-sm text-muted text-lg-start\">
+                        © <script>document.write(new Date().getFullYear())</script>,
+                        made with <i class=\"fa fa-heart\"></i> by
+                        <a href=\"https://www.creative-tim.com\" class=\"font-weight-bold\" target=\"_blank\">Creative Tim</a>
+                        for a better web.
+                    </div>
+                </div>
+                <div class=\"col-lg-6\">
+                    <ul class=\"nav nav-footer justify-content-center justify-content-lg-end\">
+                        <li class=\"nav-item\">
+                            <a href=\"https://www.creative-tim.com\" class=\"nav-link text-muted\" target=\"_blank\">Creative Tim</a>
+                        </li>
+                        <li class=\"nav-item\">
+                            <a href=\"https://www.creative-tim.com/presentation\" class=\"nav-link text-muted\" target=\"_blank\">About Us</a>
+                        </li>
+                        <li class=\"nav-item\">
+                            <a href=\"https://www.creative-tim.com/blog\" class=\"nav-link text-muted\" target=\"_blank\">Blog</a>
+                        </li>
+                        <li class=\"nav-item\">
+                            <a href=\"https://www.creative-tim.com/license\" class=\"nav-link pe-0 text-muted\" target=\"_blank\">License</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class=\"col-lg-6\">
-              <ul class=\"nav nav-footer justify-content-center justify-content-lg-end\">
-                <li class=\"nav-item\">
-                  <a href=\"https://www.creative-tim.com\" class=\"nav-link text-muted\" target=\"_blank\">Creative Tim</a>
-                </li>
-                <li class=\"nav-item\">
-                  <a href=\"https://www.creative-tim.com/presentation\" class=\"nav-link text-muted\" target=\"_blank\">About Us</a>
-                </li>
-                <li class=\"nav-item\">
-                  <a href=\"https://www.creative-tim.com/blog\" class=\"nav-link text-muted\" target=\"_blank\">Blog</a>
-                </li>
-                <li class=\"nav-item\">
-                  <a href=\"https://www.creative-tim.com/license\" class=\"nav-link pe-0 text-muted\" target=\"_blank\">License</a>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
     </footer>
-</div> ";
-        // line 158
-        yield "
+</div>
 
+<style>
+  /* Alert styles */
+  .alert {
+    font-size: 1.2em;
+    margin-top: 20px;
+  }
 
-    <style>
+  .forbidden-words-alert {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    font-size: 1.2em;
+    padding: 1rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+  }
 
-    /* General alert styling (as you had) */
-    .alert {
-        font-size: 1.2em;
-        margin-top: 20px;
+  .forbidden-words-alert h5,
+  .forbidden-words-alert p {
+    color: #dc3545 !important;
+  }
+
+  .forbidden-words-alert h5 {
+    font-weight: bold;
+  }
+
+  .forbidden-words-alert p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Form card styles */
+  .form-card {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    border: 1px solid #eaedf2;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .form-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .form-card::before {
+    content: \"\";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  .card-info::before {
+    background-color: #FBBB89;
+  }
+  
+  .card-media::before {
+    background-color: #336D8B;
+  }
+
+  .form-card-header {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #eaedf2;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  
+  .form-card-header::after {
+    content: \"\";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(251, 187, 137, 0.1));
+    z-index: -1;
+  }
+  
+  .card-info .form-card-header::after {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(251, 187, 137, 0.1));
+  }
+  
+  .card-media .form-card-header::after {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(51, 109, 139, 0.1));
+  }
+
+  .form-card-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-radius: 10px;
+    margin-right: 1rem;
+    padding: 0.5rem;
+  }
+  
+  .card-info .form-card-icon {
+    background-color: #FBBB89;
+  }
+  
+  .card-media .form-card-icon {
+    background-color: #336D8B;
+  }
+
+  .form-card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #344767;
+  }
+
+  .form-card-body {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .form-card-body::before {
+    content: \"\";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(94, 114, 228, 0.02) 0%, rgba(255, 255, 255, 0) 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .form-spacer {
+    height: 1rem;
+  }
+
+  /* Form controls */
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.75rem;
+    margin-left: -0.75rem;
+  }
+
+  .form-col {
+    position: relative;
+    width: 100%;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .form-col-md-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
     }
+  }
 
+  .form-floating {
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
 
-    /* Styles for the specific forbidden words alert container */
-    .forbidden-words-alert {
-        /* alert-danger class in HTML will provide background/border colors */
-        margin-top: 20px;
-        margin-bottom: 25px;
-        font-size: 1.2em; /* Your desired font size */
-        padding: 1rem 1.25rem; /* Standard Bootstrap padding */
-        border: 1px solid transparent; /* Let alert-danger define border */
-        border-radius: .25rem; /* Standard Bootstrap radius */
-    }
+  .form-floating > .form-control {
+    height: 58px;
+    padding: 1rem 0.75rem;
+  }
 
-    /* --- Force text color to be RED inside this specific alert --- */
-    .forbidden-words-alert h5,
-    .forbidden-words-alert p {
-        color: #dc3545 !important; /* Bootstrap's danger red. !important might be needed to override */
-    }
+  .form-floating > textarea.form-control {
+    height: auto;
+  }
 
-    /* --- Make the heading bold inside this specific alert --- */
-    .forbidden-words-alert h5 {
-         font-weight: bold;
-    }
+  .form-floating > label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding: 1rem 0.75rem;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transform-origin: 0 0;
+    transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+    color: #6c757d;
+  }
 
-    /* --- Remove margin bottom from the last paragraph inside this specific alert --- */
-     .forbidden-words-alert p:last-child {
-        margin-bottom: 0; /* Completed rule */
-     }
+  .form-floating > .form-control:focus,
+  .form-floating > .form-control:not(:placeholder-shown) {
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+  }
 
+  .form-floating > .form-control:focus ~ label,
+  .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    opacity: .65;
+    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+  }
 
-    /* --- Your other existing styles --- */
-    .get-in-touch {
-      max-width: 800px;
-      margin: 50px auto;
-      position: relative;
+  .form-control {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 12px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
 
-    }
-    .get-in-touch .title {
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      font-size: 3.2em;
-      line-height: 48px;
-      padding-bottom: 48px;
-         color: #5543ca;
-        background: #5543ca;
-        background: -moz-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
-        background: -webkit-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
-        background: linear-gradient(to right,#f4524d  0%,#5543ca  100%) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-    }
+  .form-control:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #336D8B;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(51, 109, 139, 0.25);
+  }
+  
+  .card-info .form-control:focus {
+    border-color: #FBBB89;
+    box-shadow: 0 0 0 0.2rem rgba(251, 187, 137, 0.25);
+  }
+  
+  .card-media .form-control:focus {
+    border-color: #336D8B;
+    box-shadow: 0 0 0 0.2rem rgba(51, 109, 139, 0.25);
+  }
 
-    .contact-form .form-field {
-      position: relative;
-      margin: 32px 0;
-    }
-    .contact-form .input-text {
-      display: block;
-      width: 100%;
-      height: 36px;
-      border-width: 0 0 2px 0;
-      border-color: #5543ca;
-      font-size: 18px;
-      line-height: 26px;
-      font-weight: 400;
-    }
-    .contact-form .input-text:focus {
-      outline: none;
-    }
-    .contact-form .input-text:focus + .label,
-    .contact-form .input-text.not-empty + .label {
-      -webkit-transform: translateY(-24px);
-              transform: translateY(-24px);
-    }
-    .contact-form .label {
-      position: absolute;
-      left: 20px;
-      bottom: 11px;
-      font-size: 18px;
-      line-height: 26px;
-      font-weight: 400;
-      color: #5543ca;
-      cursor: text;
-      transition: -webkit-transform .2s ease-in-out;
-      transition: transform .2s ease-in-out;
-      transition: transform .2s ease-in-out,
-      -webkit-transform .2s ease-in-out;
-    }
-    .contact-form .submit-btn {
-      display: inline-block;
-      background-color: #000;
-       background-image: linear-gradient(125deg,#a72879,#064497);
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-size: 16px;
-      padding: 8px 16px;
-      border: none;
-      width:200px;
-      cursor: pointer;
-    }
+  /* Image upload */
+  .form-image-upload {
+    padding: 1.5rem;
+    border: 2px dashed #ced4da;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+  }
 
+  .form-image-upload:hover {
+    border-color: #336D8B;
+    background-color: #f0f7ff;
+  }
+
+  .form-control-file {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #495057;
+    cursor: pointer;
+  }
+
+  .form-image-hint {
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+
+  /* Form actions */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+  }
+
+  .form-btn-outline {
+    background-color: transparent;
+    color: #336D8B;
+    border: 1px solid #336D8B;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 1rem;
+    display: inline-block;
+    text-decoration: none;
+  }
+
+  .form-btn-outline:hover {
+    background-color: #f0f7ff;
+    color: #234A5D;
+    border-color: #234A5D;
+    text-decoration: none;
+  }
+
+  .form-btn {
+    background-color: #336D8B;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+  
+  .form-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s ease;
+    z-index: -1;
+  }
+
+  .form-btn:hover {
+    background-color: #234A5D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(51, 109, 139, 0.4);
+  }
+  
+  .form-btn:hover::before {
+    left: 100%;
+  }
+  
+  /* Form header */
+  .form-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    position: relative;
+  }
+  
+  .form-header::after {
+    content: \"\";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #FBBB89, #336D8B);
+    border-radius: 3px;
+  }
+  
+  .form-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #344767;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(90deg, #FBBB89, #336D8B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+  }
+
+  .form-subtitle {
+    color: #6c757d;
+    font-size: 0.95rem;
+  }
+
+  /* Content section */
+  .content-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .content-section {
+    display: none;
+  }
+
+  .content-section.active {
+    display: block;
+  }
+
+  /* Forbidden words highlighting */
+  .forbidden-word-highlight {
+    background-color: #ffcccc;
+    color: #d9534f;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  .forbidden-words-preview {
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: #d9534f;
+  }
 </style>
-    
 ";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -475,12 +793,12 @@ class __TwigTemplate_fe0996c2003cf9454708419c89ef4a62 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  332 => 158,  298 => 125,  295 => 123,  293 => 122,  291 => 121,  289 => 120,  282 => 116,  277 => 113,  274 => 112,  267 => 108,  265 => 107,  263 => 106,  257 => 103,  255 => 102,  250 => 99,  243 => 96,  239 => 93,  235 => 90,  232 => 88,  228 => 86,  222 => 84,  219 => 83,  213 => 81,  211 => 80,  207 => 78,  204 => 77,  200 => 75,  196 => 72,  192 => 69,  190 => 68,  188 => 67,  184 => 64,  177 => 58,  164 => 57,  150 => 51,  137 => 49,  91 => 13,  87 => 12,  78 => 5,  65 => 3,  42 => 1,);
+        return array (  329 => 145,  324 => 143,  320 => 142,  310 => 135,  305 => 133,  302 => 132,  300 => 127,  296 => 126,  279 => 112,  275 => 111,  271 => 110,  260 => 102,  256 => 101,  252 => 100,  243 => 94,  239 => 93,  235 => 92,  222 => 81,  218 => 79,  212 => 77,  209 => 76,  203 => 74,  201 => 73,  197 => 71,  195 => 70,  194 => 69,  193 => 68,  188 => 66,  177 => 57,  164 => 56,  150 => 51,  137 => 49,  91 => 13,  87 => 12,  78 => 5,  65 => 3,  42 => 1,);
     }
 
     public function getSourceContext(): Source
     {
-        return new Source(" {% extends 'base.html.twig' %}
+        return new Source("{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
 
 {% block js%}
 {# Keep these includes as they were in the source template #}
@@ -491,8 +809,8 @@ class __TwigTemplate_fe0996c2003cf9454708419c89ef4a62 extends Template
 \$(document).ready(function() {
     // Get forbidden words from template if they exist
     const forbiddenWords = {
-        title: {{ forbidden_words.title|default([])|json_encode|raw }},
-        content: {{ forbidden_words.content|default([])|json_encode|raw }}
+        title: {{ forbidden_words.title is defined ? forbidden_words.title|json_encode|raw : '[]' }},
+        content: {{ forbidden_words.content is defined ? forbidden_words.content|json_encode|raw : '[]' }}
     };
 
     // Highlight forbidden words in fields
@@ -532,227 +850,534 @@ class __TwigTemplate_fe0996c2003cf9454708419c89ef4a62 extends Template
 {# Keep these includes as they were in the source template #}
 <link href=\"https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css\" rel=\"stylesheet\" />
 <link href=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" id=\"bootstrap-css\">
-
+<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css\">
 {% endblock %}
-
 
 {% block body %}
 <div class=\"container-fluid py-4\">
     <div class=\"row\">
         <div class=\"col-12\">
-            <div class=\"card mb-4\">
-                <div class=\"card-header pb-0\">
-                    {# === Changed Title === #}
-                    <h6>Nouvelle Publication</h6>
+            <div class=\"content-card content-section active\" id=\"social-media-section\">
+                <div class=\"form-header\">
+                    <h2 class=\"form-title\">Nouvelle Publication</h2>
+                    <p class=\"form-subtitle\">Complétez les informations ci-dessous pour créer une nouvelle publication sur les réseaux sociaux.</p>
                 </div>
-                <div class=\"card-body px-lg-5 pt-0 pb-2\"> {# Added more padding #}
-                    {# Removed table-responsive div #}
-                    {# === Removed Map Div and Script === #}
 
-                    <section class=\"get-in-touch\">
-                        {# === Changed Title === #}
-                        <h1 class=\"title\">Ajouter une publication</h1>
-
-                        {# === Changed form action path === #}
-{{ form_start(form, {'method': 'POST', 'attr': {'class': 'contact-form', 'novalidate': 'novalidate'}}) }}
-                            {# Alert for forbidden words #}
-                            {% if forbidden_words is defined and (forbidden_words.title is not empty or forbidden_words.content is not empty) %}
-                                <div class=\"alert alert-danger forbidden-words-alert\">
-                                    <h5>Mots interdits détectés:</h5>
-                                    {% if forbidden_words.title is not empty %}
-                                        <p><strong>Titre:</strong> {{ forbidden_words.title|join(', ') }}</p>
-                                    {% endif %}
-                                    {% if forbidden_words.content is not empty %}
-                                        <p><strong>Contenu:</strong> {{ forbidden_words.content|join(', ') }}</p>
-                                    {% endif %}
-                                </div>
+                {{ form_start(form, {'method': 'POST', 'attr': {'class': 'social-media-form', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+                    
+                    {% if forbidden_words is defined and 
+                        ((forbidden_words.title is defined and forbidden_words.title is not empty) or 
+                         (forbidden_words.content is defined and forbidden_words.content is not empty)) %}
+                        <div class=\"alert alert-danger forbidden-words-alert\">
+                            <h5>Mots interdits détectés:</h5>
+                            {% if forbidden_words.title is defined and forbidden_words.title is not empty %}
+                                <p><strong>Titre:</strong> {{ forbidden_words.title|join(', ') }}</p>
                             {% endif %}
+                            {% if forbidden_words.content is defined and forbidden_words.content is not empty %}
+                                <p><strong>Contenu:</strong> {{ forbidden_words.content|join(', ') }}</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Basic Info Card -->
+                    <div class=\"form-card card-info\">
+                        <div class=\"form-card-header\">
+                            <i class=\"fas fa-info-circle form-card-icon\"></i>
+                            <h3 class=\"form-card-title\">Informations de base</h3>
+                        </div>
+                        <div class=\"form-card-body\">
+                            <div class=\"form-row\">
+                                <div class=\"form-col form-col-md-6\">
+                                    <div class=\"form-floating\">
+                                        {{ form_widget(form.titre, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                                        {{ form_label(form.titre) }}
+                                        {{ form_errors(form.titre) }}
+                                    </div>
+                                </div>
+                                
+                                <div class=\"form-col form-col-md-6\">
+                                    <div class=\"form-floating\">
+                                        {{ form_widget(form.lieu, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                                        {{ form_label(form.lieu) }}
+                                        {{ form_errors(form.lieu) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class=\"form-spacer\"></div>
                             
-                            {# Removed outer 'row' class from form_start, using it inside #}
-                            <div class=\"row\">
-
-                                {# === Replaced Station fields with SocialMedia fields === #}
-
-                                <div class=\"form-field col-lg-6\">
-                                    {# Using form_row to replicate original structure #}
-                                    {{ form_row(form.titre, {'attr': {'class': 'input-text'}}) }}
+                            <div class=\"form-floating\">
+                                {{ form_widget(form.contenu, {'attr': {'class': 'form-control', 'style': 'height: 120px', 'placeholder': ' '}}) }}
+                                {{ form_label(form.contenu) }}
+                                {{ form_errors(form.contenu) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Media Card -->
+                    <div class=\"form-card card-media\">
+                        <div class=\"form-card-header\">
+                            <i class=\"fas fa-photo-video form-card-icon\"></i>
+                            <h3 class=\"form-card-title\">Média</h3>
+                        </div>
+                        <div class=\"form-card-body\">
+                            <div class=\"form-image-upload\">
+                                <h4>Télécharger une image ou une vidéo</h4>
+                                {{ form_label(form.imagemedia) }}
+                                {{ form_widget(form.imagemedia, {
+                                    'attr': {
+                                        'class': 'form-control-file',
+                                        'accept': 'image/jpeg, image/jpg, image/png, image/gif, image/avif, video/x-msvideo, video/avi, video/msvideo, video/mpeg, video/mp4'
+                                    }
+                                }) }}
+                                <small class=\"form-image-hint\">{{ form_help(form.imagemedia) }}</small>
+                                <div class=\"invalid-feedback\">
+                                    {{ form_errors(form.imagemedia) }}
                                 </div>
-                                <div class=\"form-field col-lg-6\">
-                                    {{ form_row(form.lieu, {'attr': {'class': 'input-text'}}) }}
-                                </div>
-                                <div class=\"form-field col-lg-12\"> {# Content full width #}
-                                     {# Ensure 'contenu' uses TextareaType in your Form Class #}
-                                    {{ form_row(form.contenu, {'attr': {'class': 'input-text'}}) }}
-                                </div>
-                                <div class=\"form-field col-lg-12\"> {# Image full width #}
-                                     {# Ensure 'imagemedia' uses FileType in your Form Class #}
-                                     {# Applying 'input-text' class as per original template, may look odd #}
-                                    {{ form_row(form.imagemedia, {'attr': {'class': 'input-text'}}) }}
-                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                {# === Submit Button === #}
-                                <div class=\"form-field col-lg-12 text-center\">
-                                    <button type=\"submit\" class=\"submit-btn\">{{ button_label|default('Ajouter') }}</button>
-                                </div>
-                            </div> {# End inner .row #}
-                        {{ form_end(form) }}
-                    </section>
+                    <div class=\"form-actions\">
+                        <a href=\"{{ path('socialVoyageurs_page') }}\" class=\"form-btn-outline\">Annuler</a>
+                        <button type=\"submit\" class=\"form-btn\">{{ button_label|default('Publier') }}</button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
 
-                </div> {# End .card-body #}
-            </div> {# End .card #}
-        </div> {# End .col-12 #}
-    </div> {# End .row #}
-
-    {# === Footer from original template === #}
-    <footer class=\"footer pt-3  \">
+    <footer class=\"footer pt-3\">
         <div class=\"container-fluid\">
-          <div class=\"row align-items-center justify-content-lg-between\">
-            <div class=\"col-lg-6 mb-lg-0 mb-4\">
-              <div class=\"copyright text-center text-sm text-muted text-lg-start\">
-                © <script>
-                  document.write(new Date().getFullYear())
-                </script>,
-                made with <i class=\"fa fa-heart\"></i> by
-                <a href=\"https://www.creative-tim.com\" class=\"font-weight-bold\" target=\"_blank\">Creative Tim</a>
-                for a better web.
-              </div>
+            <div class=\"row align-items-center justify-content-lg-between\">
+                <div class=\"col-lg-6 mb-lg-0 mb-4\">
+                    <div class=\"copyright text-center text-sm text-muted text-lg-start\">
+                        © <script>document.write(new Date().getFullYear())</script>,
+                        made with <i class=\"fa fa-heart\"></i> by
+                        <a href=\"https://www.creative-tim.com\" class=\"font-weight-bold\" target=\"_blank\">Creative Tim</a>
+                        for a better web.
+                    </div>
+                </div>
+                <div class=\"col-lg-6\">
+                    <ul class=\"nav nav-footer justify-content-center justify-content-lg-end\">
+                        <li class=\"nav-item\">
+                            <a href=\"https://www.creative-tim.com\" class=\"nav-link text-muted\" target=\"_blank\">Creative Tim</a>
+                        </li>
+                        <li class=\"nav-item\">
+                            <a href=\"https://www.creative-tim.com/presentation\" class=\"nav-link text-muted\" target=\"_blank\">About Us</a>
+                        </li>
+                        <li class=\"nav-item\">
+                            <a href=\"https://www.creative-tim.com/blog\" class=\"nav-link text-muted\" target=\"_blank\">Blog</a>
+                        </li>
+                        <li class=\"nav-item\">
+                            <a href=\"https://www.creative-tim.com/license\" class=\"nav-link pe-0 text-muted\" target=\"_blank\">License</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class=\"col-lg-6\">
-              <ul class=\"nav nav-footer justify-content-center justify-content-lg-end\">
-                <li class=\"nav-item\">
-                  <a href=\"https://www.creative-tim.com\" class=\"nav-link text-muted\" target=\"_blank\">Creative Tim</a>
-                </li>
-                <li class=\"nav-item\">
-                  <a href=\"https://www.creative-tim.com/presentation\" class=\"nav-link text-muted\" target=\"_blank\">About Us</a>
-                </li>
-                <li class=\"nav-item\">
-                  <a href=\"https://www.creative-tim.com/blog\" class=\"nav-link text-muted\" target=\"_blank\">Blog</a>
-                </li>
-                <li class=\"nav-item\">
-                  <a href=\"https://www.creative-tim.com/license\" class=\"nav-link pe-0 text-muted\" target=\"_blank\">License</a>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
     </footer>
-</div> {# End .container-fluid #}
+</div>
 
+<style>
+  /* Alert styles */
+  .alert {
+    font-size: 1.2em;
+    margin-top: 20px;
+  }
 
+  .forbidden-words-alert {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    font-size: 1.2em;
+    padding: 1rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+  }
 
-    <style>
+  .forbidden-words-alert h5,
+  .forbidden-words-alert p {
+    color: #dc3545 !important;
+  }
 
-    /* General alert styling (as you had) */
-    .alert {
-        font-size: 1.2em;
-        margin-top: 20px;
+  .forbidden-words-alert h5 {
+    font-weight: bold;
+  }
+
+  .forbidden-words-alert p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Form card styles */
+  .form-card {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    border: 1px solid #eaedf2;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .form-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .form-card::before {
+    content: \"\";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  .card-info::before {
+    background-color: #FBBB89;
+  }
+  
+  .card-media::before {
+    background-color: #336D8B;
+  }
+
+  .form-card-header {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #eaedf2;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  
+  .form-card-header::after {
+    content: \"\";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(251, 187, 137, 0.1));
+    z-index: -1;
+  }
+  
+  .card-info .form-card-header::after {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(251, 187, 137, 0.1));
+  }
+  
+  .card-media .form-card-header::after {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(51, 109, 139, 0.1));
+  }
+
+  .form-card-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-radius: 10px;
+    margin-right: 1rem;
+    padding: 0.5rem;
+  }
+  
+  .card-info .form-card-icon {
+    background-color: #FBBB89;
+  }
+  
+  .card-media .form-card-icon {
+    background-color: #336D8B;
+  }
+
+  .form-card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #344767;
+  }
+
+  .form-card-body {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .form-card-body::before {
+    content: \"\";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(94, 114, 228, 0.02) 0%, rgba(255, 255, 255, 0) 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .form-spacer {
+    height: 1rem;
+  }
+
+  /* Form controls */
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.75rem;
+    margin-left: -0.75rem;
+  }
+
+  .form-col {
+    position: relative;
+    width: 100%;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .form-col-md-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
     }
+  }
 
+  .form-floating {
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
 
-    /* Styles for the specific forbidden words alert container */
-    .forbidden-words-alert {
-        /* alert-danger class in HTML will provide background/border colors */
-        margin-top: 20px;
-        margin-bottom: 25px;
-        font-size: 1.2em; /* Your desired font size */
-        padding: 1rem 1.25rem; /* Standard Bootstrap padding */
-        border: 1px solid transparent; /* Let alert-danger define border */
-        border-radius: .25rem; /* Standard Bootstrap radius */
-    }
+  .form-floating > .form-control {
+    height: 58px;
+    padding: 1rem 0.75rem;
+  }
 
-    /* --- Force text color to be RED inside this specific alert --- */
-    .forbidden-words-alert h5,
-    .forbidden-words-alert p {
-        color: #dc3545 !important; /* Bootstrap's danger red. !important might be needed to override */
-    }
+  .form-floating > textarea.form-control {
+    height: auto;
+  }
 
-    /* --- Make the heading bold inside this specific alert --- */
-    .forbidden-words-alert h5 {
-         font-weight: bold;
-    }
+  .form-floating > label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding: 1rem 0.75rem;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transform-origin: 0 0;
+    transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+    color: #6c757d;
+  }
 
-    /* --- Remove margin bottom from the last paragraph inside this specific alert --- */
-     .forbidden-words-alert p:last-child {
-        margin-bottom: 0; /* Completed rule */
-     }
+  .form-floating > .form-control:focus,
+  .form-floating > .form-control:not(:placeholder-shown) {
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+  }
 
+  .form-floating > .form-control:focus ~ label,
+  .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    opacity: .65;
+    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+  }
 
-    /* --- Your other existing styles --- */
-    .get-in-touch {
-      max-width: 800px;
-      margin: 50px auto;
-      position: relative;
+  .form-control {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 12px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
 
-    }
-    .get-in-touch .title {
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      font-size: 3.2em;
-      line-height: 48px;
-      padding-bottom: 48px;
-         color: #5543ca;
-        background: #5543ca;
-        background: -moz-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
-        background: -webkit-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
-        background: linear-gradient(to right,#f4524d  0%,#5543ca  100%) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-    }
+  .form-control:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #336D8B;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(51, 109, 139, 0.25);
+  }
+  
+  .card-info .form-control:focus {
+    border-color: #FBBB89;
+    box-shadow: 0 0 0 0.2rem rgba(251, 187, 137, 0.25);
+  }
+  
+  .card-media .form-control:focus {
+    border-color: #336D8B;
+    box-shadow: 0 0 0 0.2rem rgba(51, 109, 139, 0.25);
+  }
 
-    .contact-form .form-field {
-      position: relative;
-      margin: 32px 0;
-    }
-    .contact-form .input-text {
-      display: block;
-      width: 100%;
-      height: 36px;
-      border-width: 0 0 2px 0;
-      border-color: #5543ca;
-      font-size: 18px;
-      line-height: 26px;
-      font-weight: 400;
-    }
-    .contact-form .input-text:focus {
-      outline: none;
-    }
-    .contact-form .input-text:focus + .label,
-    .contact-form .input-text.not-empty + .label {
-      -webkit-transform: translateY(-24px);
-              transform: translateY(-24px);
-    }
-    .contact-form .label {
-      position: absolute;
-      left: 20px;
-      bottom: 11px;
-      font-size: 18px;
-      line-height: 26px;
-      font-weight: 400;
-      color: #5543ca;
-      cursor: text;
-      transition: -webkit-transform .2s ease-in-out;
-      transition: transform .2s ease-in-out;
-      transition: transform .2s ease-in-out,
-      -webkit-transform .2s ease-in-out;
-    }
-    .contact-form .submit-btn {
-      display: inline-block;
-      background-color: #000;
-       background-image: linear-gradient(125deg,#a72879,#064497);
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-size: 16px;
-      padding: 8px 16px;
-      border: none;
-      width:200px;
-      cursor: pointer;
-    }
+  /* Image upload */
+  .form-image-upload {
+    padding: 1.5rem;
+    border: 2px dashed #ced4da;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+  }
 
+  .form-image-upload:hover {
+    border-color: #336D8B;
+    background-color: #f0f7ff;
+  }
+
+  .form-control-file {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #495057;
+    cursor: pointer;
+  }
+
+  .form-image-hint {
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+
+  /* Form actions */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+  }
+
+  .form-btn-outline {
+    background-color: transparent;
+    color: #336D8B;
+    border: 1px solid #336D8B;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 1rem;
+    display: inline-block;
+    text-decoration: none;
+  }
+
+  .form-btn-outline:hover {
+    background-color: #f0f7ff;
+    color: #234A5D;
+    border-color: #234A5D;
+    text-decoration: none;
+  }
+
+  .form-btn {
+    background-color: #336D8B;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+  
+  .form-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s ease;
+    z-index: -1;
+  }
+
+  .form-btn:hover {
+    background-color: #234A5D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(51, 109, 139, 0.4);
+  }
+  
+  .form-btn:hover::before {
+    left: 100%;
+  }
+  
+  /* Form header */
+  .form-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    position: relative;
+  }
+  
+  .form-header::after {
+    content: \"\";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #FBBB89, #336D8B);
+    border-radius: 3px;
+  }
+  
+  .form-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #344767;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(90deg, #FBBB89, #336D8B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+  }
+
+  .form-subtitle {
+    color: #6c757d;
+    font-size: 0.95rem;
+  }
+
+  /* Content section */
+  .content-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .content-section {
+    display: none;
+  }
+
+  .content-section.active {
+    display: block;
+  }
+
+  /* Forbidden words highlighting */
+  .forbidden-word-highlight {
+    background-color: #ffcccc;
+    color: #d9534f;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  .forbidden-words-preview {
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: #d9534f;
+  }
 </style>
-    
 {% endblock %}
-", "social_media/_form.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\social_media\\_form.html.twig");
+", "social_media/_form.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\social_media\\_form.html.twig");
     }
 }

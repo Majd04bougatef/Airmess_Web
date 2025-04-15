@@ -38,7 +38,7 @@ class __TwigTemplate_51379d4bb8e5b7d7e44d142c5904537d extends Template
     protected function doGetParent(array $context): bool|string|Template|TemplateWrapper
     {
         // line 1
-        return "base.html.twig";
+        return "dashboardVoyageurs/dashboardVoyageurs.html.twig";
     }
 
     protected function doDisplay(array $context, array $blocks = []): iterable
@@ -50,7 +50,7 @@ class __TwigTemplate_51379d4bb8e5b7d7e44d142c5904537d extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "reservation_transport/show.html.twig"));
 
-        $this->parent = $this->loadTemplate("base.html.twig", "reservation_transport/show.html.twig", 1);
+        $this->parent = $this->loadTemplate("dashboardVoyageurs/dashboardVoyageurs.html.twig", "reservation_transport/show.html.twig", 1);
         yield from $this->parent->unwrap()->yield($context, array_merge($this->blocks, $blocks));
         
         $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
@@ -203,7 +203,7 @@ class __TwigTemplate_51379d4bb8e5b7d7e44d142c5904537d extends Template
 
     public function getSourceContext(): Source
     {
-        return new Source("{% extends 'base.html.twig' %}
+        return new Source("{% extends 'dashboardVoyageurs/dashboardVoyageurs.html.twig' %}
 
 {% block title %}ReservationTransport{% endblock %}
 
@@ -248,7 +248,6 @@ class __TwigTemplate_51379d4bb8e5b7d7e44d142c5904537d extends Template
     <a href=\"{{ path('app_reservation_transport_edit', {'id': reservation_transport.id}) }}\">edit</a>
 
     {{ include('reservation_transport/_delete_form.html.twig') }}
-{% endblock %}
-", "reservation_transport/show.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\reservation_transport\\show.html.twig");
+{% endblock %}", "reservation_transport/show.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\reservation_transport\\show.html.twig");
     }
 }

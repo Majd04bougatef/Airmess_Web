@@ -75,32 +75,35 @@ class __TwigTemplate_4b99364ec164c8d09f729b4f958cfbb1 extends Template
         <h2>Détails de la Réservation</h2>
         
         ";
-        // line 30
-        yield "        ";
-        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 30, $this->source); })()), 'form_start', ["attr" => ["id" => "reservation-form"]]);
+        // line 29
+        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 29, $this->source); })()), 'form_start', ["attr" => ["id" => "reservation-form", "novalidate" => "novalidate"]]);
         yield "
             <div class=\"form-group\">
                 <label for=\"name\">Nom Complet</label>
                 <input type=\"text\" id=\"name\" value=\"";
-        // line 33
-        yield (((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["reservation_transport"] ?? null), "user", [], "any", false, true, false, 33), "name", [], "any", true, true, false, 33) &&  !(null === CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 33, $this->source); })()), "user", [], "any", false, false, false, 33), "name", [], "any", false, false, false, 33)))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 33, $this->source); })()), "user", [], "any", false, false, false, 33), "name", [], "any", false, false, false, 33), "html", null, true)) : (""));
+        // line 32
+        yield (((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["reservation_transport"] ?? null), "user", [], "any", false, true, false, 32), "name", [], "any", true, true, false, 32) &&  !(null === CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 32, $this->source); })()), "user", [], "any", false, false, false, 32), "name", [], "any", false, false, false, 32)))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 32, $this->source); })()), "user", [], "any", false, false, false, 32), "name", [], "any", false, false, false, 32), "html", null, true)) : (""));
         yield "\" readonly>
             </div>
             <div class=\"form-group\">
                 <label for=\"email\">Email</label>
                 <input type=\"email\" id=\"email\" value=\"";
-        // line 37
-        yield (((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["reservation_transport"] ?? null), "user", [], "any", false, true, false, 37), "email", [], "any", true, true, false, 37) &&  !(null === CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 37, $this->source); })()), "user", [], "any", false, false, false, 37), "email", [], "any", false, false, false, 37)))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 37, $this->source); })()), "user", [], "any", false, false, false, 37), "email", [], "any", false, false, false, 37), "html", null, true)) : (""));
+        // line 36
+        yield (((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["reservation_transport"] ?? null), "user", [], "any", false, true, false, 36), "email", [], "any", true, true, false, 36) &&  !(null === CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 36, $this->source); })()), "user", [], "any", false, false, false, 36), "email", [], "any", false, false, false, 36)))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 36, $this->source); })()), "user", [], "any", false, false, false, 36), "email", [], "any", false, false, false, 36), "html", null, true)) : (""));
         yield "\" readonly>
             </div>
             <div class=\"form-group\">
                 ";
+        // line 39
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 39, $this->source); })()), "dateRes", [], "any", false, false, false, 39), 'label', ["label" => "Date de Début"]);
+        yield "
+                ";
         // line 40
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 40, $this->source); })()), "dateRes", [], "any", false, false, false, 40), 'label', ["label" => "Date de Début"]);
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 40, $this->source); })()), "dateRes", [], "any", false, false, false, 40), 'widget', ["attr" => ["class" => "form-control", "id" => "date"]]);
         yield "
                 ";
         // line 41
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 41, $this->source); })()), "dateRes", [], "any", false, false, false, 41), 'widget', ["attr" => ["class" => "form-control", "id" => "date"]]);
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 41, $this->source); })()), "dateRes", [], "any", false, false, false, 41), 'errors');
         yield "
             </div>
             <div class=\"form-group\">
@@ -112,31 +115,39 @@ class __TwigTemplate_4b99364ec164c8d09f729b4f958cfbb1 extends Template
         // line 45
         yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 45, $this->source); })()), "dateFin", [], "any", false, false, false, 45), 'widget', ["attr" => ["class" => "form-control", "id" => "dateFin"]]);
         yield "
+                ";
+        // line 46
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 46, $this->source); })()), "dateFin", [], "any", false, false, false, 46), 'errors');
+        yield "
             </div>
             <div class=\"form-group\">
                 ";
-        // line 48
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 48, $this->source); })()), "nombreVelo", [], "any", false, false, false, 48), 'label', ["label" => "Nombre de Vélos"]);
+        // line 49
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 49, $this->source); })()), "nombreVelo", [], "any", false, false, false, 49), 'label', ["label" => "Nombre de Vélos"]);
         yield "
                 ";
-        // line 49
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 49, $this->source); })()), "nombreVelo", [], "any", false, false, false, 49), 'widget', ["attr" => ["class" => "form-control", "id" => "nombreVelo"]]);
+        // line 50
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 50, $this->source); })()), "nombreVelo", [], "any", false, false, false, 50), 'widget', ["attr" => ["class" => "form-control", "id" => "nombreVelo"]]);
+        yield "
+                ";
+        // line 51
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 51, $this->source); })()), "nombreVelo", [], "any", false, false, false, 51), 'errors');
         yield "
             </div>
             
             ";
-        // line 53
+        // line 55
         yield "            ";
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 53, $this->source); })()), "_token", [], "any", false, false, false, 53), 'row');
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 55, $this->source); })()), "_token", [], "any", false, false, false, 55), 'row');
         yield "
             
             <div class=\"navigation-buttons\">
                 <div></div>
-                <button type=\"button\" id=\"next-to-recap\">Continuer au Récapitulatif</button>
+                <button type=\"submit\" id=\"next-to-recap\" class=\"btn btn-primary\">Continuer au Récapitulatif</button>
             </div>
         ";
-        // line 59
-        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 59, $this->source); })()), 'form_end', ["render_rest" => false]);
+        // line 61
+        yield         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["form"]) || array_key_exists("form", $context) ? $context["form"] : (function () { throw new RuntimeError('Variable "form" does not exist.', 61, $this->source); })()), 'form_end', ["render_rest" => false]);
         yield "
     </div>
     
@@ -166,15 +177,15 @@ class __TwigTemplate_4b99364ec164c8d09f729b4f958cfbb1 extends Template
             <div class=\"recap-item\">
                 <strong>Station:</strong>
                 <span id=\"recap-station\">";
-        // line 87
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 87, $this->source); })()), "station", [], "any", false, false, false, 87), "nom", [], "any", false, false, false, 87), "html", null, true);
+        // line 89
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 89, $this->source); })()), "station", [], "any", false, false, false, 89), "nom", [], "any", false, false, false, 89), "html", null, true);
         yield "</span>
             </div>
             <div class=\"recap-item\">
                 <strong>Référence:</strong>
                 <span id=\"recap-reference\">";
-        // line 91
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 91, $this->source); })()), "reference", [], "any", false, false, false, 91), "html", null, true);
+        // line 93
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["reservation_transport"]) || array_key_exists("reservation_transport", $context) ? $context["reservation_transport"] : (function () { throw new RuntimeError('Variable "reservation_transport" does not exist.', 93, $this->source); })()), "reference", [], "any", false, false, false, 93), "html", null, true);
         yield "</span>
             </div>
         </div>
@@ -240,15 +251,15 @@ class __TwigTemplate_4b99364ec164c8d09f729b4f958cfbb1 extends Template
 
 
 ";
-        // line 155
+        // line 157
         yield from $this->unwrap()->yieldBlock('javascripts', $context, $blocks);
-        // line 162
+        // line 209
         yield "
 
 
 
 ";
-        // line 166
+        // line 213
         yield from $this->unwrap()->yieldBlock('stylesheets', $context, $blocks);
         
         $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
@@ -259,7 +270,7 @@ class __TwigTemplate_4b99364ec164c8d09f729b4f958cfbb1 extends Template
         yield from [];
     }
 
-    // line 155
+    // line 157
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -272,12 +283,57 @@ class __TwigTemplate_4b99364ec164c8d09f729b4f958cfbb1 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "javascripts"));
 
-        // line 156
-        yield "
-<script>
-alert(\"test\");
+        // line 158
+        yield "<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('reservation-form');
+    
+    // Add event listener for form submission
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        // Get form data
+        const formData = new FormData(form);
+        
+        // Submit form using fetch
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.errors) {
+                // Clear previous errors
+                document.querySelectorAll('.error-message').forEach(el => el.remove());
+                
+                // Display new errors
+                Object.keys(data.errors).forEach(field => {
+                    const input = document.querySelector(`#reservation_transport_\${field}`);
+                    if (input) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message';
+                        errorDiv.style.color = '#dc3545';
+                        errorDiv.style.fontSize = '0.875em';
+                        errorDiv.style.marginTop = '0.25rem';
+                        errorDiv.textContent = data.errors[field];
+                        input.parentNode.appendChild(errorDiv);
+                        input.style.borderColor = '#dc3545';
+                    }
+                });
+            } else if (data.success) {
+                // If successful, proceed to next step
+                window.location.href = data.redirect;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
 </script>
-
 ";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -288,7 +344,7 @@ alert(\"test\");
         yield from [];
     }
 
-    // line 166
+    // line 213
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -301,7 +357,7 @@ alert(\"test\");
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "stylesheets"));
 
-        // line 167
+        // line 214
         yield "<style>
    
     .container {
@@ -484,6 +540,26 @@ alert(\"test\");
             top: 15px;
         }
     }
+    
+    /* Add styles for error messages */
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+    
+    /* Remove default browser validation styling */
+    input:invalid {
+        box-shadow: none;
+    }
+    
+    input:-moz-ui-invalid {
+        box-shadow: none;
+    }
 </style>
 ";
         
@@ -516,7 +592,7 @@ alert(\"test\");
      */
     public function getDebugInfo(): array
     {
-        return array (  305 => 167,  292 => 166,  276 => 156,  263 => 155,  252 => 166,  246 => 162,  244 => 155,  177 => 91,  170 => 87,  139 => 59,  129 => 53,  123 => 49,  119 => 48,  113 => 45,  109 => 44,  103 => 41,  99 => 40,  93 => 37,  86 => 33,  79 => 30,  50 => 2,);
+        return array (  361 => 214,  348 => 213,  287 => 158,  274 => 157,  263 => 213,  257 => 209,  255 => 157,  188 => 93,  181 => 89,  150 => 61,  140 => 55,  134 => 51,  130 => 50,  126 => 49,  120 => 46,  116 => 45,  112 => 44,  106 => 41,  102 => 40,  98 => 39,  92 => 36,  85 => 32,  79 => 29,  50 => 2,);
     }
 
     public function getSourceContext(): Source
@@ -549,8 +625,7 @@ alert(\"test\");
     <div class=\"step-content active\" id=\"step1-content\">
         <h2>Détails de la Réservation</h2>
         
-        {# Utiliser le formulaire Symfony #}
-        {{ form_start(form, {'attr': {'id': 'reservation-form'}}) }}
+        {{ form_start(form, {'attr': {'id': 'reservation-form', 'novalidate': 'novalidate'}}) }}
             <div class=\"form-group\">
                 <label for=\"name\">Nom Complet</label>
                 <input type=\"text\" id=\"name\" value=\"{{ reservation_transport.user.name ?? '' }}\" readonly>
@@ -562,14 +637,17 @@ alert(\"test\");
             <div class=\"form-group\">
                 {{ form_label(form.dateRes, 'Date de Début') }}
                 {{ form_widget(form.dateRes, {'attr': {'class': 'form-control', 'id': 'date'}}) }}
+                {{ form_errors(form.dateRes) }}
             </div>
             <div class=\"form-group\">
                 {{ form_label(form.dateFin, 'Date de Fin') }}
                 {{ form_widget(form.dateFin, {'attr': {'class': 'form-control', 'id': 'dateFin'}}) }}
+                {{ form_errors(form.dateFin) }}
             </div>
             <div class=\"form-group\">
                 {{ form_label(form.nombreVelo, 'Nombre de Vélos') }}
                 {{ form_widget(form.nombreVelo, {'attr': {'class': 'form-control', 'id': 'nombreVelo'}}) }}
+                {{ form_errors(form.nombreVelo) }}
             </div>
             
             {# Champs cachés nécessaires pour le formulaire #}
@@ -577,7 +655,7 @@ alert(\"test\");
             
             <div class=\"navigation-buttons\">
                 <div></div>
-                <button type=\"button\" id=\"next-to-recap\">Continuer au Récapitulatif</button>
+                <button type=\"submit\" id=\"next-to-recap\" class=\"btn btn-primary\">Continuer au Récapitulatif</button>
             </div>
         {{ form_end(form, {'render_rest': false}) }}
     </div>
@@ -676,11 +754,56 @@ alert(\"test\");
 
 
 {% block javascripts %}
-
 <script>
-alert(\"test\");
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('reservation-form');
+    
+    // Add event listener for form submission
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        // Get form data
+        const formData = new FormData(form);
+        
+        // Submit form using fetch
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.errors) {
+                // Clear previous errors
+                document.querySelectorAll('.error-message').forEach(el => el.remove());
+                
+                // Display new errors
+                Object.keys(data.errors).forEach(field => {
+                    const input = document.querySelector(`#reservation_transport_\${field}`);
+                    if (input) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message';
+                        errorDiv.style.color = '#dc3545';
+                        errorDiv.style.fontSize = '0.875em';
+                        errorDiv.style.marginTop = '0.25rem';
+                        errorDiv.textContent = data.errors[field];
+                        input.parentNode.appendChild(errorDiv);
+                        input.style.borderColor = '#dc3545';
+                    }
+                });
+            } else if (data.success) {
+                // If successful, proceed to next step
+                window.location.href = data.redirect;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
 </script>
-
 {% endblock %}
 
 
@@ -869,7 +992,27 @@ alert(\"test\");
             top: 15px;
         }
     }
+    
+    /* Add styles for error messages */
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+    
+    /* Remove default browser validation styling */
+    input:invalid {
+        box-shadow: none;
+    }
+    
+    input:-moz-ui-invalid {
+        box-shadow: none;
+    }
 </style>
-{% endblock %}", "reservation_transport/steps.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\reservation_transport\\steps.html.twig");
+{% endblock %}", "reservation_transport/steps.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\reservation_transport\\steps.html.twig");
     }
 }

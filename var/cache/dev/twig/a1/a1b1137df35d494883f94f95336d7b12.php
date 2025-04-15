@@ -79,7 +79,7 @@ class __TwigTemplate_1e7ecd030b365b59d38cf233d066addb extends Template
 
     <a href=\"";
         // line 6
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_index");
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("socialVoyageurs_page");
         yield "\">back to list</a>
 ";
         
@@ -122,8 +122,8 @@ class __TwigTemplate_1e7ecd030b365b59d38cf233d066addb extends Template
 {% block body %}
     {{ include('social_media/_form.html.twig') }}
 
-    <a href=\"{{ path('app_social_media_index') }}\">back to list</a>
+    <a href=\"{{ path('socialVoyageurs_page') }}\">back to list</a>
 {% endblock %}
-", "social_media/new.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\social_media\\new.html.twig");
+", "social_media/new.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\social_media\\new.html.twig");
     }
 }

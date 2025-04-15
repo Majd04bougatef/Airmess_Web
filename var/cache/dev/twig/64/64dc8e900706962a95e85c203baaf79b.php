@@ -1206,6 +1206,6 @@ background-size: cover;\">
     </div>
   </footer>
 </div>
-{% endblock %}", "dashAdmin/dashboardPage.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashAdmin\\dashboardPage.html.twig");
+{% endblock %}", "dashAdmin/dashboardPage.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\dashAdmin\\dashboardPage.html.twig");
     }
 }

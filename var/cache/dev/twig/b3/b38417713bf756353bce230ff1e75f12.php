@@ -846,6 +846,6 @@ class __TwigTemplate_e39965077ed866a3ff00e0d1ffa23aae extends Template
     </script>
 </body>
 </html>
-{% endblock %}", "message/chat.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\message\\chat.html.twig");
+{% endblock %}", "message/chat.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\message\\chat.html.twig");
     }
 }

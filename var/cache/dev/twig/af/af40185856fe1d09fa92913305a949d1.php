@@ -235,6 +235,6 @@ class __TwigTemplate_19fd0752392272c5f572608724ac3ddc extends Template
 
     <a href=\"{{ path('app_message_new') }}\">Create new</a>
 {% endblock %}
-", "message/index.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\message\\index.html.twig");
+", "message/index.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\message\\index.html.twig");
     }
 }

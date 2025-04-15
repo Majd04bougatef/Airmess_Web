@@ -155,6 +155,6 @@ class __TwigTemplate_a1bb27f05e16876877cc987b5f17a968 extends Template
 
     <a href=\"{{ path('app_message_index') }}\">back to list</a>
 {% endblock %}
-", "message/new.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\message\\new.html.twig");
+", "message/new.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\message\\new.html.twig");
     }
 }

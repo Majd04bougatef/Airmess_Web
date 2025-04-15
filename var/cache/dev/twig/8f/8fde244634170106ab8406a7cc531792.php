@@ -94,6 +94,6 @@ class __TwigTemplate_94b923bd2f7d6cf4d3e25077827e5054 extends Template
     <input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token('delete' ~ message.id) }}\">
     <button class=\"btn\">Delete</button>
 </form>
-", "message/_delete_form.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\message\\_delete_form.html.twig");
+", "message/_delete_form.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\message\\_delete_form.html.twig");
     }
 }

@@ -106,13 +106,9 @@ class __TwigTemplate_7e20da94c7a87d46eb49106f18b88455 extends Template
 
     <a href=\"";
         // line 10
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_index");
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("socialVoyageurs_page");
         yield "\">back to list</a>
 
-    ";
-        // line 12
-        yield Twig\Extension\CoreExtension::include($this->env, $context, "social_media/_delete_form.html.twig");
-        yield "
 ";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -144,7 +140,7 @@ class __TwigTemplate_7e20da94c7a87d46eb49106f18b88455 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  114 => 12,  109 => 10,  104 => 8,  100 => 6,  87 => 5,  64 => 3,  41 => 1,);
+        return array (  109 => 10,  104 => 8,  100 => 6,  87 => 5,  64 => 3,  41 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -158,10 +154,9 @@ class __TwigTemplate_7e20da94c7a87d46eb49106f18b88455 extends Template
 
     {{ include('social_media/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href=\"{{ path('app_social_media_index') }}\">back to list</a>
+    <a href=\"{{ path('socialVoyageurs_page') }}\">back to list</a>
 
-    {{ include('social_media/_delete_form.html.twig') }}
 {% endblock %}
-", "social_media/edit.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\social_media\\edit.html.twig");
+", "social_media/edit.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\social_media\\edit.html.twig");
     }
 }

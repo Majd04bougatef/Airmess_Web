@@ -33,7 +33,6 @@ class __TwigTemplate_c65a2664fe0f21b370d4b87a53fb769d extends Template
             'title' => [$this, 'block_title'],
             'stylesheets' => [$this, 'block_stylesheets'],
             'body' => [$this, 'block_body'],
-            'javascripts' => [$this, 'block_javascripts'],
         ];
     }
 
@@ -101,11 +100,170 @@ class __TwigTemplate_c65a2664fe0f21b370d4b87a53fb769d extends Template
         // line 7
         yield "    ";
         yield from $this->yieldParentBlock("stylesheets", $context, $blocks);
-        yield " ";
-        // line 8
-        yield "    ";
-        // line 9
-        yield "    
+        yield "
+    <style>
+        :root {
+            --main-accent: #4a6bda;
+            --main-accent-hover: #3d58b3;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --light-bg: #f8f9fa;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+        }
+        
+        .feed-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+        
+        .search-form {
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .publication-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            background-color: white;
+        }
+        
+        .publication-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-img-top {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-text {
+            max-height: 4.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            color: #555;
+        }
+        
+        .location-badge {
+            background-color: #f8f9fa;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .location-badge i {
+            margin-right: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .card-footer {
+            background-color: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.75rem 1.25rem;
+        }
+        
+        .date-info {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .author-info {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .interaction-icons {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .interaction-icons .badge {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+        }
+        
+        .badge-like {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--success-color);
+        }
+        
+        .badge-dislike {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: var(--danger-color);
+        }
+        
+        .feed-header {
+            margin-bottom: 2rem;
+            text-align: center;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .add-post-btn {
+            margin-top: 1rem;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(74, 107, 218, 0.2);
+        }
+        
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--main-accent);
+            border-color: var(--main-accent);
+        }
+        
+        .page-link {
+            color: var(--main-accent);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+    </style>
 ";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -116,7 +274,7 @@ class __TwigTemplate_c65a2664fe0f21b370d4b87a53fb769d extends Template
         yield from [];
     }
 
-    // line 12
+    // line 173
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -129,13 +287,22 @@ class __TwigTemplate_c65a2664fe0f21b370d4b87a53fb769d extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
 
-        // line 13
+        // line 174
         yield "<div class=\"container feed-container mt-4 mb-4\">
 
-    <h1 class=\"text-center mb-4\">📢 Social Feed</h1>
+    <div class=\"feed-header\">
+        <h1 class=\"display-5 fw-bold\">📢 Social Feed</h1>
+        <p class=\"text-muted\">Découvrez et partagez des expériences avec la communauté</p>
+        <a href=\"";
+        // line 179
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_new");
+        yield "\" class=\"btn btn-primary add-post-btn\">
+            <i class=\"fas fa-plus-circle me-2\"></i>Nouvelle publication
+        </a>
+    </div>
     
     ";
-        // line 18
+        // line 185
         yield "    <div class=\"row justify-content-center mb-4\">
         <div class=\"col-md-8\">
             <form method=\"get\" class=\"search-form\">
@@ -145,17 +312,17 @@ class __TwigTemplate_c65a2664fe0f21b370d4b87a53fb769d extends Template
                            class=\"form-control\" 
                            placeholder=\"Rechercher par lieu...\" 
                            value=\"";
-        // line 26
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 26, $this->source); })()), "request", [], "any", false, false, false, 26), "query", [], "any", false, false, false, 26), "get", ["lieu"], "method", false, false, false, 26), "html", null, true);
+        // line 193
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 193, $this->source); })()), "request", [], "any", false, false, false, 193), "query", [], "any", false, false, false, 193), "get", ["lieu"], "method", false, false, false, 193), "html", null, true);
         yield "\"
                            aria-label=\"Rechercher par lieu\">
                     <button class=\"btn btn-primary\" type=\"submit\">
                         <i class=\"fas fa-search\"></i> Rechercher
                     </button>
                     ";
-        // line 31
-        if (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 31, $this->source); })()), "request", [], "any", false, false, false, 31), "query", [], "any", false, false, false, 31), "get", ["lieu"], "method", false, false, false, 31)) {
-            // line 32
+        // line 198
+        if (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 198, $this->source); })()), "request", [], "any", false, false, false, 198), "query", [], "any", false, false, false, 198), "get", ["lieu"], "method", false, false, false, 198)) {
+            // line 199
             yield "                        <a href=\"";
             yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_index");
             yield "\" class=\"btn btn-outline-secondary\">
@@ -163,305 +330,176 @@ class __TwigTemplate_c65a2664fe0f21b370d4b87a53fb769d extends Template
                         </a>
                     ";
         }
-        // line 36
+        // line 203
         yield "                </div>
             </form>
         </div>
     </div>
 
-    <!-- Scrollable Pane for Posts - THIS is the container with the ID -->
+    <!-- Filtres de recherche -->
     ";
-        // line 42
-        if (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 42, $this->source); })()), "request", [], "any", false, false, false, 42), "query", [], "any", false, false, false, 42), "get", ["lieu"], "method", false, false, false, 42)) {
-            // line 43
+        // line 209
+        if (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 209, $this->source); })()), "request", [], "any", false, false, false, 209), "query", [], "any", false, false, false, 209), "get", ["lieu"], "method", false, false, false, 209)) {
+            // line 210
             yield "        <div class=\"alert alert-info text-center mb-3\">
             Résultats pour le lieu : <strong>";
-            // line 44
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 44, $this->source); })()), "request", [], "any", false, false, false, 44), "query", [], "any", false, false, false, 44), "get", ["lieu"], "method", false, false, false, 44), "html", null, true);
+            // line 211
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 211, $this->source); })()), "request", [], "any", false, false, false, 211), "query", [], "any", false, false, false, 211), "get", ["lieu"], "method", false, false, false, 211), "html", null, true);
             yield "</strong>
         </div>
     ";
         }
-        // line 47
-        yield "    <div class=\"posts-scroll-pane\" id=\"posts-list\">
-
+        // line 214
+        yield "
+    <!-- Grille de publications -->
+    <div class=\"row g-4\">
         ";
-        // line 50
-        yield "        ";
-        // line 51
-        yield "        ";
-        $context['_parent'] = $context;
-        $context['_seq'] = CoreExtension::ensureTraversable((isset($context["pagination"]) || array_key_exists("pagination", $context) ? $context["pagination"] : (function () { throw new RuntimeError('Variable "pagination" does not exist.', 51, $this->source); })()));
-        $context['_iterated'] = false;
-        foreach ($context['_seq'] as $context["_key"] => $context["post"]) {
-            // line 52
-            yield "            <div class=\"card post-card\">
-                ";
-            // line 54
-            yield "                ";
-            if (CoreExtension::getAttribute($this->env, $this->source, $context["post"], "imagemedia", [], "any", false, false, false, 54)) {
-                // line 55
-                yield "                    ";
-                $context["imagePath"] = ("uploads/" . CoreExtension::getAttribute($this->env, $this->source, $context["post"], "imagemedia", [], "any", false, false, false, 55));
-                // line 56
-                yield "                    <img src=\"";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl((isset($context["imagePath"]) || array_key_exists("imagePath", $context) ? $context["imagePath"] : (function () { throw new RuntimeError('Variable "imagePath" does not exist.', 56, $this->source); })())), "html", null, true);
-                yield "\" class=\"card-img-top post-thumbnail\" style=\"max-height: 300px; width: auto; margin: 20px auto; display: block; border-radius: 2px; border: 1px solid #e9ecef; max-width: 50%;\" alt=\"Miniature : ";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["post"], "titre", [], "any", true, true, false, 56)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["post"], "titre", [], "any", false, false, false, 56), "")) : ("")), "html", null, true);
-                yield "\">
-                ";
-            }
-            // line 58
-            yield "
-                <div class=\"card-body\">
-                    ";
-            // line 61
-            yield "                    <div class=\"post-author\">
-                         <i class=\"fas fa-user-circle\"></i>
-                         <span>
-                             ";
-            // line 64
-            if ((CoreExtension::getAttribute($this->env, $this->source, $context["post"], "user", [], "any", true, true, false, 64) &&  !(null === CoreExtension::getAttribute($this->env, $this->source, $context["post"], "user", [], "any", false, false, false, 64)))) {
-                // line 65
-                yield "                                 ";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::default(Twig\Extension\CoreExtension::trim(((((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["post"], "user", [], "any", false, true, false, 65), "prenom", [], "any", true, true, false, 65)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["post"], "user", [], "any", false, false, false, 65), "prenom", [], "any", false, false, false, 65), "")) : ("")) . " ") . ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["post"], "user", [], "any", false, true, false, 65), "name", [], "any", true, true, false, 65)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["post"], "user", [], "any", false, false, false, 65), "name", [], "any", false, false, false, 65), "")) : ("")))), "Utilisateur inconnu"), "html", null, true);
-                yield "
-                             ";
-            } else {
-                // line 67
-                yield "                                 Utilisateur inconnu
-                             ";
-            }
-            // line 69
-            yield "                         </span>
-                    </div>
-
-                    ";
-            // line 73
-            yield "                    <h5 class=\"card-title\">";
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["post"], "titre", [], "any", true, true, false, 73)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["post"], "titre", [], "any", false, false, false, 73), "Sans titre")) : ("Sans titre")), "html", null, true);
-            yield "</h5>
-
-                    ";
-            // line 76
-            yield "                    <p class=\"card-text\">";
-            yield Twig\Extension\CoreExtension::nl2br($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((CoreExtension::getAttribute($this->env, $this->source, $context["post"], "contenu", [], "any", true, true, false, 76)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, $context["post"], "contenu", [], "any", false, false, false, 76), "")) : ("")), "html", null, true));
-            yield "</p>
-
-                    ";
-            // line 79
-            yield "                    <div class=\"post-meta\">
-                        ";
-            // line 80
-            if (CoreExtension::getAttribute($this->env, $this->source, $context["post"], "lieu", [], "any", false, false, false, 80)) {
-                // line 81
-                yield "                            <div><strong><i class=\"fas fa-map-marker-alt\"></i> Lieu:</strong> ";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["post"], "lieu", [], "any", false, false, false, 81), "html", null, true);
-                yield "</div>
-                        ";
-            }
-            // line 83
-            yield "                        <div><strong><i class=\"fas fa-calendar-alt\"></i> Publié le:</strong> ";
-            yield ((CoreExtension::getAttribute($this->env, $this->source, $context["post"], "publicationDate", [], "any", false, false, false, 83)) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Twig\Extension\CoreExtension']->formatDate(CoreExtension::getAttribute($this->env, $this->source, $context["post"], "publicationDate", [], "any", false, false, false, 83), "d M Y, H:i"), "html", null, true)) : ("Date inconnue"));
-            yield "</div>
-                    </div>
-
-                    ";
-            // line 87
-            yield "                    <div class=\"post-actions\">
-                        <a href=\"";
-            // line 88
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_show", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, $context["post"], "idEB", [], "any", false, false, false, 88)]), "html", null, true);
-            yield "\" class=\"btn btn-outline-primary btn-sm\">
-                            <i class=\"fas fa-eye\"></i> Voir
-                        </a>
-                        <button class=\"btn btn-outline-success btn-sm like-button\" data-post-id=\"";
-            // line 91
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["post"], "idEB", [], "any", false, false, false, 91), "html", null, true);
-            yield "\">
-                             <i class=\"fas fa-thumbs-up\"></i> J'aime
-                        </button>
-                        <button class=\"btn btn-outline-info btn-sm comment-button\" data-post-id=\"";
-            // line 94
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["post"], "idEB", [], "any", false, false, false, 94), "html", null, true);
-            yield "\">
-                             <i class=\"fas fa-comment\"></i> Commenter
-                        </button>
-
-                        ";
-            // line 99
-            yield "                        ";
-            if (($this->extensions['Symfony\Bridge\Twig\Extension\SecurityExtension']->isGranted("POST_DELETE", $context["post"]) || (CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 99, $this->source); })()), "user", [], "any", false, false, false, 99) && (CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 99, $this->source); })()), "user", [], "any", false, false, false, 99) == CoreExtension::getAttribute($this->env, $this->source, $context["post"], "user", [], "any", false, false, false, 99))))) {
-                // line 100
-                yield "                            <form method=\"post\" action=\"";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_delete", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, $context["post"], "idEB", [], "any", false, false, false, 100)]), "html", null, true);
-                yield "\" onsubmit=\"return confirm('Voulez-vous vraiment supprimer cette publication ?');\" class=\"ms-auto d-inline\">
-                                <input type=\"hidden\" name=\"_token\" value=\"";
-                // line 101
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("delete" . CoreExtension::getAttribute($this->env, $this->source, $context["post"], "idEB", [], "any", false, false, false, 101))), "html", null, true);
-                yield "\">
-                                <button type=\"submit\" class=\"btn btn-outline-danger btn-sm\">
-                                     <i class=\"fas fa-trash-alt\"></i> Supprimer
-                                </button>
-                            </form>
-                        ";
-            }
-            // line 107
-            yield "                    </div> ";
-            // line 108
-            yield "                </div> ";
-            // line 109
-            yield "            </div> ";
-            // line 110
-            yield "        ";
-            $context['_iterated'] = true;
-        }
-        if (!$context['_iterated']) {
-            // line 111
+        // line 217
+        if (Twig\Extension\CoreExtension::testEmpty(CoreExtension::getAttribute($this->env, $this->source, (isset($context["pagination"]) || array_key_exists("pagination", $context) ? $context["pagination"] : (function () { throw new RuntimeError('Variable "pagination" does not exist.', 217, $this->source); })()), "items", [], "any", false, false, false, 217))) {
+            // line 218
+            yield "            <div class=\"col-12\">
+                <div class=\"no-results\">
+                    <i class=\"fas fa-newspaper fa-3x mb-3 text-muted\"></i>
+                    <h4>Aucune publication trouvée</h4>
+                    <p class=\"text-muted\">Essayez de modifier votre recherche ou créez une nouvelle publication.</p>
+                    <a href=\"";
+            // line 223
+            yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_new");
+            yield "\" class=\"btn btn-primary mt-2\">
+                        <i class=\"fas fa-plus me-1\"></i> Créer une publication
+                    </a>
+                </div>
+            </div>
+        ";
+        } else {
+            // line 229
             yield "            ";
-            // line 112
-            yield "            <p class=\"no-posts-message\">Aucune publication trouvée pour le moment.</p>
-        ";
-        }
-        $_parent = $context['_parent'];
-        unset($context['_seq'], $context['_key'], $context['post'], $context['_parent'], $context['_iterated']);
-        $context = array_intersect_key($context, $_parent) + $_parent;
-        // line 114
-        yield "        ";
-        // line 115
-        yield "
-    </div> ";
-        // line 117
-        yield "
-    <!-- Pagination - Only shown if needed - ADDED ID -->
-    ";
-        // line 119
-        if (((CoreExtension::getAttribute($this->env, $this->source, (isset($context["pagination"]) || array_key_exists("pagination", $context) ? $context["pagination"] : (function () { throw new RuntimeError('Variable "pagination" does not exist.', 119, $this->source); })()), "getTotalItemCount", [], "any", false, false, false, 119) > 0) && (CoreExtension::getAttribute($this->env, $this->source, (isset($context["pagination"]) || array_key_exists("pagination", $context) ? $context["pagination"] : (function () { throw new RuntimeError('Variable "pagination" does not exist.', 119, $this->source); })()), "pageCount", [], "any", false, false, false, 119) > 1))) {
-            // line 120
-            yield "    <div class=\"pagination-controls\" id=\"pagination-controls\">
-        ";
-            // line 121
-            yield $this->env->getRuntime('Knp\Bundle\PaginatorBundle\Twig\Extension\PaginationRuntime')->render($this->env, (isset($context["pagination"]) || array_key_exists("pagination", $context) ? $context["pagination"] : (function () { throw new RuntimeError('Variable "pagination" does not exist.', 121, $this->source); })()));
-            yield "
-    </div>
-    ";
-        }
-        // line 124
-        yield "
-    <!-- Bouton Ajouter une publication -->
-    <div class=\"add-post-section\">
-        <a href=\"";
-        // line 127
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_new");
-        yield "\" class=\"btn btn-success btn-lg\">
-             <i class=\"fas fa-plus-circle\"></i> Ajouter une publication
-        </a>
-    </div>
-
-</div> ";
-        
-        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
-
-        
-        $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
-
-        yield from [];
-    }
-
-    // line 135
-    /**
-     * @return iterable<null|scalar|\Stringable>
-     */
-    public function block_javascripts(array $context, array $blocks = []): iterable
-    {
-        $macros = $this->macros;
-        $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
-        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "javascripts"));
-
-        $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
-        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "javascripts"));
-
-        // line 136
-        yield "    ";
-        yield from $this->yieldParentBlock("javascripts", $context, $blocks);
-        yield " ";
-        // line 137
-        yield "    ";
-        // line 138
-        yield "    <script>
-        function handlePaginationClick(event) {
-            event.preventDefault(); // Prevent default link navigation
-            const url = event.currentTarget.getAttribute('href');
-            const postsContainer = document.getElementById('posts-list'); // Target the container
-            const paginationContainer = document.getElementById('pagination-controls');
-
-            if (!postsContainer || !paginationContainer) {
-                console.error('Error: Could not find posts or pagination container elements.');
-                return;
+            $context['_parent'] = $context;
+            $context['_seq'] = CoreExtension::ensureTraversable((isset($context["pagination"]) || array_key_exists("pagination", $context) ? $context["pagination"] : (function () { throw new RuntimeError('Variable "pagination" does not exist.', 229, $this->source); })()));
+            $context['loop'] = [
+              'parent' => $context['_parent'],
+              'index0' => 0,
+              'index'  => 1,
+              'first'  => true,
+            ];
+            if (is_array($context['_seq']) || (is_object($context['_seq']) && $context['_seq'] instanceof \Countable)) {
+                $length = count($context['_seq']);
+                $context['loop']['revindex0'] = $length - 1;
+                $context['loop']['revindex'] = $length;
+                $context['loop']['length'] = $length;
+                $context['loop']['last'] = 1 === $length;
             }
-
-            // Optional: Show loading state
-            postsContainer.style.opacity = '0.5';
-
-            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }}) // Identify as AJAX
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: \${response.status}`);
-                    }
-                    return response.text(); // Fetch the FULL HTML of the next page
-                })
-                .then(html => {
-                    // Use DOMParser to safely parse the fetched FULL HTML
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-
-                    // Find the NEW content container within the parsed HTML document
-                    const newPostsContentElement = doc.getElementById('posts-list');
-                    const newPaginationContentElement = doc.getElementById('pagination-controls');
-
-                    // Update the current page's container's INNER HTML
-                    if (newPostsContentElement) {
-                        postsContainer.innerHTML = newPostsContentElement.innerHTML; // Replace content
-                        postsContainer.scrollTop = 0; // Scroll to top
-                    } else {
-                        console.error('Could not find #posts-list content in fetched data.');
-                         postsContainer.innerHTML = '<p class=\"no-posts-message text-danger\">Error loading posts content.</p>';
-                    }
-
-                    if (newPaginationContentElement) {
-                        paginationContainer.innerHTML = newPaginationContentElement.innerHTML; // Replace pagination
-                    } else {
-                        paginationContainer.innerHTML = ''; // Clear pagination if not found
-                         console.warn('Could not find #pagination-controls content in fetched data.');
-                    }
-
-                    // Re-attach event listeners to the *new* pagination links
-                    attachPaginationListeners();
-
-                })
-                .catch(error => {
-                    console.error('Error fetching posts:', error);
-                    postsContainer.innerHTML = `<p class=\"no-posts-message text-danger\">Failed to load content: \${error.message}</p>`;
-                })
-                .finally(() => {
-                    // Optional: Remove loading state
-                    postsContainer.style.opacity = '1';
-                });
+            foreach ($context['_seq'] as $context["_key"] => $context["social_media"]) {
+                // line 230
+                yield "                <div class=\"col-lg-4 col-md-6\">
+                    <div class=\"publication-card card h-100\">
+                        <div class=\"card-img-container\">
+                            ";
+                // line 233
+                if (CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "imagemedia", [], "any", false, false, false, 233)) {
+                    // line 234
+                    yield "                                <img src=\"http://localhost/ImageSocialMedia/";
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "imagemedia", [], "any", false, false, false, 234), "html", null, true);
+                    yield "\" 
+                                     class=\"card-img-top\" 
+                                     alt=\"";
+                    // line 236
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "titre", [], "any", false, false, false, 236), "html", null, true);
+                    yield "\"
+                                     onerror=\"this.onerror=null; this.src='";
+                    // line 237
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl((("img/carousel-" . ((CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 237) % 3) + 1)) . ".jpg")), "html", null, true);
+                    yield "'; this.alt='Image non disponible';\">
+                            ";
+                } else {
+                    // line 239
+                    yield "                                <img src=\"";
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl((("img/carousel-" . ((CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 239) % 3) + 1)) . ".jpg")), "html", null, true);
+                    yield "\" class=\"card-img-top\" alt=\"Publication image\">
+                            ";
+                }
+                // line 241
+                yield "                        </div>
+                        <div class=\"card-body\">
+                            <span class=\"author-info\">
+                                <i class=\"fas fa-user me-1\"></i> ";
+                // line 244
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "user", [], "any", false, false, false, 244), "name", [], "any", false, false, false, 244), "html", null, true);
+                yield " ";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "user", [], "any", false, false, false, 244), "prenom", [], "any", false, false, false, 244), "html", null, true);
+                yield "
+                            </span>
+                            <span class=\"location-badge\">
+                                <i class=\"fas fa-map-marker-alt\"></i> ";
+                // line 247
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "lieu", [], "any", false, false, false, 247), "html", null, true);
+                yield "
+                            </span>
+                            <h5 class=\"card-title\">";
+                // line 249
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "titre", [], "any", false, false, false, 249), "html", null, true);
+                yield "</h5>
+                            <p class=\"card-text\">";
+                // line 250
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "contenu", [], "any", false, false, false, 250), "html", null, true);
+                yield "</p>
+                            
+                            <div class=\"interaction-icons\">
+                                <span class=\"badge badge-like\">
+                                    <i class=\"fas fa-thumbs-up me-1\"></i> ";
+                // line 254
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "likee", [], "any", false, false, false, 254), "html", null, true);
+                yield "
+                                </span>
+                                <span class=\"badge badge-dislike\">
+                                    <i class=\"fas fa-thumbs-down me-1\"></i> ";
+                // line 257
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "dislike", [], "any", false, false, false, 257), "html", null, true);
+                yield "
+                                </span>
+                            </div>
+                        </div>
+                        <div class=\"card-footer d-flex justify-content-between align-items-center\">
+                            <span class=\"date-info\"><i class=\"far fa-calendar-alt me-1\"></i> ";
+                // line 262
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Twig\Extension\CoreExtension']->formatDate(CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "publicationDate", [], "any", false, false, false, 262), "d/m/Y"), "html", null, true);
+                yield "</span>
+                            <a href=\"";
+                // line 263
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_show", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, $context["social_media"], "idEB", [], "any", false, false, false, 263)]), "html", null, true);
+                yield "\" class=\"btn btn-sm btn-outline-primary\">
+                                <i class=\"fas fa-eye me-1\"></i> Voir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            ";
+                ++$context['loop']['index0'];
+                ++$context['loop']['index'];
+                $context['loop']['first'] = false;
+                if (isset($context['loop']['revindex0'], $context['loop']['revindex'])) {
+                    --$context['loop']['revindex0'];
+                    --$context['loop']['revindex'];
+                    $context['loop']['last'] = 0 === $context['loop']['revindex0'];
+                }
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_key'], $context['social_media'], $context['_parent'], $context['loop']);
+            $context = array_intersect_key($context, $_parent) + $_parent;
+            // line 270
+            yield "        ";
         }
+        // line 271
+        yield "    </div>
 
-        function attachPaginationListeners() {
-            const paginationLinks = document.querySelectorAll('#pagination-controls a');
-            paginationLinks.forEach(link => {
-                link.removeEventListener('click', handlePaginationClick);
-                link.addEventListener('click', handlePaginationClick);
-            });
-        }
-
-        // Initial attachment of listeners when the page fully loads
-        document.addEventListener('DOMContentLoaded', function() {
-            attachPaginationListeners();
-        });
-    </script>
+    <!-- Pagination -->
+    <div class=\"mt-4\">
+        ";
+        // line 275
+        yield $this->env->getRuntime('Knp\Bundle\PaginatorBundle\Twig\Extension\PaginationRuntime')->render($this->env, (isset($context["pagination"]) || array_key_exists("pagination", $context) ? $context["pagination"] : (function () { throw new RuntimeError('Variable "pagination" does not exist.', 275, $this->source); })()));
+        yield "
+    </div>
+</div>
 ";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -493,7 +531,7 @@ class __TwigTemplate_c65a2664fe0f21b370d4b87a53fb769d extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  391 => 138,  389 => 137,  385 => 136,  372 => 135,  355 => 127,  350 => 124,  344 => 121,  341 => 120,  339 => 119,  335 => 117,  332 => 115,  330 => 114,  323 => 112,  321 => 111,  316 => 110,  314 => 109,  312 => 108,  310 => 107,  301 => 101,  296 => 100,  293 => 99,  286 => 94,  280 => 91,  274 => 88,  271 => 87,  264 => 83,  258 => 81,  256 => 80,  253 => 79,  247 => 76,  241 => 73,  236 => 69,  232 => 67,  226 => 65,  224 => 64,  219 => 61,  215 => 58,  207 => 56,  204 => 55,  201 => 54,  198 => 52,  192 => 51,  190 => 50,  186 => 47,  180 => 44,  177 => 43,  175 => 42,  167 => 36,  159 => 32,  157 => 31,  149 => 26,  139 => 18,  133 => 13,  120 => 12,  108 => 9,  106 => 8,  102 => 7,  89 => 6,  66 => 4,  43 => 2,);
+        return array (  499 => 275,  493 => 271,  490 => 270,  469 => 263,  465 => 262,  457 => 257,  451 => 254,  444 => 250,  440 => 249,  435 => 247,  427 => 244,  422 => 241,  416 => 239,  411 => 237,  407 => 236,  401 => 234,  399 => 233,  394 => 230,  376 => 229,  367 => 223,  360 => 218,  358 => 217,  353 => 214,  347 => 211,  344 => 210,  342 => 209,  334 => 203,  326 => 199,  324 => 198,  316 => 193,  306 => 185,  298 => 179,  291 => 174,  278 => 173,  101 => 7,  88 => 6,  65 => 4,  42 => 2,);
     }
 
     public function getSourceContext(): Source
@@ -504,15 +542,182 @@ class __TwigTemplate_c65a2664fe0f21b370d4b87a53fb769d extends Template
 {% block title %}Social Media Feed{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }} {# Include any base styles #}
-    {# === Styles remain here === #}
-    
+    {{ parent() }}
+    <style>
+        :root {
+            --main-accent: #4a6bda;
+            --main-accent-hover: #3d58b3;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --light-bg: #f8f9fa;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+        }
+        
+        .feed-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+        
+        .search-form {
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .publication-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            background-color: white;
+        }
+        
+        .publication-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-img-top {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-text {
+            max-height: 4.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            color: #555;
+        }
+        
+        .location-badge {
+            background-color: #f8f9fa;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .location-badge i {
+            margin-right: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .card-footer {
+            background-color: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.75rem 1.25rem;
+        }
+        
+        .date-info {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .author-info {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .interaction-icons {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .interaction-icons .badge {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+        }
+        
+        .badge-like {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--success-color);
+        }
+        
+        .badge-dislike {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: var(--danger-color);
+        }
+        
+        .feed-header {
+            margin-bottom: 2rem;
+            text-align: center;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .add-post-btn {
+            margin-top: 1rem;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(74, 107, 218, 0.2);
+        }
+        
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--main-accent);
+            border-color: var(--main-accent);
+        }
+        
+        .page-link {
+            color: var(--main-accent);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
 <div class=\"container feed-container mt-4 mb-4\">
 
-    <h1 class=\"text-center mb-4\">📢 Social Feed</h1>
+    <div class=\"feed-header\">
+        <h1 class=\"display-5 fw-bold\">📢 Social Feed</h1>
+        <p class=\"text-muted\">Découvrez et partagez des expériences avec la communauté</p>
+        <a href=\"{{ path('app_social_media_new') }}\" class=\"btn btn-primary add-post-btn\">
+            <i class=\"fas fa-plus-circle me-2\"></i>Nouvelle publication
+        </a>
+    </div>
     
     {# Barre de recherche par lieu #}
     <div class=\"row justify-content-center mb-4\">
@@ -538,177 +743,77 @@ class __TwigTemplate_c65a2664fe0f21b370d4b87a53fb769d extends Template
         </div>
     </div>
 
-    <!-- Scrollable Pane for Posts - THIS is the container with the ID -->
+    <!-- Filtres de recherche -->
     {% if app.request.query.get('lieu') %}
         <div class=\"alert alert-info text-center mb-3\">
             Résultats pour le lieu : <strong>{{ app.request.query.get('lieu') }}</strong>
         </div>
     {% endif %}
-    <div class=\"posts-scroll-pane\" id=\"posts-list\">
 
-        {# === THE INCLUDE TAG HAS BEEN REMOVED === #}
-        {# === THE FOR LOOP IS NOW DIRECTLY HERE === #}
-        {% for post in pagination %}
-            <div class=\"card post-card\">
-                {# Image miniature #}
-                {% if post.imagemedia %}
-                    {% set imagePath = 'uploads/' ~ post.imagemedia %}
-                    <img src=\"{{ asset(imagePath) }}\" class=\"card-img-top post-thumbnail\" style=\"max-height: 300px; width: auto; margin: 20px auto; display: block; border-radius: 2px; border: 1px solid #e9ecef; max-width: 50%;\" alt=\"Miniature : {{ post.titre | default('') }}\">
-                {% endif %}
-
-                <div class=\"card-body\">
-                    {# Post Author Display #}
-                    <div class=\"post-author\">
-                         <i class=\"fas fa-user-circle\"></i>
-                         <span>
-                             {% if post.user is defined and post.user is not null %}
-                                 {{ (post.user.prenom | default('') ~ ' ' ~ post.user.name | default('')) | trim | default('Utilisateur inconnu') }}
-                             {% else %}
-                                 Utilisateur inconnu
-                             {% endif %}
-                         </span>
-                    </div>
-
-                    {# Post Title #}
-                    <h5 class=\"card-title\">{{ post.titre | default('Sans titre') }}</h5>
-
-                    {# Post Content #}
-                    <p class=\"card-text\">{{ post.contenu | default('') | nl2br }}</p>
-
-                    {# Post Metadata #}
-                    <div class=\"post-meta\">
-                        {% if post.lieu %}
-                            <div><strong><i class=\"fas fa-map-marker-alt\"></i> Lieu:</strong> {{ post.lieu }}</div>
-                        {% endif %}
-                        <div><strong><i class=\"fas fa-calendar-alt\"></i> Publié le:</strong> {{ post.publicationDate ? post.publicationDate|date('d M Y, H:i') : 'Date inconnue' }}</div>
-                    </div>
-
-                    {# Action Buttons #}
-                    <div class=\"post-actions\">
-                        <a href=\"{{ path('app_social_media_show', {'idEB': post.idEB}) }}\" class=\"btn btn-outline-primary btn-sm\">
-                            <i class=\"fas fa-eye\"></i> Voir
-                        </a>
-                        <button class=\"btn btn-outline-success btn-sm like-button\" data-post-id=\"{{ post.idEB }}\">
-                             <i class=\"fas fa-thumbs-up\"></i> J'aime
-                        </button>
-                        <button class=\"btn btn-outline-info btn-sm comment-button\" data-post-id=\"{{ post.idEB }}\">
-                             <i class=\"fas fa-comment\"></i> Commenter
-                        </button>
-
-                        {# Delete Form #}
-                        {% if is_granted('POST_DELETE', post) or (app.user and app.user == post.user) %}
-                            <form method=\"post\" action=\"{{ path('app_social_media_delete', {'idEB': post.idEB}) }}\" onsubmit=\"return confirm('Voulez-vous vraiment supprimer cette publication ?');\" class=\"ms-auto d-inline\">
-                                <input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token('delete' ~ post.idEB) }}\">
-                                <button type=\"submit\" class=\"btn btn-outline-danger btn-sm\">
-                                     <i class=\"fas fa-trash-alt\"></i> Supprimer
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div> {# End post-actions #}
-                </div> {# End card-body #}
-            </div> {# End post-card #}
+    <!-- Grille de publications -->
+    <div class=\"row g-4\">
+        {% if pagination.items is empty %}
+            <div class=\"col-12\">
+                <div class=\"no-results\">
+                    <i class=\"fas fa-newspaper fa-3x mb-3 text-muted\"></i>
+                    <h4>Aucune publication trouvée</h4>
+                    <p class=\"text-muted\">Essayez de modifier votre recherche ou créez une nouvelle publication.</p>
+                    <a href=\"{{ path('app_social_media_new') }}\" class=\"btn btn-primary mt-2\">
+                        <i class=\"fas fa-plus me-1\"></i> Créer une publication
+                    </a>
+                </div>
+            </div>
         {% else %}
-            {# Message shown if 'pagination' is empty #}
-            <p class=\"no-posts-message\">Aucune publication trouvée pour le moment.</p>
-        {% endfor %}
-        {# === END OF POST LOOP === #}
+            {% for social_media in pagination %}
+                <div class=\"col-lg-4 col-md-6\">
+                    <div class=\"publication-card card h-100\">
+                        <div class=\"card-img-container\">
+                            {% if social_media.imagemedia %}
+                                <img src=\"http://localhost/ImageSocialMedia/{{ social_media.imagemedia }}\" 
+                                     class=\"card-img-top\" 
+                                     alt=\"{{ social_media.titre }}\"
+                                     onerror=\"this.onerror=null; this.src='{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}'; this.alt='Image non disponible';\">
+                            {% else %}
+                                <img src=\"{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}\" class=\"card-img-top\" alt=\"Publication image\">
+                            {% endif %}
+                        </div>
+                        <div class=\"card-body\">
+                            <span class=\"author-info\">
+                                <i class=\"fas fa-user me-1\"></i> {{ social_media.user.name }} {{ social_media.user.prenom }}
+                            </span>
+                            <span class=\"location-badge\">
+                                <i class=\"fas fa-map-marker-alt\"></i> {{ social_media.lieu }}
+                            </span>
+                            <h5 class=\"card-title\">{{ social_media.titre }}</h5>
+                            <p class=\"card-text\">{{ social_media.contenu }}</p>
+                            
+                            <div class=\"interaction-icons\">
+                                <span class=\"badge badge-like\">
+                                    <i class=\"fas fa-thumbs-up me-1\"></i> {{ social_media.likee }}
+                                </span>
+                                <span class=\"badge badge-dislike\">
+                                    <i class=\"fas fa-thumbs-down me-1\"></i> {{ social_media.dislike }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class=\"card-footer d-flex justify-content-between align-items-center\">
+                            <span class=\"date-info\"><i class=\"far fa-calendar-alt me-1\"></i> {{ social_media.publicationDate|date(\"d/m/Y\") }}</span>
+                            <a href=\"{{ path('app_social_media_show', {'idEB': social_media.idEB}) }}\" class=\"btn btn-sm btn-outline-primary\">
+                                <i class=\"fas fa-eye me-1\"></i> Voir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-    </div> {# End posts-scroll-pane #}
-
-    <!-- Pagination - Only shown if needed - ADDED ID -->
-    {% if pagination.getTotalItemCount > 0 and pagination.pageCount > 1 %}
-    <div class=\"pagination-controls\" id=\"pagination-controls\">
+    <!-- Pagination -->
+    <div class=\"mt-4\">
         {{ knp_pagination_render(pagination) }}
     </div>
-    {% endif %}
-
-    <!-- Bouton Ajouter une publication -->
-    <div class=\"add-post-section\">
-        <a href=\"{{ path('app_social_media_new') }}\" class=\"btn btn-success btn-lg\">
-             <i class=\"fas fa-plus-circle\"></i> Ajouter une publication
-        </a>
-    </div>
-
-</div> {# End container #}
+</div>
 {% endblock %}
-
-{% block javascripts %}
-    {{ parent() }} {# Include JS from base.html.twig if any #}
-    {# === ROBUST AJAX JAVASCRIPT (Same as before) === #}
-    <script>
-        function handlePaginationClick(event) {
-            event.preventDefault(); // Prevent default link navigation
-            const url = event.currentTarget.getAttribute('href');
-            const postsContainer = document.getElementById('posts-list'); // Target the container
-            const paginationContainer = document.getElementById('pagination-controls');
-
-            if (!postsContainer || !paginationContainer) {
-                console.error('Error: Could not find posts or pagination container elements.');
-                return;
-            }
-
-            // Optional: Show loading state
-            postsContainer.style.opacity = '0.5';
-
-            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }}) // Identify as AJAX
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: \${response.status}`);
-                    }
-                    return response.text(); // Fetch the FULL HTML of the next page
-                })
-                .then(html => {
-                    // Use DOMParser to safely parse the fetched FULL HTML
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-
-                    // Find the NEW content container within the parsed HTML document
-                    const newPostsContentElement = doc.getElementById('posts-list');
-                    const newPaginationContentElement = doc.getElementById('pagination-controls');
-
-                    // Update the current page's container's INNER HTML
-                    if (newPostsContentElement) {
-                        postsContainer.innerHTML = newPostsContentElement.innerHTML; // Replace content
-                        postsContainer.scrollTop = 0; // Scroll to top
-                    } else {
-                        console.error('Could not find #posts-list content in fetched data.');
-                         postsContainer.innerHTML = '<p class=\"no-posts-message text-danger\">Error loading posts content.</p>';
-                    }
-
-                    if (newPaginationContentElement) {
-                        paginationContainer.innerHTML = newPaginationContentElement.innerHTML; // Replace pagination
-                    } else {
-                        paginationContainer.innerHTML = ''; // Clear pagination if not found
-                         console.warn('Could not find #pagination-controls content in fetched data.');
-                    }
-
-                    // Re-attach event listeners to the *new* pagination links
-                    attachPaginationListeners();
-
-                })
-                .catch(error => {
-                    console.error('Error fetching posts:', error);
-                    postsContainer.innerHTML = `<p class=\"no-posts-message text-danger\">Failed to load content: \${error.message}</p>`;
-                })
-                .finally(() => {
-                    // Optional: Remove loading state
-                    postsContainer.style.opacity = '1';
-                });
-        }
-
-        function attachPaginationListeners() {
-            const paginationLinks = document.querySelectorAll('#pagination-controls a');
-            paginationLinks.forEach(link => {
-                link.removeEventListener('click', handlePaginationClick);
-                link.addEventListener('click', handlePaginationClick);
-            });
-        }
-
-        // Initial attachment of listeners when the page fully loads
-        document.addEventListener('DOMContentLoaded', function() {
-            attachPaginationListeners();
-        });
-    </script>
-{% endblock %}", "social_media/index.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\social_media\\index.html.twig");
+", "social_media/index.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\social_media\\index.html.twig");
     }
 }

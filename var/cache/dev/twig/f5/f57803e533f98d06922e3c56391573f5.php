@@ -282,7 +282,6 @@ class __TwigTemplate_4304099dae1bb97e295d185ee619a7d9 extends Template
     </div>
   </div>
 </div>
-{% endblock %}
-", "dashAdmin/offrePage.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashAdmin\\offrePage.html.twig");
+{% endblock %}", "dashAdmin/offrePage.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\dashAdmin\\offrePage.html.twig");
     }
 }

@@ -47,13 +47,36 @@ class __TwigTemplate_6b55d48b99b544a8c128d150ce3650aa extends Template
         // line 1
         yield "<form method=\"post\" action=\"";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_delete", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 1, $this->source); })()), "idEB", [], "any", false, false, false, 1)]), "html", null, true);
-        yield "\" onsubmit=\"return confirm('Are you sure you want to delete this item?');\">
+        yield "\" onsubmit=\"return confirm('Êtes-vous sûr de vouloir supprimer cette publication?');\" class=\"delete-form\">
     <input type=\"hidden\" name=\"_token\" value=\"";
         // line 2
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("delete" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 2, $this->source); })()), "idEB", [], "any", false, false, false, 2))), "html", null, true);
         yield "\">
-    <button class=\"btn\">Delete</button>
+    <button type=\"submit\" class=\"form-btn-danger\">Supprimer</button>
 </form>
+
+<style>
+    .delete-form {
+        margin-top: 1rem;
+    }
+    
+    .form-btn-danger {
+        background-color: #dc3545;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .form-btn-danger:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    }
+</style>
 ";
         
         $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
@@ -90,10 +113,33 @@ class __TwigTemplate_6b55d48b99b544a8c128d150ce3650aa extends Template
 
     public function getSourceContext(): Source
     {
-        return new Source("<form method=\"post\" action=\"{{ path('app_social_media_delete', {'idEB': social_media.idEB}) }}\" onsubmit=\"return confirm('Are you sure you want to delete this item?');\">
+        return new Source("<form method=\"post\" action=\"{{ path('app_social_media_delete', {'idEB': social_media.idEB}) }}\" onsubmit=\"return confirm('Êtes-vous sûr de vouloir supprimer cette publication?');\" class=\"delete-form\">
     <input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token('delete' ~ social_media.idEB) }}\">
-    <button class=\"btn\">Delete</button>
+    <button type=\"submit\" class=\"form-btn-danger\">Supprimer</button>
 </form>
-", "social_media/_delete_form.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\social_media\\_delete_form.html.twig");
+
+<style>
+    .delete-form {
+        margin-top: 1rem;
+    }
+    
+    .form-btn-danger {
+        background-color: #dc3545;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .form-btn-danger:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    }
+</style>
+", "social_media/_delete_form.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\social_media\\_delete_form.html.twig");
     }
 }

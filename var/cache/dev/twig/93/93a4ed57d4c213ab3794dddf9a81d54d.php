@@ -155,6 +155,6 @@ class __TwigTemplate_5a44d28b9b43330879d6b0287eb5b5de extends Template
         Bonjour ! Comment puis-je vous aider aujourd'hui concernant nos services de vélos ?
         <div class=\"message-time\">{{ \"now\"|date('H:i') }}</div>
     </div>
-{% endif %}", "message/_message.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\message\\_message.html.twig");
+{% endif %}", "message/_message.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\message\\_message.html.twig");
     }
 }
