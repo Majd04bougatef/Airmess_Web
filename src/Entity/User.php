@@ -61,12 +61,20 @@ class User
     #[ORM\OneToMany(mappedBy: "receiver", targetEntity: Message::class, cascade: ["remove"])]
     private Collection $receivedMessages;
 
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: SocialMedia::class)]
+    private Collection $socialMedias;
+
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: Commentaire::class, orphanRemoval: true)]
+    private Collection $commentaires;
+
     public function __construct()
     {
         $this->stations = new ArrayCollection();
         $this->reservations = new ArrayCollection();
         $this->sentMessages = new ArrayCollection();
         $this->receivedMessages = new ArrayCollection();
+        $this->socialMedias = new ArrayCollection();
+        $this->commentaires = new ArrayCollection
     }
 
     // Getters et Setters
@@ -310,6 +318,66 @@ class User
             // Définir le côté propriétaire à null (sauf si déjà modifié)
             if ($message->getReceiver() === $this) {
                 $message->setReceiver(null);
+            }
+        }
+
+        return $this;
+    }
+
+     /**
+     * @return Collection<int, SocialMedia>
+     */
+    public function getSocialMedias(): Collection
+    {
+        return $this->socialMedias;
+    }
+
+    public function addSocialMedia(SocialMedia $socialMedia): self
+    {
+        if (!$this->socialMedias->contains($socialMedia)) {
+            $this->socialMedias->add($socialMedia);
+            $socialMedia->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSocialMedia(SocialMedia $socialMedia): self
+    {
+        if ($this->socialMedias->removeElement($socialMedia)) {
+            // Set the owning side to null (unless already changed)
+            if ($socialMedia->getUser() === $this) {
+                $socialMedia->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commentaire>
+     */
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaire $commentaire): self
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires->add($commentaire);
+            $commentaire->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaire $commentaire): self
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            // Set the owning side to null (unless already changed)
+            if ($commentaire->getUser() === $this) {
+                $commentaire->setUser(null);
             }
         }
 
