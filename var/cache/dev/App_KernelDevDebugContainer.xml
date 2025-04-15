@@ -83,7 +83,7 @@
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
     <parameter key="kernel.container_class">App_KernelDevDebugContainer</parameter>
-    <parameter key="uploads_directory">C:\Users\bouga\Desktop\Airmess_Web/public/uploads</parameter>
+    <parameter key="uploads_directory">C:\Users\bouga\Desktop\Airmess_Web/public/uploads/</parameter>
     <parameter key="event_dispatcher.event_aliases" type="collection">
       <parameter key="Symfony\Component\Console\Event\ConsoleCommandEvent">console.command</parameter>
       <parameter key="Symfony\Component\Console\Event\ConsoleErrorEvent">console.error</parameter>
@@ -402,6 +402,13 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\BaseController"/>
       </call>
     </service>
+    <service id="App\Controller\BonPlanController" class="App\Controller\BonPlanController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\BonPlanController"/>
+      </call>
+    </service>
     <service id="App\Controller\CommentaireController" class="App\Controller\CommentaireController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -452,6 +459,13 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\ReservationTransportController"/>
       </call>
     </service>
+    <service id="App\Controller\ReviewBonPlanController" class="App\Controller\ReviewBonPlanController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\ReviewBonPlanController"/>
+      </call>
+    </service>
     <service id="App\Controller\SecurityController" class="App\Controller\SecurityController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -466,7 +480,7 @@
       <argument type="service" id="App\Repository\UserRepository"/>
       <argument type="service" id="slugger"/>
       <argument type="service" id="knp_paginator"/>
-      <argument>C:\Users\bouga\Desktop\Airmess_Web/public/uploads</argument>
+      <argument>C:\Users\bouga\Desktop\Airmess_Web/public/uploads/</argument>
       <argument type="service" id="App\Service\ForbiddenWordsChecker"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\SocialMediaController"/>
@@ -501,6 +515,9 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\loginController"/>
       </call>
     </service>
+    <service id="App\Form\BonPlanType" class="App\Form\BonPlanType" autowire="true" autoconfigure="true">
+      <tag name="form.type"/>
+    </service>
     <service id="App\Form\CommentaireType" class="App\Form\CommentaireType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
@@ -508,6 +525,9 @@
       <tag name="form.type"/>
     </service>
     <service id="App\Form\ReservationTransportType" class="App\Form\ReservationTransportType" autowire="true" autoconfigure="true">
+      <tag name="form.type"/>
+    </service>
+    <service id="App\Form\ReviewBonPlanType" class="App\Form\ReviewBonPlanType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
     <service id="App\Form\SocialMediaType" class="App\Form\SocialMediaType" autowire="true" autoconfigure="true">
@@ -518,6 +538,10 @@
     </service>
     <service id="App\Form\UserType" class="App\Form\UserType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
+    </service>
+    <service id="App\Repository\BonPlanRepository" class="App\Repository\BonPlanRepository" autowire="true" autoconfigure="true">
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
     </service>
     <service id="App\Repository\CommentaireRepository" class="App\Repository\CommentaireRepository" autowire="true" autoconfigure="true">
       <tag name="doctrine.repository_service"/>
@@ -532,6 +556,10 @@
       <argument type="service" id="doctrine"/>
     </service>
     <service id="App\Repository\ReservationTransportRepository" class="App\Repository\ReservationTransportRepository" autowire="true" autoconfigure="true">
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
+    </service>
+    <service id="App\Repository\ReviewBonPlanRepository" class="App\Repository\ReviewBonPlanRepository" autowire="true" autoconfigure="true">
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
     </service>
@@ -578,7 +606,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.fKH9ocd"/>
+      <argument type="service" id=".service_locator.hIU_yJ6"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1501,9 +1529,11 @@
         <argument>Symfony\Bridge\Doctrine\Form\Type</argument>
       </argument>
       <argument type="collection">
+        <argument>App\Form\BonPlanType</argument>
         <argument>App\Form\CommentaireType</argument>
         <argument>App\Form\MessageType</argument>
         <argument>App\Form\ReservationTransportType</argument>
+        <argument>App\Form\ReviewBonPlanType</argument>
         <argument>App\Form\SocialMediaType</argument>
         <argument>App\Form\StationType</argument>
         <argument>App\Form\UserType</argument>
@@ -3559,7 +3589,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.fKH9ocd"/>
+      <argument type="service" id=".service_locator.hIU_yJ6"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -4048,7 +4078,7 @@
       <argument type="service" id="form.registry"/>
     </service>
     <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension">
-      <argument type="service" id=".service_locator.mLTyPdm"/>
+      <argument type="service" id=".service_locator.pDr1R9M"/>
       <argument type="collection">
         <argument key="Symfony\Component\Form\Extension\Core\Type\FormType" type="iterator">
           <argument type="service" id="form.type_extension.form.transformation_failure_handling"/>
@@ -5311,7 +5341,7 @@
     <service id="doctrine.orm.configuration" class="Doctrine\ORM\Configuration" abstract="true"/>
     <service id="doctrine.orm.entity_manager.abstract" class="Doctrine\ORM\EntityManager" lazy="true" abstract="true"/>
     <service id="doctrine.orm.container_repository_factory" class="Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory">
-      <argument type="service" id=".service_locator.wff11tj"/>
+      <argument type="service" id=".service_locator.qMTv6bt"/>
     </service>
     <service id="doctrine.orm.manager_configurator.abstract" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator" abstract="true">
       <argument type="collection"/>
@@ -7385,6 +7415,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\BaseController" class="App\Controller\BaseController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\BaseController" class="App\Controller\BaseController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\BaseController" class="App\Controller\BaseController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\BonPlanController" class="App\Controller\BonPlanController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\BonPlanController" class="App\Controller\BonPlanController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\BonPlanController" class="App\Controller\BonPlanController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\CommentaireController" class="App\Controller\CommentaireController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\CommentaireController" class="App\Controller\CommentaireController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\CommentaireController" class="App\Controller\CommentaireController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -7406,6 +7439,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\ReservationTransportController" class="App\Controller\ReservationTransportController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\ReservationTransportController" class="App\Controller\ReservationTransportController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\ReservationTransportController" class="App\Controller\ReservationTransportController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\ReviewBonPlanController" class="App\Controller\ReviewBonPlanController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\ReviewBonPlanController" class="App\Controller\ReviewBonPlanController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\ReviewBonPlanController" class="App\Controller\ReviewBonPlanController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\SecurityController" class="App\Controller\SecurityController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\SecurityController" class="App\Controller\SecurityController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\SecurityController" class="App\Controller\SecurityController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -7424,18 +7460,24 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\loginController" class="App\Controller\loginController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\loginController" class="App\Controller\loginController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\loginController" class="App\Controller\loginController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\BonPlanType" class="App\Form\BonPlanType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\BonPlanType" class="App\Form\BonPlanType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\CommentaireType" class="App\Form\CommentaireType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\CommentaireType" class="App\Form\CommentaireType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\MessageType" class="App\Form\MessageType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\MessageType" class="App\Form\MessageType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\ReservationTransportType" class="App\Form\ReservationTransportType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\ReservationTransportType" class="App\Form\ReservationTransportType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\ReviewBonPlanType" class="App\Form\ReviewBonPlanType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\ReviewBonPlanType" class="App\Form\ReviewBonPlanType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\SocialMediaType" class="App\Form\SocialMediaType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\SocialMediaType" class="App\Form\SocialMediaType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\StationType" class="App\Form\StationType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\StationType" class="App\Form\StationType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\UserType" class="App\Form\UserType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\UserType" class="App\Form\UserType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\BonPlanRepository" class="App\Repository\BonPlanRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\BonPlanRepository" class="App\Repository\BonPlanRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\CommentaireRepository" class="App\Repository\CommentaireRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\CommentaireRepository" class="App\Repository\CommentaireRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\MessageRepository" class="App\Repository\MessageRepository" autowire="true" abstract="true"/>
@@ -7444,6 +7486,8 @@
     <service id=".abstract.instanceof.App\Repository\ReservationRepository" class="App\Repository\ReservationRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\ReservationTransportRepository" class="App\Repository\ReservationTransportRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\ReservationTransportRepository" class="App\Repository\ReservationTransportRepository" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\ReviewBonPlanRepository" class="App\Repository\ReviewBonPlanRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\ReviewBonPlanRepository" class="App\Repository\ReviewBonPlanRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\SocialMediaRepository" class="App\Repository\SocialMediaRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\SocialMediaRepository" class="App\Repository\SocialMediaRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\StationRepository" class="App\Repository\StationRepository" autowire="true" abstract="true"/>
@@ -7879,6 +7923,32 @@
         <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
+    <service id=".service_locator.l3APDjS" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="bonPlanRepository" type="service_closure" id="App\Repository\BonPlanRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.LNwsF6h" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="slugger" type="service_closure" id="slugger"/>
+      </argument>
+    </service>
+    <service id=".service_locator.A_2knjV" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="bonPlan" type="service_closure" id=".errored..service_locator.A_2knjV.App\Entity\BonPlan"/>
+      </argument>
+    </service>
+    <service id=".service_locator.gfDVRhp" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="bonPlan" type="service_closure" id=".errored..service_locator.gfDVRhp.App\Entity\BonPlan"/>
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
     <service id=".service_locator.uJ0s0sI" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8018,6 +8088,25 @@
         <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.6zmxbW6" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="reviewBonPlanRepository" type="service_closure" id="App\Repository\ReviewBonPlanRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.1LBFymL" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="reviewBonPlan" type="service_closure" id=".errored..service_locator.1LBFymL.App\Entity\ReviewBonPlan"/>
+      </argument>
+    </service>
+    <service id=".service_locator.Tib7V3o" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="reviewBonPlan" type="service_closure" id=".errored..service_locator.Tib7V3o.App\Entity\ReviewBonPlan"/>
+      </argument>
+    </service>
     <service id=".service_locator.4m6SajK" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8064,10 +8153,31 @@
         <argument key="user" type="service_closure" id=".errored..service_locator.rvMNZGh.App\Entity\User"/>
       </argument>
     </service>
-    <service id=".service_locator.fKH9ocd" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.Y5q_o2b" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="bonPlanRepository" type="service_closure" id="App\Repository\BonPlanRepository"/>
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.V1Y56wb" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="bonPlan" type="service_closure" id=".errored..service_locator.V1Y56wb.App\Entity\BonPlan"/>
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="slugger" type="service_closure" id="slugger"/>
+      </argument>
+    </service>
+    <service id=".service_locator.hIU_yJ6" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminCreatorController::createAdmins" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\BonPlanController::apiAdd" type="service_closure" id=".service_locator.LNwsF6h"/>
+        <argument key="App\Controller\BonPlanController::delete" type="service_closure" id=".service_locator.gfDVRhp"/>
+        <argument key="App\Controller\BonPlanController::edit" type="service_closure" id=".service_locator.gfDVRhp"/>
+        <argument key="App\Controller\BonPlanController::index" type="service_closure" id=".service_locator.l3APDjS"/>
+        <argument key="App\Controller\BonPlanController::new" type="service_closure" id=".service_locator.LNwsF6h"/>
+        <argument key="App\Controller\BonPlanController::show" type="service_closure" id=".service_locator.A_2knjV"/>
         <argument key="App\Controller\CommentaireController::ajouterCommentaire" type="service_closure" id=".service_locator.X_5wiI3"/>
         <argument key="App\Controller\CommentaireController::delete" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController::edit" type="service_closure" id=".service_locator.HrDCg3Q"/>
@@ -8100,6 +8210,11 @@
         <argument key="App\Controller\ReservationTransportController::processPayment" type="service_closure" id=".service_locator.iVzJol."/>
         <argument key="App\Controller\ReservationTransportController::recap" type="service_closure" id=".service_locator.kSeRYn5"/>
         <argument key="App\Controller\ReservationTransportController::show" type="service_closure" id=".service_locator.C8OlVt9"/>
+        <argument key="App\Controller\ReviewBonPlanController::delete" type="service_closure" id=".service_locator.Tib7V3o"/>
+        <argument key="App\Controller\ReviewBonPlanController::edit" type="service_closure" id=".service_locator.Tib7V3o"/>
+        <argument key="App\Controller\ReviewBonPlanController::index" type="service_closure" id=".service_locator.6zmxbW6"/>
+        <argument key="App\Controller\ReviewBonPlanController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\ReviewBonPlanController::show" type="service_closure" id=".service_locator.1LBFymL"/>
         <argument key="App\Controller\SecurityController::login" type="service_closure" id=".service_locator.kPUOGb8"/>
         <argument key="App\Controller\SocialMediaController::ajouterCommentaire" type="service_closure" id=".service_locator.AzHTDsT"/>
         <argument key="App\Controller\SocialMediaController::delete" type="service_closure" id=".service_locator.AzHTDsT"/>
@@ -8119,11 +8234,23 @@
         <argument key="App\Controller\UserController::index" type="service_closure" id=".service_locator.kPUOGb8"/>
         <argument key="App\Controller\UserController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\UserController::show" type="service_closure" id=".service_locator.Hz5btge"/>
+        <argument key="App\Controller\VoyageursController::bonplanAdd" type="service_closure" id=".service_locator.LNwsF6h"/>
+        <argument key="App\Controller\VoyageursController::bonplanDelete" type="service_closure" id=".service_locator.gfDVRhp"/>
+        <argument key="App\Controller\VoyageursController::bonplanEditForm" type="service_closure" id=".service_locator.A_2knjV"/>
+        <argument key="App\Controller\VoyageursController::bonplanUpdate" type="service_closure" id=".service_locator.V1Y56wb"/>
+        <argument key="App\Controller\VoyageursController::bonplanVoyageursPage" type="service_closure" id=".service_locator.Y5q_o2b"/>
+        <argument key="App\Controller\VoyageursController::debugBonplan" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Controller\AdminCreatorController:createAdmins" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\BonPlanController:apiAdd" type="service_closure" id=".service_locator.LNwsF6h"/>
+        <argument key="App\Controller\BonPlanController:delete" type="service_closure" id=".service_locator.gfDVRhp"/>
+        <argument key="App\Controller\BonPlanController:edit" type="service_closure" id=".service_locator.gfDVRhp"/>
+        <argument key="App\Controller\BonPlanController:index" type="service_closure" id=".service_locator.l3APDjS"/>
+        <argument key="App\Controller\BonPlanController:new" type="service_closure" id=".service_locator.LNwsF6h"/>
+        <argument key="App\Controller\BonPlanController:show" type="service_closure" id=".service_locator.A_2knjV"/>
         <argument key="App\Controller\CommentaireController:ajouterCommentaire" type="service_closure" id=".service_locator.X_5wiI3"/>
         <argument key="App\Controller\CommentaireController:delete" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController:edit" type="service_closure" id=".service_locator.HrDCg3Q"/>
@@ -8156,6 +8283,11 @@
         <argument key="App\Controller\ReservationTransportController:processPayment" type="service_closure" id=".service_locator.iVzJol."/>
         <argument key="App\Controller\ReservationTransportController:recap" type="service_closure" id=".service_locator.kSeRYn5"/>
         <argument key="App\Controller\ReservationTransportController:show" type="service_closure" id=".service_locator.C8OlVt9"/>
+        <argument key="App\Controller\ReviewBonPlanController:delete" type="service_closure" id=".service_locator.Tib7V3o"/>
+        <argument key="App\Controller\ReviewBonPlanController:edit" type="service_closure" id=".service_locator.Tib7V3o"/>
+        <argument key="App\Controller\ReviewBonPlanController:index" type="service_closure" id=".service_locator.6zmxbW6"/>
+        <argument key="App\Controller\ReviewBonPlanController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\ReviewBonPlanController:show" type="service_closure" id=".service_locator.1LBFymL"/>
         <argument key="App\Controller\SecurityController:login" type="service_closure" id=".service_locator.kPUOGb8"/>
         <argument key="App\Controller\SocialMediaController:ajouterCommentaire" type="service_closure" id=".service_locator.AzHTDsT"/>
         <argument key="App\Controller\SocialMediaController:delete" type="service_closure" id=".service_locator.AzHTDsT"/>
@@ -8175,6 +8307,12 @@
         <argument key="App\Controller\UserController:index" type="service_closure" id=".service_locator.kPUOGb8"/>
         <argument key="App\Controller\UserController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\UserController:show" type="service_closure" id=".service_locator.Hz5btge"/>
+        <argument key="App\Controller\VoyageursController:bonplanAdd" type="service_closure" id=".service_locator.LNwsF6h"/>
+        <argument key="App\Controller\VoyageursController:bonplanDelete" type="service_closure" id=".service_locator.gfDVRhp"/>
+        <argument key="App\Controller\VoyageursController:bonplanEditForm" type="service_closure" id=".service_locator.A_2knjV"/>
+        <argument key="App\Controller\VoyageursController:bonplanUpdate" type="service_closure" id=".service_locator.V1Y56wb"/>
+        <argument key="App\Controller\VoyageursController:bonplanVoyageursPage" type="service_closure" id=".service_locator.Y5q_o2b"/>
+        <argument key="App\Controller\VoyageursController:debugBonplan" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="kernel:loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel:registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
       </argument>
@@ -8336,12 +8474,14 @@
       <argument type="service" id="argument_resolver.query_parameter_value_resolver"/>
       <argument type="service" id="debug.stopwatch"/>
     </service>
-    <service id=".service_locator.mLTyPdm" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.pDr1R9M" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Form\BonPlanType" type="service_closure" id="App\Form\BonPlanType"/>
         <argument key="App\Form\CommentaireType" type="service_closure" id="App\Form\CommentaireType"/>
         <argument key="App\Form\MessageType" type="service_closure" id="App\Form\MessageType"/>
         <argument key="App\Form\ReservationTransportType" type="service_closure" id="App\Form\ReservationTransportType"/>
+        <argument key="App\Form\ReviewBonPlanType" type="service_closure" id="App\Form\ReviewBonPlanType"/>
         <argument key="App\Form\SocialMediaType" type="service_closure" id="App\Form\SocialMediaType"/>
         <argument key="App\Form\StationType" type="service_closure" id="App\Form\StationType"/>
         <argument key="App\Form\UserType" type="service_closure" id="App\Form\UserType"/>
@@ -8470,13 +8610,15 @@
         <argument key="turbo.doctrine.event_listener" type="service_closure" id="turbo.doctrine.event_listener"/>
       </argument>
     </service>
-    <service id=".service_locator.wff11tj" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.qMTv6bt" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Repository\BonPlanRepository" type="service_closure" id="App\Repository\BonPlanRepository"/>
         <argument key="App\Repository\CommentaireRepository" type="service_closure" id="App\Repository\CommentaireRepository"/>
         <argument key="App\Repository\MessageRepository" type="service_closure" id="App\Repository\MessageRepository"/>
         <argument key="App\Repository\ReservationRepository" type="service_closure" id="App\Repository\ReservationRepository"/>
         <argument key="App\Repository\ReservationTransportRepository" type="service_closure" id="App\Repository\ReservationTransportRepository"/>
+        <argument key="App\Repository\ReviewBonPlanRepository" type="service_closure" id="App\Repository\ReviewBonPlanRepository"/>
         <argument key="App\Repository\SocialMediaRepository" type="service_closure" id="App\Repository\SocialMediaRepository"/>
         <argument key="App\Repository\StationRepository" type="service_closure" id="App\Repository\StationRepository"/>
         <argument key="App\Repository\UserRepository" type="service_closure" id="App\Repository\UserRepository"/>
@@ -8815,6 +8957,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\BonPlanController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\BonPlanController"/>
+      <argument>App\Controller\BonPlanController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\CommentaireController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\CommentaireController"/>
       <argument>App\Controller\CommentaireController</argument>
@@ -8854,6 +9002,12 @@
     <service id=".service_locator.O2p6Lk7.App\Controller\ReservationTransportController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\ReservationTransportController"/>
       <argument>App\Controller\ReservationTransportController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\ReviewBonPlanController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\ReviewBonPlanController"/>
+      <argument>App\Controller\ReviewBonPlanController</argument>
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
@@ -9070,6 +9224,7 @@
           <argument>App\Controller\AdminController</argument>
           <argument>App\Controller\AdminCreatorController</argument>
           <argument>App\Controller\BaseController</argument>
+          <argument>App\Controller\BonPlanController</argument>
           <argument>App\Controller\CommentaireController</argument>
           <argument>App\Controller\DashEntreprise\AnalyticsController</argument>
           <argument>App\Controller\DiagnosticController</argument>
@@ -9077,6 +9232,7 @@
           <argument>App\Controller\MessageController</argument>
           <argument>App\Controller\RegistrationController</argument>
           <argument>App\Controller\ReservationTransportController</argument>
+          <argument>App\Controller\ReviewBonPlanController</argument>
           <argument>App\Controller\SecurityController</argument>
           <argument>App\Controller\SocialMediaController</argument>
           <argument>App\Controller\StationController</argument>
@@ -9284,6 +9440,12 @@
     <service id=".errored..service_locator.y4_Zrx..Symfony\Component\Config\Loader\LoaderInterface" class="Symfony\Component\Config\Loader\LoaderInterface">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.y4_Zrx.&quot;: it needs an instance of &quot;Symfony\Component\Config\Loader\LoaderInterface&quot; but this type has been excluded from autowiring."/>
     </service>
+    <service id=".errored..service_locator.A_2knjV.App\Entity\BonPlan" class="App\Entity\BonPlan">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.A_2knjV&quot;: it needs an instance of &quot;App\Entity\BonPlan&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.gfDVRhp.App\Entity\BonPlan" class="App\Entity\BonPlan">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.gfDVRhp&quot;: it needs an instance of &quot;App\Entity\BonPlan&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
     <service id=".errored..service_locator.ZfwS4tl.App\Entity\Commentaire" class="App\Entity\Commentaire">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.ZfwS4tl&quot;: it needs an instance of &quot;App\Entity\Commentaire&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
@@ -9311,6 +9473,12 @@
     <service id=".errored..service_locator.gQpJNsQ.App\Entity\ReservationTransport" class="App\Entity\ReservationTransport">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.gQpJNsQ&quot;: it needs an instance of &quot;App\Entity\ReservationTransport&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
+    <service id=".errored..service_locator.1LBFymL.App\Entity\ReviewBonPlan" class="App\Entity\ReviewBonPlan">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.1LBFymL&quot;: it needs an instance of &quot;App\Entity\ReviewBonPlan&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.Tib7V3o.App\Entity\ReviewBonPlan" class="App\Entity\ReviewBonPlan">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.Tib7V3o&quot;: it needs an instance of &quot;App\Entity\ReviewBonPlan&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
     <service id=".errored..service_locator.hvt4Me9.App\Entity\SocialMedia" class="App\Entity\SocialMedia">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.hvt4Me9&quot;: it needs an instance of &quot;App\Entity\SocialMedia&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
@@ -9322,6 +9490,9 @@
     </service>
     <service id=".errored..service_locator.rvMNZGh.App\Entity\User" class="App\Entity\User">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.rvMNZGh&quot;: it needs an instance of &quot;App\Entity\User&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.V1Y56wb.App\Entity\BonPlan" class="App\Entity\BonPlan">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.V1Y56wb&quot;: it needs an instance of &quot;App\Entity\BonPlan&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".App\Command\CreateAdminUsersCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>app:create-admin-users</argument>
@@ -10521,7 +10692,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.fKH9ocd"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.hIU_yJ6"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
@@ -10555,12 +10726,13 @@
     <service id=".service_locator.UPoZUVc" alias=".service_locator.7jf0haM"/>
     <service id=".service_locator.uajK6SR" alias=".service_locator.wLT9ipV"/>
     <service id=".service_locator.UuCU7Lh" alias=".service_locator.gQpJNsQ"/>
+    <service id=".service_locator.KkCW1FA" alias=".service_locator.Tib7V3o"/>
     <service id=".service_locator.DVR2LwI" alias=".service_locator.hvt4Me9"/>
     <service id=".service_locator.TGRHV_0" alias=".service_locator.kSeRYn5"/>
     <service id=".service_locator.R0Sb2kd" alias=".service_locator.rvMNZGh"/>
-    <service id=".service_locator.xDcweol" alias=".service_locator.fKH9ocd"/>
+    <service id=".service_locator.2SFGxXx" alias=".service_locator.hIU_yJ6"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
-    <service id=".service_locator.iu3Tr_u" alias=".service_locator.mLTyPdm"/>
+    <service id=".service_locator.fBrUMY8" alias=".service_locator.pDr1R9M"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
     <service id=".service_locator.O24_MAy" alias=".service_locator.yY.p4P7"/>
     <service id=".service_locator.jUv.zyj" alias=".service_locator.O2p6Lk7"/>
@@ -10585,6 +10757,10 @@
     <service id="security.event_dispatcher.main" alias="debug.security.event_dispatcher.main"/>
     <service id=".service_locator.gFlme_s" alias=".service_locator.y4_Zrx."/>
     <service id=".service_locator.9e2t_lq" alias=".service_locator.CsMkqUa"/>
+    <service id=".service_locator.p7Jm3Xt" alias=".service_locator.l3APDjS"/>
+    <service id=".service_locator.lUJI3Z8" alias=".service_locator.LNwsF6h"/>
+    <service id=".service_locator.zISr6qg" alias=".service_locator.A_2knjV"/>
+    <service id=".service_locator.yJg2B7d" alias=".service_locator.gfDVRhp"/>
     <service id=".service_locator.yORP_vM" alias=".service_locator.uJ0s0sI"/>
     <service id=".service_locator.M9rwfbv" alias=".service_locator.X_5wiI3"/>
     <service id=".service_locator.5.mGh0p" alias=".service_locator.ZfwS4tl"/>
@@ -10605,6 +10781,9 @@
     <service id=".service_locator.AR1xoo5" alias=".service_locator.7jf0haM"/>
     <service id=".service_locator.ng8grpY" alias=".service_locator.wLT9ipV"/>
     <service id=".service_locator.xzQLFQp" alias=".service_locator.gQpJNsQ"/>
+    <service id=".service_locator.OutiPbT" alias=".service_locator.6zmxbW6"/>
+    <service id=".service_locator.mhT6EPZ" alias=".service_locator.1LBFymL"/>
+    <service id=".service_locator.Bkme16O" alias=".service_locator.Tib7V3o"/>
     <service id=".service_locator.K0XJD4w" alias=".service_locator.4m6SajK"/>
     <service id=".service_locator.nxbNn8K" alias=".service_locator.hvt4Me9"/>
     <service id=".service_locator.heb0tpT" alias=".service_locator.AzHTDsT"/>
@@ -10612,6 +10791,8 @@
     <service id=".service_locator.5aH53ud" alias=".service_locator.kSeRYn5"/>
     <service id=".service_locator.EmZ4cZI" alias=".service_locator.Hz5btge"/>
     <service id=".service_locator.ICTRhpx" alias=".service_locator.rvMNZGh"/>
+    <service id=".service_locator.r11vCin" alias=".service_locator.Y5q_o2b"/>
+    <service id=".service_locator.c21AMQV" alias=".service_locator.V1Y56wb"/>
     <service id=".service_locator.Q1z.f9O" alias=".service_locator.O2p6Lk7"/>
     <service id=".service_locator.dGUCsbe" alias=".service_locator.oR77BOj"/>
     <service id=".service_locator._kIAbz1" alias=".service_locator.TpoC7U9"/>
