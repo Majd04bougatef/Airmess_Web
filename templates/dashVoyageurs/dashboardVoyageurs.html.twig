@@ -114,6 +114,9 @@
     .user-profile {
       position: relative;
       margin-left: 1rem;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
     }
 
     .user-img {
@@ -513,11 +516,12 @@
           
           <div class="user-profile">
             <img src="{{ asset('uploads/users/' ~ app.session.get('user_image')) }}" alt="{{ app.session.get('user_name') }}" class="user-img" id="userDropdown" onerror="this.src='{{ asset('images/user-avatar.svg') }}'; this.onerror='';">
+            <span class="user-name" style="margin-left: 10px; font-weight: 600; color: #344767;">{{ app.session.get('user_name') }}</span>
             <div class="dropdown-menu" id="userMenu">
               <a class="dropdown-item" href="#">Profile</a>
               <a class="dropdown-item" href="#">Settings</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="{{path('app_base')}}">Se déconnecter</a>
+              <a class="dropdown-item" href="{{ path('app_logout') }}">Se déconnecter</a>
             </div>
           </div>
         </div>
@@ -656,15 +660,16 @@
       // Toggle user dropdown menu
       const userDropdown = document.getElementById('userDropdown');
       const userMenu = document.getElementById('userMenu');
+      const userProfile = document.querySelector('.user-profile');
       
-      if (userDropdown && userMenu) {
-        userDropdown.addEventListener('click', function() {
+      if (userProfile && userMenu) {
+        userProfile.addEventListener('click', function() {
           userMenu.classList.toggle('show');
         });
         
         // Close menu when clicking outside
         document.addEventListener('click', function(e) {
-          if (!userDropdown.contains(e.target)) {
+          if (!userProfile.contains(e.target)) {
             userMenu.classList.remove('show');
           }
         });

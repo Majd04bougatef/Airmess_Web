@@ -208,7 +208,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
       <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
       <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"";
         // line 117
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_base");
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
         yield "\" type=\"button\">Se déconnecter</a>
     </div>
   </aside>
@@ -372,6 +372,16 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("social_page");
         yield "\";
       });
+
+      // Initialize user management features if on the user page
+      if (document.getElementById('usersTable')) {
+        userManagement.init();
+      }
+
+      // Initialize charts if needed
+      if (document.getElementById('userRoleChart')) {
+        initCharts();
+      }
     });
   </script>
   
@@ -379,8 +389,13 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
   <script async defer src=\"https://buttons.github.io/buttons.js\"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src=\"";
-        // line 250
+        // line 260
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/argon-dashboard.min.js"), "html", null, true);
+        yield "\"></script>
+  <!-- Custom JS for Dashboard -->
+  <script src=\"";
+        // line 262
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/dashAdmin.js"), "html", null, true);
         yield "\"></script>
 </body>
 
@@ -460,7 +475,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  421 => 122,  398 => 8,  383 => 250,  372 => 242,  364 => 237,  356 => 232,  348 => 227,  340 => 222,  332 => 217,  313 => 201,  309 => 200,  305 => 199,  301 => 198,  297 => 197,  221 => 123,  219 => 122,  211 => 117,  199 => 108,  175 => 87,  163 => 78,  153 => 71,  142 => 63,  129 => 53,  108 => 35,  104 => 34,  95 => 32,  88 => 28,  76 => 19,  63 => 9,  59 => 8,  50 => 1,);
+        return array (  436 => 122,  413 => 8,  398 => 262,  393 => 260,  372 => 242,  364 => 237,  356 => 232,  348 => 227,  340 => 222,  332 => 217,  313 => 201,  309 => 200,  305 => 199,  301 => 198,  297 => 197,  221 => 123,  219 => 122,  211 => 117,  199 => 108,  175 => 87,  163 => 78,  153 => 71,  142 => 63,  129 => 53,  108 => 35,  104 => 34,  95 => 32,  88 => 28,  76 => 19,  63 => 9,  59 => 8,  50 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -581,7 +596,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
         </div>
       </div>
       <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
-      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"{{path('app_base')}}\" type=\"button\">Se déconnecter</a>
+      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"{{path('app_logout')}}\" type=\"button\">Se déconnecter</a>
     </div>
   </aside>
   <main class=\"main-content position-relative border-radius-lg \" id=\"content\">
@@ -708,6 +723,16 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
         e.preventDefault();
         window.location.href = \"{{ path('social_page') }}\";
       });
+
+      // Initialize user management features if on the user page
+      if (document.getElementById('usersTable')) {
+        userManagement.init();
+      }
+
+      // Initialize charts if needed
+      if (document.getElementById('userRoleChart')) {
+        initCharts();
+      }
     });
   </script>
   
@@ -715,6 +740,8 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
   <script async defer src=\"https://buttons.github.io/buttons.js\"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src=\"{{asset('js/argon-dashboard.min.js')}}\"></script>
+  <!-- Custom JS for Dashboard -->
+  <script src=\"{{asset('js/dashAdmin.js')}}\"></script>
 </body>
 
 </html>", "dashAdmin/dashboard.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashAdmin\\dashboard.html.twig");

@@ -40,9 +40,7 @@ class VerificationController extends AbstractController
         }
 
         $error = null;
-        $success = null;
         $remainingTime = $this->verificationService->getRemainingTime();
-        $verificationComplete = false;
         
         if ($request->isMethod('POST')) {
             $code = $request->request->get('verification_code');
@@ -76,10 +74,8 @@ class VerificationController extends AbstractController
         
         return $this->render('verification/verify.html.twig', [
             'error' => $error,
-            'success' => $success,
             'email' => $userData['email'] ?? null,
-            'remaining_seconds' => $remainingTime,
-            'verification_complete' => $verificationComplete
+            'remaining_seconds' => $remainingTime
         ]);
     }
 

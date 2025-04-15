@@ -41,6 +41,12 @@ abstract class AuthenticatedController extends AbstractController
     protected function hasRole(string $role): bool
     {
         $userRole = $this->authService->getUserRole();
+        
+        // Handle special case for admin roles
+        if ($role === 'Admin' && ($userRole === 'Admin' || $userRole === 'ROLE_ADMIN')) {
+            return true;
+        }
+        
         return $userRole === $role;
     }
 } 

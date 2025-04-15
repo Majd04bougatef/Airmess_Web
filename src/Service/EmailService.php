@@ -104,6 +104,46 @@ class EmailService
         }
     }
 
+    public function sendResetPasswordCode(string $emailAddress, string $code): bool
+    {
+        try {
+            // Log attempt
+            if ($this->logger) {
+                $this->logger->info('Attempting to send password reset code to: ' . $emailAddress);
+            } else {
+                error_log('Attempting to send password reset code to: ' . $emailAddress);
+            }
+
+            $emailMessage = (new Email())
+                ->from(new Address($this->fromEmail, 'Airmess'))
+                ->to($emailAddress)
+                ->subject('Réinitialisation de votre mot de passe - Airmess')
+                ->html($this->getResetPasswordEmailTemplate($code));
+
+            $this->mailer->send($emailMessage);
+            
+            // Log success
+            if ($this->logger) {
+                $this->logger->info('Successfully sent password reset code to: ' . $emailAddress);
+            } else {
+                error_log('Successfully sent password reset code to: ' . $emailAddress);
+            }
+            
+            return true;
+        } catch (\Exception $e) {
+            // Log error
+            $errorMsg = 'Failed to send password reset code to ' . $emailAddress . ': ' . $e->getMessage();
+            
+            if ($this->logger) {
+                $this->logger->error($errorMsg);
+            } else {
+                error_log($errorMsg);
+            }
+            
+            return false;
+        }
+    }
+
     private function getWelcomeEmailTemplate(User $user): string
     {
         // Basic HTML template for welcome email
@@ -272,6 +312,94 @@ class EmailService
                     <p class="important-note">Ce code est valable pour 2 minutes seulement.</p>
                     
                     <p>Si vous n\'avez pas demandé ce code, vous pouvez ignorer cet email.</p>
+                    
+                    <p>Cordialement,<br>L\'équipe Airmess</p>
+                </div>
+                <div class="footer">
+                    <p>© ' . date('Y') . ' Airmess. Tous droits réservés.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        ';
+    }
+
+    private function getResetPasswordEmailTemplate(string $code): string
+    {
+        // Basic HTML template for password reset email
+        return '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Réinitialisation de votre mot de passe - Airmess</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                .header {
+                    background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
+                    padding: 20px;
+                    text-align: center;
+                    color: white;
+                    border-radius: 10px 10px 0 0;
+                }
+                .content {
+                    background-color: #f9f9f9;
+                    padding: 20px;
+                    border-radius: 0 0 10px 10px;
+                }
+                .verification-code {
+                    font-size: 32px;
+                    font-weight: bold;
+                    letter-spacing: 5px;
+                    text-align: center;
+                    color: #406dab;
+                    padding: 20px;
+                    margin: 20px 0;
+                    background-color: #e8f0fe;
+                    border-radius: 10px;
+                }
+                .footer {
+                    text-align: center;
+                    margin-top: 20px;
+                    font-size: 12px;
+                    color: #777;
+                }
+                h1 {
+                    color: #406dab;
+                    margin-bottom: 20px;
+                }
+                .important-note {
+                    font-weight: bold;
+                    color: #dc3545;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Réinitialisation de mot de passe</h1>
+                </div>
+                <div class="content">
+                    <p>Bonjour,</p>
+                    
+                    <p>Vous avez demandé à réinitialiser votre mot de passe sur Airmess. Veuillez saisir le code de vérification ci-dessous sur la page de réinitialisation :</p>
+                    
+                    <div class="verification-code">' . $code . '</div>
+                    
+                    <p class="important-note">Ce code est valable pour 2 minutes seulement.</p>
+                    
+                    <p>Si vous n\'avez pas demandé à réinitialiser votre mot de passe, vous pouvez ignorer cet email.</p>
                     
                     <p>Cordialement,<br>L\'équipe Airmess</p>
                 </div>

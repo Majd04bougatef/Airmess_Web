@@ -15,7 +15,8 @@ return [
         '/_profiler/xdebug' => [[['_route' => '_profiler_xdebug', '_controller' => 'web_profiler.controller.profiler::xdebugAction'], null, null, null, false, false, null]],
         '/_profiler/open' => [[['_route' => '_profiler_open_file', '_controller' => 'web_profiler.controller.profiler::openAction'], null, null, null, false, false, null]],
         '/dashboardPage' => [[['_route' => 'dashboard_page', '_controller' => 'App\\Controller\\AdminController::dashboardPage'], null, null, null, false, false, null]],
-        '/UserPage' => [[['_route' => 'user_page', '_controller' => 'App\\Controller\\AdminController::UserPage'], null, null, null, false, false, null]],
+        '/UserPage/add' => [[['_route' => 'admin_user_add', '_controller' => 'App\\Controller\\AdminController::addUser'], null, ['POST' => 0], null, false, false, null]],
+        '/UserPage/activate-all' => [[['_route' => 'admin_activate_all_users', '_controller' => 'App\\Controller\\AdminController::activateAllUsers'], null, ['POST' => 0], null, false, false, null]],
         '/StationPage' => [[['_route' => 'station_page', '_controller' => 'App\\Controller\\AdminController::stationPage'], null, null, null, false, false, null]],
         '/BonplanPage' => [[['_route' => 'bonplan_page', '_controller' => 'App\\Controller\\AdminController::bonplanPage'], null, null, null, false, false, null]],
         '/OffrePage' => [[['_route' => 'offre_page', '_controller' => 'App\\Controller\\AdminController::offrePage'], null, null, null, false, false, null]],
@@ -32,9 +33,15 @@ return [
         '/BonplanEntreprisePage' => [[['_route' => 'bonplanEntreprise_page', '_controller' => 'App\\Controller\\EntrepriseController::bonplanEntreprisePage'], null, null, null, false, false, null]],
         '/OffreEntreprisePage' => [[['_route' => 'offreEntreprise_page', '_controller' => 'App\\Controller\\EntrepriseController::offreEntreprisePage'], null, null, null, false, false, null]],
         '/SocialEntreprisePage' => [[['_route' => 'socialEntreprise_page', '_controller' => 'App\\Controller\\EntrepriseController::socialEntreprisePage'], null, null, null, false, false, null]],
+        '/connect/google' => [[['_route' => 'connect_google', '_controller' => 'App\\Controller\\GoogleController::connectAction'], null, null, null, false, false, null]],
+        '/connect/google/test' => [[['_route' => 'connect_google_test', '_controller' => 'App\\Controller\\GoogleController::testGoogleLogin'], null, null, null, false, false, null]],
         '/message' => [[['_route' => 'app_message_index', '_controller' => 'App\\Controller\\MessageController::index'], null, ['GET' => 0], null, false, false, null]],
         '/message/new' => [[['_route' => 'app_message_new', '_controller' => 'App\\Controller\\MessageController::new'], null, ['POST' => 0], null, false, false, null]],
         '/message/chatVoyageurs' => [[['_route' => 'app_message_voyageurs', '_controller' => 'App\\Controller\\MessageController::chatVoyageurs'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/password-reset' => [[['_route' => 'app_password_reset_request', '_controller' => 'App\\Controller\\PasswordResetController::requestReset'], null, null, null, false, false, null]],
+        '/password-reset/verify' => [[['_route' => 'app_password_reset_verify', '_controller' => 'App\\Controller\\PasswordResetController::verifyCode'], null, null, null, false, false, null]],
+        '/password-reset/new' => [[['_route' => 'app_password_reset_new', '_controller' => 'App\\Controller\\PasswordResetController::newPassword'], null, null, null, false, false, null]],
+        '/password-reset/resend' => [[['_route' => 'app_password_reset_resend', '_controller' => 'App\\Controller\\PasswordResetController::resendCode'], null, null, null, false, false, null]],
         '/register' => [[['_route' => 'app_register', '_controller' => 'App\\Controller\\RegistrationController::register'], null, null, null, false, false, null]],
         '/reservation/transport' => [[['_route' => 'app_reservation_transport_index', '_controller' => 'App\\Controller\\ReservationTransportController::index'], null, ['GET' => 0], null, false, false, null]],
         '/reservation/transport/new2' => [[['_route' => 'app_reservation_transport_new', '_controller' => 'App\\Controller\\ReservationTransportController::new2'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
@@ -63,6 +70,7 @@ return [
         '/dash' => [[['_route' => 'app_dash', '_controller' => 'App\\Controller\\loginController::dash'], null, null, null, false, false, null]],
         '/dashEntreprise' => [[['_route' => 'app_dashEntreprise', '_controller' => 'App\\Controller\\loginController::dashEntreprise'], null, null, null, false, false, null]],
         '/dashVoyageurs' => [[['_route' => 'app_dashVoyageurs', '_controller' => 'App\\Controller\\loginController::dashVoyageurs'], null, null, null, false, false, null]],
+        '/connect/google/check' => [[['_route' => 'connect_google_check', '_controller' => 'App\\Controller\\GoogleController::connectCheckAction'], null, null, null, false, false, null]],
     ],
     [ // $regexpList
         0 => '{^(?'
@@ -84,61 +92,68 @@ return [
                         .')'
                     .')'
                 .')'
+                .'|/UserPage(?'
+                    .'|(?:/(\\d+))?(*:225)'
+                    .'|/(?'
+                        .'|edit/([^/]++)(*:250)'
+                        .'|delete/([^/]++)(*:273)'
+                    .')'
+                .')'
                 .'|/commentaire/(?'
-                    .'|ajouter/([^/]++)(*:234)'
+                    .'|ajouter/([^/]++)(*:315)'
                     .'|([^/]++)(?'
-                        .'|(*:253)'
+                        .'|(*:334)'
                         .'|/(?'
                             .'|edit(?'
-                                .'|(*:272)'
-                                .'|\\-ajax(*:286)'
+                                .'|(*:353)'
+                                .'|\\-ajax(*:367)'
                             .')'
-                            .'|delete(*:301)'
-                            .'|like(*:313)'
+                            .'|delete(*:382)'
+                            .'|like(*:394)'
                         .')'
                     .')'
                 .')'
                 .'|/message/([^/]++)/(?'
-                    .'|show(*:349)'
-                    .'|edit(*:361)'
-                    .'|delete(*:375)'
+                    .'|show(*:430)'
+                    .'|edit(*:442)'
+                    .'|delete(*:456)'
                 .')'
                 .'|/reservation/transport/(?'
-                    .'|new/([^/]++)(*:422)'
-                    .'|show/([^/]++)(*:443)'
-                    .'|([^/]++)/edit(*:464)'
-                    .'|payment/([^/]++)(*:488)'
-                    .'|recap/([^/]++)(*:510)'
+                    .'|new/([^/]++)(*:503)'
+                    .'|show/([^/]++)(*:524)'
+                    .'|([^/]++)/edit(*:545)'
+                    .'|payment/([^/]++)(*:569)'
+                    .'|recap/([^/]++)(*:591)'
                     .'|([^/]++)(?'
-                        .'|(*:529)'
+                        .'|(*:610)'
                         .'|/(?'
-                            .'|chat(*:545)'
-                            .'|message/new(*:564)'
+                            .'|chat(*:626)'
+                            .'|message/new(*:645)'
                         .')'
                     .')'
                 .')'
                 .'|/s(?'
                     .'|ocial/media/(?'
-                        .'|(\\d+)(*:600)'
-                        .'|(\\d+)/edit(*:618)'
-                        .'|(\\d+)/like(*:636)'
-                        .'|(\\d+)/dislike(*:657)'
-                        .'|(\\d+)/commentaire(*:682)'
-                        .'|(\\d+)(*:695)'
+                        .'|(\\d+)(*:681)'
+                        .'|(\\d+)/edit(*:699)'
+                        .'|(\\d+)/like(*:717)'
+                        .'|(\\d+)/dislike(*:738)'
+                        .'|(\\d+)/commentaire(*:763)'
+                        .'|(\\d+)(*:776)'
                     .')'
                     .'|tation/(?'
                         .'|([^/]++)(?'
-                            .'|(*:725)'
-                            .'|/edit(*:738)'
-                            .'|(*:746)'
+                            .'|(*:806)'
+                            .'|/edit(*:819)'
+                            .'|(*:827)'
                         .')'
-                        .'|dashEntreprise(*:769)'
+                        .'|dashEntreprise(*:850)'
                     .')'
                 .')'
                 .'|/user/([^/]++)(?'
-                    .'|(*:796)'
-                    .'|/edit(*:809)'
-                    .'|(*:817)'
+                    .'|(*:877)'
+                    .'|/edit(*:890)'
+                    .'|(*:898)'
                 .')'
             .')/?$}sDu',
     ],
@@ -151,36 +166,39 @@ return [
         168 => [[['_route' => '_profiler_exception', '_controller' => 'web_profiler.controller.exception_panel::body'], ['token'], null, null, false, false, null]],
         181 => [[['_route' => '_profiler_exception_css', '_controller' => 'web_profiler.controller.exception_panel::stylesheet'], ['token'], null, null, false, false, null]],
         191 => [[['_route' => '_profiler', '_controller' => 'web_profiler.controller.profiler::panelAction'], ['token'], null, null, false, true, null]],
-        234 => [[['_route' => 'ajouter_commentaire', '_controller' => 'App\\Controller\\CommentaireController::ajouterCommentaire'], ['idEB'], ['POST' => 0], null, false, true, null]],
-        253 => [[['_route' => 'app_commentaire_show', '_controller' => 'App\\Controller\\CommentaireController::show'], ['idC'], ['GET' => 0], null, false, true, null]],
-        272 => [[['_route' => 'app_commentaire_edit', '_controller' => 'App\\Controller\\CommentaireController::edit'], ['idC'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        286 => [[['_route' => 'app_commentaire_edit_ajax', '_controller' => 'App\\Controller\\CommentaireController::editAjax'], ['idC'], ['POST' => 0], null, false, false, null]],
-        301 => [[['_route' => 'app_commentaire_delete', '_controller' => 'App\\Controller\\CommentaireController::delete'], ['idC'], ['POST' => 0], null, false, false, null]],
-        313 => [[['_route' => 'app_commentaire_like', '_controller' => 'App\\Controller\\CommentaireController::likeCommentaire'], ['idC'], ['POST' => 0], null, false, false, null]],
-        349 => [[['_route' => 'app_message_show', '_controller' => 'App\\Controller\\MessageController::show'], ['id'], ['GET' => 0], null, false, false, null]],
-        361 => [[['_route' => 'app_message_edit', '_controller' => 'App\\Controller\\MessageController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        375 => [[['_route' => 'app_message_delete', '_controller' => 'App\\Controller\\MessageController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        422 => [[['_route' => 'app_reservation_transport_new_reservation', '_controller' => 'App\\Controller\\ReservationTransportController::new'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        443 => [[['_route' => 'app_reservation_transport_show', '_controller' => 'App\\Controller\\ReservationTransportController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        464 => [[['_route' => 'app_reservation_transport_edit', '_controller' => 'App\\Controller\\ReservationTransportController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        488 => [[['_route' => 'app_reservation_transport_payment', '_controller' => 'App\\Controller\\ReservationTransportController::payment'], ['id'], ['GET' => 0], null, false, true, null]],
-        510 => [[['_route' => 'app_reservation_transport_recap', '_controller' => 'App\\Controller\\ReservationTransportController::recap'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        529 => [[['_route' => 'app_reservation_transport_delete', '_controller' => 'App\\Controller\\ReservationTransportController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        545 => [[['_route' => 'app_reservation_transport_chat', '_controller' => 'App\\Controller\\ReservationTransportController::chat'], ['id'], ['GET' => 0], null, false, false, null]],
-        564 => [[['_route' => 'app_reservation_message_new', '_controller' => 'App\\Controller\\ReservationTransportController::newMessage'], ['id'], ['POST' => 0], null, false, false, null]],
-        600 => [[['_route' => 'app_social_media_show', '_controller' => 'App\\Controller\\SocialMediaController::show'], ['idEB'], ['GET' => 0], null, false, true, null]],
-        618 => [[['_route' => 'app_social_media_edit', '_controller' => 'App\\Controller\\SocialMediaController::edit'], ['idEB'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        636 => [[['_route' => 'app_social_media_like', '_controller' => 'App\\Controller\\SocialMediaController::like'], ['idEB'], ['POST' => 0], null, false, false, null]],
-        657 => [[['_route' => 'app_social_media_dislike', '_controller' => 'App\\Controller\\SocialMediaController::dislike'], ['idEB'], ['POST' => 0], null, false, false, null]],
-        682 => [[['_route' => 'app_social_media_ajouter_commentaire', '_controller' => 'App\\Controller\\SocialMediaController::ajouterCommentaire'], ['idEB'], ['POST' => 0], null, false, false, null]],
-        695 => [[['_route' => 'app_social_media_delete', '_controller' => 'App\\Controller\\SocialMediaController::delete'], ['idEB'], ['POST' => 0], null, false, true, null]],
-        725 => [[['_route' => 'app_station_show', '_controller' => 'App\\Controller\\StationController::show'], ['idS'], ['GET' => 0], null, false, true, null]],
-        738 => [[['_route' => 'app_station_edit', '_controller' => 'App\\Controller\\StationController::edit'], ['idS'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        746 => [[['_route' => 'app_station_delete', '_controller' => 'App\\Controller\\StationController::delete'], ['idS'], ['POST' => 0], null, false, true, null]],
-        769 => [[['_route' => 'app_dashboard', '_controller' => 'App\\Controller\\StationController::dashboard'], [], null, null, false, false, null]],
-        796 => [[['_route' => 'app_user_show', '_controller' => 'App\\Controller\\UserController::show'], ['id_U'], ['GET' => 0], null, false, true, null]],
-        809 => [[['_route' => 'app_user_edit', '_controller' => 'App\\Controller\\UserController::edit'], ['id_U'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        817 => [
+        225 => [[['_route' => 'user_page', 'page' => 1, '_controller' => 'App\\Controller\\AdminController::UserPage'], ['page'], null, null, false, true, null]],
+        250 => [[['_route' => 'admin_user_edit', '_controller' => 'App\\Controller\\AdminController::editUser'], ['id'], ['POST' => 0], null, false, true, null]],
+        273 => [[['_route' => 'admin_user_delete', '_controller' => 'App\\Controller\\AdminController::deleteUser'], ['id'], ['POST' => 0], null, false, true, null]],
+        315 => [[['_route' => 'ajouter_commentaire', '_controller' => 'App\\Controller\\CommentaireController::ajouterCommentaire'], ['idEB'], ['POST' => 0], null, false, true, null]],
+        334 => [[['_route' => 'app_commentaire_show', '_controller' => 'App\\Controller\\CommentaireController::show'], ['idC'], ['GET' => 0], null, false, true, null]],
+        353 => [[['_route' => 'app_commentaire_edit', '_controller' => 'App\\Controller\\CommentaireController::edit'], ['idC'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        367 => [[['_route' => 'app_commentaire_edit_ajax', '_controller' => 'App\\Controller\\CommentaireController::editAjax'], ['idC'], ['POST' => 0], null, false, false, null]],
+        382 => [[['_route' => 'app_commentaire_delete', '_controller' => 'App\\Controller\\CommentaireController::delete'], ['idC'], ['POST' => 0], null, false, false, null]],
+        394 => [[['_route' => 'app_commentaire_like', '_controller' => 'App\\Controller\\CommentaireController::likeCommentaire'], ['idC'], ['POST' => 0], null, false, false, null]],
+        430 => [[['_route' => 'app_message_show', '_controller' => 'App\\Controller\\MessageController::show'], ['id'], ['GET' => 0], null, false, false, null]],
+        442 => [[['_route' => 'app_message_edit', '_controller' => 'App\\Controller\\MessageController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        456 => [[['_route' => 'app_message_delete', '_controller' => 'App\\Controller\\MessageController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        503 => [[['_route' => 'app_reservation_transport_new_reservation', '_controller' => 'App\\Controller\\ReservationTransportController::new'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        524 => [[['_route' => 'app_reservation_transport_show', '_controller' => 'App\\Controller\\ReservationTransportController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        545 => [[['_route' => 'app_reservation_transport_edit', '_controller' => 'App\\Controller\\ReservationTransportController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        569 => [[['_route' => 'app_reservation_transport_payment', '_controller' => 'App\\Controller\\ReservationTransportController::payment'], ['id'], ['GET' => 0], null, false, true, null]],
+        591 => [[['_route' => 'app_reservation_transport_recap', '_controller' => 'App\\Controller\\ReservationTransportController::recap'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        610 => [[['_route' => 'app_reservation_transport_delete', '_controller' => 'App\\Controller\\ReservationTransportController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        626 => [[['_route' => 'app_reservation_transport_chat', '_controller' => 'App\\Controller\\ReservationTransportController::chat'], ['id'], ['GET' => 0], null, false, false, null]],
+        645 => [[['_route' => 'app_reservation_message_new', '_controller' => 'App\\Controller\\ReservationTransportController::newMessage'], ['id'], ['POST' => 0], null, false, false, null]],
+        681 => [[['_route' => 'app_social_media_show', '_controller' => 'App\\Controller\\SocialMediaController::show'], ['idEB'], ['GET' => 0], null, false, true, null]],
+        699 => [[['_route' => 'app_social_media_edit', '_controller' => 'App\\Controller\\SocialMediaController::edit'], ['idEB'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        717 => [[['_route' => 'app_social_media_like', '_controller' => 'App\\Controller\\SocialMediaController::like'], ['idEB'], ['POST' => 0], null, false, false, null]],
+        738 => [[['_route' => 'app_social_media_dislike', '_controller' => 'App\\Controller\\SocialMediaController::dislike'], ['idEB'], ['POST' => 0], null, false, false, null]],
+        763 => [[['_route' => 'app_social_media_ajouter_commentaire', '_controller' => 'App\\Controller\\SocialMediaController::ajouterCommentaire'], ['idEB'], ['POST' => 0], null, false, false, null]],
+        776 => [[['_route' => 'app_social_media_delete', '_controller' => 'App\\Controller\\SocialMediaController::delete'], ['idEB'], ['POST' => 0], null, false, true, null]],
+        806 => [[['_route' => 'app_station_show', '_controller' => 'App\\Controller\\StationController::show'], ['idS'], ['GET' => 0], null, false, true, null]],
+        819 => [[['_route' => 'app_station_edit', '_controller' => 'App\\Controller\\StationController::edit'], ['idS'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        827 => [[['_route' => 'app_station_delete', '_controller' => 'App\\Controller\\StationController::delete'], ['idS'], ['POST' => 0], null, false, true, null]],
+        850 => [[['_route' => 'app_dashboard', '_controller' => 'App\\Controller\\StationController::dashboard'], [], null, null, false, false, null]],
+        877 => [[['_route' => 'app_user_show', '_controller' => 'App\\Controller\\UserController::show'], ['id_U'], ['GET' => 0], null, false, true, null]],
+        890 => [[['_route' => 'app_user_edit', '_controller' => 'App\\Controller\\UserController::edit'], ['id_U'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        898 => [
             [['_route' => 'app_user_delete', '_controller' => 'App\\Controller\\UserController::delete'], ['id_U'], ['POST' => 0], null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],

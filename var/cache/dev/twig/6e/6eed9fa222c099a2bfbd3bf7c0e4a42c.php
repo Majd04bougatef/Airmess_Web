@@ -253,7 +253,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
         <div class=\"logo-text\">
             <img src=\"";
         // line 194
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/AirMess-text.png"), "html", null, true);
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo/airmess-logo.png"), "html", null, true);
         yield "\" alt=\"Logo text\" width=\"110\" height=\"80\"
                  onerror=\"this.src='https://via.placeholder.com/200x150?text=AirMess'\">
         </div>
@@ -300,15 +300,34 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
         $context = array_intersect_key($context, $_parent) + $_parent;
         // line 215
         yield "            
-            <form action=\"";
+            ";
         // line 216
+        $context['_parent'] = $context;
+        $context['_seq'] = CoreExtension::ensureTraversable(CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 216, $this->source); })()), "flashes", ["success"], "method", false, false, false, 216));
+        foreach ($context['_seq'] as $context["_key"] => $context["flash_success"]) {
+            // line 217
+            yield "                <div class=\"alert alert-success\">
+                    ";
+            // line 218
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($context["flash_success"], "html", null, true);
+            yield "
+                </div>
+            ";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_key'], $context['flash_success'], $context['_parent']);
+        $context = array_intersect_key($context, $_parent) + $_parent;
+        // line 221
+        yield "            
+            <form action=\"";
+        // line 222
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("login");
         yield "\" method=\"post\" id=\"login-form\" novalidate>
                 <div class=\"form-group\">
                     <label class=\"form-label\">Email</label>
                     <input type=\"email\" name=\"email\" class=\"form-control\" value=\"";
-        // line 219
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("last_username", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["last_username"]) || array_key_exists("last_username", $context) ? $context["last_username"] : (function () { throw new RuntimeError('Variable "last_username" does not exist.', 219, $this->source); })()), "")) : ("")), "html", null, true);
+        // line 225
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("last_username", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["last_username"]) || array_key_exists("last_username", $context) ? $context["last_username"] : (function () { throw new RuntimeError('Variable "last_username" does not exist.', 225, $this->source); })()), "")) : ("")), "html", null, true);
         yield "\">
                     <div id=\"email-error\" class=\"field-error\">
                         <!-- Client-side validation error will appear here -->
@@ -318,8 +337,8 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
                     <label class=\"form-label\">Mot de passe</label>
                     <div class=\"forgot-password\">
                         <a href=\"";
-        // line 227
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("login");
+        // line 233
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_password_reset_request");
         yield "\">Mot de passe oublié ?</a>
                     </div>
                     <div class=\"password-field-container\">
@@ -334,7 +353,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
                 <button type=\"submit\" class=\"btnLogin\">S'identifier</button>
                 
                 <input type=\"hidden\" name=\"_csrf_token\" value=\"";
-        // line 240
+        // line 246
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::default($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken("authenticate"), ""), "html", null, true);
         yield "\">
             </form>
@@ -342,8 +361,10 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
             <div class=\"or-continue\">ou continuer avec</div>
             
             <div class=\"social-login\">
-                <a href=\"#\"><img src=\"";
-        // line 246
+                <a href=\"";
+        // line 252
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("connect_google");
+        yield "\"><img src=\"";
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/google-logo.svg"), "html", null, true);
         yield "\" alt=\"Google\" 
                    onerror=\"this.src='https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg'\"></a>
@@ -353,11 +374,29 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
             <div class=\"register-link\">
                 <span>Vous n'avez pas encore de compte ?</span>
                 <a href=\"";
-        // line 253
+        // line 259
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_signup");
         yield "\">Inscrivez-vous gratuitement</a>
             </div>
-        </div>
+            
+            ";
+        // line 262
+        if ((CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 262, $this->source); })()), "environment", [], "any", false, false, false, 262) == "dev")) {
+            // line 263
+            yield "            <div class=\"text-center mt-3\">
+                <a href=\"";
+            // line 264
+            yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("connect_google_test");
+            yield "\" class=\"btn btn-sm btn-light border\">Test Google Login (Clear Session)</a>
+                <a href=\"";
+            // line 265
+            yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
+            yield "\" class=\"btn btn-sm btn-light border ml-2\">Logout</a>
+            </div>
+            ";
+        }
+        // line 268
+        yield "        </div>
     </div>
 
     <script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>
@@ -480,7 +519,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  440 => 6,  357 => 253,  347 => 246,  338 => 240,  322 => 227,  311 => 219,  305 => 216,  302 => 215,  293 => 212,  290 => 211,  286 => 210,  283 => 209,  277 => 206,  274 => 205,  272 => 204,  263 => 198,  256 => 194,  248 => 189,  240 => 184,  60 => 7,  56 => 6,  49 => 1,);
+        return array (  479 => 6,  399 => 268,  393 => 265,  389 => 264,  386 => 263,  384 => 262,  378 => 259,  366 => 252,  357 => 246,  341 => 233,  330 => 225,  324 => 222,  321 => 221,  312 => 218,  309 => 217,  305 => 216,  302 => 215,  293 => 212,  290 => 211,  286 => 210,  283 => 209,  277 => 206,  274 => 205,  272 => 204,  263 => 198,  256 => 194,  248 => 189,  240 => 184,  60 => 7,  56 => 6,  49 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -678,7 +717,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
         </div>
         
         <div class=\"logo-text\">
-            <img src=\"{{ asset('images/AirMess-text.png') }}\" alt=\"Logo text\" width=\"110\" height=\"80\"
+            <img src=\"{{ asset('images/logo/airmess-logo.png') }}\" alt=\"Logo text\" width=\"110\" height=\"80\"
                  onerror=\"this.src='https://via.placeholder.com/200x150?text=AirMess'\">
         </div>
         
@@ -700,6 +739,12 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
                 </div>
             {% endfor %}
             
+            {% for flash_success in app.flashes('success') %}
+                <div class=\"alert alert-success\">
+                    {{ flash_success }}
+                </div>
+            {% endfor %}
+            
             <form action=\"{{ path('login') }}\" method=\"post\" id=\"login-form\" novalidate>
                 <div class=\"form-group\">
                     <label class=\"form-label\">Email</label>
@@ -711,7 +756,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
                 <div class=\"form-group\">
                     <label class=\"form-label\">Mot de passe</label>
                     <div class=\"forgot-password\">
-                        <a href=\"{{ path('login') }}\">Mot de passe oublié ?</a>
+                        <a href=\"{{ path('app_password_reset_request') }}\">Mot de passe oublié ?</a>
                     </div>
                     <div class=\"password-field-container\">
                         <input type=\"password\" name=\"password\" id=\"password-field\" class=\"form-control\">
@@ -730,7 +775,7 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
             <div class=\"or-continue\">ou continuer avec</div>
             
             <div class=\"social-login\">
-                <a href=\"#\"><img src=\"{{ asset('images/google-logo.svg') }}\" alt=\"Google\" 
+                <a href=\"{{ path('connect_google') }}\"><img src=\"{{ asset('images/google-logo.svg') }}\" alt=\"Google\" 
                    onerror=\"this.src='https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg'\"></a>
                 <a href=\"#\"><img src=\"https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg\" alt=\"Facebook\"></a>
             </div>
@@ -739,6 +784,13 @@ class __TwigTemplate_8f6abf0e2e861db14576cdf20ae61060 extends Template
                 <span>Vous n'avez pas encore de compte ?</span>
                 <a href=\"{{path('app_signup')}}\">Inscrivez-vous gratuitement</a>
             </div>
+            
+            {% if app.environment == 'dev' %}
+            <div class=\"text-center mt-3\">
+                <a href=\"{{ path('connect_google_test') }}\" class=\"btn btn-sm btn-light border\">Test Google Login (Clear Session)</a>
+                <a href=\"{{ path('app_logout') }}\" class=\"btn btn-sm btn-light border ml-2\">Logout</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 

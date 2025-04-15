@@ -26,6 +26,7 @@
       <parameter key="MonologBundle">Symfony\Bundle\MonologBundle\MonologBundle</parameter>
       <parameter key="MakerBundle">Symfony\Bundle\MakerBundle\MakerBundle</parameter>
       <parameter key="KnpPaginatorBundle">Knp\Bundle\PaginatorBundle\KnpPaginatorBundle</parameter>
+      <parameter key="KnpUOAuth2ClientBundle">KnpU\OAuth2ClientBundle\KnpUOAuth2ClientBundle</parameter>
     </parameter>
     <parameter key="kernel.bundles_metadata" type="collection">
       <parameter key="FrameworkBundle" type="collection">
@@ -79,6 +80,10 @@
       <parameter key="KnpPaginatorBundle" type="collection">
         <parameter key="path">C:\Users\MSI\Desktop\Airmess_Web\vendor\knplabs\knp-paginator-bundle</parameter>
         <parameter key="namespace">Knp\Bundle\PaginatorBundle</parameter>
+      </parameter>
+      <parameter key="KnpUOAuth2ClientBundle" type="collection">
+        <parameter key="path">C:\Users\MSI\Desktop\Airmess_Web\vendor\knpuniversity\oauth2-client-bundle\src</parameter>
+        <parameter key="namespace">KnpU\OAuth2ClientBundle</parameter>
       </parameter>
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
@@ -417,11 +422,32 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\EntrepriseController"/>
       </call>
     </service>
+    <service id="App\Controller\GoogleController" class="App\Controller\GoogleController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <argument type="service" id="knpu.oauth2.registry"/>
+      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="App\Repository\UserRepository"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\GoogleController"/>
+      </call>
+    </service>
     <service id="App\Controller\MessageController" class="App\Controller\MessageController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\MessageController"/>
+      </call>
+    </service>
+    <service id="App\Controller\PasswordResetController" class="App\Controller\PasswordResetController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <argument type="service" id="App\Service\VerificationService"/>
+      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="App\Service\EmailService"/>
+      <argument type="service" id="App\Repository\UserRepository"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\PasswordResetController"/>
       </call>
     </service>
     <service id="App\Controller\RegistrationController" class="App\Controller\RegistrationController" public="true" autowire="true" autoconfigure="true">
@@ -545,10 +571,6 @@
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
     </service>
-    <service id="App\Repository\VerificationCodeRepository" class="App\Repository\VerificationCodeRepository" autowire="true" autoconfigure="true">
-      <tag name="doctrine.repository_service"/>
-      <argument type="service" id="doctrine"/>
-    </service>
     <service id="App\Service\AuthService" class="App\Service\AuthService" autowire="true" autoconfigure="true">
       <argument type="service" id="request_stack"/>
       <argument type="service" id="App\Repository\UserRepository"/>
@@ -588,7 +610,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.hce8Ndj"/>
+      <argument type="service" id=".service_locator.79Lx_7M"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -2087,6 +2109,11 @@
       </call>
       <factory class="Symfony\Component\HttpClient\HttpClient" method="create"/>
     </service>
+    <service id="psr18.http_client" class="Symfony\Component\HttpClient\Psr18Client">
+      <argument type="service" id=".debug.http_client"/>
+      <argument>null</argument>
+      <argument>null</argument>
+    </service>
     <service id="http_client.abstract_retry_strategy" class="Symfony\Component\HttpClient\Retry\GenericRetryStrategy" abstract="true">
       <argument type="abstract">http codes</argument>
       <argument type="abstract">delay ms</argument>
@@ -2574,6 +2601,7 @@
           <argument>C:\Users\MSI\Desktop\Airmess_Web\vendor\symfony\security-bundle/translations</argument>
           <argument>C:\Users\MSI\Desktop\Airmess_Web\vendor\symfony\monolog-bundle/translations</argument>
           <argument>C:\Users\MSI\Desktop\Airmess_Web\vendor\symfony\maker-bundle/translations</argument>
+          <argument>C:\Users\MSI\Desktop\Airmess_Web\vendor\knpuniversity\oauth2-client-bundle\src/translations</argument>
         </argument>
         <argument key="cache_vary" type="collection">
           <argument key="scanned_directories" type="collection">
@@ -2594,6 +2622,7 @@
             <argument>C:\Users\MSI\Desktop\Airmess_Web\vendor\symfony\security-bundle/translations</argument>
             <argument>C:\Users\MSI\Desktop\Airmess_Web\vendor\symfony\monolog-bundle/translations</argument>
             <argument>C:\Users\MSI\Desktop\Airmess_Web\vendor\symfony\maker-bundle/translations</argument>
+            <argument>C:\Users\MSI\Desktop\Airmess_Web\vendor\knpuniversity\oauth2-client-bundle\src/translations</argument>
           </argument>
         </argument>
       </argument>
@@ -3571,7 +3600,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.hce8Ndj"/>
+      <argument type="service" id=".service_locator.79Lx_7M"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -5344,7 +5373,7 @@
     <service id="doctrine.orm.configuration" class="Doctrine\ORM\Configuration" abstract="true"/>
     <service id="doctrine.orm.entity_manager.abstract" class="Doctrine\ORM\EntityManager" lazy="true" abstract="true"/>
     <service id="doctrine.orm.container_repository_factory" class="Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory">
-      <argument type="service" id=".service_locator.TEmcRCj"/>
+      <argument type="service" id=".service_locator.wff11tj"/>
     </service>
     <service id="doctrine.orm.manager_configurator.abstract" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator" abstract="true">
       <argument type="collection"/>
@@ -7407,6 +7436,31 @@
       <argument>page</argument>
       <argument>false</argument>
     </service>
+    <service id="knpu.oauth2.provider_factory" class="KnpU\OAuth2ClientBundle\DependencyInjection\ProviderFactory">
+      <argument type="service" id="router.default"/>
+    </service>
+    <service id="knpu.oauth2.registry" class="KnpU\OAuth2ClientBundle\Client\ClientRegistry" public="true">
+      <argument type="service" id="service_container"/>
+      <argument type="collection">
+        <argument key="google">knpu.oauth2.client.google</argument>
+      </argument>
+    </service>
+    <service id="knpu.oauth2.user_provider" class="KnpU\OAuth2ClientBundle\Security\User\OAuthUserProvider"/>
+    <service id="knpu.oauth2.provider.google" class="League\OAuth2\Client\Provider\Google">
+      <argument>League\OAuth2\Client\Provider\Google</argument>
+      <argument type="collection">
+        <argument key="clientId">1067245005656-689tlhkenng025fgk1jr3vns3t32m07o.apps.googleusercontent.com</argument>
+        <argument key="clientSecret">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</argument>
+      </argument>
+      <argument>connect_google_check</argument>
+      <argument type="collection"/>
+      <argument type="collection"/>
+      <factory service="knpu.oauth2.provider_factory" method="createProvider"/>
+    </service>
+    <service id="knpu.oauth2.client.google" class="KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient" public="true">
+      <argument type="service" id="knpu.oauth2.provider.google"/>
+      <argument type="service" id="request_stack"/>
+    </service>
     <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\TestEmailCommand" class="App\Command\TestEmailCommand" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Command\TestEmailCommand" class="App\Command\TestEmailCommand" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AdminController" class="App\Controller\AdminController" autowire="true" abstract="true"/>
@@ -7424,9 +7478,15 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\EntrepriseController" class="App\Controller\EntrepriseController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\GoogleController" class="App\Controller\GoogleController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\GoogleController" class="App\Controller\GoogleController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\GoogleController" class="App\Controller\GoogleController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\MessageController" class="App\Controller\MessageController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\MessageController" class="App\Controller\MessageController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\MessageController" class="App\Controller\MessageController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\PasswordResetController" class="App\Controller\PasswordResetController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\PasswordResetController" class="App\Controller\PasswordResetController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\PasswordResetController" class="App\Controller\PasswordResetController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\RegistrationController" class="App\Controller\RegistrationController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\RegistrationController" class="App\Controller\RegistrationController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\RegistrationController" class="App\Controller\RegistrationController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -7480,8 +7540,6 @@
     <service id=".abstract.instanceof.App\Repository\StationRepository" class="App\Repository\StationRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\UserRepository" class="App\Repository\UserRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\UserRepository" class="App\Repository\UserRepository" autowire="true" autoconfigure="true" abstract="true"/>
-    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\VerificationCodeRepository" class="App\Repository\VerificationCodeRepository" autowire="true" abstract="true"/>
-    <service id=".abstract.instanceof.App\Repository\VerificationCodeRepository" class="App\Repository\VerificationCodeRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".service_locator.w7.f4fT" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -7905,6 +7963,35 @@
         <argument key="loader" type="service_closure" id=".errored..service_locator.y4_Zrx..Symfony\Component\Config\Loader\LoaderInterface"/>
       </argument>
     </service>
+    <service id=".service_locator.dlujV77" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="reservationRepository" type="service_closure" id="App\Repository\ReservationTransportRepository"/>
+        <argument key="stationRepository" type="service_closure" id="App\Repository\StationRepository"/>
+        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.NjUBG3v" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.qrNhk2c" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="passwordHasher" type="service_closure" id="security.user_password_hasher"/>
+      </argument>
+    </service>
+    <service id=".service_locator.rvMNZGh" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="user" type="service_closure" id=".errored..service_locator.rvMNZGh.App\Entity\User"/>
+      </argument>
+    </service>
     <service id=".service_locator.uJ0s0sI" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8078,13 +8165,6 @@
         <argument key="socialMedia" type="service_closure" id=".errored..service_locator.AzHTDsT.App\Entity\SocialMedia"/>
       </argument>
     </service>
-    <service id=".service_locator.8IbU9zc" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
-      </argument>
-    </service>
     <service id=".service_locator.RWGstl3" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8104,16 +8184,15 @@
         <argument key="user" type="service_closure" id=".errored..service_locator.Hz5btge.App\Entity\User"/>
       </argument>
     </service>
-    <service id=".service_locator.rvMNZGh" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.79Lx_7M" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="user" type="service_closure" id=".errored..service_locator.rvMNZGh.App\Entity\User"/>
-      </argument>
-    </service>
-    <service id=".service_locator.hce8Ndj" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
+        <argument key="App\Controller\AdminController::UserPage" type="service_closure" id=".service_locator.NjUBG3v"/>
+        <argument key="App\Controller\AdminController::activateAllUsers" type="service_closure" id=".service_locator.NjUBG3v"/>
+        <argument key="App\Controller\AdminController::addUser" type="service_closure" id=".service_locator.qrNhk2c"/>
+        <argument key="App\Controller\AdminController::dashboardPage" type="service_closure" id=".service_locator.dlujV77"/>
+        <argument key="App\Controller\AdminController::deleteUser" type="service_closure" id=".service_locator.rvMNZGh"/>
+        <argument key="App\Controller\AdminController::editUser" type="service_closure" id=".service_locator.rvMNZGh"/>
         <argument key="App\Controller\CommentaireController::ajouterCommentaire" type="service_closure" id=".service_locator.X_5wiI3"/>
         <argument key="App\Controller\CommentaireController::delete" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController::edit" type="service_closure" id=".service_locator.HrDCg3Q"/>
@@ -8156,7 +8235,7 @@
         <argument key="App\Controller\StationController::delete" type="service_closure" id=".service_locator.phVsJul"/>
         <argument key="App\Controller\StationController::edit" type="service_closure" id=".service_locator.phVsJul"/>
         <argument key="App\Controller\StationController::index" type="service_closure" id=".service_locator.qCOaJRT"/>
-        <argument key="App\Controller\StationController::new" type="service_closure" id=".service_locator.8IbU9zc"/>
+        <argument key="App\Controller\StationController::new" type="service_closure" id=".service_locator.NjUBG3v"/>
         <argument key="App\Controller\StationController::show" type="service_closure" id=".service_locator.RWGstl3"/>
         <argument key="App\Controller\UserController::delete" type="service_closure" id=".service_locator.rvMNZGh"/>
         <argument key="App\Controller\UserController::edit" type="service_closure" id=".service_locator.rvMNZGh"/>
@@ -8167,6 +8246,12 @@
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
+        <argument key="App\Controller\AdminController:UserPage" type="service_closure" id=".service_locator.NjUBG3v"/>
+        <argument key="App\Controller\AdminController:activateAllUsers" type="service_closure" id=".service_locator.NjUBG3v"/>
+        <argument key="App\Controller\AdminController:addUser" type="service_closure" id=".service_locator.qrNhk2c"/>
+        <argument key="App\Controller\AdminController:dashboardPage" type="service_closure" id=".service_locator.dlujV77"/>
+        <argument key="App\Controller\AdminController:deleteUser" type="service_closure" id=".service_locator.rvMNZGh"/>
+        <argument key="App\Controller\AdminController:editUser" type="service_closure" id=".service_locator.rvMNZGh"/>
         <argument key="App\Controller\CommentaireController:ajouterCommentaire" type="service_closure" id=".service_locator.X_5wiI3"/>
         <argument key="App\Controller\CommentaireController:delete" type="service_closure" id=".service_locator.HrDCg3Q"/>
         <argument key="App\Controller\CommentaireController:edit" type="service_closure" id=".service_locator.HrDCg3Q"/>
@@ -8209,7 +8294,7 @@
         <argument key="App\Controller\StationController:delete" type="service_closure" id=".service_locator.phVsJul"/>
         <argument key="App\Controller\StationController:edit" type="service_closure" id=".service_locator.phVsJul"/>
         <argument key="App\Controller\StationController:index" type="service_closure" id=".service_locator.qCOaJRT"/>
-        <argument key="App\Controller\StationController:new" type="service_closure" id=".service_locator.8IbU9zc"/>
+        <argument key="App\Controller\StationController:new" type="service_closure" id=".service_locator.NjUBG3v"/>
         <argument key="App\Controller\StationController:show" type="service_closure" id=".service_locator.RWGstl3"/>
         <argument key="App\Controller\UserController:delete" type="service_closure" id=".service_locator.rvMNZGh"/>
         <argument key="App\Controller\UserController:edit" type="service_closure" id=".service_locator.rvMNZGh"/>
@@ -8511,7 +8596,7 @@
         <argument key="turbo.doctrine.event_listener" type="service_closure" id="turbo.doctrine.event_listener"/>
       </argument>
     </service>
-    <service id=".service_locator.TEmcRCj" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.wff11tj" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Repository\CommentaireRepository" type="service_closure" id="App\Repository\CommentaireRepository"/>
@@ -8521,7 +8606,6 @@
         <argument key="App\Repository\SocialMediaRepository" type="service_closure" id="App\Repository\SocialMediaRepository"/>
         <argument key="App\Repository\StationRepository" type="service_closure" id="App\Repository\StationRepository"/>
         <argument key="App\Repository\UserRepository" type="service_closure" id="App\Repository\UserRepository"/>
-        <argument key="App\Repository\VerificationCodeRepository" type="service_closure" id="App\Repository\VerificationCodeRepository"/>
       </argument>
     </service>
     <service id=".service_locator.KLVvNIq" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -8869,9 +8953,21 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\GoogleController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\GoogleController"/>
+      <argument>App\Controller\GoogleController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\MessageController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\MessageController"/>
       <argument>App\Controller\MessageController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\PasswordResetController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\PasswordResetController"/>
+      <argument>App\Controller\PasswordResetController</argument>
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
@@ -9108,7 +9204,9 @@
           <argument>App\Controller\CommentaireController</argument>
           <argument>App\Controller\DashEntreprise\AnalyticsController</argument>
           <argument>App\Controller\EntrepriseController</argument>
+          <argument>App\Controller\GoogleController</argument>
           <argument>App\Controller\MessageController</argument>
+          <argument>App\Controller\PasswordResetController</argument>
           <argument>App\Controller\RegistrationController</argument>
           <argument>App\Controller\ReservationTransportController</argument>
           <argument>App\Controller\SecurityController</argument>
@@ -9319,6 +9417,9 @@
     <service id=".errored..service_locator.y4_Zrx..Symfony\Component\Config\Loader\LoaderInterface" class="Symfony\Component\Config\Loader\LoaderInterface">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.y4_Zrx.&quot;: it needs an instance of &quot;Symfony\Component\Config\Loader\LoaderInterface&quot; but this type has been excluded from autowiring."/>
     </service>
+    <service id=".errored..service_locator.rvMNZGh.App\Entity\User" class="App\Entity\User">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.rvMNZGh&quot;: it needs an instance of &quot;App\Entity\User&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
     <service id=".errored..service_locator.ZfwS4tl.App\Entity\Commentaire" class="App\Entity\Commentaire">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.ZfwS4tl&quot;: it needs an instance of &quot;App\Entity\Commentaire&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
@@ -9360,9 +9461,6 @@
     </service>
     <service id=".errored..service_locator.Hz5btge.App\Entity\User" class="App\Entity\User">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.Hz5btge&quot;: it needs an instance of &quot;App\Entity\User&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
-    </service>
-    <service id=".errored..service_locator.rvMNZGh.App\Entity\User" class="App\Entity\User">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.rvMNZGh&quot;: it needs an instance of &quot;App\Entity\User&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".App\Command\TestEmailCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>app:test-email</argument>
@@ -10429,6 +10527,7 @@
     <service id="asset_mapper.http_client" alias=".debug.http_client"/>
     <service id="Symfony\Component\AssetMapper\ImportMap\ImportMapManager" alias="asset_mapper.importmap.manager"/>
     <service id="Symfony\Contracts\HttpClient\HttpClientInterface" alias=".debug.http_client"/>
+    <service id="Psr\Http\Client\ClientInterface" alias="psr18.http_client"/>
     <service id="mailer" alias="mailer.mailer"/>
     <service id="Symfony\Component\Mailer\MailerInterface" alias="mailer.mailer"/>
     <service id="mailer.default_transport" alias="mailer.transports"/>
@@ -10560,9 +10659,12 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="Knp\Component\Pager\PaginatorInterface" alias="knp_paginator"/>
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
+    <service id="KnpU\OAuth2ClientBundle\Client\ClientRegistry" alias="knpu.oauth2.registry"/>
+    <service id="oauth2.registry" alias="knpu.oauth2.registry" public="true"/>
+    <service id="KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient" alias="knpu.oauth2.client.google"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.hce8Ndj"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.79Lx_7M"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
@@ -10587,6 +10689,9 @@
     <service id=".service_locator.Q7if2wv" alias="messenger.retry_strategy_locator"/>
     <service id=".service_locator.ZBZXtOS" alias=".service_locator.NZdAz3P"/>
     <service id=".service_locator.bJ.4HC5" alias=".service_locator.w7.f4fT"/>
+    <service id=".service_locator.bvuEI5G" alias=".service_locator.dlujV77"/>
+    <service id=".service_locator.8IbU9zc" alias=".service_locator.NjUBG3v"/>
+    <service id=".service_locator.R0Sb2kd" alias=".service_locator.rvMNZGh"/>
     <service id=".service_locator.FSYDRZL" alias=".service_locator.X_5wiI3"/>
     <service id=".service_locator.a_J36us" alias=".service_locator.hsYjguD"/>
     <service id=".service_locator.NmFzssJ" alias=".service_locator.SJArFDd"/>
@@ -10598,8 +10703,7 @@
     <service id=".service_locator.UuCU7Lh" alias=".service_locator.gQpJNsQ"/>
     <service id=".service_locator.DVR2LwI" alias=".service_locator.hvt4Me9"/>
     <service id=".service_locator.1dJfu2A" alias=".service_locator.phVsJul"/>
-    <service id=".service_locator.R0Sb2kd" alias=".service_locator.rvMNZGh"/>
-    <service id=".service_locator.8bq.okH" alias=".service_locator.hce8Ndj"/>
+    <service id=".service_locator.Sf2hV61" alias=".service_locator.79Lx_7M"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.iu3Tr_u" alias=".service_locator.mLTyPdm"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -10625,6 +10729,10 @@
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id="security.event_dispatcher.main" alias="debug.security.event_dispatcher.main"/>
     <service id=".service_locator.gFlme_s" alias=".service_locator.y4_Zrx."/>
+    <service id=".service_locator.xgjQQrE" alias=".service_locator.dlujV77"/>
+    <service id=".service_locator.SPFAmCQ" alias=".service_locator.NjUBG3v"/>
+    <service id=".service_locator.GEFQPA3" alias=".service_locator.qrNhk2c"/>
+    <service id=".service_locator.ICTRhpx" alias=".service_locator.rvMNZGh"/>
     <service id=".service_locator.yORP_vM" alias=".service_locator.uJ0s0sI"/>
     <service id=".service_locator.9e2t_lq" alias=".service_locator.CsMkqUa"/>
     <service id=".service_locator.M9rwfbv" alias=".service_locator.X_5wiI3"/>
@@ -10651,11 +10759,9 @@
     <service id=".service_locator.K0XJD4w" alias=".service_locator.4m6SajK"/>
     <service id=".service_locator.nxbNn8K" alias=".service_locator.hvt4Me9"/>
     <service id=".service_locator.heb0tpT" alias=".service_locator.AzHTDsT"/>
-    <service id=".service_locator.SPFAmCQ" alias=".service_locator.8IbU9zc"/>
     <service id=".service_locator.O0Wwc7K" alias=".service_locator.RWGstl3"/>
     <service id=".service_locator.W8jGyKv" alias=".service_locator.phVsJul"/>
     <service id=".service_locator.EmZ4cZI" alias=".service_locator.Hz5btge"/>
-    <service id=".service_locator.ICTRhpx" alias=".service_locator.rvMNZGh"/>
     <service id=".service_locator.Q1z.f9O" alias=".service_locator.O2p6Lk7"/>
     <service id=".service_locator.dGUCsbe" alias=".service_locator.oR77BOj"/>
     <service id=".service_locator._kIAbz1" alias=".service_locator.TpoC7U9"/>

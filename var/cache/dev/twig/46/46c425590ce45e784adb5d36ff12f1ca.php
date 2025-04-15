@@ -14,7 +14,7 @@ use Twig\Source;
 use Twig\Template;
 use Twig\TemplateWrapper;
 
-/* login/sign-up.html.twig */
+/* Login/sign-up.html.twig */
 class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
 {
     private Source $source;
@@ -39,10 +39,10 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
     {
         $macros = $this->macros;
         $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
-        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "login/sign-up.html.twig"));
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "Login/sign-up.html.twig"));
 
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
-        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "login/sign-up.html.twig"));
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "Login/sign-up.html.twig"));
 
         // line 1
         yield "<!DOCTYPE html>
@@ -698,7 +698,7 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
      */
     public function getTemplateName(): string
     {
-        return "login/sign-up.html.twig";
+        return "Login/sign-up.html.twig";
     }
 
     /**
@@ -1319,6 +1319,6 @@ class __TwigTemplate_05e2e632abf5fac648db28c444183874 extends Template
     </script>
     <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css\">
             </body>
-            </html>", "login/sign-up.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\Login\\sign-up.html.twig");
+            </html>", "Login/sign-up.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\Login\\sign-up.html.twig");
     }
 }

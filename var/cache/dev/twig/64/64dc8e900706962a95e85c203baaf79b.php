@@ -104,7 +104,7 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
         <li class=\"breadcrumb-item text-sm\"><a class=\"opacity-5 text-white\" href=\"javascript:;\">Pages</a></li>
         <li class=\"breadcrumb-item text-sm text-white active\" aria-current=\"page\">Dashboard</li>
       </ol>
-      <h6 class=\"font-weight-bolder text-white mb-0\">Dashboard</h6>
+      <h6 class=\"font-weight-bolder text-white mb-0\">Dashboard Admin</h6>
     </nav>
     <div class=\"collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4\" id=\"navbar\">
       <div class=\"ms-md-auto pe-md-3 d-flex align-items-center\">
@@ -113,48 +113,31 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
           <input type=\"text\" class=\"form-control\" placeholder=\"Type here...\">
         </div>
       </div>
-      <ul class=\"navbar-nav  justify-content-end\">
-        <li class=\"nav-item d-flex align-items-center\">
-          <a href=\"javascript:;\" class=\"nav-link text-white font-weight-bold px-0\">
-            <i class=\"fa fa-user me-sm-1\"></i>
-            <span class=\"d-sm-inline d-none\">Sign In</span>
-          </a>
-        </li>
-        <li class=\"nav-item d-xl-none ps-3 d-flex align-items-center\">
-          <a href=\"javascript:;\" class=\"nav-link text-white p-0\" id=\"iconNavbarSidenav\">
-            <div class=\"sidenav-toggler-inner\">
-              <i class=\"sidenav-toggler-line bg-white\"></i>
-              <i class=\"sidenav-toggler-line bg-white\"></i>
-              <i class=\"sidenav-toggler-line bg-white\"></i>
-            </div>
-          </a>
-        </li>
-        <li class=\"nav-item px-3 d-flex align-items-center\">
-          <a href=\"javascript:;\" class=\"nav-link text-white p-0\">
-            <i class=\"fa fa-cog fixed-plugin-button-nav cursor-pointer\"></i>
-          </a>
-        </li>
+      <ul class=\"navbar-nav justify-content-end\">
         <li class=\"nav-item dropdown pe-2 d-flex align-items-center\">
           <a href=\"javascript:;\" class=\"nav-link text-white p-0\" id=\"dropdownMenuButton\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">
             <i class=\"fa fa-bell cursor-pointer\"></i>
+            <span class=\"position-absolute top-5 start-100 translate-middle badge rounded-pill bg-danger\">
+              3
+            </span>
           </a>
-          <ul class=\"dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4\" aria-labelledby=\"dropdownMenuButton\">
+          <ul class=\"dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4\" aria-labelledby=\"dropdownMenuButton\">
             <li class=\"mb-2\">
               <a class=\"dropdown-item border-radius-md\" href=\"javascript:;\">
                 <div class=\"d-flex py-1\">
                   <div class=\"my-auto\">
                     <img src=\"";
-        // line 52
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/team-2.jpg"), "html", null, true);
-        yield "\" class=\"avatar avatar-sm  me-3 \">
+        // line 35
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/user-avatar.svg"), "html", null, true);
+        yield "\" class=\"avatar avatar-sm me-3\">
                   </div>
                   <div class=\"d-flex flex-column justify-content-center\">
                     <h6 class=\"text-sm font-weight-normal mb-1\">
-                      <span class=\"font-weight-bold\">New message</span> from Laur
+                      <span class=\"font-weight-bold\">Nouvel utilisateur</span> inscrit
                     </h6>
                     <p class=\"text-xs text-secondary mb-0\">
                       <i class=\"fa fa-clock me-1\"></i>
-                      13 minutes ago
+                      Il y a 13 minutes
                     </p>
                   </div>
                 </div>
@@ -165,17 +148,17 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
                 <div class=\"d-flex py-1\">
                   <div class=\"my-auto\">
                     <img src=\"";
-        // line 70
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/small-logos/logo-spotify.svg"), "html", null, true);
-        yield "\" class=\"avatar avatar-sm bg-gradient-dark  me-3 \">
+        // line 53
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/station-icon.png"), "html", null, true);
+        yield "\" class=\"avatar avatar-sm me-3\">
                   </div>
                   <div class=\"d-flex flex-column justify-content-center\">
                     <h6 class=\"text-sm font-weight-normal mb-1\">
-                      <span class=\"font-weight-bold\">New album</span> by Travis Scott
+                      <span class=\"font-weight-bold\">Nouvelle station</span> ajoutée
                     </h6>
                     <p class=\"text-xs text-secondary mb-0\">
                       <i class=\"fa fa-clock me-1\"></i>
-                      1 day
+                      Il y a 1 jour
                     </p>
                   </div>
                 </div>
@@ -184,28 +167,16 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
             <li>
               <a class=\"dropdown-item border-radius-md\" href=\"javascript:;\">
                 <div class=\"d-flex py-1\">
-                  <div class=\"avatar avatar-sm bg-gradient-secondary  me-3  my-auto\">
-                    <svg width=\"12px\" height=\"12px\" viewBox=\"0 0 43 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">
-                      <title>credit-card</title>
-                      <g stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">
-                        <g transform=\"translate(-2169.000000, -745.000000)\" fill=\"#FFFFFF\" fill-rule=\"nonzero\">
-                          <g transform=\"translate(1716.000000, 291.000000)\">
-                            <g transform=\"translate(453.000000, 454.000000)\">
-                              <path class=\"color-background\" d=\"M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z\" opacity=\"0.593633743\"></path>
-                              <path class=\"color-background\" d=\"M0,16.125 L0,32.25 C0,34.2297917 1.60354167,35.8333333 3.58333333,35.8333333 L39.4166667,35.8333333 C41.3964583,35.8333333 43,34.2297917 43,32.25 L43,16.125 L0,16.125 Z M19.7083333,26.875 L7.16666667,26.875 L7.16666667,23.2916667 L19.7083333,23.2916667 L19.7083333,26.875 Z M35.8333333,26.875 L28.6666667,26.875 L28.6666667,23.2916667 L35.8333333,23.2916667 L35.8333333,26.875 Z\"></path>
-                            </g>
-                          </g>
-                        </g>
-                      </g>
-                    </svg>
+                  <div class=\"avatar avatar-sm bg-gradient-secondary me-3 my-auto\">
+                    <i class=\"fa fa-exclamation-triangle text-white\"></i>
                   </div>
                   <div class=\"d-flex flex-column justify-content-center\">
                     <h6 class=\"text-sm font-weight-normal mb-1\">
-                      Payment successfully completed
+                      Alerte système
                     </h6>
                     <p class=\"text-xs text-secondary mb-0\">
                       <i class=\"fa fa-clock me-1\"></i>
-                      2 days
+                      Il y a 2 jours
                     </p>
                   </div>
                 </div>
@@ -217,8 +188,9 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
     </div>
   </div>
 </nav>
-<!-- End Navbar -->
+
 <div class=\"container-fluid py-4\">
+  <!-- System Overview Cards -->
   <div class=\"row\">
     <div class=\"col-xl-3 col-sm-6 mb-xl-0 mb-4\">
       <div class=\"card\">
@@ -226,19 +198,22 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
           <div class=\"row\">
             <div class=\"col-8\">
               <div class=\"numbers\">
-                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Nombre des utilsateurs</p>
+                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Utilisateurs</p>
                 <h5 class=\"font-weight-bolder\">
-                  245
+                  ";
+        // line 103
+        yield (((array_key_exists("userCount", $context) &&  !(null === $context["userCount"]))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($context["userCount"], "html", null, true)) : (245));
+        yield "
                 </h5>
                 <p class=\"mb-0\">
-                  <span class=\"text-success text-sm font-weight-bolder\">+55%</span>
-                  since yesterday
+                  <span class=\"text-success text-sm font-weight-bolder\">+5%</span>
+                  cette semaine
                 </p>
               </div>
             </div>
             <div class=\"col-4 text-end\">
               <div class=\"icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle\">
-                <i class=\"ni ni-money-coins text-lg opacity-10\" aria-hidden=\"true\"></i>
+                <i class=\"ni ni-single-02 text-lg opacity-10\" aria-hidden=\"true\"></i>
               </div>
             </div>
           </div>
@@ -251,13 +226,16 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
           <div class=\"row\">
             <div class=\"col-8\">
               <div class=\"numbers\">
-                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Today's Users</p>
+                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Stations</p>
                 <h5 class=\"font-weight-bolder\">
-                  2,300
+                  ";
+        // line 128
+        yield (((array_key_exists("stationCount", $context) &&  !(null === $context["stationCount"]))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($context["stationCount"], "html", null, true)) : (32));
+        yield "
                 </h5>
                 <p class=\"mb-0\">
-                  <span class=\"text-success text-sm font-weight-bolder\">+3%</span>
-                  since last week
+                  <span class=\"text-success text-sm font-weight-bolder\">+12%</span>
+                  ce mois
                 </p>
               </div>
             </div>
@@ -276,19 +254,22 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
           <div class=\"row\">
             <div class=\"col-8\">
               <div class=\"numbers\">
-                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">New Clients</p>
+                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Réservations</p>
                 <h5 class=\"font-weight-bolder\">
-                  +3,462
+                  ";
+        // line 153
+        yield (((array_key_exists("reservationCount", $context) &&  !(null === $context["reservationCount"]))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($context["reservationCount"], "html", null, true)) : (143));
+        yield "
                 </h5>
                 <p class=\"mb-0\">
-                  <span class=\"text-danger text-sm font-weight-bolder\">-2%</span>
-                  since last quarter
+                  <span class=\"text-success text-sm font-weight-bolder\">+8%</span>
+                  cette semaine
                 </p>
               </div>
             </div>
             <div class=\"col-4 text-end\">
               <div class=\"icon icon-shape bg-gradient-success shadow-success text-center rounded-circle\">
-                <i class=\"ni ni-paper-diploma text-lg opacity-10\" aria-hidden=\"true\"></i>
+                <i class=\"ni ni-calendar-grid-58 text-lg opacity-10\" aria-hidden=\"true\"></i>
               </div>
             </div>
           </div>
@@ -301,18 +282,22 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
           <div class=\"row\">
             <div class=\"col-8\">
               <div class=\"numbers\">
-                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Sales</p>
+                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Offres</p>
                 <h5 class=\"font-weight-bolder\">
-                  \$103,430
+                  ";
+        // line 178
+        yield (((array_key_exists("offerCount", $context) &&  !(null === $context["offerCount"]))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($context["offerCount"], "html", null, true)) : (28));
+        yield "
                 </h5>
                 <p class=\"mb-0\">
-                  <span class=\"text-success text-sm font-weight-bolder\">+5%</span> than last month
+                  <span class=\"text-success text-sm font-weight-bolder\">+15%</span> 
+                  ce mois
                 </p>
               </div>
             </div>
             <div class=\"col-4 text-end\">
               <div class=\"icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle\">
-                <i class=\"ni ni-cart text-lg opacity-10\" aria-hidden=\"true\"></i>
+                <i class=\"ni ni-tag text-lg opacity-10\" aria-hidden=\"true\"></i>
               </div>
             </div>
           </div>
@@ -320,14 +305,119 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
       </div>
     </div>
   </div>
+  
+  <!-- Admin Actions -->
+  <div class=\"row mt-4\">
+    <div class=\"col-lg-8 mb-lg-0 mb-4\">
+      <div class=\"card\">
+        <div class=\"card-header pb-0\">
+          <h6>Actions rapides</h6>
+        </div>
+        <div class=\"card-body p-3\">
+          <div class=\"row\">
+            <div class=\"col-md-4 mb-3\">
+              <a href=\"";
+        // line 207
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("user_page");
+        yield "\" class=\"btn btn-primary btn-lg w-100\">
+                <i class=\"fas fa-user-plus me-2\"></i> Gérer utilisateurs
+              </a>
+            </div>
+            <div class=\"col-md-4 mb-3\">
+              <a href=\"";
+        // line 212
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("station_page");
+        yield "\" class=\"btn btn-success btn-lg w-100\">
+                <i class=\"fas fa-bicycle me-2\"></i> Gérer stations
+              </a>
+            </div>
+            <div class=\"col-md-4 mb-3\">
+              <a href=\"";
+        // line 217
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("bonplan_page");
+        yield "\" class=\"btn btn-info btn-lg w-100\">
+                <i class=\"fas fa-map-marker-alt me-2\"></i> Gérer bons plans
+              </a>
+            </div>
+            <div class=\"col-md-6 mb-3\">
+              <a href=\"";
+        // line 222
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("offre_page");
+        yield "\" class=\"btn btn-warning btn-lg w-100\">
+                <i class=\"fas fa-gift me-2\"></i> Gérer offres
+              </a>
+            </div>
+            <div class=\"col-md-6 mb-3\">
+              <a href=\"";
+        // line 227
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("social_page");
+        yield "\" class=\"btn btn-danger btn-lg w-100\">
+                <i class=\"fas fa-share-alt me-2\"></i> Gérer réseaux sociaux
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class=\"col-lg-4\">
+      <div class=\"card h-100\">
+        <div class=\"card-header pb-0\">
+          <h6>Statistiques système</h6>
+        </div>
+        <div class=\"card-body p-3\">
+          <div class=\"timeline timeline-one-side\">
+            <div class=\"timeline-block mb-3\">
+              <span class=\"timeline-step\">
+                <i class=\"ni ni-bell-55 text-success\"></i>
+              </span>
+              <div class=\"timeline-content\">
+                <h6 class=\"text-dark text-sm font-weight-bold mb-0\">Système en ligne</h6>
+                <p class=\"text-secondary font-weight-bold text-xs mt-1 mb-0\">Uptime: 99.8%</p>
+              </div>
+            </div>
+            <div class=\"timeline-block mb-3\">
+              <span class=\"timeline-step\">
+                <i class=\"ni ni-html5 text-danger\"></i>
+              </span>
+              <div class=\"timeline-content\">
+                <h6 class=\"text-dark text-sm font-weight-bold mb-0\">Capacité serveur</h6>
+                <p class=\"text-secondary font-weight-bold text-xs mt-1 mb-0\">CPU: 24%, RAM: 38%</p>
+              </div>
+            </div>
+            <div class=\"timeline-block mb-3\">
+              <span class=\"timeline-step\">
+                <i class=\"ni ni-cart text-info\"></i>
+              </span>
+              <div class=\"timeline-content\">
+                <h6 class=\"text-dark text-sm font-weight-bold mb-0\">Dernière sauvegarde</h6>
+                <p class=\"text-secondary font-weight-bold text-xs mt-1 mb-0\">Il y a 2 heures</p>
+              </div>
+            </div>
+            <div class=\"timeline-block\">
+              <span class=\"timeline-step\">
+                <i class=\"ni ni-check-bold text-primary\"></i>
+              </span>
+              <div class=\"timeline-content\">
+                <h6 class=\"text-dark text-sm font-weight-bold mb-0\">Version du système</h6>
+                <p class=\"text-secondary font-weight-bold text-xs mt-1 mb-0\">v1.2.4 (dernière MAJ: 03/05/2023)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Recent Activity and User Demographics -->
   <div class=\"row mt-4\">
     <div class=\"col-lg-7 mb-lg-0 mb-4\">
       <div class=\"card z-index-2 h-100\">
         <div class=\"card-header pb-0 pt-3 bg-transparent\">
-          <h6 class=\"text-capitalize\">Sales overview</h6>
+          <h6 class=\"text-capitalize\">Activité utilisateurs</h6>
           <p class=\"text-sm mb-0\">
             <i class=\"fa fa-arrow-up text-success\"></i>
-            <span class=\"font-weight-bold\">4% more</span> in 2021
+            <span class=\"font-weight-bold\">12% plus</span> que le mois dernier
           </p>
         </div>
         <div class=\"card-body p-3\">
@@ -338,214 +428,9 @@ class __TwigTemplate_915e102468b94af01b81de11c327ed4d extends Template
       </div>
     </div>
     <div class=\"col-lg-5\">
-      <div class=\"card card-carousel overflow-hidden h-100 p-0\">
-        <div id=\"carouselExampleCaptions\" class=\"carousel slide h-100\" data-bs-ride=\"carousel\">
-          <div class=\"carousel-inner border-radius-lg h-100\">
-            <div class=\"carousel-item h-100 active\" style=\"background-image: url('";
-        // line 244
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/carousel-1.jpg"), "html", null, true);
-        yield "');
-background-size: cover;\">
-              <div class=\"carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5\">
-                <div class=\"icon icon-shape icon-sm bg-white text-center border-radius-md mb-3\">
-                  <i class=\"ni ni-camera-compact text-dark opacity-10\"></i>
-                </div>
-                <h5 class=\"text-white mb-1\">Get started with Argon</h5>
-                <p>There's nothing I really wanted to do in life that I wasn't able to get good at.</p>
-              </div>
-            </div>
-            <div class=\"carousel-item h-100\" style=\"background-image: url('";
-        // line 254
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/carousel-2.jpg"), "html", null, true);
-        yield "');
-background-size: cover;\">
-              <div class=\"carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5\">
-                <div class=\"icon icon-shape icon-sm bg-white text-center border-radius-md mb-3\">
-                  <i class=\"ni ni-bulb-61 text-dark opacity-10\"></i>
-                </div>
-                <h5 class=\"text-white mb-1\">Faster way to create web pages</h5>
-                <p>That's my skill. I'm not really specifically talented at anything except for the ability to learn.</p>
-              </div>
-            </div>
-            <div class=\"carousel-item h-100\" style=\"background-image: url('img/carousel-3.jpg');
-background-size: cover;\">
-              <div class=\"carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5\">
-                <div class=\"icon icon-shape icon-sm bg-white text-center border-radius-md mb-3\">
-                  <i class=\"ni ni-trophy text-dark opacity-10\"></i>
-                </div>
-                <h5 class=\"text-white mb-1\">Share with us your design tips!</h5>
-                <p>Don't be afraid to be wrong because you can't learn anything from a compliment.</p>
-              </div>
-            </div>
-          </div>
-          <button class=\"carousel-control-prev w-5 me-3\" type=\"button\" data-bs-target=\"#carouselExampleCaptions\" data-bs-slide=\"prev\">
-            <span class=\"carousel-control-prev-icon\" aria-hidden=\"true\"></span>
-            <span class=\"visually-hidden\">Previous</span>
-          </button>
-          <button class=\"carousel-control-next w-5 me-3\" type=\"button\" data-bs-target=\"#carouselExampleCaptions\" data-bs-slide=\"next\">
-            <span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>
-            <span class=\"visually-hidden\">Next</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class=\"row mt-4\">
-    <div class=\"col-lg-7 mb-lg-0 mb-4\">
-      <div class=\"card \">
-        <div class=\"card-header pb-0 p-3\">
-          <div class=\"d-flex justify-content-between\">
-            <h6 class=\"mb-2\">Sales by Country</h6>
-          </div>
-        </div>
-        <div class=\"table-responsive\">
-          <table class=\"table align-items-center \">
-            <tbody>
-              <tr>
-                <td class=\"w-30\">
-                  <div class=\"d-flex px-2 py-1 align-items-center\">
-                    <div>
-                      <img src=\"";
-        // line 302
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/icons/flags/US.png"), "html", null, true);
-        yield "\" alt=\"Country flag\">
-                    </div>
-                    <div class=\"ms-4\">
-                      <p class=\"text-xs font-weight-bold mb-0\">Country:</p>
-                      <h6 class=\"text-sm mb-0\">United States</h6>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Sales:</p>
-                    <h6 class=\"text-sm mb-0\">2500</h6>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Value:</p>
-                    <h6 class=\"text-sm mb-0\">\$230,900</h6>
-                  </div>
-                </td>
-                <td class=\"align-middle text-sm\">
-                  <div class=\"col text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Bounce:</p>
-                    <h6 class=\"text-sm mb-0\">29.9%</h6>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class=\"w-30\">
-                  <div class=\"d-flex px-2 py-1 align-items-center\">
-                    <div>
-                      <img src=\"";
-        // line 333
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/icons/flags/DE.png"), "html", null, true);
-        yield "\" alt=\"Country flag\">
-                    </div>
-                    <div class=\"ms-4\">
-                      <p class=\"text-xs font-weight-bold mb-0\">Country:</p>
-                      <h6 class=\"text-sm mb-0\">Germany</h6>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Sales:</p>
-                    <h6 class=\"text-sm mb-0\">3.900</h6>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Value:</p>
-                    <h6 class=\"text-sm mb-0\">\$440,000</h6>
-                  </div>
-                </td>
-                <td class=\"align-middle text-sm\">
-                  <div class=\"col text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Bounce:</p>
-                    <h6 class=\"text-sm mb-0\">40.22%</h6>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class=\"w-30\">
-                  <div class=\"d-flex px-2 py-1 align-items-center\">
-                    <div>
-                      <img src=\"";
-        // line 364
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/icons/flags/GB.png"), "html", null, true);
-        yield "\" alt=\"Country flag\">
-                    </div>
-                    <div class=\"ms-4\">
-                      <p class=\"text-xs font-weight-bold mb-0\">Country:</p>
-                      <h6 class=\"text-sm mb-0\">Great Britain</h6>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Sales:</p>
-                    <h6 class=\"text-sm mb-0\">1.400</h6>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Value:</p>
-                    <h6 class=\"text-sm mb-0\">\$190,700</h6>
-                  </div>
-                </td>
-                <td class=\"align-middle text-sm\">
-                  <div class=\"col text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Bounce:</p>
-                    <h6 class=\"text-sm mb-0\">23.44%</h6>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class=\"w-30\">
-                  <div class=\"d-flex px-2 py-1 align-items-center\">
-                    <div>
-                      <img src=\"";
-        // line 395
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/icons/flags/BR.png"), "html", null, true);
-        yield "\" alt=\"Country flag\">
-                    </div>
-                    <div class=\"ms-4\">
-                      <p class=\"text-xs font-weight-bold mb-0\">Country:</p>
-                      <h6 class=\"text-sm mb-0\">Brasil</h6>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Sales:</p>
-                    <h6 class=\"text-sm mb-0\">562</h6>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Value:</p>
-                    <h6 class=\"text-sm mb-0\">\$143,960</h6>
-                  </div>
-                </td>
-                <td class=\"align-middle text-sm\">
-                  <div class=\"col text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Bounce:</p>
-                    <h6 class=\"text-sm mb-0\">32.14%</h6>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class=\"col-lg-5\">
       <div class=\"card\">
         <div class=\"card-header pb-0 p-3\">
-          <h6 class=\"mb-0\">Categories</h6>
+          <h6 class=\"mb-0\">Activité récente</h6>
         </div>
         <div class=\"card-body p-3\">
           <ul class=\"list-group\">
@@ -555,8 +440,8 @@ background-size: cover;\">
                   <i class=\"ni ni-mobile-button text-white opacity-10\"></i>
                 </div>
                 <div class=\"d-flex flex-column\">
-                  <h6 class=\"mb-1 text-dark text-sm\">Devices</h6>
-                  <span class=\"text-xs\">250 in stock, <span class=\"font-weight-bold\">346+ sold</span></span>
+                  <h6 class=\"mb-1 text-dark text-sm\">Nouvelle réservation #2458</h6>
+                  <span class=\"text-xs\">Il y a 28 minutes</span>
                 </div>
               </div>
               <div class=\"d-flex\">
@@ -569,8 +454,8 @@ background-size: cover;\">
                   <i class=\"ni ni-tag text-white opacity-10\"></i>
                 </div>
                 <div class=\"d-flex flex-column\">
-                  <h6 class=\"mb-1 text-dark text-sm\">Tickets</h6>
-                  <span class=\"text-xs\">123 closed, <span class=\"font-weight-bold\">15 open</span></span>
+                  <h6 class=\"mb-1 text-dark text-sm\">Nouvelle offre créée</h6>
+                  <span class=\"text-xs\">Il y a 2 heures</span>
                 </div>
               </div>
               <div class=\"d-flex\">
@@ -583,8 +468,8 @@ background-size: cover;\">
                   <i class=\"ni ni-box-2 text-white opacity-10\"></i>
                 </div>
                 <div class=\"d-flex flex-column\">
-                  <h6 class=\"mb-1 text-dark text-sm\">Error logs</h6>
-                  <span class=\"text-xs\">1 is active, <span class=\"font-weight-bold\">40 closed</span></span>
+                  <h6 class=\"mb-1 text-dark text-sm\">Nouvel utilisateur inscrit</h6>
+                  <span class=\"text-xs\">Il y a 5 heures</span>
                 </div>
               </div>
               <div class=\"d-flex\">
@@ -597,8 +482,8 @@ background-size: cover;\">
                   <i class=\"ni ni-satisfied text-white opacity-10\"></i>
                 </div>
                 <div class=\"d-flex flex-column\">
-                  <h6 class=\"mb-1 text-dark text-sm\">Happy users</h6>
-                  <span class=\"text-xs font-weight-bold\">+ 430</span>
+                  <h6 class=\"mb-1 text-dark text-sm\">Nouveau commentaire ajouté</h6>
+                  <span class=\"text-xs\">Il y a 1 jour</span>
                 </div>
               </div>
               <div class=\"d-flex\">
@@ -610,39 +495,247 @@ background-size: cover;\">
       </div>
     </div>
   </div>
-  <footer class=\"footer pt-3  \">
+  
+  <!-- User Distribution and Usage Maps -->
+  <div class=\"row mt-4\">
+    <div class=\"col-lg-6 mb-lg-0 mb-4\">
+      <div class=\"card\">
+        <div class=\"card-header pb-0 p-3\">
+          <div class=\"d-flex justify-content-between\">
+            <h6 class=\"mb-2\">Distribution des utilisateurs</h6>
+          </div>
+        </div>
+        <div class=\"table-responsive\">
+          <table class=\"table align-items-center mb-0\">
+            <thead>
+              <tr>
+                <th class=\"text-uppercase text-secondary text-xxs font-weight-bolder opacity-7\">Type d'utilisateur</th>
+                <th class=\"text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2\">Nombre</th>
+                <th class=\"text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7\">Pourcentage</th>
+                <th class=\"text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7\">Évolution</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class=\"d-flex px-2 py-1\">
+                    <div class=\"d-flex flex-column justify-content-center\">
+                      <h6 class=\"mb-0 text-sm\">Voyageurs</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class=\"text-xs font-weight-bold mb-0\">182</p>
+                </td>
+                <td class=\"align-middle text-center text-sm\">
+                  <span class=\"text-secondary text-xs font-weight-bold\">74%</span>
+                </td>
+                <td class=\"align-middle text-center\">
+                  <span class=\"text-success text-xs font-weight-bold\">+12%</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class=\"d-flex px-2 py-1\">
+                    <div class=\"d-flex flex-column justify-content-center\">
+                      <h6 class=\"mb-0 text-sm\">Entreprises</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class=\"text-xs font-weight-bold mb-0\">56</p>
+                </td>
+                <td class=\"align-middle text-center text-sm\">
+                  <span class=\"text-secondary text-xs font-weight-bold\">23%</span>
+                </td>
+                <td class=\"align-middle text-center\">
+                  <span class=\"text-success text-xs font-weight-bold\">+7%</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class=\"d-flex px-2 py-1\">
+                    <div class=\"d-flex flex-column justify-content-center\">
+                      <h6 class=\"mb-0 text-sm\">Administrateurs</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class=\"text-xs font-weight-bold mb-0\">7</p>
+                </td>
+                <td class=\"align-middle text-center text-sm\">
+                  <span class=\"text-secondary text-xs font-weight-bold\">3%</span>
+                </td>
+                <td class=\"align-middle text-center\">
+                  <span class=\"text-success text-xs font-weight-bold\">+1%</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class=\"col-lg-6\">
+      <div class=\"card h-100\">
+        <div class=\"card-header pb-0 p-3\">
+          <div class=\"d-flex justify-content-between\">
+            <h6 class=\"mb-2\">État des stations</h6>
+          </div>
+        </div>
+        <div class=\"card-body pt-2\">
+          <div class=\"d-flex mb-3\">
+            <div class=\"progress-wrapper w-100\">
+              <div class=\"progress-info\">
+                <div class=\"progress-percentage\">
+                  <span class=\"text-xs font-weight-bold\">Disponibilité: 92%</span>
+                </div>
+              </div>
+              <div class=\"progress\">
+                <div class=\"progress-bar bg-gradient-success\" role=\"progressbar\" aria-valuenow=\"92\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 92%;\"></div>
+              </div>
+            </div>
+          </div>
+          <div class=\"d-flex mb-3\">
+            <div class=\"progress-wrapper w-100\">
+              <div class=\"progress-info\">
+                <div class=\"progress-percentage\">
+                  <span class=\"text-xs font-weight-bold\">Utilisation moyenne: 68%</span>
+                </div>
+              </div>
+              <div class=\"progress\">
+                <div class=\"progress-bar bg-gradient-info\" role=\"progressbar\" aria-valuenow=\"68\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 68%;\"></div>
+              </div>
+            </div>
+          </div>
+          <div class=\"d-flex mb-3\">
+            <div class=\"progress-wrapper w-100\">
+              <div class=\"progress-info\">
+                <div class=\"progress-percentage\">
+                  <span class=\"text-xs font-weight-bold\">Satisfaction client: 87%</span>
+                </div>
+              </div>
+              <div class=\"progress\">
+                <div class=\"progress-bar bg-gradient-primary\" role=\"progressbar\" aria-valuenow=\"87\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 87%;\"></div>
+              </div>
+            </div>
+          </div>
+          <div class=\"d-flex\">
+            <div class=\"progress-wrapper w-100\">
+              <div class=\"progress-info\">
+                <div class=\"progress-percentage\">
+                  <span class=\"text-xs font-weight-bold\">Maintenance à jour: 78%</span>
+                </div>
+              </div>
+              <div class=\"progress\">
+                <div class=\"progress-bar bg-gradient-warning\" role=\"progressbar\" aria-valuenow=\"78\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 78%;\"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class=\"footer pt-3 mt-4\">
     <div class=\"container-fluid\">
       <div class=\"row align-items-center justify-content-lg-between\">
         <div class=\"col-lg-6 mb-lg-0 mb-4\">
           <div class=\"copyright text-center text-sm text-muted text-lg-start\">
-            © <script>
-              document.write(new Date().getFullYear())
-            </script>,
-            made with <i class=\"fa fa-heart\"></i> by
-            <a href=\"https://www.creative-tim.com\" class=\"font-weight-bold\" target=\"_blank\">Creative Tim</a>
-            for a better web.
+            © ";
+        // line 517
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Twig\Extension\CoreExtension']->formatDate("now", "Y"), "html", null, true);
+        yield " Airmess
           </div>
-        </div>
-        <div class=\"col-lg-6\">
-          <ul class=\"nav nav-footer justify-content-center justify-content-lg-end\">
-            <li class=\"nav-item\">
-              <a href=\"https://www.creative-tim.com\" class=\"nav-link text-muted\" target=\"_blank\">Creative Tim</a>
-            </li>
-            <li class=\"nav-item\">
-              <a href=\"https://www.creative-tim.com/presentation\" class=\"nav-link text-muted\" target=\"_blank\">About Us</a>
-            </li>
-            <li class=\"nav-item\">
-              <a href=\"https://www.creative-tim.com/blog\" class=\"nav-link text-muted\" target=\"_blank\">Blog</a>
-            </li>
-            <li class=\"nav-item\">
-              <a href=\"https://www.creative-tim.com/license\" class=\"nav-link pe-0 text-muted\" target=\"_blank\">License</a>
-            </li>
-          </ul>
         </div>
       </div>
     </div>
   </footer>
 </div>
+
+<script>
+  document.addEventListener(\"DOMContentLoaded\", function() {
+    var ctx1 = document.getElementById(\"chart-line\").getContext(\"2d\");
+    
+    var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
+    gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
+    gradientStroke1.addColorStop(0.2, 'rgba(94, 114, 228, 0.0)');
+    gradientStroke1.addColorStop(0, 'rgba(94, 114, 228, 0)');
+    
+    new Chart(ctx1, {
+      type: \"line\",
+      data: {
+        labels: [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"Mai\", \"Jun\", \"Jul\", \"Aug\", \"Sep\", \"Oct\", \"Nov\", \"Dec\"],
+        datasets: [{
+          label: \"Utilisateurs actifs\",
+          tension: 0.4,
+          borderWidth: 0,
+          pointRadius: 0,
+          borderColor: \"#5e72e4\",
+          backgroundColor: gradientStroke1,
+          borderWidth: 3,
+          fill: true,
+          data: [50, 65, 75, 70, 90, 105, 120, 130, 145, 160, 175, 185],
+          maxBarThickness: 6
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              color: '#fbfbfb',
+              font: {
+                size: 11,
+                family: \"Open Sans\",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#ccc',
+              padding: 20,
+              font: {
+                size: 11,
+                family: \"Open Sans\",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+  });
+</script>
 ";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -674,7 +767,7 @@ background-size: cover;\">
      */
     public function getDebugInfo(): array
     {
-        return array (  512 => 395,  478 => 364,  444 => 333,  410 => 302,  359 => 254,  346 => 244,  169 => 70,  148 => 52,  100 => 6,  87 => 5,  64 => 3,  41 => 1,);
+        return array (  646 => 517,  353 => 227,  345 => 222,  337 => 217,  329 => 212,  321 => 207,  289 => 178,  261 => 153,  233 => 128,  205 => 103,  152 => 53,  131 => 35,  100 => 6,  87 => 5,  64 => 3,  41 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -691,7 +784,7 @@ background-size: cover;\">
         <li class=\"breadcrumb-item text-sm\"><a class=\"opacity-5 text-white\" href=\"javascript:;\">Pages</a></li>
         <li class=\"breadcrumb-item text-sm text-white active\" aria-current=\"page\">Dashboard</li>
       </ol>
-      <h6 class=\"font-weight-bolder text-white mb-0\">Dashboard</h6>
+      <h6 class=\"font-weight-bolder text-white mb-0\">Dashboard Admin</h6>
     </nav>
     <div class=\"collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4\" id=\"navbar\">
       <div class=\"ms-md-auto pe-md-3 d-flex align-items-center\">
@@ -700,45 +793,28 @@ background-size: cover;\">
           <input type=\"text\" class=\"form-control\" placeholder=\"Type here...\">
         </div>
       </div>
-      <ul class=\"navbar-nav  justify-content-end\">
-        <li class=\"nav-item d-flex align-items-center\">
-          <a href=\"javascript:;\" class=\"nav-link text-white font-weight-bold px-0\">
-            <i class=\"fa fa-user me-sm-1\"></i>
-            <span class=\"d-sm-inline d-none\">Sign In</span>
-          </a>
-        </li>
-        <li class=\"nav-item d-xl-none ps-3 d-flex align-items-center\">
-          <a href=\"javascript:;\" class=\"nav-link text-white p-0\" id=\"iconNavbarSidenav\">
-            <div class=\"sidenav-toggler-inner\">
-              <i class=\"sidenav-toggler-line bg-white\"></i>
-              <i class=\"sidenav-toggler-line bg-white\"></i>
-              <i class=\"sidenav-toggler-line bg-white\"></i>
-            </div>
-          </a>
-        </li>
-        <li class=\"nav-item px-3 d-flex align-items-center\">
-          <a href=\"javascript:;\" class=\"nav-link text-white p-0\">
-            <i class=\"fa fa-cog fixed-plugin-button-nav cursor-pointer\"></i>
-          </a>
-        </li>
+      <ul class=\"navbar-nav justify-content-end\">
         <li class=\"nav-item dropdown pe-2 d-flex align-items-center\">
           <a href=\"javascript:;\" class=\"nav-link text-white p-0\" id=\"dropdownMenuButton\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">
             <i class=\"fa fa-bell cursor-pointer\"></i>
+            <span class=\"position-absolute top-5 start-100 translate-middle badge rounded-pill bg-danger\">
+              3
+            </span>
           </a>
-          <ul class=\"dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4\" aria-labelledby=\"dropdownMenuButton\">
+          <ul class=\"dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4\" aria-labelledby=\"dropdownMenuButton\">
             <li class=\"mb-2\">
               <a class=\"dropdown-item border-radius-md\" href=\"javascript:;\">
                 <div class=\"d-flex py-1\">
                   <div class=\"my-auto\">
-                    <img src=\"{{asset('img/team-2.jpg')}}\" class=\"avatar avatar-sm  me-3 \">
+                    <img src=\"{{asset('images/user-avatar.svg')}}\" class=\"avatar avatar-sm me-3\">
                   </div>
                   <div class=\"d-flex flex-column justify-content-center\">
                     <h6 class=\"text-sm font-weight-normal mb-1\">
-                      <span class=\"font-weight-bold\">New message</span> from Laur
+                      <span class=\"font-weight-bold\">Nouvel utilisateur</span> inscrit
                     </h6>
                     <p class=\"text-xs text-secondary mb-0\">
                       <i class=\"fa fa-clock me-1\"></i>
-                      13 minutes ago
+                      Il y a 13 minutes
                     </p>
                   </div>
                 </div>
@@ -748,15 +824,15 @@ background-size: cover;\">
               <a class=\"dropdown-item border-radius-md\" href=\"javascript:;\">
                 <div class=\"d-flex py-1\">
                   <div class=\"my-auto\">
-                    <img src=\"{{asset('img/small-logos/logo-spotify.svg')}}\" class=\"avatar avatar-sm bg-gradient-dark  me-3 \">
+                    <img src=\"{{asset('images/station-icon.png')}}\" class=\"avatar avatar-sm me-3\">
                   </div>
                   <div class=\"d-flex flex-column justify-content-center\">
                     <h6 class=\"text-sm font-weight-normal mb-1\">
-                      <span class=\"font-weight-bold\">New album</span> by Travis Scott
+                      <span class=\"font-weight-bold\">Nouvelle station</span> ajoutée
                     </h6>
                     <p class=\"text-xs text-secondary mb-0\">
                       <i class=\"fa fa-clock me-1\"></i>
-                      1 day
+                      Il y a 1 jour
                     </p>
                   </div>
                 </div>
@@ -765,28 +841,16 @@ background-size: cover;\">
             <li>
               <a class=\"dropdown-item border-radius-md\" href=\"javascript:;\">
                 <div class=\"d-flex py-1\">
-                  <div class=\"avatar avatar-sm bg-gradient-secondary  me-3  my-auto\">
-                    <svg width=\"12px\" height=\"12px\" viewBox=\"0 0 43 36\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">
-                      <title>credit-card</title>
-                      <g stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">
-                        <g transform=\"translate(-2169.000000, -745.000000)\" fill=\"#FFFFFF\" fill-rule=\"nonzero\">
-                          <g transform=\"translate(1716.000000, 291.000000)\">
-                            <g transform=\"translate(453.000000, 454.000000)\">
-                              <path class=\"color-background\" d=\"M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z\" opacity=\"0.593633743\"></path>
-                              <path class=\"color-background\" d=\"M0,16.125 L0,32.25 C0,34.2297917 1.60354167,35.8333333 3.58333333,35.8333333 L39.4166667,35.8333333 C41.3964583,35.8333333 43,34.2297917 43,32.25 L43,16.125 L0,16.125 Z M19.7083333,26.875 L7.16666667,26.875 L7.16666667,23.2916667 L19.7083333,23.2916667 L19.7083333,26.875 Z M35.8333333,26.875 L28.6666667,26.875 L28.6666667,23.2916667 L35.8333333,23.2916667 L35.8333333,26.875 Z\"></path>
-                            </g>
-                          </g>
-                        </g>
-                      </g>
-                    </svg>
+                  <div class=\"avatar avatar-sm bg-gradient-secondary me-3 my-auto\">
+                    <i class=\"fa fa-exclamation-triangle text-white\"></i>
                   </div>
                   <div class=\"d-flex flex-column justify-content-center\">
                     <h6 class=\"text-sm font-weight-normal mb-1\">
-                      Payment successfully completed
+                      Alerte système
                     </h6>
                     <p class=\"text-xs text-secondary mb-0\">
                       <i class=\"fa fa-clock me-1\"></i>
-                      2 days
+                      Il y a 2 jours
                     </p>
                   </div>
                 </div>
@@ -798,8 +862,9 @@ background-size: cover;\">
     </div>
   </div>
 </nav>
-<!-- End Navbar -->
+
 <div class=\"container-fluid py-4\">
+  <!-- System Overview Cards -->
   <div class=\"row\">
     <div class=\"col-xl-3 col-sm-6 mb-xl-0 mb-4\">
       <div class=\"card\">
@@ -807,19 +872,19 @@ background-size: cover;\">
           <div class=\"row\">
             <div class=\"col-8\">
               <div class=\"numbers\">
-                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Nombre des utilsateurs</p>
+                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Utilisateurs</p>
                 <h5 class=\"font-weight-bolder\">
-                  245
+                  {{ userCount ?? 245 }}
                 </h5>
                 <p class=\"mb-0\">
-                  <span class=\"text-success text-sm font-weight-bolder\">+55%</span>
-                  since yesterday
+                  <span class=\"text-success text-sm font-weight-bolder\">+5%</span>
+                  cette semaine
                 </p>
               </div>
             </div>
             <div class=\"col-4 text-end\">
               <div class=\"icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle\">
-                <i class=\"ni ni-money-coins text-lg opacity-10\" aria-hidden=\"true\"></i>
+                <i class=\"ni ni-single-02 text-lg opacity-10\" aria-hidden=\"true\"></i>
               </div>
             </div>
           </div>
@@ -832,13 +897,13 @@ background-size: cover;\">
           <div class=\"row\">
             <div class=\"col-8\">
               <div class=\"numbers\">
-                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Today's Users</p>
+                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Stations</p>
                 <h5 class=\"font-weight-bolder\">
-                  2,300
+                  {{ stationCount ?? 32 }}
                 </h5>
                 <p class=\"mb-0\">
-                  <span class=\"text-success text-sm font-weight-bolder\">+3%</span>
-                  since last week
+                  <span class=\"text-success text-sm font-weight-bolder\">+12%</span>
+                  ce mois
                 </p>
               </div>
             </div>
@@ -857,19 +922,19 @@ background-size: cover;\">
           <div class=\"row\">
             <div class=\"col-8\">
               <div class=\"numbers\">
-                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">New Clients</p>
+                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Réservations</p>
                 <h5 class=\"font-weight-bolder\">
-                  +3,462
+                  {{ reservationCount ?? 143 }}
                 </h5>
                 <p class=\"mb-0\">
-                  <span class=\"text-danger text-sm font-weight-bolder\">-2%</span>
-                  since last quarter
+                  <span class=\"text-success text-sm font-weight-bolder\">+8%</span>
+                  cette semaine
                 </p>
               </div>
             </div>
             <div class=\"col-4 text-end\">
               <div class=\"icon icon-shape bg-gradient-success shadow-success text-center rounded-circle\">
-                <i class=\"ni ni-paper-diploma text-lg opacity-10\" aria-hidden=\"true\"></i>
+                <i class=\"ni ni-calendar-grid-58 text-lg opacity-10\" aria-hidden=\"true\"></i>
               </div>
             </div>
           </div>
@@ -882,18 +947,19 @@ background-size: cover;\">
           <div class=\"row\">
             <div class=\"col-8\">
               <div class=\"numbers\">
-                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Sales</p>
+                <p class=\"text-sm mb-0 text-uppercase font-weight-bold\">Offres</p>
                 <h5 class=\"font-weight-bolder\">
-                  \$103,430
+                  {{ offerCount ?? 28 }}
                 </h5>
                 <p class=\"mb-0\">
-                  <span class=\"text-success text-sm font-weight-bolder\">+5%</span> than last month
+                  <span class=\"text-success text-sm font-weight-bolder\">+15%</span> 
+                  ce mois
                 </p>
               </div>
             </div>
             <div class=\"col-4 text-end\">
               <div class=\"icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle\">
-                <i class=\"ni ni-cart text-lg opacity-10\" aria-hidden=\"true\"></i>
+                <i class=\"ni ni-tag text-lg opacity-10\" aria-hidden=\"true\"></i>
               </div>
             </div>
           </div>
@@ -901,14 +967,104 @@ background-size: cover;\">
       </div>
     </div>
   </div>
+  
+  <!-- Admin Actions -->
+  <div class=\"row mt-4\">
+    <div class=\"col-lg-8 mb-lg-0 mb-4\">
+      <div class=\"card\">
+        <div class=\"card-header pb-0\">
+          <h6>Actions rapides</h6>
+        </div>
+        <div class=\"card-body p-3\">
+          <div class=\"row\">
+            <div class=\"col-md-4 mb-3\">
+              <a href=\"{{ path('user_page') }}\" class=\"btn btn-primary btn-lg w-100\">
+                <i class=\"fas fa-user-plus me-2\"></i> Gérer utilisateurs
+              </a>
+            </div>
+            <div class=\"col-md-4 mb-3\">
+              <a href=\"{{ path('station_page') }}\" class=\"btn btn-success btn-lg w-100\">
+                <i class=\"fas fa-bicycle me-2\"></i> Gérer stations
+              </a>
+            </div>
+            <div class=\"col-md-4 mb-3\">
+              <a href=\"{{ path('bonplan_page') }}\" class=\"btn btn-info btn-lg w-100\">
+                <i class=\"fas fa-map-marker-alt me-2\"></i> Gérer bons plans
+              </a>
+            </div>
+            <div class=\"col-md-6 mb-3\">
+              <a href=\"{{ path('offre_page') }}\" class=\"btn btn-warning btn-lg w-100\">
+                <i class=\"fas fa-gift me-2\"></i> Gérer offres
+              </a>
+            </div>
+            <div class=\"col-md-6 mb-3\">
+              <a href=\"{{ path('social_page') }}\" class=\"btn btn-danger btn-lg w-100\">
+                <i class=\"fas fa-share-alt me-2\"></i> Gérer réseaux sociaux
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class=\"col-lg-4\">
+      <div class=\"card h-100\">
+        <div class=\"card-header pb-0\">
+          <h6>Statistiques système</h6>
+        </div>
+        <div class=\"card-body p-3\">
+          <div class=\"timeline timeline-one-side\">
+            <div class=\"timeline-block mb-3\">
+              <span class=\"timeline-step\">
+                <i class=\"ni ni-bell-55 text-success\"></i>
+              </span>
+              <div class=\"timeline-content\">
+                <h6 class=\"text-dark text-sm font-weight-bold mb-0\">Système en ligne</h6>
+                <p class=\"text-secondary font-weight-bold text-xs mt-1 mb-0\">Uptime: 99.8%</p>
+              </div>
+            </div>
+            <div class=\"timeline-block mb-3\">
+              <span class=\"timeline-step\">
+                <i class=\"ni ni-html5 text-danger\"></i>
+              </span>
+              <div class=\"timeline-content\">
+                <h6 class=\"text-dark text-sm font-weight-bold mb-0\">Capacité serveur</h6>
+                <p class=\"text-secondary font-weight-bold text-xs mt-1 mb-0\">CPU: 24%, RAM: 38%</p>
+              </div>
+            </div>
+            <div class=\"timeline-block mb-3\">
+              <span class=\"timeline-step\">
+                <i class=\"ni ni-cart text-info\"></i>
+              </span>
+              <div class=\"timeline-content\">
+                <h6 class=\"text-dark text-sm font-weight-bold mb-0\">Dernière sauvegarde</h6>
+                <p class=\"text-secondary font-weight-bold text-xs mt-1 mb-0\">Il y a 2 heures</p>
+              </div>
+            </div>
+            <div class=\"timeline-block\">
+              <span class=\"timeline-step\">
+                <i class=\"ni ni-check-bold text-primary\"></i>
+              </span>
+              <div class=\"timeline-content\">
+                <h6 class=\"text-dark text-sm font-weight-bold mb-0\">Version du système</h6>
+                <p class=\"text-secondary font-weight-bold text-xs mt-1 mb-0\">v1.2.4 (dernière MAJ: 03/05/2023)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Recent Activity and User Demographics -->
   <div class=\"row mt-4\">
     <div class=\"col-lg-7 mb-lg-0 mb-4\">
       <div class=\"card z-index-2 h-100\">
         <div class=\"card-header pb-0 pt-3 bg-transparent\">
-          <h6 class=\"text-capitalize\">Sales overview</h6>
+          <h6 class=\"text-capitalize\">Activité utilisateurs</h6>
           <p class=\"text-sm mb-0\">
             <i class=\"fa fa-arrow-up text-success\"></i>
-            <span class=\"font-weight-bold\">4% more</span> in 2021
+            <span class=\"font-weight-bold\">12% plus</span> que le mois dernier
           </p>
         </div>
         <div class=\"card-body p-3\">
@@ -919,196 +1075,9 @@ background-size: cover;\">
       </div>
     </div>
     <div class=\"col-lg-5\">
-      <div class=\"card card-carousel overflow-hidden h-100 p-0\">
-        <div id=\"carouselExampleCaptions\" class=\"carousel slide h-100\" data-bs-ride=\"carousel\">
-          <div class=\"carousel-inner border-radius-lg h-100\">
-            <div class=\"carousel-item h-100 active\" style=\"background-image: url('{{asset('img/carousel-1.jpg')}}');
-background-size: cover;\">
-              <div class=\"carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5\">
-                <div class=\"icon icon-shape icon-sm bg-white text-center border-radius-md mb-3\">
-                  <i class=\"ni ni-camera-compact text-dark opacity-10\"></i>
-                </div>
-                <h5 class=\"text-white mb-1\">Get started with Argon</h5>
-                <p>There's nothing I really wanted to do in life that I wasn't able to get good at.</p>
-              </div>
-            </div>
-            <div class=\"carousel-item h-100\" style=\"background-image: url('{{asset('img/carousel-2.jpg')}}');
-background-size: cover;\">
-              <div class=\"carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5\">
-                <div class=\"icon icon-shape icon-sm bg-white text-center border-radius-md mb-3\">
-                  <i class=\"ni ni-bulb-61 text-dark opacity-10\"></i>
-                </div>
-                <h5 class=\"text-white mb-1\">Faster way to create web pages</h5>
-                <p>That's my skill. I'm not really specifically talented at anything except for the ability to learn.</p>
-              </div>
-            </div>
-            <div class=\"carousel-item h-100\" style=\"background-image: url('img/carousel-3.jpg');
-background-size: cover;\">
-              <div class=\"carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5\">
-                <div class=\"icon icon-shape icon-sm bg-white text-center border-radius-md mb-3\">
-                  <i class=\"ni ni-trophy text-dark opacity-10\"></i>
-                </div>
-                <h5 class=\"text-white mb-1\">Share with us your design tips!</h5>
-                <p>Don't be afraid to be wrong because you can't learn anything from a compliment.</p>
-              </div>
-            </div>
-          </div>
-          <button class=\"carousel-control-prev w-5 me-3\" type=\"button\" data-bs-target=\"#carouselExampleCaptions\" data-bs-slide=\"prev\">
-            <span class=\"carousel-control-prev-icon\" aria-hidden=\"true\"></span>
-            <span class=\"visually-hidden\">Previous</span>
-          </button>
-          <button class=\"carousel-control-next w-5 me-3\" type=\"button\" data-bs-target=\"#carouselExampleCaptions\" data-bs-slide=\"next\">
-            <span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>
-            <span class=\"visually-hidden\">Next</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class=\"row mt-4\">
-    <div class=\"col-lg-7 mb-lg-0 mb-4\">
-      <div class=\"card \">
-        <div class=\"card-header pb-0 p-3\">
-          <div class=\"d-flex justify-content-between\">
-            <h6 class=\"mb-2\">Sales by Country</h6>
-          </div>
-        </div>
-        <div class=\"table-responsive\">
-          <table class=\"table align-items-center \">
-            <tbody>
-              <tr>
-                <td class=\"w-30\">
-                  <div class=\"d-flex px-2 py-1 align-items-center\">
-                    <div>
-                      <img src=\"{{asset('img/icons/flags/US.png')}}\" alt=\"Country flag\">
-                    </div>
-                    <div class=\"ms-4\">
-                      <p class=\"text-xs font-weight-bold mb-0\">Country:</p>
-                      <h6 class=\"text-sm mb-0\">United States</h6>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Sales:</p>
-                    <h6 class=\"text-sm mb-0\">2500</h6>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Value:</p>
-                    <h6 class=\"text-sm mb-0\">\$230,900</h6>
-                  </div>
-                </td>
-                <td class=\"align-middle text-sm\">
-                  <div class=\"col text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Bounce:</p>
-                    <h6 class=\"text-sm mb-0\">29.9%</h6>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class=\"w-30\">
-                  <div class=\"d-flex px-2 py-1 align-items-center\">
-                    <div>
-                      <img src=\"{{asset('img/icons/flags/DE.png')}}\" alt=\"Country flag\">
-                    </div>
-                    <div class=\"ms-4\">
-                      <p class=\"text-xs font-weight-bold mb-0\">Country:</p>
-                      <h6 class=\"text-sm mb-0\">Germany</h6>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Sales:</p>
-                    <h6 class=\"text-sm mb-0\">3.900</h6>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Value:</p>
-                    <h6 class=\"text-sm mb-0\">\$440,000</h6>
-                  </div>
-                </td>
-                <td class=\"align-middle text-sm\">
-                  <div class=\"col text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Bounce:</p>
-                    <h6 class=\"text-sm mb-0\">40.22%</h6>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class=\"w-30\">
-                  <div class=\"d-flex px-2 py-1 align-items-center\">
-                    <div>
-                      <img src=\"{{asset('img/icons/flags/GB.png')}}\" alt=\"Country flag\">
-                    </div>
-                    <div class=\"ms-4\">
-                      <p class=\"text-xs font-weight-bold mb-0\">Country:</p>
-                      <h6 class=\"text-sm mb-0\">Great Britain</h6>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Sales:</p>
-                    <h6 class=\"text-sm mb-0\">1.400</h6>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Value:</p>
-                    <h6 class=\"text-sm mb-0\">\$190,700</h6>
-                  </div>
-                </td>
-                <td class=\"align-middle text-sm\">
-                  <div class=\"col text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Bounce:</p>
-                    <h6 class=\"text-sm mb-0\">23.44%</h6>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td class=\"w-30\">
-                  <div class=\"d-flex px-2 py-1 align-items-center\">
-                    <div>
-                      <img src=\"{{asset('img/icons/flags/BR.png')}}\" alt=\"Country flag\">
-                    </div>
-                    <div class=\"ms-4\">
-                      <p class=\"text-xs font-weight-bold mb-0\">Country:</p>
-                      <h6 class=\"text-sm mb-0\">Brasil</h6>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Sales:</p>
-                    <h6 class=\"text-sm mb-0\">562</h6>
-                  </div>
-                </td>
-                <td>
-                  <div class=\"text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Value:</p>
-                    <h6 class=\"text-sm mb-0\">\$143,960</h6>
-                  </div>
-                </td>
-                <td class=\"align-middle text-sm\">
-                  <div class=\"col text-center\">
-                    <p class=\"text-xs font-weight-bold mb-0\">Bounce:</p>
-                    <h6 class=\"text-sm mb-0\">32.14%</h6>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class=\"col-lg-5\">
       <div class=\"card\">
         <div class=\"card-header pb-0 p-3\">
-          <h6 class=\"mb-0\">Categories</h6>
+          <h6 class=\"mb-0\">Activité récente</h6>
         </div>
         <div class=\"card-body p-3\">
           <ul class=\"list-group\">
@@ -1118,8 +1087,8 @@ background-size: cover;\">
                   <i class=\"ni ni-mobile-button text-white opacity-10\"></i>
                 </div>
                 <div class=\"d-flex flex-column\">
-                  <h6 class=\"mb-1 text-dark text-sm\">Devices</h6>
-                  <span class=\"text-xs\">250 in stock, <span class=\"font-weight-bold\">346+ sold</span></span>
+                  <h6 class=\"mb-1 text-dark text-sm\">Nouvelle réservation #2458</h6>
+                  <span class=\"text-xs\">Il y a 28 minutes</span>
                 </div>
               </div>
               <div class=\"d-flex\">
@@ -1132,8 +1101,8 @@ background-size: cover;\">
                   <i class=\"ni ni-tag text-white opacity-10\"></i>
                 </div>
                 <div class=\"d-flex flex-column\">
-                  <h6 class=\"mb-1 text-dark text-sm\">Tickets</h6>
-                  <span class=\"text-xs\">123 closed, <span class=\"font-weight-bold\">15 open</span></span>
+                  <h6 class=\"mb-1 text-dark text-sm\">Nouvelle offre créée</h6>
+                  <span class=\"text-xs\">Il y a 2 heures</span>
                 </div>
               </div>
               <div class=\"d-flex\">
@@ -1146,8 +1115,8 @@ background-size: cover;\">
                   <i class=\"ni ni-box-2 text-white opacity-10\"></i>
                 </div>
                 <div class=\"d-flex flex-column\">
-                  <h6 class=\"mb-1 text-dark text-sm\">Error logs</h6>
-                  <span class=\"text-xs\">1 is active, <span class=\"font-weight-bold\">40 closed</span></span>
+                  <h6 class=\"mb-1 text-dark text-sm\">Nouvel utilisateur inscrit</h6>
+                  <span class=\"text-xs\">Il y a 5 heures</span>
                 </div>
               </div>
               <div class=\"d-flex\">
@@ -1160,8 +1129,8 @@ background-size: cover;\">
                   <i class=\"ni ni-satisfied text-white opacity-10\"></i>
                 </div>
                 <div class=\"d-flex flex-column\">
-                  <h6 class=\"mb-1 text-dark text-sm\">Happy users</h6>
-                  <span class=\"text-xs font-weight-bold\">+ 430</span>
+                  <h6 class=\"mb-1 text-dark text-sm\">Nouveau commentaire ajouté</h6>
+                  <span class=\"text-xs\">Il y a 1 jour</span>
                 </div>
               </div>
               <div class=\"d-flex\">
@@ -1173,39 +1142,244 @@ background-size: cover;\">
       </div>
     </div>
   </div>
-  <footer class=\"footer pt-3  \">
+  
+  <!-- User Distribution and Usage Maps -->
+  <div class=\"row mt-4\">
+    <div class=\"col-lg-6 mb-lg-0 mb-4\">
+      <div class=\"card\">
+        <div class=\"card-header pb-0 p-3\">
+          <div class=\"d-flex justify-content-between\">
+            <h6 class=\"mb-2\">Distribution des utilisateurs</h6>
+          </div>
+        </div>
+        <div class=\"table-responsive\">
+          <table class=\"table align-items-center mb-0\">
+            <thead>
+              <tr>
+                <th class=\"text-uppercase text-secondary text-xxs font-weight-bolder opacity-7\">Type d'utilisateur</th>
+                <th class=\"text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2\">Nombre</th>
+                <th class=\"text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7\">Pourcentage</th>
+                <th class=\"text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7\">Évolution</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class=\"d-flex px-2 py-1\">
+                    <div class=\"d-flex flex-column justify-content-center\">
+                      <h6 class=\"mb-0 text-sm\">Voyageurs</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class=\"text-xs font-weight-bold mb-0\">182</p>
+                </td>
+                <td class=\"align-middle text-center text-sm\">
+                  <span class=\"text-secondary text-xs font-weight-bold\">74%</span>
+                </td>
+                <td class=\"align-middle text-center\">
+                  <span class=\"text-success text-xs font-weight-bold\">+12%</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class=\"d-flex px-2 py-1\">
+                    <div class=\"d-flex flex-column justify-content-center\">
+                      <h6 class=\"mb-0 text-sm\">Entreprises</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class=\"text-xs font-weight-bold mb-0\">56</p>
+                </td>
+                <td class=\"align-middle text-center text-sm\">
+                  <span class=\"text-secondary text-xs font-weight-bold\">23%</span>
+                </td>
+                <td class=\"align-middle text-center\">
+                  <span class=\"text-success text-xs font-weight-bold\">+7%</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class=\"d-flex px-2 py-1\">
+                    <div class=\"d-flex flex-column justify-content-center\">
+                      <h6 class=\"mb-0 text-sm\">Administrateurs</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class=\"text-xs font-weight-bold mb-0\">7</p>
+                </td>
+                <td class=\"align-middle text-center text-sm\">
+                  <span class=\"text-secondary text-xs font-weight-bold\">3%</span>
+                </td>
+                <td class=\"align-middle text-center\">
+                  <span class=\"text-success text-xs font-weight-bold\">+1%</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class=\"col-lg-6\">
+      <div class=\"card h-100\">
+        <div class=\"card-header pb-0 p-3\">
+          <div class=\"d-flex justify-content-between\">
+            <h6 class=\"mb-2\">État des stations</h6>
+          </div>
+        </div>
+        <div class=\"card-body pt-2\">
+          <div class=\"d-flex mb-3\">
+            <div class=\"progress-wrapper w-100\">
+              <div class=\"progress-info\">
+                <div class=\"progress-percentage\">
+                  <span class=\"text-xs font-weight-bold\">Disponibilité: 92%</span>
+                </div>
+              </div>
+              <div class=\"progress\">
+                <div class=\"progress-bar bg-gradient-success\" role=\"progressbar\" aria-valuenow=\"92\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 92%;\"></div>
+              </div>
+            </div>
+          </div>
+          <div class=\"d-flex mb-3\">
+            <div class=\"progress-wrapper w-100\">
+              <div class=\"progress-info\">
+                <div class=\"progress-percentage\">
+                  <span class=\"text-xs font-weight-bold\">Utilisation moyenne: 68%</span>
+                </div>
+              </div>
+              <div class=\"progress\">
+                <div class=\"progress-bar bg-gradient-info\" role=\"progressbar\" aria-valuenow=\"68\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 68%;\"></div>
+              </div>
+            </div>
+          </div>
+          <div class=\"d-flex mb-3\">
+            <div class=\"progress-wrapper w-100\">
+              <div class=\"progress-info\">
+                <div class=\"progress-percentage\">
+                  <span class=\"text-xs font-weight-bold\">Satisfaction client: 87%</span>
+                </div>
+              </div>
+              <div class=\"progress\">
+                <div class=\"progress-bar bg-gradient-primary\" role=\"progressbar\" aria-valuenow=\"87\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 87%;\"></div>
+              </div>
+            </div>
+          </div>
+          <div class=\"d-flex\">
+            <div class=\"progress-wrapper w-100\">
+              <div class=\"progress-info\">
+                <div class=\"progress-percentage\">
+                  <span class=\"text-xs font-weight-bold\">Maintenance à jour: 78%</span>
+                </div>
+              </div>
+              <div class=\"progress\">
+                <div class=\"progress-bar bg-gradient-warning\" role=\"progressbar\" aria-valuenow=\"78\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 78%;\"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class=\"footer pt-3 mt-4\">
     <div class=\"container-fluid\">
       <div class=\"row align-items-center justify-content-lg-between\">
         <div class=\"col-lg-6 mb-lg-0 mb-4\">
           <div class=\"copyright text-center text-sm text-muted text-lg-start\">
-            © <script>
-              document.write(new Date().getFullYear())
-            </script>,
-            made with <i class=\"fa fa-heart\"></i> by
-            <a href=\"https://www.creative-tim.com\" class=\"font-weight-bold\" target=\"_blank\">Creative Tim</a>
-            for a better web.
+            © {{ \"now\"|date(\"Y\") }} Airmess
           </div>
-        </div>
-        <div class=\"col-lg-6\">
-          <ul class=\"nav nav-footer justify-content-center justify-content-lg-end\">
-            <li class=\"nav-item\">
-              <a href=\"https://www.creative-tim.com\" class=\"nav-link text-muted\" target=\"_blank\">Creative Tim</a>
-            </li>
-            <li class=\"nav-item\">
-              <a href=\"https://www.creative-tim.com/presentation\" class=\"nav-link text-muted\" target=\"_blank\">About Us</a>
-            </li>
-            <li class=\"nav-item\">
-              <a href=\"https://www.creative-tim.com/blog\" class=\"nav-link text-muted\" target=\"_blank\">Blog</a>
-            </li>
-            <li class=\"nav-item\">
-              <a href=\"https://www.creative-tim.com/license\" class=\"nav-link pe-0 text-muted\" target=\"_blank\">License</a>
-            </li>
-          </ul>
         </div>
       </div>
     </div>
   </footer>
 </div>
+
+<script>
+  document.addEventListener(\"DOMContentLoaded\", function() {
+    var ctx1 = document.getElementById(\"chart-line\").getContext(\"2d\");
+    
+    var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
+    gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
+    gradientStroke1.addColorStop(0.2, 'rgba(94, 114, 228, 0.0)');
+    gradientStroke1.addColorStop(0, 'rgba(94, 114, 228, 0)');
+    
+    new Chart(ctx1, {
+      type: \"line\",
+      data: {
+        labels: [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"Mai\", \"Jun\", \"Jul\", \"Aug\", \"Sep\", \"Oct\", \"Nov\", \"Dec\"],
+        datasets: [{
+          label: \"Utilisateurs actifs\",
+          tension: 0.4,
+          borderWidth: 0,
+          pointRadius: 0,
+          borderColor: \"#5e72e4\",
+          backgroundColor: gradientStroke1,
+          borderWidth: 3,
+          fill: true,
+          data: [50, 65, 75, 70, 90, 105, 120, 130, 145, 160, 175, 185],
+          maxBarThickness: 6
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              color: '#fbfbfb',
+              font: {
+                size: 11,
+                family: \"Open Sans\",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#ccc',
+              padding: 20,
+              font: {
+                size: 11,
+                family: \"Open Sans\",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+  });
+</script>
 {% endblock %}", "dashAdmin/dashboardPage.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashAdmin\\dashboardPage.html.twig");
     }
 }
