@@ -26,8 +26,7 @@
     <div class="step-content active" id="step1-content">
         <h2>Détails de la Réservation</h2>
         
-        {# Utiliser le formulaire Symfony #}
-        {{ form_start(form, {'attr': {'id': 'reservation-form'}}) }}
+        {{ form_start(form, {'attr': {'id': 'reservation-form', 'novalidate': 'novalidate'}}) }}
             <div class="form-group">
                 <label for="name">Nom Complet</label>
                 <input type="text" id="name" value="{{ reservation_transport.user.name ?? '' }}" readonly>
@@ -39,14 +38,17 @@
             <div class="form-group">
                 {{ form_label(form.dateRes, 'Date de Début') }}
                 {{ form_widget(form.dateRes, {'attr': {'class': 'form-control', 'id': 'date'}}) }}
+                {{ form_errors(form.dateRes) }}
             </div>
             <div class="form-group">
                 {{ form_label(form.dateFin, 'Date de Fin') }}
                 {{ form_widget(form.dateFin, {'attr': {'class': 'form-control', 'id': 'dateFin'}}) }}
+                {{ form_errors(form.dateFin) }}
             </div>
             <div class="form-group">
                 {{ form_label(form.nombreVelo, 'Nombre de Vélos') }}
                 {{ form_widget(form.nombreVelo, {'attr': {'class': 'form-control', 'id': 'nombreVelo'}}) }}
+                {{ form_errors(form.nombreVelo) }}
             </div>
             
             {# Champs cachés nécessaires pour le formulaire #}
@@ -54,7 +56,7 @@
             
             <div class="navigation-buttons">
                 <div></div>
-                <button type="button" id="next-to-recap">Continuer au Récapitulatif</button>
+                <button type="submit" id="next-to-recap" class="btn btn-primary">Continuer au Récapitulatif</button>
             </div>
         {{ form_end(form, {'render_rest': false}) }}
     </div>
@@ -153,11 +155,56 @@
 
 
 {% block javascripts %}
-
 <script>
-alert("test");
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('reservation-form');
+    
+    // Add event listener for form submission
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        // Get form data
+        const formData = new FormData(form);
+        
+        // Submit form using fetch
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.errors) {
+                // Clear previous errors
+                document.querySelectorAll('.error-message').forEach(el => el.remove());
+                
+                // Display new errors
+                Object.keys(data.errors).forEach(field => {
+                    const input = document.querySelector(`#reservation_transport_${field}`);
+                    if (input) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message';
+                        errorDiv.style.color = '#dc3545';
+                        errorDiv.style.fontSize = '0.875em';
+                        errorDiv.style.marginTop = '0.25rem';
+                        errorDiv.textContent = data.errors[field];
+                        input.parentNode.appendChild(errorDiv);
+                        input.style.borderColor = '#dc3545';
+                    }
+                });
+            } else if (data.success) {
+                // If successful, proceed to next step
+                window.location.href = data.redirect;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
 </script>
-
 {% endblock %}
 
 
@@ -345,6 +392,26 @@ alert("test");
         .steps-container::before {
             top: 15px;
         }
+    }
+    
+    /* Add styles for error messages */
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+    
+    /* Remove default browser validation styling */
+    input:invalid {
+        box-shadow: none;
+    }
+    
+    input:-moz-ui-invalid {
+        box-shadow: none;
     }
 </style>
 {% endblock %}

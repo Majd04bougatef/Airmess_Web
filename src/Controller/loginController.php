@@ -8,12 +8,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class loginController extends AbstractController
 {
-    #[Route('/login', name: 'app_login')]
-    public function login(): Response
-    {
-        return $this->render('login/login.html.twig');
-    }
-
     #[Route('/sign-up', name: 'app_signup')]
     public function signup(): Response
     {
@@ -37,7 +31,5 @@ class loginController extends AbstractController
     {
         return $this->render('dashVoyageurs/dashboardVoyageursPage.html.twig');
     }
-
-
 }
 ?>
