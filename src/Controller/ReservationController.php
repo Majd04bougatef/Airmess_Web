@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Reservation;
 use App\Form\ReservationType;
 use App\Repository\ReservationRepository;
+use App\Repository\OffreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,5 +78,21 @@ final class ReservationController extends AbstractController
         }
 
         return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/reservation/new/{idO}', name: 'app_reservation_new')]
+    public function newReservation(int $idO, OffreRepository $offreRepository): Response
+    {
+        $offre = $offreRepository->find($idO);
+
+        if (!$offre) {
+            throw $this->createNotFoundException('Offre non trouvée.');
+        }
+
+        // Logique pour créer une réservation...
+
+        return $this->render('reservation/new.html.twig', [
+            'offre' => $offre,
+        ]);
     }
 }

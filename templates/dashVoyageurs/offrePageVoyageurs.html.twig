@@ -76,7 +76,8 @@
         color: #344767;
     }
 
-    .btn-view {
+    .btn-view,
+    .btn-reserve {
         background-color: #5e72e4;
         color: white;
         border: none;
@@ -89,14 +90,20 @@
         align-items: center;
     }
 
-    .btn-view:hover {
+    .btn-view:hover,
+    .btn-reserve:hover {
         background-color: #324cdd;
         transform: translateY(-2px);
         box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
     }
 
-    .btn-view i {
+    .btn-view i,
+    .btn-reserve i {
         margin-right: 8px;
+    }
+
+    .btn-reserve {
+        margin-left: 0.5rem;
     }
 </style>
 
@@ -125,10 +132,16 @@
                     <div class="offer-price">
                         {{ offre.priceAfter ? offre.priceAfter ~ '€' : 'Prix non défini' }}
                     </div>
-                    <a href="{{ path('app_offre_show', {'idO': offre.idO}) }}" class="btn-view">
-                        <i class="fas fa-eye"></i>
-                        Voir
-                    </a>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{{ path('app_offre_show', {'idO': offre.idO}) }}" class="btn-view">
+                            <i class="fas fa-eye"></i>
+                            Voir
+                        </a>
+                        <a href="{{ path('app_reservation_new', {'idO': offre.idO}) }}" class="btn-reserve">
+                            <i class="fas fa-calendar-check"></i>
+                            Réserver
+                        </a>
+                    </div>
                 </div>
             </div>
         {% else %}
@@ -136,8 +149,4 @@
         {% endfor %}
     </div>
 </div>
-<a href="{{ path('app_offre_voyageurs') }}" class="nav-link">
-    <i class="fas fa-tags"></i>
-    <span>Offres</span>
-</a>
 {% endblock %}
