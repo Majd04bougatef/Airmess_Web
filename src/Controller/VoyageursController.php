@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use App\Repository\OffreRepository;
 
 class VoyageursController extends AbstractController{
 
@@ -53,6 +54,18 @@ class VoyageursController extends AbstractController{
     public function offreForm(): Response
     {
         return $this->render('dashVoyageurs/offreForm.html.twig');
+    }
+
+    #[Route('/voyageurs/offres', name: 'app_offre_voyageurs')]
+    public function offrePageVoyageurs(OffreRepository $offreRepository): Response
+    {
+        // Récupérer toutes les offres depuis le repository
+        $offres = $offreRepository->findAll();
+
+        // Rendre la vue avec les offres
+        return $this->render('dashVoyageurs/offrePageVoyageurs.html.twig', [
+            'offres' => $offres,
+        ]);
     }
 }
 
