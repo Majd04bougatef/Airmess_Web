@@ -1,0 +1,141 @@
+{% extends 'dashAdmin/dashboard.html.twig' %}
+
+{% block title %}Commentaires de la Publication{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
+  <div class="container-fluid py-1 px-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="{{ path('social_page') }}">Réseaux Sociaux</a></li>
+        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Commentaires</li>
+      </ol>
+      <h6 class="font-weight-bolder text-white mb-0">Commentaires de la Publication</h6>
+    </nav>
+  </div>
+</nav>
+<!-- End Navbar -->
+
+<div class="container-fluid py-4">
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+          <h6>Commentaires de "{{ social_media.titre }}"</h6>
+          <div>
+            <a href="{{ path('admin_social_media_show', {'idEB': social_media.idEB}) }}" class="btn btn-sm btn-info me-2">
+              <i class="fas fa-eye me-1"></i>Voir la publication
+            </a>
+            <a href="{{ path('admin_social_media_edit', {'idEB': social_media.idEB}) }}" class="btn btn-sm btn-primary">
+              <i class="fas fa-edit me-1"></i>Modifier la publication
+            </a>
+          </div>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          {% if commentaires|length > 0 %}
+            <div class="table-responsive p-0">
+              <table class="table align-items-center mb-0">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Utilisateur</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Commentaire</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Likes</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dislikes</th>
+                    <th class="text-secondary opacity-7">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for commentaire in commentaires %}
+                    <tr>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm">{{ commentaire.user ? commentaire.user.name ~ ' ' ~ commentaire.user.prenom : 'Utilisateur inconnu' }}</h6>
+                            <p class="text-xs text-secondary mb-0">ID: {{ commentaire.user ? commentaire.user.idU : 'N/A' }}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0">{{ commentaire.description }}</p>
+                      </td>
+                      <td class="align-middle text-center">
+                        <span class="badge bg-success">{{ commentaire.numberlike }}</span>
+                      </td>
+                      <td class="align-middle text-center">
+                        <span class="badge bg-danger">{{ commentaire.numberdislike }}</span>
+                      </td>
+                      <td class="align-middle">
+                        <div class="d-flex">
+                          <a href="{{ path('admin_comment_edit', {'idC': commentaire.idC}) }}" class="btn btn-link text-info me-2">
+                            <i class="fas fa-edit"></i> Modifier
+                          </a>
+                          <form method="post" action="{{ path('admin_comment_delete', {'idC': commentaire.idC}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ commentaire.idC) }}">
+                            <button type="submit" class="btn btn-link text-danger">
+                              <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center p-4">
+              <p class="text-muted mb-0">Aucun commentaire pour cette publication</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card card-plain">
+        <div class="card-header pb-0">
+          <h6>Détails de la Publication</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <h4>{{ social_media.titre }}</h4>
+              <div class="mb-3">
+                <span class="badge bg-gradient-info me-2">
+                  <i class="fas fa-map-marker-alt me-1"></i>{{ social_media.lieu }}
+                </span>
+                <span class="badge bg-gradient-dark">
+                  <i class="fas fa-calendar me-1"></i>{{ social_media.publicationDate|date('d/m/Y') }}
+                </span>
+              </div>
+              <p>{{ social_media.contenu|slice(0, 200) }}{% if social_media.contenu|length > 200 %}...{% endif %}</p>
+            </div>
+            {% if social_media.imagemedia %}
+              <div class="col-md-4">
+                <img src="{{ asset('http://localhost/ImageSocialMedia/' ~ social_media.getImagemedia()) }}" alt="Image de la publication" class="img-fluid rounded" style="max-height: 200px;">
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <a href="{{ path('admin_social_media_index') }}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+    </a>
+  </div>
+</div>
+{% endblock %} 

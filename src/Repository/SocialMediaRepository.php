@@ -47,6 +47,25 @@ class SocialMediaRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findRandom(int $limit = 4): array
+    {
+        // First try to get more than needed to allow for randomness
+        $qb = $this->createQueryBuilder('s')
+            ->orderBy('s.publicationDate', 'DESC')
+            ->setMaxResults($limit * 2);
+            
+        $result = $qb->getQuery()->getResult();
+        
+        // If we have more than we need, shuffle and take only what we need
+        if (count($result) > $limit) {
+            shuffle($result);
+            return array_slice($result, 0, $limit);
+        }
+        
+        // Otherwise just return what we have
+        return $result;
+    }
+
    
     public function findByUser(int $userId): array
     {

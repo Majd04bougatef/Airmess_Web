@@ -2,7 +2,8 @@
     <div class="post-item mb-4">
         <div class="card">
             {% if social_media.imagemedia %}
-                <img src="{{ asset('uploads/' ~ social_media.imagemedia) }}" class="card-img-top" alt="Post image">
+                <img src="http://localhost/ImageSocialMedia/{{ social_media.imagemedia }}" class="card-img-top" alt="Post image"
+                     onerror="this.onerror=null; this.src='{{ asset('img/image-placeholder.jpg') }}'; this.alt='Image non disponible';">
             {% endif %}
             <div class="card-body">
                 <h5 class="card-title">{{ social_media.titre }}</h5>
