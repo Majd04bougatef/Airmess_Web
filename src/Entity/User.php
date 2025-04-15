@@ -60,6 +60,7 @@ class User
     
     #[ORM\OneToMany(mappedBy: "receiver", targetEntity: Message::class, cascade: ["remove"])]
     private Collection $receivedMessages;
+
     #[ORM\OneToMany(mappedBy: "user", targetEntity: SocialMedia::class)]
     private Collection $socialMedias;
 
@@ -73,7 +74,7 @@ class User
         $this->sentMessages = new ArrayCollection();
         $this->receivedMessages = new ArrayCollection();
         $this->socialMedias = new ArrayCollection();
-        $this->commentaires = new ArrayCollection();
+        $this->commentaires = new ArrayCollection
     }
 
     // Getters et Setters
@@ -323,9 +324,7 @@ class User
         return $this;
     }
 
-
-    
-    /**
+     /**
      * @return Collection<int, SocialMedia>
      */
     public function getSocialMedias(): Collection
@@ -384,7 +383,5 @@ class User
 
         return $this;
     }
-
-
 
 }

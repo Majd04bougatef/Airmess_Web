@@ -1,0 +1,362 @@
+{% extends 'dashEntreprise/dashboardEntreprise.html.twig' %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.css">
+<style>
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0.5rem 0;
+}
+
+.metric-label {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.metric-change {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.metric-change.positive {
+    color: #10b981;
+}
+
+.metric-change.negative {
+    color: #ef4444;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.chart-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.chart-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.time-filter {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    color: #64748b;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.time-filter:hover {
+    background: #f8fafc;
+}
+
+.station-list {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.station-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.station-item:last-child {
+    border-bottom: none;
+}
+
+.station-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.station-name {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.station-metrics {
+    display: flex;
+    gap: 2rem;
+}
+
+.station-metric {
+    text-align: center;
+}
+
+.metric-number {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+</style>
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Usage Trends Chart
+    const usageCtx = document.getElementById('usageChart').getContext('2d');
+    fetch('{{ path('app_entreprise_analytics_usage') }}')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(usageCtx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Bike Usage',
+                        data: data.data,
+                        borderColor: '#3b82f6',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    fetch('{{ path('app_entreprise_analytics_revenue') }}')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Daily Revenue',
+                        data: data.data,
+                        backgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+
+    // Station Performance Chart
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    const stationData = {{ stationPerformance|json_encode|raw }};
+    
+    new Chart(performanceCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Availability', 'Usage', 'Revenue', 'Maintenance', 'Customer Satisfaction'],
+            datasets: [{
+                label: 'Station Performance',
+                data: [85, 75, 90, 80, 95],
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: '#3b82f6',
+                pointBackgroundColor: '#3b82f6'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block body %}
+<div class="content-section active" id="analytics-section">
+    <div class="section-header">
+        <h2>Analytics Dashboard</h2>
+        <p>Monitor your business performance and make data-driven decisions</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="analytics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Total Revenue</div>
+            <div class="metric-value">${{ totalRevenue|number_format(2) }}</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>12% from last month</span>
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-label">Active Users</div>
+            <div class="metric-value">{{ activeUsers }}</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>8% from last week</span>
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-label">Bike Utilization</div>
+            <div class="metric-value">{{ bikeUtilization|number_format(1) }}%</div>
+            <div class="metric-change negative">
+                <i class="fas fa-arrow-down"></i>
+                <span>3% from last week</span>
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-label">Average Ride Duration</div>
+            <div class="metric-value">{{ averageRideDuration }} min</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>5% from last month</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <h3 class="chart-title">Bike Usage Trends</h3>
+            <div class="chart-actions">
+                <select class="time-filter">
+                    <option>Last 7 days</option>
+                    <option>Last 30 days</option>
+                    <option>Last 3 months</option>
+                    <option>Last year</option>
+                </select>
+            </div>
+        </div>
+        <canvas id="usageChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-header">
+            <h3 class="chart-title">Revenue Overview</h3>
+            <div class="chart-actions">
+                <select class="time-filter">
+                    <option>Daily</option>
+                    <option>Weekly</option>
+                    <option>Monthly</option>
+                </select>
+            </div>
+        </div>
+        <canvas id="revenueChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-header">
+            <h3 class="chart-title">Station Performance</h3>
+            <div class="chart-actions">
+                <select class="time-filter">
+                    <option>All Stations</option>
+                    <option>Top Performing</option>
+                    <option>Needs Attention</option>
+                </select>
+            </div>
+        </div>
+        <canvas id="performanceChart"></canvas>
+    </div>
+
+    <!-- Station List -->
+    <div class="station-list">
+        <h3 class="chart-title">Station Performance Details</h3>
+        {% for station in stationPerformance %}
+        <div class="station-item">
+            <div class="station-info">
+                <div class="station-name">{{ station.name }}</div>
+            </div>
+            <div class="station-metrics">
+                <div class="station-metric">
+                    <div class="metric-number">{{ station.availability|number_format(1) }}%</div>
+                    <div class="metric-label">Availability</div>
+                </div>
+                <div class="station-metric">
+                    <div class="metric-number">{{ station.dailyRides }}</div>
+                    <div class="metric-label">Daily Rides</div>
+                </div>
+                <div class="station-metric">
+                    <div class="metric-number">${{ station.dailyRevenue|number_format(2) }}</div>
+                    <div class="metric-label">Daily Revenue</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ReviewBonPlan index{% endblock %}
+
+{% block body %}
+    <h1>ReviewBonPlan index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IdR</th>
+                <th>Id_U</th>
+                <th>Commente</th>
+                <th>Rating</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for reviewbonplan in reviewbonplans %}
+            <tr>
+                <td>{{ reviewbonplan.idR }}</td>
+                <td>{{ reviewbonplan.idU }}</td>
+                <td>{{ reviewbonplan.commente }}</td>
+                <td>{{ reviewbonplan.rating }}</td>
+                <td>
+                    <a href="{{ path('app_reviewbonplan_show', {'idR': reviewbonplan.idR}) }}">show</a>
+                    <a href="{{ path('app_reviewbonplan_edit', {'idR': reviewbonplan.idR}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_reviewbonplan_new') }}">Create new</a>
+{% endblock %}

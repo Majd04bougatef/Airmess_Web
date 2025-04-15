@@ -7,6 +7,7 @@ parameters:
     upload_directory: 'C:/xampp/htdocs/ImageSocialMedia'
     uploads_directory: 'C:/xampp/htdocs/ImageSocialMedia'
 
+    uploads_directory: '%kernel.project_dir%/public/uploads/'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -35,4 +36,5 @@ services:
 
     App\Controller\AdminSocialMediaController:
         arguments:
+            $uploadsDirectory: '%uploads_directory%'
             $uploadsDirectory: '%uploads_directory%'

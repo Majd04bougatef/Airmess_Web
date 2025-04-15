@@ -1,0 +1,113 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<style>
+.contact-form {
+    background: #fff;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    width: 80%;
+    border-radius: 20px;
+    padding: 2rem;
+}
+.contact-form .form-control {
+    border-radius: 1rem;
+}
+.contact-image {
+    text-align: center;
+}
+.contact-image img {
+    width: 11%;
+    margin-top: -3%;
+}
+.contact-form h3 {
+    margin-top: 3%;
+    text-align: center;
+    color: rgb(197, 0, 204);
+}
+.contact-form .btnContact {
+    width: 50%;
+    border: none;
+    border-radius: 1rem;
+    padding: 1.5%;
+    background: #dc3545;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+}
+.btnn {
+    width: 100%;
+    border-radius: 1rem;
+    padding: 1.5%;
+    color: #fff;
+    background-color: #0062cc;
+    border: none;
+    cursor: pointer;
+}
+.form-error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    font-weight: bold;
+}
+</style>
+
+<div class="container contact-form">
+    <div class="contact-image">
+        <img src="{{ asset('images/map (1).png') }}" alt="rocket_contact" />
+    </div>
+    <h3>Ajouter un Bon Plan</h3>
+
+    {% form_theme form _self %}
+    {{ form_start(form, {
+        'method': 'POST',
+        'action': path('app_bonplan_new'),
+        'attr': {
+            'novalidate': 'novalidate',
+            'enctype': 'multipart/form-data'
+        }
+    }) }}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.id_U, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(form.nomplace, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(form.localisation, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(form.description, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.typePlace, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(form.imageBP, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group text-center mt-4">
+        <button class="btnn">{{ button_label|default('Enregistrer') }}</button>
+    </div>
+
+    {{ form_end(form) }}
+
+    {% block form_errors %}
+        {% if form.vars.errors|length > 0 %}
+            <div class="form-error">
+                {% for error in form.vars.errors %}
+                    {{ error.message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endblock %}
+</div>
