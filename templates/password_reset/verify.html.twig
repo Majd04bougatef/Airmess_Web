@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vérification de code - Airmess{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 500px; border-radius: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%); border-radius: 25px 25px 0 0;">
+            <img src="{{ asset('images/logo-airmess.png') }}" alt="Airmess Logo" class="mb-2" width="50">
+            <h2 class="text-white mb-0">Vérification de code</h2>
+        </div>
+        
+        <div class="card-body p-4">
+            {% for flash_message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ flash_message }}
+                </div>
+            {% endfor %}
+            
+            {% for flash_message in app.flashes('error') %}
+                <div class="alert alert-danger">
+                    {{ flash_message }}
+                </div>
+            {% endfor %}
+            
+            {% if error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+            {% endif %}
+            
+            <p class="text-center mb-4">
+                Un code de vérification a été envoyé à <strong>{{ email }}</strong>.<br>
+                Veuillez vérifier votre boîte de réception et entrer le code ci-dessous.
+            </p>
+            
+            <form action="{{ path('app_password_reset_verify') }}" method="post">
+                <div class="form-group verification-input">
+                    <label for="verification_code" class="font-weight-bold">Code de vérification</label>
+                    <input type="text" id="verification_code" name="verification_code" class="form-control form-control-lg text-center" maxlength="6" placeholder="123456" required autofocus style="letter-spacing: 5px; font-size: 24px; border-radius: 15px;">
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p id="countdown-timer" class="mb-3">Ce code expire dans: <span id="timer">02:00</span></p>
+                    <button type="submit" class="btn btn-primary btn-block" style="background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%); border: none; border-radius: 50px; padding: 12px 15px;">
+                        Vérifier
+                    </button>
+                </div>
+            </form>
+            
+            <div class="text-center mt-3">
+                <p>Vous n'avez pas reçu de code? <a href="{{ path('app_password_reset_resend') }}">Renvoyer le code</a></p>
+                <p><a href="{{ path('app_password_reset_request') }}">Retour à la réinitialisation</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Timer functionality for verification code
+        let timeLeft = {{ remaining_seconds|default(120) }}; // Use remaining time from server or default to 2 minutes
+        const timerElement = document.getElementById('timer');
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            
+            timerElement.textContent = minutes + ':' + seconds;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.textContent = "Expiré";
+                document.getElementById('countdown-timer').classList.add('text-danger');
+            }
+            
+            timeLeft--;
+        }
+        
+        // Initialize and start the timer
+        updateTimer();
+        const timerInterval = setInterval(updateTimer, 1000);
+        
+        // Auto-submit when all digits are entered
+        const codeInput = document.getElementById('verification_code');
+        codeInput.addEventListener('input', function() {
+            // Only allow numbers
+            this.value = this.value.replace(/[^0-9]/g, '');
+            
+            // Auto-submit when 6 digits are entered
+            if (this.value.length === 6) {
+                this.form.submit();
+            }
+        });
+    });
+</script>
+{% endblock %} 

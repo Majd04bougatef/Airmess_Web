@@ -35,7 +35,7 @@ class VoyageursController extends AuthenticatedController
         if (!$this->hasRole('Voyageurs')) {
             // Redirect to appropriate dashboard based on role
             $userRole = $this->authService->getUserRole();
-            if ($userRole === 'Admin') {
+            if ($userRole === 'Admin' || $userRole === 'ROLE_ADMIN') {
                 return $this->redirectToRoute('app_dash');
             } elseif ($userRole === 'Entreprise') {
                 return $this->redirectToRoute('app_dashEntreprise');
