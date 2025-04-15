@@ -191,7 +191,7 @@
         </div>
         
         <div class="logo-text">
-            <img src="{{ asset('images/AirMess-text.png') }}" alt="Logo text" width="110" height="80"
+            <img src="{{ asset('images/Capture d\'écran 2025-01-30 203129.png') }}" alt="Logo text" width="110" height="80"
                  onerror="this.src='https://via.placeholder.com/200x150?text=AirMess'">
         </div>
         
@@ -213,6 +213,12 @@
                 </div>
             {% endfor %}
             
+            {% for flash_success in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ flash_success }}
+                </div>
+            {% endfor %}
+            
             <form action="{{ path('login') }}" method="post" id="login-form" novalidate>
                 <div class="form-group">
                     <label class="form-label">Email</label>
@@ -224,7 +230,7 @@
                 <div class="form-group">
                     <label class="form-label">Mot de passe</label>
                     <div class="forgot-password">
-                        <a href="{{ path('login') }}">Mot de passe oublié ?</a>
+                        <a href="{{ path('app_password_reset_request') }}">Mot de passe oublié ?</a>
                     </div>
                     <div class="password-field-container">
                         <input type="password" name="password" id="password-field" class="form-control">
@@ -243,7 +249,7 @@
             <div class="or-continue">ou continuer avec</div>
             
             <div class="social-login">
-                <a href="#"><img src="{{ asset('images/google-logo.svg') }}" alt="Google" 
+                <a href="{{ path('connect_google') }}"><img src="{{ asset('images/google-logo.svg') }}" alt="Google" 
                    onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg'"></a>
                 <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook"></a>
             </div>
@@ -252,6 +258,13 @@
                 <span>Vous n'avez pas encore de compte ?</span>
                 <a href="{{path('app_signup')}}">Inscrivez-vous gratuitement</a>
             </div>
+            
+            {% if app.environment == 'dev' %}
+            <div class="text-center mt-3">
+                <a href="{{ path('connect_google_test') }}" class="btn btn-sm btn-light border">Test Google Login (Clear Session)</a>
+                <a href="{{ path('app_logout') }}" class="btn btn-sm btn-light border ml-2">Logout</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 

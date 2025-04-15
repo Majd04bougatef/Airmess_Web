@@ -16,12 +16,12 @@ class SecurityController extends AbstractController
     #[Route('/login', name: 'login')]
     public function login(Request $request, UserRepository $userRepository, SessionInterface $session): Response
     {
-        // Check if user is already logged in
-        if ($session->has('user_id')) {
+        // Check if user is already logged in and 'force_login' is not set
+        if ($session->has('user_id') && !$request->query->has('force_login')) {
             $userRole = $session->get('user_role');
             
             // Redirect to appropriate dashboard
-            if ($userRole === 'Admin') {
+            if ($userRole === 'Admin' || $userRole === 'ROLE_ADMIN') {
                 return $this->redirectToRoute('app_dash');
             } elseif ($userRole === 'Entreprise') {
                 return $this->redirectToRoute('app_dashEntreprise');
@@ -44,6 +44,7 @@ class SecurityController extends AbstractController
                     $session->set('user_id', $user->getIdU());
                     $session->set('user_role', $user->getRoleUser());
                     $session->set('user_name', $user->getName() . ' ' . $user->getPrenom());
+                    $session->set('user_image', $user->getImagesU());
                     
                     // Force session write
                     $session->save();
@@ -52,7 +53,7 @@ class SecurityController extends AbstractController
                     $userRole = $user->getRoleUser();
                     
                     // Redirect based on user role
-                    if ($userRole === 'Admin') {
+                    if ($userRole === 'Admin' || $userRole === 'ROLE_ADMIN') {
                         return $this->redirectToRoute('app_dash');
                     } elseif ($userRole === 'Entreprise') {
                         return $this->redirectToRoute('app_dashEntreprise');
