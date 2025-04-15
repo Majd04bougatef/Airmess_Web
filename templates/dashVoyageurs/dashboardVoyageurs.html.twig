@@ -386,6 +386,58 @@
         text-align: center;
       }
     }
+    
+    /* Submenu Styles */
+    .nav-item-dropdown {
+      position: relative;
+    }
+    
+    .nav-submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 0.5rem 0;
+      min-width: 180px;
+      z-index: 10;
+    }
+    
+    .nav-item-dropdown:hover .nav-submenu {
+      display: block;
+    }
+    
+    .nav-submenu-item {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #67748e;
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-submenu-item:hover {
+      background-color: rgba(94, 114, 228, 0.08);
+      color: #344767;
+    }
+    
+    @media (max-width: 992px) {
+      .nav-submenu {
+        position: static;
+        display: none;
+        background-color: #f8f9fa;
+        box-shadow: none;
+        padding: 0.5rem 1rem;
+        margin-left: 2rem;
+        border-radius: 8px;
+      }
+      
+      .nav-item-dropdown.active .nav-submenu {
+        display: block;
+      }
+    }
   </style>
 </head>
 
@@ -421,21 +473,29 @@
                 Utilisateurs
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path('stationVoyageurs_page') }}" id="station-button" data-section="station-section">
+            <li class="nav-item nav-item-dropdown">
+              <a class="nav-link" href="#" id="velo-button">
                 <span class="nav-link-icon">
                   <img src="{{ asset('images/station-icon.png') }}" alt="Bike" onerror="this.src='{{ asset('images/station-icon.svg') }}'; this.onerror='';">
                 </span>
                 Réserver Vélo
               </a>
+              <div class="nav-submenu">
+                <a class="nav-submenu-item" href="{{ path('app_reservation_transport_station') }}" id="reserver-button" data-section="station-section">Reserver</a>
+                <a class="nav-submenu-item" href="{{ path('app_reservation_transport_index') }}" id="reservations-button" data-section="reservations-section">Mes reservations</a>
+              </div>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path('bonplanVoyageurs_page') }}" id="bonplan-button" data-section="bonplan-section">
+            <li class="nav-item nav-item-dropdown">
+              <a class="nav-link" href="#" id="bonplan-button">
                 <span class="nav-link-icon">
                   <img src="{{ asset('images/bonplan-icon.png') }}" alt="Good Plan" onerror="this.src='{{ asset('images/bonplan-icon.svg') }}'; this.onerror='';">
                 </span>
                 Bon Plan
               </a>
+              <div class="nav-submenu">
+                <a class="nav-submenu-item" href="{{ path('bonplanVoyageurs_page') }}?action=add" id="add-bonplan-button" data-section="add-bonplan-section">Ajouter un bon plan</a>
+                <a class="nav-submenu-item" href="{{ path('bonplanVoyageurs_page') }}" id="view-bonplan-button" data-section="view-bonplan-section">Voir les bons plans</a>
+              </div>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#" id="offre-button" data-section="offre-section">
@@ -471,7 +531,7 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="container">
+    <div class="container" style="width: 90%; max-width: 90%;">
       <!-- Regular Content Card - For normal pages -->
       <div class="content-card content-section" id="default-section">
         {% block body %}{% endblock %}
@@ -597,22 +657,36 @@
         }
       }
       
-      // User dropdown functionality
+      // Toggle user dropdown menu
       const userDropdown = document.getElementById('userDropdown');
       const userMenu = document.getElementById('userMenu');
       
-      userDropdown.addEventListener('click', function() {
-        userMenu.classList.toggle('show');
-      });
-      
-      // Close the dropdown if clicked outside
-      window.addEventListener('click', function(event) {
-        if (!event.target.matches('.user-img')) {
-          if (userMenu.classList.contains('show')) {
+      if (userDropdown && userMenu) {
+        userDropdown.addEventListener('click', function() {
+          userMenu.classList.toggle('show');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!userDropdown.contains(e.target)) {
             userMenu.classList.remove('show');
           }
-        }
-      });
+        });
+      }
+      
+      // Mobile submenu toggle
+      const dropdowns = document.querySelectorAll('.nav-item-dropdown');
+      
+      if (window.innerWidth <= 992) {
+        dropdowns.forEach(dropdown => {
+          const link = dropdown.querySelector('.nav-link');
+          
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            dropdown.classList.toggle('active');
+          });
+        });
+      }
     });
   </script>
 </body>

@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BonPlan{% endblock %}
+
+{% block body %}
+    <h1>BonPlan</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>IdP</th>
+                <td>{{ bonplan.id }}</td>
+            </tr>
+            <tr>
+                <th>Id_U</th>
+                <td>{{ bonplan.idU }}</td>
+            </tr>
+            <tr>
+                <th>Nomplace</th>
+                <td>{{ bonplan.nomplace }}</td>
+            </tr>
+            <tr>
+                <th>Localisation</th>
+                <td>{{ bonplan.localisation }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ bonplan.description }}</td>
+            </tr>
+            <tr>
+                <th>TypePlace</th>
+                <td>{{ bonplan.typePlace }}</td>
+            </tr>
+            <tr>
+                <th>ImageBP</th>
+                <td>{{ bonplan.imageBP }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_bonplan_index') }}">back to list</a>
+
+    <a href="{{ path('app_bonplan_edit', {'idP': bonplan.id}) }}">edit</a>
+
+    {{ include('bonplan/_delete_form.html.twig') }}
+{% endblock %}

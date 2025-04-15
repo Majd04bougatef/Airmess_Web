@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin accounts created{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h1 class="h4 mb-0">Admin Accounts Creation</h1>
+        </div>
+        <div class="card-body">
+            <h2 class="h5 mb-3">Process completed</h2>
+            
+            {% if admins_created|length > 0 %}
+                <div class="alert alert-success">
+                    <h3 class="h6">The following admin accounts were created:</h3>
+                    <ul class="mb-0">
+                        {% for admin in admins_created %}
+                            <li>{{ admin }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            {% if admins_existing|length > 0 %}
+                <div class="alert alert-info">
+                    <h3 class="h6">The following admin accounts already exist:</h3>
+                    <ul class="mb-0">
+                        {% for admin in admins_existing %}
+                            <li>{{ admin }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            {% if admins_created|length == 0 and admins_existing|length == 0 %}
+                <div class="alert alert-warning">
+                    No admin accounts were processed.
+                </div>
+            {% endif %}
+            
+            <div class="alert alert-info">
+                <h4 class="h6">Login credentials:</h4>
+                <p>All created admin accounts use the default password: <strong>admin123</strong></p>
+            </div>
+            
+            <div class="mt-4">
+                <a href="{{ path('login') }}" class="btn btn-primary">Go to Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

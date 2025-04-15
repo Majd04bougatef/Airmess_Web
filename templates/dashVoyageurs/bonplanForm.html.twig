@@ -1,0 +1,473 @@
+<div class="content-card content-section active" id="bonplan-section">
+  <div class="form-header">
+    <h2 class="form-title">Ajouter un nouveau bon plan</h2>
+    <p class="form-subtitle">Complétez les informations ci-dessous pour créer un nouveau bon plan pour les voyageurs.</p>
+  </div>
+
+  <form action="{{ path('bonplan_add') }}" method="post" id="bonplan-form" enctype="multipart/form-data">
+    <!-- Basic Info Card -->
+    <div class="form-card card-info">
+      <div class="form-card-header">
+        <i class="fas fa-info-circle form-card-icon"></i>
+        <h3 class="form-card-title">Informations de base</h3>
+      </div>
+      <div class="form-card-body">
+        <div class="form-row">
+          <div class="form-col form-col-md-12">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="nomplace" name="nomplace" placeholder=" " required>
+              <label for="nomplace">Nom du lieu</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-spacer"></div>
+        
+        <div class="form-group">
+          <label for="map" class="form-label">Localisation (cliquez sur la carte pour sélectionner)</label>
+          <div id="map" style="height: 400px; border-radius: 10px;"></div>
+          <div class="form-spacer"></div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="searchLocation" placeholder=" ">
+                <label for="searchLocation">Rechercher un lieu</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="localisation" name="localisation" placeholder=" " readonly>
+                <label for="localisation">Coordonnées</label>
+              </div>
+              <small class="form-text text-muted">Format: latitude, longitude</small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-spacer"></div>
+        
+        <div class="form-floating">
+          <textarea class="form-control" id="description" name="description" style="height: 120px" placeholder=" "></textarea>
+          <label for="description">Description</label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Type Place Card -->
+    <div class="form-card card-type">
+      <div class="form-card-header">
+        <i class="fas fa-map-marker-alt form-card-icon"></i>
+        <h3 class="form-card-title">Type de lieu</h3>
+      </div>
+      <div class="form-card-body">
+        <div class="form-row">
+          <div class="form-col form-col-md-12">
+            <div class="form-floating">
+              <select class="form-select" id="typePlace" name="typePlace" required>
+                <option selected disabled value="">Sélectionnez un type</option>
+                <option value="resto">Restaurant</option>
+                <option value="coworkingspace">Espace de coworking</option>
+                <option value="cafe">Café</option>
+                <option value="musée">Musée</option>
+              </select>
+              <label for="typePlace">Type de lieu</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Image Card -->
+    <div class="form-card card-image">
+      <div class="form-card-header">
+        <i class="fas fa-image form-card-icon"></i>
+        <h3 class="form-card-title">Image</h3>
+      </div>
+      <div class="form-card-body">
+        <div class="form-row">
+          <div class="form-col form-col-md-12">
+            <div class="form-floating">
+              <input type="file" class="form-control" id="imageBP" name="imageBP" placeholder=" ">
+              <label for="imageBP">Image du lieu</label>
+            </div>
+            <small class="form-text text-muted">Choisissez une image pour le bon plan (formats acceptés: JPG, PNG)</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ path('bonplanVoyageurs_page') }}" class="form-btn-outline" id="cancel-bonplan">Annuler</a>
+      <button type="submit" class="form-btn">Ajouter le bon plan</button>
+    </div>
+  </form>
+</div>
+
+<style>
+  .form-card {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    border: 1px solid #eaedf2;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .form-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .form-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  .card-info::before {
+    background-color: #5e72e4;
+  }
+  
+  .card-type::before {
+    background-color: #2dce89;
+  }
+  
+  .card-image::before {
+    background-color: #fb6340;
+  }
+
+  .form-card-header {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #eaedf2;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  
+  .form-card-header::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(94, 114, 228, 0.1));
+    z-index: -1;
+  }
+  
+  .card-info .form-card-header::after {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(94, 114, 228, 0.1));
+  }
+  
+  .card-type .form-card-header::after {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(45, 206, 137, 0.1));
+  }
+  
+  .card-image .form-card-header::after {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(251, 99, 64, 0.1));
+  }
+
+  .form-card-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-radius: 10px;
+    margin-right: 1rem;
+    padding: 0.5rem;
+  }
+  
+  .card-info .form-card-icon {
+    background-color: #5e72e4;
+  }
+  
+  .card-type .form-card-icon {
+    background-color: #2dce89;
+  }
+  
+  .card-image .form-card-icon {
+    background-color: #fb6340;
+  }
+  
+  .form-card-title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #344767;
+  }
+  
+  .form-card-body {
+    padding: 1.5rem;
+  }
+  
+  .form-spacer {
+    height: 1.5rem;
+  }
+  
+  .form-floating {
+    position: relative;
+  }
+  
+  .form-floating label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding: 1rem;
+    pointer-events: none;
+    transform-origin: 0 0;
+    transition: opacity .1s ease-in-out,transform .1s ease-in-out;
+    color: #67748e;
+    font-size: 0.875rem;
+  }
+  
+  .form-floating .form-control:focus ~ label,
+  .form-floating .form-control:not(:placeholder-shown) ~ label {
+    transform: scale(.85) translateY(-.5rem) translateX(.15rem);
+    background-color: white;
+    padding: 0 0.5rem;
+    height: auto;
+    color: #5e72e4;
+  }
+  
+  .form-control, .form-select {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #5e72e4;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
+  }
+  
+  .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px 12px;
+    appearance: none;
+  }
+  
+  .form-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+  }
+  
+  .form-btn-outline {
+    background-color: transparent;
+    color: #5e72e4;
+    border: 1px solid #5e72e4;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 1rem;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .form-btn-outline:hover {
+    background-color: #f0f7ff;
+    color: #324cdd;
+    border-color: #324cdd;
+  }
+  
+  .form-btn {
+    background-color: #5e72e4;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .form-btn:hover {
+    background-color: #324cdd;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
+  }
+
+  /* Styles pour la map */
+  .map-container {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .leaflet-container {
+    border-radius: 10px;
+  }
+  
+  .marker-pin {
+    background-color: #5e72e4;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 4px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.75rem;
+    margin-left: -0.75rem;
+  }
+  
+  .col-md-6 {
+    position: relative;
+    width: 100%;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+  }
+  
+  @media (min-width: 768px) {
+    .col-md-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+  }
+</style>
+
+<!-- Ajout des CSS Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialiser la carte
+  var map = L.map('map').setView([46.603354, 1.888334], 5); // Centrer sur la France
+
+  // Ajouter la couche de tuiles OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Variable pour stocker le marqueur
+  var marker;
+
+  // Fonction pour ajouter un marqueur
+  function addMarker(latlng) {
+    // Supprimer le marqueur existant s'il y en a un
+    if (marker) {
+      map.removeLayer(marker);
+    }
+    
+    // Ajouter un nouveau marqueur
+    marker = L.marker(latlng, {
+      draggable: true // Permettre de déplacer le marqueur
+    }).addTo(map);
+    
+    // Mettre à jour les coordonnées lorsque le marqueur est déplacé
+    marker.on('dragend', function(event) {
+      var position = marker.getLatLng();
+      updateCoordinates(position);
+    });
+    
+    updateCoordinates(latlng);
+  }
+  
+  // Mettre à jour le champ de texte avec les coordonnées
+  function updateCoordinates(latlng) {
+    document.getElementById('localisation').value = latlng.lat.toFixed(6) + ', ' + latlng.lng.toFixed(6);
+  }
+  
+  // Ajouter un marqueur lorsqu'on clique sur la carte
+  map.on('click', function(e) {
+    addMarker(e.latlng);
+  });
+  
+  // Ajouter un géocodeur pour la recherche d'adresses
+  var geocoder = L.Control.geocoder({
+    defaultMarkGeocode: false
+  }).addTo(map);
+  
+  geocoder.on('markgeocode', function(e) {
+    var latlng = e.geocode.center;
+    map.setView(latlng, 13);
+    addMarker(latlng);
+  });
+  
+  // Utiliser la barre de recherche personnalisée
+  var searchInput = document.getElementById('searchLocation');
+  searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      var query = this.value;
+      if (query) {
+        geocoder.options.geocoder.geocode(query, function(results) {
+          if (results.length > 0) {
+            var latlng = results[0].center;
+            map.setView(latlng, 13);
+            addMarker(latlng);
+          }
+        });
+      }
+    }
+  });
+  
+  // Setup form submission
+  const bonplanForm = document.getElementById('bonplan-form');
+  if (bonplanForm) {
+    bonplanForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Create FormData object to handle file uploads
+      const formData = new FormData(bonplanForm);
+      
+      // Submit form using fetch API
+      fetch('{{ path('bonplan_add') }}', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Bon plan ajouté avec succès!');
+          // Redirect to the bons plans list page
+          window.location.href = '{{ path('bonplanVoyageurs_page') }}';
+        } else {
+          alert('Erreur: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+        alert('Une erreur est survenue lors de l\'ajout du bon plan.');
+      });
+    });
+  }
+});
+</script> 

@@ -30,12 +30,19 @@ class ReservationTransport
     }
 
     #[ORM\Column(name: "dateRes", type: "datetime")]
+    #[Assert\NotBlank(message: "La date de réservation est obligatoire")]
+    #[Assert\GreaterThanOrEqual(
+        value: "today",
+        message: "La date de réservation doit être aujourd'hui ou dans le futur"
+    )]
     private \DateTimeInterface $dateRes;
 
     #[ORM\Column(name: "dateFin", type: "datetime")]
-    #[Assert\NotBlank(message: "La date de fin est oblig")]
-    #[Assert\GreaterThan(propertyPath: "dateRes", message: "La date de fin doit être après la date de réservation.")]
-
+    #[Assert\NotBlank(message: "La date de fin est obligatoire")]
+    #[Assert\GreaterThan(
+        propertyPath: "dateRes",
+        message: "La date de fin doit être après la date de réservation"
+    )]
     private \DateTimeInterface $dateFin;
 
     #[ORM\Column(name: "prix", type: "float")]
@@ -49,7 +56,14 @@ class ReservationTransport
 
     #[ORM\Column(name: "nombreVelo", type: "integer")]
     #[Assert\NotBlank(message: "Le nombre de vélos est obligatoire")]
-    #[Assert\GreaterThan(value: 0, message: "Le nombre de vélos doit être supérieur à 0.")]
+    #[Assert\GreaterThan(
+        value: 0,
+        message: "Le nombre de vélos doit être supérieur à 0"
+    )]
+    #[Assert\LessThanOrEqual(
+        value: 10,
+        message: "Le nombre de vélos ne peut pas dépasser 10"
+    )]
     private int $nombreVelo;
 
     // Getters et Setters
