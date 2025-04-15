@@ -80,13 +80,13 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
     ";
         // line 35
         yield from $this->unwrap()->yieldBlock('body', $context, $blocks);
-        // line 1222
+        // line 1264
         yield "
     <!-- Scripts -->
     ";
-        // line 1224
+        // line 1266
         yield from $this->unwrap()->yieldBlock('js', $context, $blocks);
-        // line 1237
+        // line 1279
         yield "  </body>
 </html>
 
@@ -217,7 +217,7 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
           <li><a href=\"#hero\" class=\"active\">Acceuil</a></li>
           <li><a href=\"#about\">About</a></li>
           <li><a href=\"#features\">Features</a></li>
-          <li><a href=\"#services\">Services</a></li>
+          <li><a href=\"#services\">Social Media</a></li>
           <li><a href=\"#pricing\">Pricing</a></li>
           <li class=\"dropdown\"><a href=\"#\"><span>Dropdown</span> <i class=\"bi bi-chevron-down toggle-dropdown\"></i></a>
             <ul>
@@ -992,72 +992,274 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
 
     <!-- Services Section -->
     <section id=\"services\" class=\"services section light-background\">
-
-      <!-- Section Title -->
-      <div class=\"container section-title\" data-aos=\"fade-up\">
-        <h2>Services</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
-      </div><!-- End Section Title -->
-
-      <div class=\"container\" data-aos=\"fade-up\" data-aos-delay=\"100\">
-
-        <div class=\"row g-4\">
-
-          <div class=\"col-lg-6\" data-aos=\"fade-up\" data-aos-delay=\"100\">
-            <div class=\"service-card d-flex\">
-              <div class=\"icon flex-shrink-0\">
-                <i class=\"bi bi-activity\"></i>
-              </div>
-              <div>
-                <h3>Nesciunt Mete</h3>
-                <p>Provident nihil minus qui consequatur non omnis maiores. Eos accusantium minus dolores iure perferendis tempore et consequatur.</p>
-                <a href=\"service-details.html\" class=\"read-more\">Read More <i class=\"bi bi-arrow-right\"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Card -->
-
-          <div class=\"col-lg-6\" data-aos=\"fade-up\" data-aos-delay=\"200\">
-            <div class=\"service-card d-flex\">
-              <div class=\"icon flex-shrink-0\">
-                <i class=\"bi bi-diagram-3\"></i>
-              </div>
-              <div>
-                <h3>Eosle Commodi</h3>
-                <p>Ut autem aut autem non a. Sint sint sit facilis nam iusto sint. Libero corrupti neque eum hic non ut nesciunt dolorem.</p>
-                <a href=\"service-details.html\" class=\"read-more\">Read More <i class=\"bi bi-arrow-right\"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Card -->
-
-          <div class=\"col-lg-6\" data-aos=\"fade-up\" data-aos-delay=\"300\">
-            <div class=\"service-card d-flex\">
-              <div class=\"icon flex-shrink-0\">
-                <i class=\"bi bi-easel\"></i>
-              </div>
-              <div>
-                <h3>Ledo Markt</h3>
-                <p>Ut excepturi voluptatem nisi sed. Quidem fuga consequatur. Minus ea aut. Vel qui id voluptas adipisci eos earum corrupti.</p>
-                <a href=\"service-details.html\" class=\"read-more\">Read More <i class=\"bi bi-arrow-right\"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Card -->
-
-          <div class=\"col-lg-6\" data-aos=\"fade-up\" data-aos-delay=\"400\">
-            <div class=\"service-card d-flex\">
-              <div class=\"icon flex-shrink-0\">
-                <i class=\"bi bi-clipboard-data\"></i>
-              </div>
-              <div>
-                <h3>Asperiores Commodit</h3>
-                <p>Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga sit provident adipisci neque.</p>
-                <a href=\"service-details.html\" class=\"read-more\">Read More <i class=\"bi bi-arrow-right\"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Card -->
-
+      
+      <!-- Social Media Publications Section -->
+      <div class=\"container mt-5\" data-aos=\"fade-up\" data-aos-delay=\"200\">
+        <div class=\"row mb-4\">
+          <div class=\"col-12 text-center\">
+            <h3 class=\"social-media-title\">Nos Publications Récentes</h3>
+            <p class=\"social-media-description\">Découvrez nos dernières actualités et suivez notre activité sur les réseaux sociaux</p>
+          </div>
         </div>
-
+        
+        <div class=\"row g-4\">
+          ";
+        // line 755
+        $context["publications"] = ((array_key_exists("socialMedia", $context)) ? ((isset($context["socialMedia"]) || array_key_exists("socialMedia", $context) ? $context["socialMedia"] : (function () { throw new RuntimeError('Variable "socialMedia" does not exist.', 755, $this->source); })())) : ([]));
+        // line 756
+        yield "          ";
+        $context['_parent'] = $context;
+        $context['_seq'] = CoreExtension::ensureTraversable((isset($context["publications"]) || array_key_exists("publications", $context) ? $context["publications"] : (function () { throw new RuntimeError('Variable "publications" does not exist.', 756, $this->source); })()));
+        $context['_iterated'] = false;
+        $context['loop'] = [
+          'parent' => $context['_parent'],
+          'index0' => 0,
+          'index'  => 1,
+          'first'  => true,
+        ];
+        if (is_array($context['_seq']) || (is_object($context['_seq']) && $context['_seq'] instanceof \Countable)) {
+            $length = count($context['_seq']);
+            $context['loop']['revindex0'] = $length - 1;
+            $context['loop']['revindex'] = $length;
+            $context['loop']['length'] = $length;
+            $context['loop']['last'] = 1 === $length;
+        }
+        foreach ($context['_seq'] as $context["_key"] => $context["publication"]) {
+            // line 757
+            yield "              <div class=\"col-lg-3 col-md-6\" data-aos=\"fade-up\" data-aos-delay=\"";
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 757) * 100), "html", null, true);
+            yield "\">
+                  <div class=\"social-post\">
+                      <div class=\"social-post-header\">
+                          <div class=\"social-avatar\">
+                              ";
+            // line 761
+            if ((CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "user", [], "any", false, false, false, 761) && CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "user", [], "any", false, false, false, 761), "getImagesU", [], "method", false, false, false, 761))) {
+                // line 762
+                yield "                                  <img src=\"";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/profile_pictures/" . CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "user", [], "any", false, false, false, 762), "getImagesU", [], "method", false, false, false, 762))), "html", null, true);
+                yield "\" alt=\"User Avatar\">
+                              ";
+            } else {
+                // line 764
+                yield "                                  <img src=\"";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl((("img/avatar-" . ((CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 764) % 5) + 1)) . ".webp")), "html", null, true);
+                yield "\" alt=\"User Avatar\">
+                              ";
+            }
+            // line 766
+            yield "                          </div>
+                          <div class=\"social-user-info\">
+                              <h5>";
+            // line 768
+            yield ((CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "user", [], "any", false, false, false, 768)) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "user", [], "any", false, false, false, 768), "prenom", [], "any", false, false, false, 768) . " ") . CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "user", [], "any", false, false, false, 768), "name", [], "any", false, false, false, 768)), "html", null, true)) : ("Utilisateur Airmess"));
+            yield "</h5>
+                              <p class=\"social-time\">
+                                  ";
+            // line 770
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Twig\Extension\CoreExtension']->formatDate(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "publicationDate", [], "any", false, false, false, 770), "d/m/Y"), "html", null, true);
+            yield "
+                                  <i class=\"bi bi-";
+            // line 771
+            if ((0 == CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 771) % 4)) {
+                yield "facebook";
+            } elseif ((0 == CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 771) % 3)) {
+                yield "twitter";
+            } elseif ((0 == CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 771) % 2)) {
+                yield "instagram";
+            } else {
+                yield "globe";
+            }
+            yield "\"></i>
+                              </p>
+                          </div>
+                      </div>
+                      <div class=\"social-post-image\">
+                          ";
+            // line 776
+            if (CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "imagemedia", [], "any", false, false, false, 776)) {
+                // line 777
+                yield "                              <img src=\"http://localhost/ImageSocialMedia/";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "imagemedia", [], "any", false, false, false, 777), "html", null, true);
+                yield "\" 
+                                   alt=\"";
+                // line 778
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "titre", [], "any", false, false, false, 778), "html", null, true);
+                yield "\" 
+                                   class=\"img-fluid rounded\"
+                                   onerror=\"this.onerror=null; this.src='";
+                // line 780
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl((("img/features-illustration-" . ((CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 780) % 3) + 1)) . ".webp")), "html", null, true);
+                yield "'; this.alt='";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "titre", [], "any", false, false, false, 780), "html", null, true);
+                yield "';\">
+                          ";
+            } else {
+                // line 782
+                yield "                              <img src=\"";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl((("img/features-illustration-" . ((CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 782) % 3) + 1)) . ".webp")), "html", null, true);
+                yield "\" alt=\"";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "titre", [], "any", false, false, false, 782), "html", null, true);
+                yield "\" class=\"img-fluid rounded\">
+                          ";
+            }
+            // line 784
+            yield "                      </div>
+                      <div class=\"social-post-content\">
+                          <h5>";
+            // line 786
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "titre", [], "any", false, false, false, 786), "html", null, true);
+            yield "</h5>
+                          <p>";
+            // line 787
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((Twig\Extension\CoreExtension::trim(Twig\Extension\CoreExtension::slice($this->env->getCharset(), Twig\Extension\CoreExtension::striptags(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "contenu", [], "any", false, false, false, 787)), 0, 100)) . (((Twig\Extension\CoreExtension::length($this->env->getCharset(), CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "contenu", [], "any", false, false, false, 787)) > 100)) ? ("...") : (""))), "html", null, true);
+            yield "</p>
+                          <span class=\"location-badge mt-2\">
+                              <i class=\"bi bi-geo-alt\"></i> ";
+            // line 789
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "lieu", [], "any", false, false, false, 789), "html", null, true);
+            yield "
+                          </span>
+                      </div>
+                      <div class=\"social-post-footer\">
+                          <div class=\"social-interactions\">
+                              <span><i class=\"bi bi-heart\"></i> ";
+            // line 794
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "likee", [], "any", false, false, false, 794), "html", null, true);
+            yield "</span>
+                              <span><i class=\"bi bi-chat\"></i> ";
+            // line 795
+            if (CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "commentaires", [], "any", true, true, false, 795)) {
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::length($this->env->getCharset(), CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "commentaires", [], "any", false, false, false, 795)), "html", null, true);
+            } else {
+                yield "0";
+            }
+            yield "</span>
+                              <span><i class=\"bi bi-share\"></i> ";
+            // line 796
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["publication"], "dislike", [], "any", false, false, false, 796), "html", null, true);
+            yield "</span>
+                          </div>
+                      </div>
+                      <div class=\"mt-2 text-center\">
+                          <a href=\"";
+            // line 800
+            if (CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 800, $this->source); })()), "user", [], "any", false, false, false, 800)) {
+                yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("socialVoyageurs_page");
+            } else {
+                yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_login");
+            }
+            yield "\" class=\"btn btn-sm btn-outline-primary\">
+                              <i class=\"bi bi-eye\"></i> Voir plus
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          ";
+            $context['_iterated'] = true;
+            ++$context['loop']['index0'];
+            ++$context['loop']['index'];
+            $context['loop']['first'] = false;
+            if (isset($context['loop']['revindex0'], $context['loop']['revindex'])) {
+                --$context['loop']['revindex0'];
+                --$context['loop']['revindex'];
+                $context['loop']['last'] = 0 === $context['loop']['revindex0'];
+            }
+        }
+        // line 806
+        if (!$context['_iterated']) {
+            // line 807
+            yield "              <!-- Fallback if no publications are found -->
+              ";
+            // line 808
+            $context['_parent'] = $context;
+            $context['_seq'] = CoreExtension::ensureTraversable(range(1, 4));
+            foreach ($context['_seq'] as $context["_key"] => $context["i"]) {
+                // line 809
+                yield "                  <div class=\"col-lg-3 col-md-6\" data-aos=\"fade-up\" data-aos-delay=\"";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(($context["i"] * 100), "html", null, true);
+                yield "\">
+                      <div class=\"social-post\">
+                          <div class=\"social-post-header\">
+                              <div class=\"social-avatar\">
+                                  <img src=\"";
+                // line 813
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl((("img/avatar-" . $context["i"]) . ".webp")), "html", null, true);
+                yield "\" alt=\"User Avatar\">
+                              </div>
+                              <div class=\"social-user-info\">
+                                  <h5>Utilisateur Airmess</h5>
+                                  <p class=\"social-time\">Publication récente <i class=\"bi bi-globe\"></i></p>
+                              </div>
+                          </div>
+                          <div class=\"social-post-image\">
+                              <img src=\"";
+                // line 821
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl((("img/features-illustration-" . $context["i"]) . ".webp")), "html", null, true);
+                yield "\" alt=\"Post Image\" class=\"img-fluid rounded\">
+                          </div>
+                          <div class=\"social-post-content\">
+                              <h5>Découvrez Airmess</h5>
+                              <p>Rejoignez notre communauté et partagez vos expériences de voyage avec d'autres passionnés.</p>
+                          </div>
+                          <div class=\"social-post-footer\">
+                              <div class=\"social-interactions\">
+                                  <span><i class=\"bi bi-heart\"></i> ";
+                // line 829
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((($context["i"] * 70) + 50), "html", null, true);
+                yield "</span>
+                                  <span><i class=\"bi bi-chat\"></i> ";
+                // line 830
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((($context["i"] * 12) + 5), "html", null, true);
+                yield "</span>
+                                  <span><i class=\"bi bi-share\"></i> ";
+                // line 831
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((($context["i"] * 8) + 3), "html", null, true);
+                yield "</span>
+                              </div>
+                          </div>
+                          <div class=\"mt-2 text-center\">
+                              <a href=\"";
+                // line 835
+                if (CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 835, $this->source); })()), "user", [], "any", false, false, false, 835)) {
+                    yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("socialVoyageurs_page");
+                } else {
+                    yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_login");
+                }
+                yield "\" class=\"btn btn-sm btn-outline-primary\">
+                                  <i class=\"bi bi-eye\"></i> Voir plus
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_key'], $context['i'], $context['_parent']);
+            $context = array_intersect_key($context, $_parent) + $_parent;
+            // line 842
+            yield "          ";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_key'], $context['publication'], $context['_parent'], $context['_iterated'], $context['loop']);
+        $context = array_intersect_key($context, $_parent) + $_parent;
+        // line 843
+        yield "        </div>
+        
+        <div class=\"row mt-4\">
+          <div class=\"col-12 text-center\">
+            <a href=\"";
+        // line 847
+        if (CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 847, $this->source); })()), "user", [], "any", false, false, false, 847)) {
+            yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("socialVoyageurs_page");
+        } else {
+            yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_login");
+        }
+        yield "\" class=\"btn btn-primary\">Voir plus de publications</a>
+          </div>
+        </div>
       </div>
+      <!-- End Social Media Publications Section -->
 
     </section><!-- /Services Section -->
 
@@ -1411,7 +1613,7 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
           <ul>
             <li><a href=\"#\">Home</a></li>
             <li><a href=\"#\">About us</a></li>
-            <li><a href=\"#\">Services</a></li>
+            <li><a href=\"#\">Social Media</a></li>
             <li><a href=\"#\">Terms of service</a></li>
             <li><a href=\"#\">Privacy policy</a></li>
           </ul>
@@ -1479,7 +1681,7 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
         yield from [];
     }
 
-    // line 1224
+    // line 1266
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -1492,40 +1694,40 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "js"));
 
-        // line 1225
+        // line 1267
         yield "        <!-- Vendor JS Files -->
   <script src=\"";
-        // line 1226
+        // line 1268
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("bootstrap/js/bootstrap.bundle.min.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 1227
+        // line 1269
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("vendor/php-email-form/validate.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 1228
+        // line 1270
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("vendor/aos/aos.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 1229
+        // line 1271
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("vendor/glightbox/js/glightbox.min.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 1230
+        // line 1272
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("vendor/swiper/swiper-bundle.min.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 1231
+        // line 1273
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("vendor/purecounter/purecounter_vanilla.js"), "html", null, true);
         yield "\"></script>
   <script src=\"";
-        // line 1232
+        // line 1274
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/station.js"), "html", null, true);
         yield "\"></script>
 
   <!-- Main JS File -->
   <script src=\"";
-        // line 1235
+        // line 1277
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/main.js"), "html", null, true);
         yield "\"></script>
     ";
@@ -1559,7 +1761,7 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  1529 => 1235,  1523 => 1232,  1519 => 1231,  1515 => 1230,  1511 => 1229,  1507 => 1228,  1503 => 1227,  1499 => 1226,  1496 => 1225,  1483 => 1224,  931 => 681,  912 => 665,  893 => 649,  874 => 633,  847 => 609,  843 => 608,  839 => 607,  835 => 606,  831 => 605,  827 => 604,  823 => 603,  819 => 602,  672 => 458,  564 => 353,  541 => 333,  517 => 312,  446 => 244,  442 => 243,  416 => 220,  320 => 127,  316 => 126,  312 => 125,  308 => 124,  304 => 123,  297 => 119,  283 => 108,  247 => 75,  210 => 41,  203 => 36,  190 => 35,  175 => 29,  171 => 28,  167 => 27,  161 => 24,  157 => 23,  153 => 22,  149 => 21,  145 => 20,  141 => 18,  128 => 17,  105 => 9,  90 => 1237,  88 => 1224,  84 => 1222,  82 => 35,  78 => 33,  76 => 17,  66 => 10,  62 => 9,  52 => 1,);
+        return array (  1731 => 1277,  1725 => 1274,  1721 => 1273,  1717 => 1272,  1713 => 1271,  1709 => 1270,  1705 => 1269,  1701 => 1268,  1698 => 1267,  1685 => 1266,  1253 => 847,  1247 => 843,  1241 => 842,  1224 => 835,  1217 => 831,  1213 => 830,  1209 => 829,  1198 => 821,  1187 => 813,  1179 => 809,  1175 => 808,  1172 => 807,  1170 => 806,  1147 => 800,  1140 => 796,  1132 => 795,  1128 => 794,  1120 => 789,  1115 => 787,  1111 => 786,  1107 => 784,  1099 => 782,  1092 => 780,  1087 => 778,  1082 => 777,  1080 => 776,  1064 => 771,  1060 => 770,  1055 => 768,  1051 => 766,  1045 => 764,  1039 => 762,  1037 => 761,  1029 => 757,  1010 => 756,  1008 => 755,  931 => 681,  912 => 665,  893 => 649,  874 => 633,  847 => 609,  843 => 608,  839 => 607,  835 => 606,  831 => 605,  827 => 604,  823 => 603,  819 => 602,  672 => 458,  564 => 353,  541 => 333,  517 => 312,  446 => 244,  442 => 243,  416 => 220,  320 => 127,  316 => 126,  312 => 125,  308 => 124,  304 => 123,  297 => 119,  283 => 108,  247 => 75,  210 => 41,  203 => 36,  190 => 35,  175 => 29,  171 => 28,  167 => 27,  161 => 24,  157 => 23,  153 => 22,  149 => 21,  145 => 20,  141 => 18,  128 => 17,  105 => 9,  90 => 1279,  88 => 1266,  84 => 1264,  82 => 35,  78 => 33,  76 => 17,  66 => 10,  62 => 9,  52 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -1613,7 +1815,7 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
           <li><a href=\"#hero\" class=\"active\">Acceuil</a></li>
           <li><a href=\"#about\">About</a></li>
           <li><a href=\"#features\">Features</a></li>
-          <li><a href=\"#services\">Services</a></li>
+          <li><a href=\"#services\">Social Media</a></li>
           <li><a href=\"#pricing\">Pricing</a></li>
           <li class=\"dropdown\"><a href=\"#\"><span>Dropdown</span> <i class=\"bi bi-chevron-down toggle-dropdown\"></i></a>
             <ul>
@@ -2307,72 +2509,114 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
 
     <!-- Services Section -->
     <section id=\"services\" class=\"services section light-background\">
-
-      <!-- Section Title -->
-      <div class=\"container section-title\" data-aos=\"fade-up\">
-        <h2>Services</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
-      </div><!-- End Section Title -->
-
-      <div class=\"container\" data-aos=\"fade-up\" data-aos-delay=\"100\">
-
-        <div class=\"row g-4\">
-
-          <div class=\"col-lg-6\" data-aos=\"fade-up\" data-aos-delay=\"100\">
-            <div class=\"service-card d-flex\">
-              <div class=\"icon flex-shrink-0\">
-                <i class=\"bi bi-activity\"></i>
-              </div>
-              <div>
-                <h3>Nesciunt Mete</h3>
-                <p>Provident nihil minus qui consequatur non omnis maiores. Eos accusantium minus dolores iure perferendis tempore et consequatur.</p>
-                <a href=\"service-details.html\" class=\"read-more\">Read More <i class=\"bi bi-arrow-right\"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Card -->
-
-          <div class=\"col-lg-6\" data-aos=\"fade-up\" data-aos-delay=\"200\">
-            <div class=\"service-card d-flex\">
-              <div class=\"icon flex-shrink-0\">
-                <i class=\"bi bi-diagram-3\"></i>
-              </div>
-              <div>
-                <h3>Eosle Commodi</h3>
-                <p>Ut autem aut autem non a. Sint sint sit facilis nam iusto sint. Libero corrupti neque eum hic non ut nesciunt dolorem.</p>
-                <a href=\"service-details.html\" class=\"read-more\">Read More <i class=\"bi bi-arrow-right\"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Card -->
-
-          <div class=\"col-lg-6\" data-aos=\"fade-up\" data-aos-delay=\"300\">
-            <div class=\"service-card d-flex\">
-              <div class=\"icon flex-shrink-0\">
-                <i class=\"bi bi-easel\"></i>
-              </div>
-              <div>
-                <h3>Ledo Markt</h3>
-                <p>Ut excepturi voluptatem nisi sed. Quidem fuga consequatur. Minus ea aut. Vel qui id voluptas adipisci eos earum corrupti.</p>
-                <a href=\"service-details.html\" class=\"read-more\">Read More <i class=\"bi bi-arrow-right\"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Card -->
-
-          <div class=\"col-lg-6\" data-aos=\"fade-up\" data-aos-delay=\"400\">
-            <div class=\"service-card d-flex\">
-              <div class=\"icon flex-shrink-0\">
-                <i class=\"bi bi-clipboard-data\"></i>
-              </div>
-              <div>
-                <h3>Asperiores Commodit</h3>
-                <p>Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga sit provident adipisci neque.</p>
-                <a href=\"service-details.html\" class=\"read-more\">Read More <i class=\"bi bi-arrow-right\"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Card -->
-
+      
+      <!-- Social Media Publications Section -->
+      <div class=\"container mt-5\" data-aos=\"fade-up\" data-aos-delay=\"200\">
+        <div class=\"row mb-4\">
+          <div class=\"col-12 text-center\">
+            <h3 class=\"social-media-title\">Nos Publications Récentes</h3>
+            <p class=\"social-media-description\">Découvrez nos dernières actualités et suivez notre activité sur les réseaux sociaux</p>
+          </div>
         </div>
-
+        
+        <div class=\"row g-4\">
+          {% set publications = socialMedia is defined ? socialMedia : [] %}
+          {% for publication in publications %}
+              <div class=\"col-lg-3 col-md-6\" data-aos=\"fade-up\" data-aos-delay=\"{{ loop.index * 100 }}\">
+                  <div class=\"social-post\">
+                      <div class=\"social-post-header\">
+                          <div class=\"social-avatar\">
+                              {% if publication.user and publication.user.getImagesU() %}
+                                  <img src=\"{{ asset('uploads/profile_pictures/' ~ publication.user.getImagesU()) }}\" alt=\"User Avatar\">
+                              {% else %}
+                                  <img src=\"{{ asset('img/avatar-' ~ (loop.index % 5 + 1) ~ '.webp') }}\" alt=\"User Avatar\">
+                              {% endif %}
+                          </div>
+                          <div class=\"social-user-info\">
+                              <h5>{{ publication.user ? publication.user.prenom ~ ' ' ~ publication.user.name : 'Utilisateur Airmess' }}</h5>
+                              <p class=\"social-time\">
+                                  {{ publication.publicationDate|date('d/m/Y') }}
+                                  <i class=\"bi bi-{% if loop.index is divisible by(4) %}facebook{% elseif loop.index is divisible by(3) %}twitter{% elseif loop.index is divisible by(2) %}instagram{% else %}globe{% endif %}\"></i>
+                              </p>
+                          </div>
+                      </div>
+                      <div class=\"social-post-image\">
+                          {% if publication.imagemedia %}
+                              <img src=\"http://localhost/ImageSocialMedia/{{ publication.imagemedia }}\" 
+                                   alt=\"{{ publication.titre }}\" 
+                                   class=\"img-fluid rounded\"
+                                   onerror=\"this.onerror=null; this.src='{{ asset('img/features-illustration-' ~ (loop.index % 3 + 1) ~ '.webp') }}'; this.alt='{{ publication.titre }}';\">
+                          {% else %}
+                              <img src=\"{{ asset('img/features-illustration-' ~ (loop.index % 3 + 1) ~ '.webp') }}\" alt=\"{{ publication.titre }}\" class=\"img-fluid rounded\">
+                          {% endif %}
+                      </div>
+                      <div class=\"social-post-content\">
+                          <h5>{{ publication.titre }}</h5>
+                          <p>{{ publication.contenu|striptags|slice(0, 100)|trim ~ (publication.contenu|length > 100 ? '...' : '') }}</p>
+                          <span class=\"location-badge mt-2\">
+                              <i class=\"bi bi-geo-alt\"></i> {{ publication.lieu }}
+                          </span>
+                      </div>
+                      <div class=\"social-post-footer\">
+                          <div class=\"social-interactions\">
+                              <span><i class=\"bi bi-heart\"></i> {{ publication.likee }}</span>
+                              <span><i class=\"bi bi-chat\"></i> {% if publication.commentaires is defined %}{{ publication.commentaires|length }}{% else %}0{% endif %}</span>
+                              <span><i class=\"bi bi-share\"></i> {{ publication.dislike }}</span>
+                          </div>
+                      </div>
+                      <div class=\"mt-2 text-center\">
+                          <a href=\"{% if app.user %}{{ path('socialVoyageurs_page') }}{% else %}{{ path('app_login') }}{% endif %}\" class=\"btn btn-sm btn-outline-primary\">
+                              <i class=\"bi bi-eye\"></i> Voir plus
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          {% else %}
+              <!-- Fallback if no publications are found -->
+              {% for i in 1..4 %}
+                  <div class=\"col-lg-3 col-md-6\" data-aos=\"fade-up\" data-aos-delay=\"{{ i * 100 }}\">
+                      <div class=\"social-post\">
+                          <div class=\"social-post-header\">
+                              <div class=\"social-avatar\">
+                                  <img src=\"{{ asset('img/avatar-' ~ i ~ '.webp') }}\" alt=\"User Avatar\">
+                              </div>
+                              <div class=\"social-user-info\">
+                                  <h5>Utilisateur Airmess</h5>
+                                  <p class=\"social-time\">Publication récente <i class=\"bi bi-globe\"></i></p>
+                              </div>
+                          </div>
+                          <div class=\"social-post-image\">
+                              <img src=\"{{ asset('img/features-illustration-' ~ i ~ '.webp') }}\" alt=\"Post Image\" class=\"img-fluid rounded\">
+                          </div>
+                          <div class=\"social-post-content\">
+                              <h5>Découvrez Airmess</h5>
+                              <p>Rejoignez notre communauté et partagez vos expériences de voyage avec d'autres passionnés.</p>
+                          </div>
+                          <div class=\"social-post-footer\">
+                              <div class=\"social-interactions\">
+                                  <span><i class=\"bi bi-heart\"></i> {{ (i * 70) + 50 }}</span>
+                                  <span><i class=\"bi bi-chat\"></i> {{ (i * 12) + 5 }}</span>
+                                  <span><i class=\"bi bi-share\"></i> {{ (i * 8) + 3 }}</span>
+                              </div>
+                          </div>
+                          <div class=\"mt-2 text-center\">
+                              <a href=\"{% if app.user %}{{ path('socialVoyageurs_page') }}{% else %}{{ path('app_login') }}{% endif %}\" class=\"btn btn-sm btn-outline-primary\">
+                                  <i class=\"bi bi-eye\"></i> Voir plus
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              {% endfor %}
+          {% endfor %}
+        </div>
+        
+        <div class=\"row mt-4\">
+          <div class=\"col-12 text-center\">
+            <a href=\"{% if app.user %}{{ path('socialVoyageurs_page') }}{% else %}{{ path('app_login') }}{% endif %}\" class=\"btn btn-primary\">Voir plus de publications</a>
+          </div>
+        </div>
       </div>
+      <!-- End Social Media Publications Section -->
 
     </section><!-- /Services Section -->
 
@@ -2726,7 +2970,7 @@ class __TwigTemplate_14456eb2a79074cceb2f979f3c2c4a7b extends Template
           <ul>
             <li><a href=\"#\">Home</a></li>
             <li><a href=\"#\">About us</a></li>
-            <li><a href=\"#\">Services</a></li>
+            <li><a href=\"#\">Social Media</a></li>
             <li><a href=\"#\">Terms of service</a></li>
             <li><a href=\"#\">Privacy policy</a></li>
           </ul>
