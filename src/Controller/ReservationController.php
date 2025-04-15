@@ -95,8 +95,20 @@ class ReservationController extends AbstractController
     }
 
     #[Route('/payment/{idR}', name: 'app_reservation_payment', methods: ['GET', 'POST'])]
-    public function payment(Reservation $reservation): Response
+    public function payment(Request $request, Reservation $reservation, EntityManagerInterface $entityManager): Response
     {
+        if ($request->isMethod('POST')) {
+            // Logique de paiement ici (par exemple, validation du paiement)
+
+            // Enregistrer la réservation dans la base de données (si ce n'est pas déjà fait)
+            $reservation->setDateRes(new \DateTime()); // Date actuelle
+            $entityManager->persist($reservation);
+            $entityManager->flush();
+
+            // Rediriger vers la confirmation après le paiement
+            return $this->redirectToRoute('app_reservation_confirmation', ['idR' => $reservation->getIdR()]);
+        }
+
         return $this->render('reservation/payment.html.twig', [
             'reservation' => $reservation,
         ]);
