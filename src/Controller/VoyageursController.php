@@ -35,14 +35,44 @@ class VoyageursController extends AbstractController{
     }
 
     #[Route('/BonplanVoyageursPage', name: 'bonplanVoyageurs_page')]
-    public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository)
+    public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager)
     {
         // Récupérer tous les bons plans
         $bonplans = $bonPlanRepository->findAll();
         
-        // Passer les bons plans à la vue
+        // Récupérer les notes moyennes pour chaque bon plan
+        $ratings = [];
+        $reviewsCount = [];
+        
+        foreach ($bonplans as $bonplan) {
+            // Requête pour calculer la note moyenne
+            $averageRating = $entityManager->createQuery(
+                'SELECT AVG(r.rating) as average
+                FROM App\Entity\ReviewBonPlan r
+                WHERE r.bonPlan = :bonplanId'
+            )
+            ->setParameter('bonplanId', $bonplan->getIdP())
+            ->getSingleScalarResult();
+            
+            // Requête pour compter le nombre d'avis
+            $count = $entityManager->createQuery(
+                'SELECT COUNT(r.idR) as count
+                FROM App\Entity\ReviewBonPlan r
+                WHERE r.bonPlan = :bonplanId'
+            )
+            ->setParameter('bonplanId', $bonplan->getIdP())
+            ->getSingleScalarResult();
+            
+            // Stocker les résultats
+            $ratings[$bonplan->getIdP()] = $averageRating ? round($averageRating, 1) : 0;
+            $reviewsCount[$bonplan->getIdP()] = $count;
+        }
+        
+        // Passer les bons plans et les notes moyennes à la vue
         return $this->render('dashVoyageurs/bonplanPageVoyageurs.html.twig', [
-            'bonplans' => $bonplans
+            'bonplans' => $bonplans,
+            'ratings' => $ratings,
+            'reviewsCount' => $reviewsCount
         ]);
     }
 
@@ -119,8 +149,8 @@ class VoyageursController extends AbstractController{
                 
                 $bonPlan->setImageBP($newFilename);
             } else {
-                // If no image provided, set a default image or return an error
-                $bonPlan->setImageBP('default.jpg');
+                // If no image provided, use an existing image or set a placeholder
+                $bonPlan->setImageBP('espagne-67f714bee028d.jpg');
             }
             
             // Save to database
@@ -169,6 +199,101 @@ class VoyageursController extends AbstractController{
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+        }
+    }
+
+    #[Route('/BonplanEdit/{idP}', name: 'bonplan_edit_form')]
+    public function bonplanEditForm(BonPlan $bonPlan): Response
+    {
+        return $this->render('dashVoyageurs/bonplanEditForm.html.twig', [
+            'bonplan' => $bonPlan
+        ]);
+    }
+
+    #[Route('/BonplanUpdate/{idP}', name: 'bonplan_update', methods: ['POST'])]
+    public function bonplanUpdate(Request $request, BonPlan $bonPlan, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    {
+        try {
+            // Update data from form
+            $bonPlan->setNomplace($request->request->get('nomplace'));
+            $bonPlan->setLocalisation($request->request->get('localisation'));
+            $bonPlan->setDescription($request->request->get('description'));
+            $bonPlan->setTypePlace($request->request->get('typePlace'));
+            
+            // Handle image upload
+            $imageFile = $request->files->get('imageBP');
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                
+                // Move the file to the uploads directory
+                try {
+                    $imageFile->move(
+                        $this->getParameter('uploads_directory'), 
+                        $newFilename
+                    );
+                    
+                    // Delete old image if it's not the default
+                    $oldImage = $bonPlan->getImageBP();
+                    if ($oldImage && $oldImage != 'default.jpg') {
+                        $oldImagePath = $this->getParameter('uploads_directory') . $oldImage;
+                        if (file_exists($oldImagePath)) {
+                            unlink($oldImagePath);
+                        }
+                    }
+                    
+                    $bonPlan->setImageBP($newFilename);
+                } catch (FileException $e) {
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage()
+                    ], 500);
+                }
+            }
+            
+            // Save to database
+            $entityManager->flush();
+            
+            // Return JSON response for AJAX handling
+            return $this->json([
+                'success' => true,
+                'message' => 'Bon plan modifié avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    #[Route('/BonplanDelete/{idP}', name: 'bonplan_delete', methods: ['POST'])]
+    public function bonplanDelete(BonPlan $bonPlan, EntityManagerInterface $entityManager): Response
+    {
+        try {
+            // Delete image if it's not the default
+            $image = $bonPlan->getImageBP();
+            if ($image && $image != 'default.jpg') {
+                $imagePath = $this->getParameter('uploads_directory') . $image;
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+            
+            // Delete from database
+            $entityManager->remove($bonPlan);
+            $entityManager->flush();
+            
+            return $this->json([
+                'success' => true,
+                'message' => 'Bon plan supprimé avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

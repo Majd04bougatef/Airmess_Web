@@ -1,10 +1,10 @@
 <div class="content-card content-section active" id="bonplan-section">
   <div class="form-header">
-    <h2 class="form-title">Ajouter un nouveau bon plan</h2>
-    <p class="form-subtitle">Complétez les informations ci-dessous pour créer un nouveau bon plan pour les voyageurs.</p>
+    <h2 class="form-title">Modifier un bon plan</h2>
+    <p class="form-subtitle">Complétez les informations ci-dessous pour modifier le bon plan "{{ bonplan.nomplace }}".</p>
   </div>
 
-  <form action="{{ path('bonplan_add') }}" method="post" id="bonplan-form" enctype="multipart/form-data">
+  <form action="{{ path('bonplan_update', {'idP': bonplan.idP}) }}" method="post" id="bonplan-edit-form" enctype="multipart/form-data">
     <!-- Basic Info Card -->
     <div class="form-card card-info">
       <div class="form-card-header">
@@ -15,7 +15,7 @@
         <div class="form-row">
           <div class="form-col form-col-md-12">
             <div class="form-floating">
-              <input type="text" class="form-control" id="nomplace" name="nomplace" placeholder=" " required>
+              <input type="text" class="form-control" id="nomplace" name="nomplace" placeholder=" " value="{{ bonplan.nomplace }}" required>
               <label for="nomplace">Nom du lieu</label>
             </div>
           </div>
@@ -24,8 +24,8 @@
         <div class="form-spacer"></div>
         
         <div class="form-group">
-          <label for="map" class="form-label">Localisation (cliquez sur la carte pour sélectionner)</label>
-          <div id="map" style="height: 400px; border-radius: 10px;"></div>
+          <label for="map" class="form-label">Localisation (cliquez sur la carte pour modifier)</label>
+          <div id="map" style="height: 300px; border-radius: 10px;"></div>
           <div class="form-spacer"></div>
           <div class="row">
             <div class="col-md-6">
@@ -36,7 +36,7 @@
             </div>
             <div class="col-md-6">
               <div class="form-floating">
-                <input type="text" class="form-control" id="localisation" name="localisation" placeholder=" " readonly>
+                <input type="text" class="form-control" id="localisation" name="localisation" placeholder=" " value="{{ bonplan.localisation }}" readonly>
                 <label for="localisation">Coordonnées</label>
               </div>
               <small class="form-text text-muted">Format: latitude, longitude</small>
@@ -47,7 +47,7 @@
         <div class="form-spacer"></div>
         
         <div class="form-floating">
-          <textarea class="form-control" id="description" name="description" style="height: 120px" placeholder=" "></textarea>
+          <textarea class="form-control" id="description" name="description" style="height: 120px" placeholder=" ">{{ bonplan.description }}</textarea>
           <label for="description">Description</label>
         </div>
       </div>
@@ -64,11 +64,11 @@
           <div class="form-col form-col-md-12">
             <div class="form-floating">
               <select class="form-select" id="typePlace" name="typePlace" required>
-                <option selected disabled value="">Sélectionnez un type</option>
-                <option value="resto">Restaurant</option>
-                <option value="coworkingspace">Espace de coworking</option>
-                <option value="cafe">Café</option>
-                <option value="musée">Musée</option>
+                <option disabled value="">Sélectionnez un type</option>
+                <option value="resto" {% if bonplan.typePlace == 'resto' %}selected{% endif %}>Restaurant</option>
+                <option value="coworkingspace" {% if bonplan.typePlace == 'coworkingspace' %}selected{% endif %}>Espace de coworking</option>
+                <option value="cafe" {% if bonplan.typePlace == 'cafe' %}selected{% endif %}>Café</option>
+                <option value="musée" {% if bonplan.typePlace == 'musée' %}selected{% endif %}>Musée</option>
               </select>
               <label for="typePlace">Type de lieu</label>
             </div>
@@ -84,21 +84,21 @@
         <h3 class="form-card-title">Image</h3>
       </div>
       <div class="form-card-body">
-        <div class="form-row">
-          <div class="form-col form-col-md-12">
-            <div class="form-floating">
-              <input type="file" class="form-control" id="imageBP" name="imageBP" placeholder=" ">
-              <label for="imageBP">Image du lieu</label>
-            </div>
-            <small class="form-text text-muted">Choisissez une image pour le bon plan (formats acceptés: JPG, PNG)</small>
-          </div>
+        <div class="current-image mb-3">
+          <p>Image actuelle :</p>
+          <img src="{{ asset('uploads/' ~ bonplan.imageBP) }}" alt="Image actuelle" class="img-thumbnail" style="max-height: 150px;" onerror="this.src='{{ asset('uploads/espagne-67f714bee028d.jpg') }}';">
         </div>
+        <div class="form-floating">
+          <input type="file" class="form-control" id="imageBP" name="imageBP" placeholder=" ">
+          <label for="imageBP">Nouvelle image (laisser vide pour conserver l'actuelle)</label>
+        </div>
+        <small class="form-text text-muted">Choisissez une nouvelle image pour le bon plan (formats acceptés: JPG, PNG)</small>
       </div>
     </div>
 
     <div class="form-actions">
       <a href="{{ path('bonplanVoyageurs_page') }}" class="form-btn-outline" id="cancel-bonplan">Annuler</a>
-      <button type="submit" class="form-btn">Ajouter le bon plan</button>
+      <button type="submit" class="form-btn">Enregistrer les modifications</button>
     </div>
   </form>
 </div>
@@ -265,6 +265,8 @@
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 16px 12px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     appearance: none;
   }
   
@@ -298,6 +300,7 @@
     background-color: #f0f7ff;
     color: #324cdd;
     border-color: #324cdd;
+    text-decoration: none;
   }
   
   .form-btn {
@@ -315,6 +318,15 @@
     background-color: #324cdd;
     transform: translateY(-2px);
     box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
+  }
+  
+  .img-thumbnail {
+    padding: 0.25rem;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    max-width: 100%;
+    height: auto;
   }
 
   /* Styles pour la map */
@@ -358,6 +370,103 @@
       max-width: 50%;
     }
   }
+
+  /* Classes additionnelles pour aligner avec bonplanForm */
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.75rem;
+    margin-left: -0.75rem;
+  }
+  
+  .form-col-md-12 {
+    position: relative;
+    width: 100%;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  
+  .mb-3 {
+    margin-bottom: 1rem;
+  }
+
+  /* Styles pour le géocodeur */
+  .leaflet-control-geocoder {
+    border-radius: 4px;
+    background: white;
+    min-width: 26px;
+    min-height: 26px;
+    max-width: 100%;
+    max-height: 40px;
+    overflow: hidden;
+    transition: max-height .5s, max-width .5s;
+    margin-right: 10px;
+    z-index: 1000;
+  }
+
+  .leaflet-control-geocoder.leaflet-control-geocoder-expanded {
+    max-width: 1000px;
+    max-height: 500px;
+    overflow: auto;
+  }
+
+  .leaflet-control-geocoder-form {
+    display: none;
+  }
+
+  .leaflet-control-geocoder-form input {
+    font-size: 16px;
+    border: 0;
+    background-color: transparent;
+    width: 100%;
+  }
+
+  .leaflet-control-geocoder-form input:focus {
+    outline: none;
+  }
+
+  .leaflet-control-geocoder-icon {
+    background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath d="M12.2 13l3.4 6.6c.6 1.1 2.5-.4 2-1.2l-4-6.2-1.4.8z"/%3E%3Ccircle cx="10.8" cy="8.9" r="3.9" fill="none" stroke="%23000" stroke-width="1.5"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    display: block;
+    width: 26px;
+    height: 26px;
+  }
+
+  .leaflet-control-geocoder-alternatives {
+    width: 100%;
+    max-height: 300px;
+    overflow: auto;
+    font-size: 1.1em;
+    margin-top: 5px;
+  }
+
+  .leaflet-control-geocoder-alternatives-minimized {
+    display: none;
+  }
+
+  .leaflet-control-geocoder-alternatives li {
+    white-space: nowrap;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+  }
+
+  .leaflet-control-geocoder-alternatives li:last-child {
+    border-bottom: none;
+  }
+
+  .leaflet-control-geocoder-alternatives li:hover, 
+  .leaflet-control-geocoder-selected {
+    background-color: #f5f5f5;
+  }
 </style>
 
 <!-- Ajout des CSS Leaflet -->
@@ -368,6 +477,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('bonplan-edit-form');
+  
   // Initialiser la carte
   var map = L.map('map').setView([46.603354, 1.888334], 5); // Centrer sur la France
 
@@ -410,9 +521,14 @@ document.addEventListener('DOMContentLoaded', function() {
     addMarker(e.latlng);
   });
   
-  // Ajouter un géocodeur pour la recherche d'adresses
+  // Configurer le géocodeur avec des options personnalisées
   var geocoder = L.Control.geocoder({
-    defaultMarkGeocode: false
+    defaultMarkGeocode: false,
+    placeholder: 'Rechercher une adresse...',
+    errorMessage: 'Aucun résultat trouvé.',
+    suggestMinLength: 3,
+    suggestTimeout: 250,
+    queryMinLength: 3
   }).addTo(map);
   
   geocoder.on('markgeocode', function(e) {
@@ -427,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key === 'Enter') {
       e.preventDefault();
       var query = this.value;
-      if (query) {
+      if (query && query.length > 2) {
         geocoder.options.geocoder.geocode(query, function(results) {
           if (results.length > 0) {
             var latlng = results[0].center;
@@ -439,35 +555,46 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Setup form submission
-  const bonplanForm = document.getElementById('bonplan-form');
-  if (bonplanForm) {
-    bonplanForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Create FormData object to handle file uploads
-      const formData = new FormData(bonplanForm);
-      
-      // Submit form using fetch API
-      fetch('{{ path('bonplan_add') }}', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Bon plan ajouté avec succès!');
-          // Redirect to the bons plans list page
-          window.location.href = '{{ path('bonplanVoyageurs_page') }}';
-        } else {
-          alert('Erreur: ' + data.message);
-        }
-      })
-      .catch(error => {
-        console.error('Erreur:', error);
-        alert('Une erreur est survenue lors de l\'ajout du bon plan.');
-      });
-    });
+  // Placer le marqueur à la position actuelle si elle existe
+  var initialLocation = document.getElementById('localisation').value;
+  if (initialLocation && initialLocation.includes(',')) {
+    var coords = initialLocation.split(',');
+    if (coords.length === 2) {
+      var lat = parseFloat(coords[0].trim());
+      var lng = parseFloat(coords[1].trim());
+      if (!isNaN(lat) && !isNaN(lng)) {
+        var initialLatLng = L.latLng(lat, lng);
+        map.setView(initialLatLng, 13);
+        addMarker(initialLatLng);
+      }
+    }
   }
+  
+  // Setup form submission
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Create FormData object for form submission with file upload
+    const formData = new FormData(form);
+    
+    // Submit form using fetch API
+    fetch(form.getAttribute('action'), {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Bon plan modifié avec succès!');
+        window.location.href = '{{ path('bonplanVoyageurs_page') }}';
+      } else {
+        alert('Erreur: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      alert('Une erreur est survenue lors de la modification du bon plan.');
+    });
+  });
 });
 </script> 
