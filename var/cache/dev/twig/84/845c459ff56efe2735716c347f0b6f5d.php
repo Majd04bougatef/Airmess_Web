@@ -40,7 +40,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
     protected function doGetParent(array $context): bool|string|Template|TemplateWrapper
     {
         // line 2
-        return "base.html.twig";
+        return "dashVoyageurs/dashboardVoyageurs.html.twig";
     }
 
     protected function doDisplay(array $context, array $blocks = []): iterable
@@ -52,7 +52,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "social_media/show.html.twig"));
 
-        $this->parent = $this->loadTemplate("base.html.twig", "social_media/show.html.twig", 2);
+        $this->parent = $this->loadTemplate("dashVoyageurs/dashboardVoyageurs.html.twig", "social_media/show.html.twig", 2);
         yield from $this->parent->unwrap()->yield($context, array_merge($this->blocks, $blocks));
         
         $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
@@ -62,7 +62,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
 
     }
 
-    // line 5
+    // line 6
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -75,7 +75,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "title"));
 
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 5, $this->source); })()), "getTitre", [], "method", false, false, false, 5), "html", null, true);
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 6, $this->source); })()), "getTitre", [], "method", false, false, false, 6), "html", null, true);
         yield " - Détails";
         
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
@@ -86,7 +86,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         yield from [];
     }
 
-    // line 7
+    // line 8
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -99,12 +99,12 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "css"));
 
-        // line 8
+        // line 9
         yield "    ";
         yield from $this->yieldParentBlock("css", $context, $blocks);
         yield "
     <link rel=\"stylesheet\" href=\"";
-        // line 9
+        // line 10
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("css/feed.css"), "html", null, true);
         yield "\">
     <style>
@@ -155,28 +155,66 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         }
         
         .post-image-container {
-            max-height: 350px;
+            max-height: 250px;
             overflow: hidden;
+            position: relative;
+            border-radius: 10px;
+            margin: 0.5rem auto 1.25rem;
+            max-width: 75%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 0.25rem;
+            background-color: #f9f9f9;
         }
         
         .post-image-container img {
-            transition: all 0.6s ease;
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
             object-fit: cover;
             width: 100%;
-            max-height: 350px;
+            max-height: 250px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
         
         .post-image-container:hover img {
-            transform: scale(1.03);
+            transform: scale(1.05);
+        }
+        
+        /* Effet de brillance au survol */
+        .post-image-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 100%);
+            transform: skewX(-25deg);
+            z-index: 1;
+            transition: left 0.8s ease-out;
+        }
+        
+        .post-image-container:hover::before {
+            left: 150%;
+        }
+        
+        .post-actions {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            background-color: #fbfbfd;
         }
         
         .btn-action {
             border-radius: 30px;
             transition: all var(--transition-speed) ease;
-            padding: 0.4rem 0.75rem;
+            padding: 0.5rem 0.5rem;
             font-weight: 500;
             font-size: 0.9rem;
             border: none;
+            text-align: center;
+            white-space: nowrap;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 2px;
         }
         
         .btn-action:hover {
@@ -186,6 +224,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         
         .like-button:hover, .like-button.active {
             color: var(--main-accent) !important;
+            background-color: rgba(74, 107, 218, 0.1);
         }
         
         /* Style pour l'icône Flaticon du bouton like */
@@ -200,9 +239,9 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
             filter: drop-shadow(0px 0px 3px rgba(74, 107, 218, 0.5));
         }
         
-        .dislike-button:hover img, .dislike-button.active img {
-            transform: scale(1.15);
-            filter: drop-shadow(0px 0px 3px rgba(220, 53, 69, 0.5));
+        .dislike-button:hover, .dislike-button.active {
+            color: var(--danger-color) !important;
+            background-color: rgba(220, 53, 69, 0.1);
         }
         
         .like-count-badge img {
@@ -286,22 +325,33 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
             position: absolute;
             right: 10px;
             bottom: 10px;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
-            background-color: var(--main-accent);
-            border-color: var(--main-accent);
-            box-shadow: 0 2px 5px rgba(74, 107, 218, 0.3);
+            background: linear-gradient(45deg, #5e72e4, #3f51b5);
+            border: none;
+            box-shadow: 0 3px 8px rgba(94, 114, 228, 0.4);
+            transition: all 0.3s ease;
         }
         
         .btn-send-comment:hover, 
         .btn-send-comment:focus {
-            background-color: var(--main-accent-hover);
-            border-color: var(--main-accent-hover);
-            transform: translateY(-1px);
+            background: linear-gradient(45deg, #4a6bda, #3949ab);
+            transform: translateY(-2px) rotate(15deg);
+            box-shadow: 0 5px 12px rgba(94, 114, 228, 0.5);
+        }
+        
+        .btn-send-comment i {
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-send-comment:hover i {
+            transform: scale(1.1);
         }
         
         .comment-action-link {
@@ -550,6 +600,140 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
             min-width: 18px;
             height: 18px;
         }
+        
+        /* Style du bouton retour */
+        .btn-back {
+            transition: all 0.3s ease;
+            border-radius: 50px;
+            padding: 0.5rem 1.2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn-back:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+        
+        .btn-back i {
+            transition: transform 0.3s ease;
+        }
+        
+        .btn-back:hover i {
+            transform: translateX(-3px);
+        }
+        
+        /* Style badge lieu */
+        .location-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: #f8f9fa;
+            color: #495057;
+            padding: 0.35rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .location-badge i {
+            margin-right: 0.4rem;
+            color: var(--main-accent);
+        }
+        
+        /* Style pour le bouton j'aime/je n'aime pas */
+        .like-button, .dislike-button {
+            transition: all 0.3s ease;
+        }
+        
+        .like-button:hover, .like-button.active {
+            color: var(--main-accent) !important;
+        }
+        
+        .dislike-button:hover, .dislike-button.active {
+            color: var(--danger-color) !important;
+        }
+        
+        .like-button:hover i, .like-button.active i,
+        .dislike-button:hover i, .dislike-button.active i {
+            transform: scale(1.15);
+        }
+        
+        .like-button:hover i, .like-button.active i {
+            filter: drop-shadow(0px 0px 3px rgba(74, 107, 218, 0.5));
+        }
+        
+        .dislike-button:hover i, .dislike-button.active i {
+            filter: drop-shadow(0px 0px 3px rgba(220, 53, 69, 0.5));
+        }
+        
+        /* Style pour les boutons de like des commentaires */
+        .comment-action-link.comment-like-btn {
+            transition: all 0.3s ease;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        
+        .comment-action-link.comment-like-btn:hover,
+        .comment-action-link.comment-like-btn.active {
+            background-color: rgba(74, 107, 218, 0.1);
+            color: var(--main-accent) !important;
+        }
+        
+        .comment-action-link.comment-like-btn i {
+            transition: all 0.3s ease;
+        }
+        
+        .comment-action-link.comment-like-btn:hover i,
+        .comment-action-link.comment-like-btn.active i {
+            transform: scale(1.15);
+            color: var(--main-accent);
+        }
+        
+        .comment-like-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--main-accent);
+            background-color: rgba(74, 107, 218, 0.1);
+            border-radius: 10px;
+            padding: 0 6px;
+            min-width: 18px;
+            height: 18px;
+        }
+        
+        .like-button.active {
+            color: var(--main-accent) !important;
+            background-color: rgba(74, 107, 218, 0.15) !important;
+            font-weight: 500;
+        }
+        
+        .like-button.active i {
+            transform: scale(1.15);
+        }
+        
+        .dislike-button.active {
+            color: var(--danger-color) !important;
+            background-color: rgba(220, 53, 69, 0.15) !important;
+            font-weight: 500;
+        }
+        
+        .dislike-button.active i {
+            transform: scale(1.15);
+        }
+        
+        /* Styles inline pour forcer la coloration des boutons actifs */
+        button.like-button.active {
+            color: #4a6bda !important;
+            background-color: rgba(74, 107, 218, 0.15) !important;
+        }
+        
+        button.dislike-button.active {
+            color: #dc3545 !important;
+            background-color: rgba(220, 53, 69, 0.15) !important;
+        }
     </style>
 ";
         
@@ -561,7 +745,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         yield from [];
     }
 
-    // line 457
+    // line 642
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -574,318 +758,402 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
 
-        // line 458
+        // line 643
         yield "<div class=\"container my-4 my-lg-5\">
     <div class=\"row justify-content-center\">
         <div class=\"col-md-10 col-lg-8 col-xl-7\">
+            <!-- Bouton de retour -->
+            <a href=\"";
+        // line 647
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("socialVoyageurs_page");
+        yield "\" class=\"btn btn-outline-primary btn-back mb-3\">
+                <i class=\"fas fa-arrow-left me-2\"></i> Retour aux publications
+            </a>
 
             ";
-        // line 463
+        // line 652
         yield "            <div class=\"post-card bg-white overflow-hidden\">
                 ";
-        // line 465
+        // line 654
         yield "                <header class=\"post-header d-flex align-items-center\">
                     ";
-        // line 466
-        $context["post_author"] = CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 466, $this->source); })()), "getUser", [], "method", false, false, false, 466);
-        // line 467
+        // line 655
+        $context["post_author"] = CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 655, $this->source); })()), "getUser", [], "method", false, false, false, 655);
+        // line 656
         yield "                    <div class=\"flex-shrink-0 me-3\">
                         <img src=\"";
-        // line 468
-        yield ((((isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 468, $this->source); })()) && CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 468, $this->source); })()), "getImagesU", [], "method", false, false, false, 468))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/profile_pictures/" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 468, $this->source); })()), "getImagesU", [], "method", false, false, false, 468))), "html", null, true)) : ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/placeholder-avatar.png"), "html", null, true)));
+        // line 657
+        yield ((((isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 657, $this->source); })()) && CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 657, $this->source); })()), "getImagesU", [], "method", false, false, false, 657))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/profile_pictures/" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 657, $this->source); })()), "getImagesU", [], "method", false, false, false, 657))), "html", null, true)) : ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/placeholder-avatar.png"), "html", null, true)));
         yield "\"
                              alt=\"";
-        // line 469
-        yield (((isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 469, $this->source); })())) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 469, $this->source); })()), "getPrenom", [], "method", false, false, false, 469), "html", null, true)) : ("Utilisateur"));
+        // line 658
+        yield (((isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 658, $this->source); })())) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 658, $this->source); })()), "getPrenom", [], "method", false, false, false, 658), "html", null, true)) : ("Utilisateur"));
         yield "\"
                              class=\"post-author-img rounded-circle\" width=\"38\" height=\"38\">
                     </div>
                     <div class=\"post-author-info flex-grow-1\">
                         <h5 class=\"post-author-name mb-0\">
                             ";
-        // line 474
-        if ((isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 474, $this->source); })())) {
-            // line 475
+        // line 663
+        if ((isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 663, $this->source); })())) {
+            // line 664
             yield "                                <strong>";
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 475, $this->source); })()), "getPrenom", [], "method", false, false, false, 475), "html", null, true);
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 664, $this->source); })()), "getPrenom", [], "method", false, false, false, 664), "html", null, true);
             yield " ";
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 475, $this->source); })()), "getName", [], "method", false, false, false, 475), "html", null, true);
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 664, $this->source); })()), "getName", [], "method", false, false, false, 664), "html", null, true);
             yield "</strong>
                             ";
         } else {
-            // line 477
+            // line 666
             yield "                                <em class=\"text-muted\">Utilisateur inconnu</em>
                             ";
         }
-        // line 479
+        // line 668
         yield "                        </h5>
                         <small class=\"post-timestamp text-muted\">
                             <i class=\"bi bi-clock me-1\"></i>";
-        // line 481
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Twig\Extension\CoreExtension']->formatDate(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 481, $this->source); })()), "getPublicationDate", [], "method", false, false, false, 481), "d/m/Y à H:i"), "html", null, true);
+        // line 670
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Twig\Extension\CoreExtension']->formatDate(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 670, $this->source); })()), "getPublicationDate", [], "method", false, false, false, 670), "d/m/Y à H:i"), "html", null, true);
         yield "
                         </small>
                     </div>
                 </header>
 
                 ";
-        // line 487
+        // line 676
         yield "                <div class=\"post-content pb-0\">
                     <h3 class=\"post-title\">";
-        // line 488
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 488, $this->source); })()), "getTitre", [], "method", false, false, false, 488), "html", null, true);
+        // line 677
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 677, $this->source); })()), "getTitre", [], "method", false, false, false, 677), "html", null, true);
         yield "</h3>
+                    
+                    <!-- Badge lieu -->
+                    <div class=\"location-badge\">
+                        <i class=\"fas fa-map-marker-alt\"></i> ";
+        // line 681
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 681, $this->source); })()), "getLieu", [], "method", false, false, false, 681), "html", null, true);
+        yield "
+                    </div>
                 </div>
 
                 ";
-        // line 492
+        // line 686
         yield "                ";
-        if (CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 492, $this->source); })()), "getImagemedia", [], "method", false, false, false, 492)) {
-            // line 493
-            yield "                    <div class=\"post-image-container\">
+        if (CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 686, $this->source); })()), "getImagemedia", [], "method", false, false, false, 686)) {
+            // line 687
+            yield "                    <div class=\"post-image-container d-flex justify-content-center align-items-center bg-light\">
                         <img src=\"";
-            // line 494
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 494, $this->source); })()), "getImagemedia", [], "method", false, false, false, 494))), "html", null, true);
+            // line 688
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("http://localhost/ImageSocialMedia/" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 688, $this->source); })()), "getImagemedia", [], "method", false, false, false, 688))), "html", null, true);
             yield "\"
                              alt=\"Image pour ";
-            // line 495
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 495, $this->source); })()), "getTitre", [], "method", false, false, false, 495), "html", null, true);
-            yield "\">
+            // line 689
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 689, $this->source); })()), "getTitre", [], "method", false, false, false, 689), "html", null, true);
+            yield "\" class=\"img-fluid\"
+                             onerror=\"this.onerror=null; this.src='";
+            // line 690
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/image-not-found.png"), "html", null, true);
+            yield "'; this.alt='Image non disponible';\">
                     </div>
                 ";
         }
-        // line 498
+        // line 693
         yield "
                 ";
-        // line 500
+        // line 695
         yield "                <div class=\"post-content pt-2\">
                     <div class=\"post-text\">";
-        // line 501
-        yield Twig\Extension\CoreExtension::nl2br($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 501, $this->source); })()), "getContenu", [], "method", false, false, false, 501), "html", null, true));
+        // line 696
+        yield Twig\Extension\CoreExtension::nl2br($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 696, $this->source); })()), "getContenu", [], "method", false, false, false, 696), "html", null, true));
         yield "</div>
                 </div>
 
                 ";
-        // line 505
+        // line 700
         yield "                <div class=\"post-stats d-flex justify-content-between align-items-center\">
                     <div class=\"d-flex align-items-center gap-3\">
-                         ";
-        // line 507
-        if ((CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 507, $this->source); })()), "getLikee", [], "method", false, false, false, 507) > 0)) {
-            // line 508
-            yield "                            <div class=\"d-flex align-items-center\">
-                                <span class=\"like-count-badge d-flex align-items-center justify-content-center rounded-pill\">
-                                    <img src=\"";
-            // line 510
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/like-button.png"), "html", null, true);
-            yield "\" alt=\"J'aime\" width=\"18\" height=\"18\" class=\"me-1\">
-                                    <span class=\"fw-medium text-white\">";
-            // line 511
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 511, $this->source); })()), "getLikee", [], "method", false, false, false, 511), "html", null, true);
-            yield "</span>
+                            <div class=\"d-flex align-items-center\">
+                            <span class=\"badge rounded-pill bg-primary me-2\">
+                                <i class=\"fas fa-thumbs-up me-1\"></i> ";
+        // line 704
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 704, $this->source); })()), "getLikee", [], "method", false, false, false, 704), "html", null, true);
+        yield "
+                                </span>
+                            
+                            <span class=\"badge rounded-pill bg-danger\">
+                                <i class=\"fas fa-thumbs-down me-1\"></i> ";
+        // line 708
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 708, $this->source); })()), "getDislike", [], "method", false, false, false, 708), "html", null, true);
+        yield "
                                 </span>
                             </div>
-                         ";
-        }
-        // line 515
-        yield "                         
-                         ";
-        // line 516
-        if (((CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 516, $this->source); })()), "getLikee", [], "method", false, false, false, 516) > 0) && (CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 516, $this->source); })()), "getDislike", [], "method", false, false, false, 516) > 0))) {
-            // line 517
-            yield "                            <div class=\"stats-separator mx-1\"></div>
-                         ";
-        }
-        // line 519
-        yield "                        
-                          ";
-        // line 520
-        if ((CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 520, $this->source); })()), "getDislike", [], "method", false, false, false, 520) > 0)) {
-            // line 521
-            yield "                            <div class=\"d-flex align-items-center\">
-                                <span class=\"dislike-count-badge d-flex align-items-center justify-content-center rounded-pill\">
-                                    <img src=\"";
-            // line 523
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/dislike-button.png"), "html", null, true);
-            yield "\" alt=\"Je n'aime pas\" width=\"18\" height=\"18\" class=\"me-1\">
-                                    <span class=\"fw-medium text-white\">";
-            // line 524
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 524, $this->source); })()), "getDislike", [], "method", false, false, false, 524), "html", null, true);
-            yield "</span>
-                                </span>
-                            </div>
-                          ";
-        }
-        // line 528
-        yield "                    </div>
+                    </div>
                     
                     <div>
                         <small class=\"text-muted d-flex align-items-center\">
                             <i class=\"bi bi-chat-dots me-1\"></i>
                             <span class=\"comments-count\">";
-        // line 533
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::length($this->env->getCharset(), (isset($context["comments"]) || array_key_exists("comments", $context) ? $context["comments"] : (function () { throw new RuntimeError('Variable "comments" does not exist.', 533, $this->source); })())), "html", null, true);
+        // line 716
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(Twig\Extension\CoreExtension::length($this->env->getCharset(), (isset($context["comments"]) || array_key_exists("comments", $context) ? $context["comments"] : (function () { throw new RuntimeError('Variable "comments" does not exist.', 716, $this->source); })())), "html", null, true);
         yield "</span> commentaire";
-        if ((Twig\Extension\CoreExtension::length($this->env->getCharset(), (isset($context["comments"]) || array_key_exists("comments", $context) ? $context["comments"] : (function () { throw new RuntimeError('Variable "comments" does not exist.', 533, $this->source); })())) != 1)) {
+        if ((Twig\Extension\CoreExtension::length($this->env->getCharset(), (isset($context["comments"]) || array_key_exists("comments", $context) ? $context["comments"] : (function () { throw new RuntimeError('Variable "comments" does not exist.', 716, $this->source); })())) != 1)) {
             yield "s";
         }
-        // line 534
+        // line 717
         yield "                     </small>
                     </div>
                  </div>
 
                ";
-        // line 539
-        yield "                <div class=\"post-actions d-flex justify-content-around align-items-center flex-wrap\">
+        // line 722
+        yield "                <div class=\"post-actions d-flex justify-content-between align-items-center\">
+                    <div class=\"d-flex flex-grow-1 mx-n1\">
                     ";
-        // line 541
-        yield "                    <form action=\"";
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_like", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 541, $this->source); })()), "idEB", [], "any", false, false, false, 541)]), "html", null, true);
-        yield "\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 mx-1 my-1 like-form\">
+        // line 725
+        yield "                        <form action=\"";
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_like", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 725, $this->source); })()), "idEB", [], "any", false, false, false, 725)]), "html", null, true);
+        yield "\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 px-1 like-form\">
                         <input type=\"hidden\" name=\"_token\" value=\"";
-        // line 542
+        // line 726
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken("like-post"), "html", null, true);
         yield "\">
-                        <button type=\"submit\" class=\"btn btn-action w-100 text-muted like-button ";
-        // line 543
-        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 543), "get", ["user_post_actions"], "method", false, true, false, 543), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 543, $this->source); })()), "idEB", [], "any", false, false, false, 543), [], "array", true, true, false, 543) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 543, $this->source); })()), "session", [], "any", false, false, false, 543), "get", ["user_post_actions"], "method", false, false, false, 543), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 543, $this->source); })()), "idEB", [], "any", false, false, false, 543), [], "array", false, false, false, 543) == "like"))) {
+                        <button type=\"submit\" 
+                               class=\"btn btn-action w-100 text-muted like-button ";
+        // line 728
+        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 728), "get", ["user_post_actions"], "method", false, true, false, 728), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 728, $this->source); })()), "idEB", [], "any", false, false, false, 728), [], "array", true, true, false, 728) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 728, $this->source); })()), "session", [], "any", false, false, false, 728), "get", ["user_post_actions"], "method", false, false, false, 728), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 728, $this->source); })()), "idEB", [], "any", false, false, false, 728), [], "array", false, false, false, 728) == "like"))) {
             yield "active";
         }
-        yield "\">
-                            <img src=\"";
-        // line 544
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/like-button.png"), "html", null, true);
-        yield "\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>
+        yield "\"
+                               ";
+        // line 729
+        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 729), "get", ["user_post_actions"], "method", false, true, false, 729), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 729, $this->source); })()), "idEB", [], "any", false, false, false, 729), [], "array", true, true, false, 729) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 729, $this->source); })()), "session", [], "any", false, false, false, 729), "get", ["user_post_actions"], "method", false, false, false, 729), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 729, $this->source); })()), "idEB", [], "any", false, false, false, 729), [], "array", false, false, false, 729) == "like"))) {
+            // line 730
+            yield "                                  style=\"color: #4a6bda !important; background-color: rgba(74, 107, 218, 0.15) !important; font-weight: 500;\"
+                               ";
+        }
+        // line 732
+        yield "                        >
+                                <i class=\"fas fa-thumbs-up me-1\" 
+                                   ";
+        // line 734
+        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 734), "get", ["user_post_actions"], "method", false, true, false, 734), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 734, $this->source); })()), "idEB", [], "any", false, false, false, 734), [], "array", true, true, false, 734) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 734, $this->source); })()), "session", [], "any", false, false, false, 734), "get", ["user_post_actions"], "method", false, false, false, 734), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 734, $this->source); })()), "idEB", [], "any", false, false, false, 734), [], "array", false, false, false, 734) == "like"))) {
+            // line 735
+            yield "                                       style=\"transform: scale(1.15);\"
+                                   ";
+        }
+        // line 737
+        yield "                                ></i> <span class=\"action-text\">J'aime</span>
                         </button>
                     </form>
 
                     ";
-        // line 549
-        yield "                    <form action=\"";
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_dislike", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 549, $this->source); })()), "idEB", [], "any", false, false, false, 549)]), "html", null, true);
-        yield "\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 mx-1 my-1 dislike-form\">
+        // line 742
+        yield "                        <form action=\"";
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_dislike", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 742, $this->source); })()), "idEB", [], "any", false, false, false, 742)]), "html", null, true);
+        yield "\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 px-1 dislike-form\">
                         <input type=\"hidden\" name=\"_token\" value=\"";
-        // line 550
+        // line 743
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken("dislike-post"), "html", null, true);
         yield "\">
-                        <button type=\"submit\" class=\"btn btn-action w-100 text-muted dislike-button ";
-        // line 551
-        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 551), "get", ["user_post_actions"], "method", false, true, false, 551), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 551, $this->source); })()), "idEB", [], "any", false, false, false, 551), [], "array", true, true, false, 551) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 551, $this->source); })()), "session", [], "any", false, false, false, 551), "get", ["user_post_actions"], "method", false, false, false, 551), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 551, $this->source); })()), "idEB", [], "any", false, false, false, 551), [], "array", false, false, false, 551) == "dislike"))) {
+                        <button type=\"submit\" 
+                                class=\"btn btn-action w-100 text-muted dislike-button ";
+        // line 745
+        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 745), "get", ["user_post_actions"], "method", false, true, false, 745), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 745, $this->source); })()), "idEB", [], "any", false, false, false, 745), [], "array", true, true, false, 745) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 745, $this->source); })()), "session", [], "any", false, false, false, 745), "get", ["user_post_actions"], "method", false, false, false, 745), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 745, $this->source); })()), "idEB", [], "any", false, false, false, 745), [], "array", false, false, false, 745) == "dislike"))) {
             yield "active";
         }
-        yield "\">
-                            <img src=\"";
-        // line 552
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/dislike-button.png"), "html", null, true);
-        yield "\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>
+        yield "\"
+                                ";
+        // line 746
+        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 746), "get", ["user_post_actions"], "method", false, true, false, 746), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 746, $this->source); })()), "idEB", [], "any", false, false, false, 746), [], "array", true, true, false, 746) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 746, $this->source); })()), "session", [], "any", false, false, false, 746), "get", ["user_post_actions"], "method", false, false, false, 746), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 746, $this->source); })()), "idEB", [], "any", false, false, false, 746), [], "array", false, false, false, 746) == "dislike"))) {
+            // line 747
+            yield "                                   style=\"color: #dc3545 !important; background-color: rgba(220, 53, 69, 0.15) !important; font-weight: 500;\"
+                                ";
+        }
+        // line 749
+        yield "                        >
+                                <i class=\"fas fa-thumbs-down me-1\"
+                                   ";
+        // line 751
+        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 751), "get", ["user_post_actions"], "method", false, true, false, 751), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 751, $this->source); })()), "idEB", [], "any", false, false, false, 751), [], "array", true, true, false, 751) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 751, $this->source); })()), "session", [], "any", false, false, false, 751), "get", ["user_post_actions"], "method", false, false, false, 751), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 751, $this->source); })()), "idEB", [], "any", false, false, false, 751), [], "array", false, false, false, 751) == "dislike"))) {
+            // line 752
+            yield "                                       style=\"transform: scale(1.15);\"
+                                   ";
+        }
+        // line 754
+        yield "                                ></i> <span class=\"action-text\">Je n'aime pas</span>
                         </button>
                     </form>
 
     ";
-        // line 557
-        yield "                    <a href=\"#comments-area\" class=\"btn btn-action flex-grow-1 text-muted mx-1 my-1\">
+        // line 759
+        yield "                        <a href=\"#comments-area\" class=\"btn btn-action flex-grow-1 text-muted mx-1\">
                         <i class=\"bi bi-chat-dots me-1\"></i> <span class=\"action-text\">Commenter</span>
     </a>
 
                     ";
-        // line 562
+        // line 764
         yield "    ";
-        if (((isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 562, $this->source); })()) && (CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 562, $this->source); })()), "getIdU", [], "method", false, false, false, 562) == (isset($context["default_user_id"]) || array_key_exists("default_user_id", $context) ? $context["default_user_id"] : (function () { throw new RuntimeError('Variable "default_user_id" does not exist.', 562, $this->source); })())))) {
-            // line 563
-            yield "                        ";
-            // line 564
-            yield "                        <a href=\"";
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_edit", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 564, $this->source); })()), "idEB", [], "any", false, false, false, 564)]), "html", null, true);
-            yield "\" class=\"btn btn-action flex-grow-1 text-muted mx-1 my-1\">
+        if (((isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 764, $this->source); })()) && (CoreExtension::getAttribute($this->env, $this->source, (isset($context["post_author"]) || array_key_exists("post_author", $context) ? $context["post_author"] : (function () { throw new RuntimeError('Variable "post_author" does not exist.', 764, $this->source); })()), "getIdU", [], "method", false, false, false, 764) == (isset($context["default_user_id"]) || array_key_exists("default_user_id", $context) ? $context["default_user_id"] : (function () { throw new RuntimeError('Variable "default_user_id" does not exist.', 764, $this->source); })())))) {
+            // line 765
+            yield "                            <div class=\"d-flex flex-grow-1\">
+                        ";
+            // line 767
+            yield "                                <a href=\"";
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_edit", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 767, $this->source); })()), "idEB", [], "any", false, false, false, 767)]), "html", null, true);
+            yield "\" class=\"btn btn-action flex-grow-1 text-muted mx-1\">
                             <i class=\"bi bi-pencil-square me-1\"></i> <span class=\"action-text\">Éditer</span>
                         </a>
 
                         ";
-            // line 569
-            yield "                        <form action=\"";
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_delete", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 569, $this->source); })()), "idEB", [], "any", false, false, false, 569)]), "html", null, true);
-            yield "\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 mx-1 my-1\" onsubmit=\"return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');\">
+            // line 772
+            yield "                                <form action=\"";
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_social_media_delete", ["idEB" => CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 772, $this->source); })()), "idEB", [], "any", false, false, false, 772)]), "html", null, true);
+            yield "\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 px-1\" onsubmit=\"return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');\">
             <input type=\"hidden\" name=\"_token\" value=\"";
-            // line 570
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("delete" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 570, $this->source); })()), "idEB", [], "any", false, false, false, 570))), "html", null, true);
+            // line 773
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("delete" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 773, $this->source); })()), "idEB", [], "any", false, false, false, 773))), "html", null, true);
             yield "\">
             <button type=\"submit\" class=\"btn btn-action w-100 text-danger\">
                                 <i class=\"bi bi-trash me-1\"></i> <span class=\"action-text\">Supprimer</span>
             </button>
         </form>
+                            </div>
     ";
         }
-        // line 576
-        yield "</div>
+        // line 780
+        yield "                    </div>
+</div>
 
                 ";
-        // line 579
+        // line 784
         yield "                <div id=\"comments-area\" class=\"comments-section p-3\">
                     <h3 class=\"section-title fs-5\">Commentaires</h3>
 
+                    ";
+        // line 788
+        yield "                    ";
+        if (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 788, $this->source); })()), "request", [], "any", false, false, false, 788), "query", [], "any", false, false, false, 788), "get", ["error"], "method", false, false, false, 788)) {
+            // line 789
+            yield "                        ";
+            $context["error_type"] = CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 789, $this->source); })()), "request", [], "any", false, false, false, 789), "query", [], "any", false, false, false, 789), "get", ["error"], "method", false, false, false, 789);
+            // line 790
+            yield "                        <div class=\"alert alert-danger mb-3\">
+                            ";
+            // line 791
+            if (((isset($context["error_type"]) || array_key_exists("error_type", $context) ? $context["error_type"] : (function () { throw new RuntimeError('Variable "error_type" does not exist.', 791, $this->source); })()) == "empty_comment")) {
+                // line 792
+                yield "                                <strong>Erreur :</strong> Le commentaire ne peut pas être vide.
+                            ";
+            } elseif ((            // line 793
+(isset($context["error_type"]) || array_key_exists("error_type", $context) ? $context["error_type"] : (function () { throw new RuntimeError('Variable "error_type" does not exist.', 793, $this->source); })()) == "validation_failed")) {
+                // line 794
+                yield "                                <strong>Erreur :</strong> ";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 794, $this->source); })()), "request", [], "any", false, false, false, 794), "query", [], "any", false, false, false, 794), "get", ["message", "Erreur de validation du formulaire."], "method", false, false, false, 794), "html", null, true);
+                yield "
+                            ";
+            } elseif ((            // line 795
+(isset($context["error_type"]) || array_key_exists("error_type", $context) ? $context["error_type"] : (function () { throw new RuntimeError('Variable "error_type" does not exist.', 795, $this->source); })()) == "forbidden_words")) {
+                // line 796
+                yield "                                <strong>Erreur :</strong> Votre commentaire contient des mots interdits: ";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 796, $this->source); })()), "request", [], "any", false, false, false, 796), "query", [], "any", false, false, false, 796), "get", ["words"], "method", false, false, false, 796), "html", null, true);
+                yield "
+                            ";
+            } elseif ((            // line 797
+(isset($context["error_type"]) || array_key_exists("error_type", $context) ? $context["error_type"] : (function () { throw new RuntimeError('Variable "error_type" does not exist.', 797, $this->source); })()) == "database_error")) {
+                // line 798
+                yield "                                <strong>Erreur :</strong> Une erreur s'est produite lors de l'enregistrement du commentaire.
+                            ";
+            } elseif ((            // line 799
+(isset($context["error_type"]) || array_key_exists("error_type", $context) ? $context["error_type"] : (function () { throw new RuntimeError('Variable "error_type" does not exist.', 799, $this->source); })()) == "form_not_submitted")) {
+                // line 800
+                yield "                                <strong>Erreur :</strong> Le formulaire n'a pas été soumis correctement.
+                            ";
+            } else {
+                // line 802
+                yield "                                <strong>Erreur :</strong> Une erreur est survenue.
+                            ";
+            }
+            // line 804
+            yield "                        </div>
+                    ";
+        }
+        // line 806
+        yield "
                 ";
-        // line 583
+        // line 808
         yield "                    <div class=\"add-comment-form-container d-flex align-items-start\">
                         ";
-        // line 584
-        $context["current_user"] = CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 584, $this->source); })()), "user", [], "any", false, false, false, 584);
-        // line 585
+        // line 809
+        $context["current_user"] = CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 809, $this->source); })()), "user", [], "any", false, false, false, 809);
+        // line 810
         yield "                        <div class=\"flex-shrink-0 me-2\">
                          <img src=\"";
-        // line 586
-        yield ((((isset($context["current_user"]) || array_key_exists("current_user", $context) ? $context["current_user"] : (function () { throw new RuntimeError('Variable "current_user" does not exist.', 586, $this->source); })()) && CoreExtension::getAttribute($this->env, $this->source, (isset($context["current_user"]) || array_key_exists("current_user", $context) ? $context["current_user"] : (function () { throw new RuntimeError('Variable "current_user" does not exist.', 586, $this->source); })()), "getImagesU", [], "method", false, false, false, 586))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/profile_pictures/" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["current_user"]) || array_key_exists("current_user", $context) ? $context["current_user"] : (function () { throw new RuntimeError('Variable "current_user" does not exist.', 586, $this->source); })()), "getImagesU", [], "method", false, false, false, 586))), "html", null, true)) : ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/placeholder-avatar.png"), "html", null, true)));
+        // line 811
+        yield ((((isset($context["current_user"]) || array_key_exists("current_user", $context) ? $context["current_user"] : (function () { throw new RuntimeError('Variable "current_user" does not exist.', 811, $this->source); })()) && CoreExtension::getAttribute($this->env, $this->source, (isset($context["current_user"]) || array_key_exists("current_user", $context) ? $context["current_user"] : (function () { throw new RuntimeError('Variable "current_user" does not exist.', 811, $this->source); })()), "getImagesU", [], "method", false, false, false, 811))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/profile_pictures/" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["current_user"]) || array_key_exists("current_user", $context) ? $context["current_user"] : (function () { throw new RuntimeError('Variable "current_user" does not exist.', 811, $this->source); })()), "getImagesU", [], "method", false, false, false, 811))), "html", null, true)) : ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/placeholder-avatar.png"), "html", null, true)));
         yield "\"
                               alt=\"Votre avatar\"
                                 class=\"comment-author-img rounded-circle\" width=\"32\" height=\"32\">
                      </div>
                      <div class=\"flex-grow-1\">
-                        <form name=\"";
-        // line 591
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 591, $this->source); })()), "vars", [], "any", false, false, false, 591), "name", [], "any", false, false, false, 591), "html", null, true);
+                        ";
+        // line 817
+        yield "                        <form name=\"";
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 817, $this->source); })()), "vars", [], "any", false, false, false, 817), "name", [], "any", false, false, false, 817), "html", null, true);
         yield "\" method=\"";
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 591, $this->source); })()), "vars", [], "any", false, false, false, 591), "method", [], "any", false, false, false, 591), "html", null, true);
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 817, $this->source); })()), "vars", [], "any", false, false, false, 817), "method", [], "any", false, false, false, 817), "html", null, true);
         yield "\" action=\"";
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 591, $this->source); })()), "vars", [], "any", false, false, false, 591), "action", [], "any", false, false, false, 591), "html", null, true);
-        yield "\" class=\"add-comment-form\" id=\"comment-form\">
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 817, $this->source); })()), "vars", [], "any", false, false, false, 817), "action", [], "any", false, false, false, 817), "html", null, true);
+        yield "\" class=\"add-comment-form\" id=\"comment-form\" novalidate>
                             <div class=\"position-relative\">
                                 ";
-        // line 593
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 593, $this->source); })()), "description", [], "any", false, false, false, 593), 'widget', ["attr" => ["rows" => 1, "placeholder" => "Écrivez un commentaire...", "class" => "form-control comment-input py-2 px-3", "id" => "comment-input"]]);
+        // line 819
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 819, $this->source); })()), "description", [], "any", false, false, false, 819), 'widget', ["attr" => ["rows" => 2, "placeholder" => "Écrivez un commentaire...", "class" => "form-control comment-input py-2 px-3", "id" => "comment-input", "required" => "required", "minlength" => "5"]]);
         yield "
                                 ";
-        // line 594
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 594, $this->source); })()), "description", [], "any", false, false, false, 594), 'errors');
+        // line 820
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 820, $this->source); })()), "description", [], "any", false, false, false, 820), 'errors');
         yield "
+                                <div id=\"empty-comment-error\" class=\"alert alert-danger mt-2\" style=\"display: none;\">Le commentaire ne peut pas être vide.</div>
                                 <button type=\"submit\" class=\"btn btn-primary btn-send-comment\" id=\"submit-comment\" aria-label=\"Publier le commentaire\">
-                                    <i class=\"bi bi-send-fill\"></i>
+                                    <i class=\"fas fa-paper-plane\"></i>
                                 </button>
                             </div>
                             ";
-        // line 599
-        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock((isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 599, $this->source); })()), 'rest');
+        // line 826
+        yield $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock((isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 826, $this->source); })()), 'rest');
         yield "
                             <input type=\"hidden\" name=\"_token\" value=\"";
-        // line 600
+        // line 827
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken("comment_token"), "html", null, true);
         yield "\">
+                            <div class=\"d-none\">
+                                <p>DEBUG - Nom du formulaire: ";
+        // line 829
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 829, $this->source); })()), "vars", [], "any", false, false, false, 829), "name", [], "any", false, false, false, 829), "html", null, true);
+        yield "</p>
+                                <p>DEBUG - Nom du champ description: ";
+        // line 830
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_form"]) || array_key_exists("comment_form", $context) ? $context["comment_form"] : (function () { throw new RuntimeError('Variable "comment_form" does not exist.', 830, $this->source); })()), "description", [], "any", false, false, false, 830), "vars", [], "any", false, false, false, 830), "full_name", [], "any", false, false, false, 830), "html", null, true);
+        yield "</p>
+                            </div>
                         </form>
                      </div>
                 </div>
 
                     ";
-        // line 606
+        // line 837
         yield "                    <hr class=\"my-2 text-muted\">
 
                 ";
-        // line 609
+        // line 840
         yield "                    <div id=\"comments-list\" class=\"comments-container\">
     ";
-        // line 610
-        if ((array_key_exists("comments", $context) && (Twig\Extension\CoreExtension::length($this->env->getCharset(), (isset($context["comments"]) || array_key_exists("comments", $context) ? $context["comments"] : (function () { throw new RuntimeError('Variable "comments" does not exist.', 610, $this->source); })())) > 0))) {
-            // line 611
+        // line 841
+        if ((array_key_exists("comments", $context) && (Twig\Extension\CoreExtension::length($this->env->getCharset(), (isset($context["comments"]) || array_key_exists("comments", $context) ? $context["comments"] : (function () { throw new RuntimeError('Variable "comments" does not exist.', 841, $this->source); })())) > 0))) {
+            // line 842
             yield "        ";
             $context['_parent'] = $context;
-            $context['_seq'] = CoreExtension::ensureTraversable((isset($context["comments"]) || array_key_exists("comments", $context) ? $context["comments"] : (function () { throw new RuntimeError('Variable "comments" does not exist.', 611, $this->source); })()));
+            $context['_seq'] = CoreExtension::ensureTraversable((isset($context["comments"]) || array_key_exists("comments", $context) ? $context["comments"] : (function () { throw new RuntimeError('Variable "comments" does not exist.', 842, $this->source); })()));
             $context['loop'] = [
               'parent' => $context['_parent'],
               'index0' => 0,
@@ -900,148 +1168,149 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
                 $context['loop']['last'] = 1 === $length;
             }
             foreach ($context['_seq'] as $context["_key"] => $context["commentaire"]) {
-                // line 612
+                // line 843
                 yield "            ";
-                $context["comment_author"] = CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "getUser", [], "method", false, false, false, 612);
-                // line 613
+                $context["comment_author"] = CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "getUser", [], "method", false, false, false, 843);
+                // line 844
                 yield "                                ";
-                $context["animation_order"] = CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 613);
-                // line 614
+                $context["animation_order"] = CoreExtension::getAttribute($this->env, $this->source, $context["loop"], "index", [], "any", false, false, false, 844);
+                // line 845
                 yield "                                <div class=\"comment-entry d-flex align-items-start\" id=\"comment-";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 614), "html", null, true);
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 845), "html", null, true);
                 yield "\" style=\"--animation-order: ";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["animation_order"]) || array_key_exists("animation_order", $context) ? $context["animation_order"] : (function () { throw new RuntimeError('Variable "animation_order" does not exist.', 614, $this->source); })()), "html", null, true);
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["animation_order"]) || array_key_exists("animation_order", $context) ? $context["animation_order"] : (function () { throw new RuntimeError('Variable "animation_order" does not exist.', 845, $this->source); })()), "html", null, true);
                 yield "\">
                  ";
-                // line 616
+                // line 847
                 yield "                                    <div class=\"flex-shrink-0 me-2\">
                     <img src=\"";
-                // line 617
-                yield ((((isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 617, $this->source); })()) && CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 617, $this->source); })()), "getImagesU", [], "method", false, false, false, 617))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/profile_pictures/" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 617, $this->source); })()), "getImagesU", [], "method", false, false, false, 617))), "html", null, true)) : ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/placeholder-avatar.png"), "html", null, true)));
+                // line 848
+                yield ((((isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 848, $this->source); })()) && CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 848, $this->source); })()), "getImagesU", [], "method", false, false, false, 848))) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl(("uploads/profile_pictures/" . CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 848, $this->source); })()), "getImagesU", [], "method", false, false, false, 848))), "html", null, true)) : ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/placeholder-avatar.png"), "html", null, true)));
                 yield "\"
                          alt=\"";
-                // line 618
-                yield (((isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 618, $this->source); })())) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 618, $this->source); })()), "getPrenom", [], "method", false, false, false, 618), "html", null, true)) : ("Avatar"));
+                // line 849
+                yield (((isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 849, $this->source); })())) ? ($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 849, $this->source); })()), "getPrenom", [], "method", false, false, false, 849), "html", null, true)) : ("Avatar"));
                 yield "\"
                                             class=\"comment-author-img rounded-circle\" width=\"28\" height=\"28\">
                 </div>
                  ";
-                // line 622
+                // line 853
                 yield "                <div class=\"flex-grow-1\">
                                         <div class=\"comment-bubble\">
                         <strong class=\"comment-author-name d-block mb-1\">
                             ";
-                // line 625
-                if ((isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 625, $this->source); })())) {
-                    // line 626
+                // line 856
+                if ((isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 856, $this->source); })())) {
+                    // line 857
                     yield "                                ";
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 626, $this->source); })()), "getPrenom", [], "method", false, false, false, 626), "html", null, true);
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 857, $this->source); })()), "getPrenom", [], "method", false, false, false, 857), "html", null, true);
                     yield " ";
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 626, $this->source); })()), "getName", [], "method", false, false, false, 626), "html", null, true);
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 857, $this->source); })()), "getName", [], "method", false, false, false, 857), "html", null, true);
                     yield "
                             ";
                 } else {
-                    // line 628
+                    // line 859
                     yield "                                Utilisateur inconnu
                             ";
                 }
-                // line 630
+                // line 861
                 yield "                        </strong>
                         <p class=\"comment-text mb-0\">";
-                // line 631
-                yield Twig\Extension\CoreExtension::nl2br($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "getDescription", [], "method", false, false, false, 631), "html", null, true));
+                // line 862
+                yield Twig\Extension\CoreExtension::nl2br($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "getDescription", [], "method", false, false, false, 862), "html", null, true));
                 yield "</p>
                     </div>
                                         ";
-                // line 634
+                // line 865
                 yield "                                        <div class=\"comment-meta mt-1 ps-2 d-flex align-items-center flex-wrap\">
                         ";
-                // line 636
+                // line 867
                 yield "                                            <small class=\"text-muted me-3\">
-                                                <i class=\"bi bi-clock\"></i>
-                                                Commentaire #";
-                // line 638
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 638), "html", null, true);
-                yield "
+                                                <i class=\"fas fa-clock me-1\"></i>
+                                                Il y a quelques instants
                         </small>
 
                                             ";
-                // line 642
+                // line 873
                 yield "                                            <a href=\"#\" 
                                                class=\"comment-action-link small me-3 comment-like-btn ";
-                // line 643
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 643), "get", ["user_comment_actions"], "method", false, true, false, 643), CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 643), [], "array", true, true, false, 643) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 643, $this->source); })()), "session", [], "any", false, false, false, 643), "get", ["user_comment_actions"], "method", false, false, false, 643), CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 643), [], "array", false, false, false, 643) == "like"))) {
+                // line 874
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 874), "get", ["user_comment_actions"], "method", false, true, false, 874), CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 874), [], "array", true, true, false, 874) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 874, $this->source); })()), "session", [], "any", false, false, false, 874), "get", ["user_comment_actions"], "method", false, false, false, 874), CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 874), [], "array", false, false, false, 874) == "like"))) {
                     yield "active text-primary";
                 }
                 yield "\"
+                                               onclick=\"event.preventDefault(); document.getElementById('like-comment-form-";
+                // line 875
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 875), "html", null, true);
+                yield "').submit();\"
                                                data-comment-id=\"";
-                // line 644
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 644), "html", null, true);
+                // line 876
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 876), "html", null, true);
                 yield "\">
-                                                <i class=\"bi ";
-                // line 645
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 645), "get", ["user_comment_actions"], "method", false, true, false, 645), CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 645), [], "array", true, true, false, 645) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 645, $this->source); })()), "session", [], "any", false, false, false, 645), "get", ["user_comment_actions"], "method", false, false, false, 645), CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 645), [], "array", false, false, false, 645) == "like"))) {
-                    yield "bi-heart-fill";
+                                                <i class=\"";
+                // line 877
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 877), "get", ["user_comment_actions"], "method", false, true, false, 877), CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 877), [], "array", true, true, false, 877) && (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 877, $this->source); })()), "session", [], "any", false, false, false, 877), "get", ["user_comment_actions"], "method", false, false, false, 877), CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 877), [], "array", false, false, false, 877) == "like"))) {
+                    yield "fas fa-heart";
                 } else {
-                    yield "bi-heart";
+                    yield "far fa-heart";
                 }
                 yield "\"></i> 
                                                 <span class=\"like-label\">J'aime</span>
                                                 ";
-                // line 647
-                if ((CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "numberlike", [], "any", false, false, false, 647) > 0)) {
-                    // line 648
+                // line 879
+                if ((CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "numberlike", [], "any", false, false, false, 879) > 0)) {
+                    // line 880
                     yield "                                                    <span class=\"comment-like-count\">";
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "numberlike", [], "any", false, false, false, 648), "html", null, true);
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "numberlike", [], "any", false, false, false, 880), "html", null, true);
                     yield "</span>
                                                 ";
                 }
-                // line 650
+                // line 882
                 yield "                                            </a>
                                             <form id=\"like-comment-form-";
-                // line 651
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 651), "html", null, true);
+                // line 883
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 883), "html", null, true);
                 yield "\" action=\"";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_commentaire_like", ["idC" => CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 651)]), "html", null, true);
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_commentaire_like", ["idC" => CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 883)]), "html", null, true);
                 yield "\" method=\"POST\" class=\"d-none\">
                                                 <input type=\"hidden\" name=\"_token\" value=\"";
-                // line 652
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("like_commentaire" . CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 652))), "html", null, true);
+                // line 884
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("like_commentaire" . CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 884))), "html", null, true);
                 yield "\">
                                             </form>
                                             
                                             ";
-                // line 655
-                if (((isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 655, $this->source); })()) && (CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 655, $this->source); })()), "getIdU", [], "method", false, false, false, 655) == (isset($context["default_user_id"]) || array_key_exists("default_user_id", $context) ? $context["default_user_id"] : (function () { throw new RuntimeError('Variable "default_user_id" does not exist.', 655, $this->source); })())))) {
-                    // line 656
-                    yield "                                                <a href=\"#\" class=\"comment-action-link small me-3 edit-comment-btn\" data-comment-id=\"";
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 656), "html", null, true);
-                    yield "\">
-                                                    <i class=\"bi bi-pencil-square\"></i> Modifier
+                // line 887
+                if (((isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 887, $this->source); })()) && (CoreExtension::getAttribute($this->env, $this->source, (isset($context["comment_author"]) || array_key_exists("comment_author", $context) ? $context["comment_author"] : (function () { throw new RuntimeError('Variable "comment_author" does not exist.', 887, $this->source); })()), "getIdU", [], "method", false, false, false, 887) == (isset($context["default_user_id"]) || array_key_exists("default_user_id", $context) ? $context["default_user_id"] : (function () { throw new RuntimeError('Variable "default_user_id" does not exist.', 887, $this->source); })())))) {
+                    // line 888
+                    yield "                                                <a href=\"";
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_commentaire_edit", ["idC" => CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 888)]), "html", null, true);
+                    yield "\" class=\"comment-action-link small me-3\">
+                                                    <i class=\"fas fa-pencil-alt\"></i> Modifier
                                                 </a>
 
                                                 <a href=\"#\" 
                                                    class=\"comment-action-link small text-danger\"
                                                    onclick=\"event.preventDefault(); if(confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) { document.getElementById('delete-form-";
-                    // line 662
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 662), "html", null, true);
+                    // line 894
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 894), "html", null, true);
                     yield "').submit(); }\">
-                                                    <i class=\"bi bi-trash\"></i> Supprimer
+                                                    <i class=\"fas fa-trash-alt\"></i> Supprimer
                                                 </a>
                                                 <form id=\"delete-form-";
-                    // line 665
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 665), "html", null, true);
+                    // line 897
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 897), "html", null, true);
                     yield "\" action=\"";
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_commentaire_delete", ["idC" => CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 665)]), "html", null, true);
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_commentaire_delete", ["idC" => CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 897)]), "html", null, true);
                     yield "\" method=\"POST\" class=\"d-none\">
                                                     <input type=\"hidden\" name=\"_token\" value=\"";
-                    // line 666
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("delete" . CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 666))), "html", null, true);
+                    // line 898
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken(("delete" . CoreExtension::getAttribute($this->env, $this->source, $context["commentaire"], "idC", [], "any", false, false, false, 898))), "html", null, true);
                     yield "\">
                                                 </form>
                                             ";
                 }
-                // line 669
+                // line 901
                 yield "                                        </div>
                                     </div>
                                 </div>
@@ -1058,17 +1327,17 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
             $_parent = $context['_parent'];
             unset($context['_seq'], $context['_key'], $context['commentaire'], $context['_parent'], $context['loop']);
             $context = array_intersect_key($context, $_parent) + $_parent;
-            // line 673
+            // line 905
             yield "    ";
         } else {
-            // line 674
+            // line 906
             yield "                            <div class=\"text-center text-muted py-2\">
                                 <i class=\"bi bi-chat-left-dots fs-4 mb-2 d-block opacity-50\"></i>
                                 <p class=\"mb-0\">Soyez le premier à commenter cette publication.</p>
                             </div>
                         ";
         }
-        // line 679
+        // line 911
         yield "                    </div>
                 </div>
             </div>
@@ -1077,7 +1346,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
 </div>
 
 ";
-        // line 687
+        // line 919
         yield "<div class=\"container mt-4\">
     <div class=\"row\">
         <div class=\"col-12 text-center text-muted small\">
@@ -1096,7 +1365,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         yield from [];
     }
 
-    // line 697
+    // line 929
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -1109,542 +1378,175 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "javascripts"));
 
-        // line 698
+        // line 930
         yield "    ";
         yield from $this->yieldParentBlock("javascripts", $context, $blocks);
         yield "
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Add AJAX functionality to like and dislike forms
-            const likeForm = document.querySelector('.like-form');
-            const dislikeForm = document.querySelector('.dislike-form');
-            const likeButton = document.querySelector('.like-button');
-            const dislikeButton = document.querySelector('.dislike-button');
-            
-            // Édition des commentaires in-line
-            const editCommentButtons = document.querySelectorAll('.edit-comment-btn');
-            if (editCommentButtons.length > 0) {
-                console.log('Found', editCommentButtons.length, 'edit comment buttons');
-                editCommentButtons.forEach(button => {
-                    button.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        
-                        const commentId = this.dataset.commentId;
-                        console.log('Edit clicked for comment ID:', commentId);
-                        
-                        // Trouver le conteneur de commentaire
-                        const commentContainer = document.getElementById('comment-' + commentId);
-                        if (!commentContainer) {
-                            console.error('Comment container not found for ID:', commentId);
-                            return;
-                        }
-                        
-                        // Trouver la bulle de commentaire
-                        const commentBubble = commentContainer.querySelector('.comment-bubble');
-                        const commentText = commentBubble.querySelector('.comment-text').innerHTML;
-                        
-                        // Sauvegarder le contenu original
-                        commentBubble.setAttribute('data-original-content', commentBubble.innerHTML);
-                        
-                        // Créer le formulaire d'édition
-                        const formHtml = `
-                            <div class=\"edit-comment-form\">
-                                <div class=\"form-group\">
-                                    <textarea class=\"form-control mb-2\" rows=\"3\" id=\"edit-comment-textarea-\${commentId}\">\${commentText.trim()}</textarea>
-                                </div>
-                                <div class=\"d-flex\">
-                                    <button type=\"button\" class=\"btn btn-primary btn-sm me-2 save-edit-btn\" data-comment-id=\"\${commentId}\">Enregistrer</button>
-                                    <button type=\"button\" class=\"btn btn-secondary btn-sm cancel-edit-btn\" data-comment-id=\"\${commentId}\">Annuler</button>
-                                </div>
-                            </div>
-                        `;
-                        
-                        // Remplacer le contenu de la bulle par le formulaire
-                        commentBubble.innerHTML = formHtml;
-                        
-                        // Focus sur le textarea
-                        document.getElementById(`edit-comment-textarea-\${commentId}`).focus();
-                        
-                        // Gérer l'annulation de l'édition
-                        commentBubble.querySelector('.cancel-edit-btn').addEventListener('click', function() {
-                            commentBubble.innerHTML = commentBubble.getAttribute('data-original-content');
-                        });
-                        
-                        // Gérer la sauvegarde de l'édition
-                        commentBubble.querySelector('.save-edit-btn').addEventListener('click', function() {
-                            const newContent = document.getElementById(`edit-comment-textarea-\${commentId}`).value;
-                            if (newContent.trim() === '') {
-                                showNotification('Le commentaire ne peut pas être vide', 'warning');
-                                return;
-                            }
-                            
-                            // Préparer les données
-                            const formData = new FormData();
-                            formData.append('description', newContent);
-                            
-                            // Envoyer la requête AJAX
-                            fetch(`/commentaire/\${commentId}/edit-ajax`, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                }
-                            })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`HTTP error! Status: \${response.status}`);
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                if (data.success) {
-                                    // Mettre à jour le commentaire
-                                    commentBubble.innerHTML = commentBubble.getAttribute('data-original-content');
-                                    commentBubble.querySelector('.comment-text').innerHTML = data.description;
-                                    
-                                    // Afficher une notification de succès
-                                    showNotification('Commentaire modifié avec succès', 'success');
-                                } else {
-                                    showNotification(data.error || 'Une erreur est survenue', 'danger');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                showNotification('Erreur lors de la modification du commentaire', 'danger');
-                                
-                                // Restaurer le formulaire en cas d'erreur
-                                commentBubble.innerHTML = commentBubble.getAttribute('data-original-content');
-                            });
-                        });
-                    });
-                });
-            }
-            
-            // Vérifiez l'état initial des boutons (via une requête au serveur ou des données injectées)
-            ";
-        // line 807
-        if (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["app"] ?? null), "session", [], "any", false, true, false, 807), "get", ["user_post_actions"], "method", false, true, false, 807), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 807, $this->source); })()), "idEB", [], "any", false, false, false, 807), [], "array", true, true, false, 807)) {
-            // line 808
-            yield "                ";
-            $context["userAction"] = CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 808, $this->source); })()), "session", [], "any", false, false, false, 808), "get", ["user_post_actions"], "method", false, false, false, 808), CoreExtension::getAttribute($this->env, $this->source, (isset($context["social_media"]) || array_key_exists("social_media", $context) ? $context["social_media"] : (function () { throw new RuntimeError('Variable "social_media" does not exist.', 808, $this->source); })()), "idEB", [], "any", false, false, false, 808), [], "array", false, false, false, 808);
-            // line 809
-            yield "                ";
-            if (((isset($context["userAction"]) || array_key_exists("userAction", $context) ? $context["userAction"] : (function () { throw new RuntimeError('Variable "userAction" does not exist.', 809, $this->source); })()) == "like")) {
-                // line 810
-                yield "                    likeButton.classList.add('active');
-                    likeButton.innerHTML = `<img src=\"";
-                // line 811
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/like-button.png"), "html", null, true);
-                yield "\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                ";
-            } elseif ((            // line 812
-(isset($context["userAction"]) || array_key_exists("userAction", $context) ? $context["userAction"] : (function () { throw new RuntimeError('Variable "userAction" does not exist.', 812, $this->source); })()) == "dislike")) {
-                // line 813
-                yield "                    dislikeButton.classList.add('active');
-                    dislikeButton.innerHTML = `<img src=\"";
-                // line 814
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/dislike-button.png"), "html", null, true);
-                yield "\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                ";
-            }
-            // line 816
-            yield "            ";
-        }
-        // line 817
-        yield "            
-            // Add animation to comments when they come into view
-            const commentEntries = document.querySelectorAll('.comment-entry');
-            
-            if (commentEntries.length > 0) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.style.opacity = \"1\";
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, {
-                    threshold: 0.1
-                });
+            // Force style des boutons actifs (like/dislike)
+            function applyActiveStyles() {
+                // Gestion du bouton like
+                const likeButton = document.querySelector('.like-button');
+                if (likeButton && likeButton.classList.contains('active')) {
+                    likeButton.style.color = '#4a6bda';
+                    likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
+                    likeButton.style.fontWeight = '500';
+                    const icon = likeButton.querySelector('i');
+                    if (icon) icon.style.transform = 'scale(1.15)';
+                }
                 
-                // Set initial opacity to 0 for smooth animation
-                commentEntries.forEach(entry => {
-                    entry.style.opacity = \"0\";
-                    observer.observe(entry);
-                });
-            }
-            
-            // Function to handle form submission
-            function handleFormSubmit(form, action) {
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    
-                    const button = form.querySelector('button');
-                    button.disabled = true;
-                    
-                    // Create FormData object
-                    const formData = new FormData(form);
-                    
-                    // Get the action URL from the form
-                    const url = form.getAttribute('action');
-                    
-                    // Create fetch request
-                    fetch(url, {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        button.disabled = false;
-                        
-                        if (data.success) {
-                            const oppositeButton = action === 'like' 
-                                ? document.querySelector('.dislike-button')
-                                : document.querySelector('.like-button');
-                            
-                            // Vérifier l'action retournée par le serveur
-                            if (data.action === action) {
-                                // L'action a été appliquée (ajout)
-                                if (action === 'like') {
-                                    button.innerHTML = `<img src=\"";
-        // line 872
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/like-button.png"), "html", null, true);
-        yield "\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                                } else {
-                                    button.innerHTML = `<img src=\"";
-        // line 874
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/dislike-button.png"), "html", null, true);
-        yield "\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                }
-                                button.classList.add('active');
-                                
-                                // S'assurer que l'autre bouton est désactivé
-                                oppositeButton.classList.remove('active');
-                                oppositeButton.innerHTML = action === 'like'
-                                    ? `<img src=\"";
-        // line 881
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/like-button.png"), "html", null, true);
-        yield "\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`
-                                    : `<img src=\"";
-        // line 882
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/dislike-button.png"), "html", null, true);
-        yield "\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                
-                            } else if (data.action === null) {
-                                // L'action a été retirée (toggle off)
-                                if (action === 'like') {
-                                    button.innerHTML = `<img src=\"";
-        // line 887
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/like-button.png"), "html", null, true);
-        yield "\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                                } else {
-                                    button.innerHTML = `<img src=\"";
-        // line 889
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/dislike-button.png"), "html", null, true);
-        yield "\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                }
-                                button.classList.remove('active');
-                            } else {
-                                // On a changé d'avis (like -> dislike ou dislike -> like)
-                                if (data.action === 'like') {
-                                    document.querySelector('.like-button').innerHTML = `<img src=\"";
-        // line 895
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/like-button.png"), "html", null, true);
-        yield "\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                                    document.querySelector('.like-button').classList.add('active');
-                                    document.querySelector('.dislike-button').innerHTML = `<img src=\"";
-        // line 897
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/dislike-button.png"), "html", null, true);
-        yield "\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                    document.querySelector('.dislike-button').classList.remove('active');
-                                } else {
-                                    document.querySelector('.dislike-button').innerHTML = `<img src=\"";
-        // line 900
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/dislike-button.png"), "html", null, true);
-        yield "\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                    document.querySelector('.dislike-button').classList.add('active');
-                                    document.querySelector('.like-button').innerHTML = `<img src=\"";
-        // line 902
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/like-button.png"), "html", null, true);
-        yield "\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                                    document.querySelector('.like-button').classList.remove('active');
-                                }
-                            }
-                            
-                            // Update stats
-                            updateStats(data.likeCount, data.dislikeCount);
-                            
-                            // Add a subtle feedback animation
-                            button.classList.add('pulsate');
-                            setTimeout(() => {
-                                button.classList.remove('pulsate');
-                            }, 1000);
-                            
-                            // Show success notification
-                            showNotification(data.message, 'success');
-                        } else {
-                            console.error('Action failed:', data.error);
-                            // Show error notification
-                            showNotification('Une erreur est survenue', 'danger');
-                        }
-                    })
-                    .catch(error => {
-                        button.disabled = false;
-                        console.error('Error:', error);
-                        showNotification('Erreur de connexion', 'danger');
-                    });
-                });
-            }
-            
-            // Apply handlers
-            if (likeForm) handleFormSubmit(likeForm, 'like');
-            if (dislikeForm) handleFormSubmit(dislikeForm, 'dislike');
-            
-            // Function to update stats display
-            function updateStats(likeCount, dislikeCount) {
-                const statsElement = document.querySelector('.post-stats');
-                if (statsElement) {
-                    let html = '<div class=\"d-flex align-items-center gap-3\">';
-                    
-                    if (likeCount > 0) {
-                        html += `
-                            <div class=\"d-flex align-items-center\">
-                                <span class=\"like-count-badge d-flex align-items-center justify-content-center rounded-pill\">
-                                    <img src=\"";
-        // line 946
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/like-button.png"), "html", null, true);
-        yield "\" alt=\"J'aime\" width=\"18\" height=\"18\" class=\"me-1\">
-                                    <span class=\"fw-medium text-white\">\${likeCount}</span>
-                                </span>
-                            </div>
-                        `;
-                    }
-                    
-                    if (likeCount > 0 && dislikeCount > 0) {
-                        html += `<div class=\"stats-separator mx-1\"></div>`;
-                    }
-                    
-                    if (dislikeCount > 0) {
-                        html += `
-                            <div class=\"d-flex align-items-center\">
-                                <span class=\"dislike-count-badge d-flex align-items-center justify-content-center rounded-pill\">
-                                    <img src=\"";
-        // line 961
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/icons/dislike-button.png"), "html", null, true);
-        yield "\" alt=\"Je n'aime pas\" width=\"18\" height=\"18\" class=\"me-1\">
-                                    <span class=\"fw-medium text-white\">\${dislikeCount}</span>
-                                </span>
-                            </div>
-                        `;
-                    }
-                    
-                    html += '</div>';
-                    html += `
-                        <div>
-                            <small class=\"text-muted d-flex align-items-center\">
-                                <i class=\"bi bi-chat-dots me-1\"></i>
-                                <span class=\"comments-count\">\${document.querySelectorAll('.comment-entry').length}</span> 
-                                commentaire\${document.querySelectorAll('.comment-entry').length !== 1 ? 's' : ''}
-                            </small>
-                        </div>
-                    `;
-                    
-                    // Create a flash effect on update
-                    statsElement.classList.add('highlight');
-                    statsElement.innerHTML = html;
-                    
-                    setTimeout(() => {
-                        statsElement.classList.remove('highlight');
-                    }, 1000);
+                // Gestion du bouton dislike
+                const dislikeButton = document.querySelector('.dislike-button');
+                if (dislikeButton && dislikeButton.classList.contains('active')) {
+                    dislikeButton.style.color = '#dc3545';
+                    dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
+                    dislikeButton.style.fontWeight = '500';
+                    const icon = dislikeButton.querySelector('i');
+                    if (icon) icon.style.transform = 'scale(1.15)';
                 }
             }
             
-            // Function to show notification
-            function showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `alert alert-\${type} position-fixed start-50 translate-middle-x`;
-                notification.style.top = '20px';
-                notification.style.zIndex = '9999';
-                notification.style.maxWidth = '90%';
-                notification.style.width = '350px';
-                notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateY(-20px)';
-                notification.style.transition = 'all 0.3s ease';
-                notification.innerHTML = message;
-                
-                document.body.appendChild(notification);
-                
-                // Trigger animation
-                setTimeout(() => {
-                    notification.style.opacity = '1';
-                    notification.style.transform = 'translateY(0)';
-                }, 10);
-                
-                setTimeout(() => {
-                    notification.style.opacity = '0';
-                    notification.style.transform = 'translateY(-20px)';
-                    
-                    setTimeout(() => {
-                        document.body.removeChild(notification);
-                    }, 300);
-                }, 3000);
+            // Appliquer les styles immédiatement
+            applyActiveStyles();
+            
+            // Appliquer les styles à nouveau après un court délai (pour être sûr que le DOM est entièrement chargé)
+            setTimeout(applyActiveStyles, 100);
+            
+            // -------------------- GESTION DES LIKES/DISLIKES --------------------
+            const likeButton = document.querySelector('.like-button');
+            const dislikeButton = document.querySelector('.dislike-button');
+            
+            // Mettre en évidence les boutons actifs
+            if (likeButton && likeButton.classList.contains('active')) {
+                likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
+                likeButton.style.color = '#4a6bda';
+                const icon = likeButton.querySelector('i');
+                if (icon) icon.style.transform = 'scale(1.15)';
             }
             
-            // Smooth scroll for comment link
-            const commentLink = document.querySelector('a[href=\"#comments-area\"]');
-            if (commentLink) {
-                commentLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const commentsSection = document.getElementById('comments-area');
-                    if (commentsSection) {
-                        commentsSection.scrollIntoView({
-                            behavior: 'smooth'
-                        });
+            if (dislikeButton && dislikeButton.classList.contains('active')) {
+                dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
+                dislikeButton.style.color = '#dc3545';
+                const icon = dislikeButton.querySelector('i');
+                if (icon) icon.style.transform = 'scale(1.15)';
+            }
+            
+            // Effets au survol
+            if (likeButton) {
+                likeButton.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '#4a6bda';
+                        this.style.backgroundColor = 'rgba(74, 107, 218, 0.05)';
+                    }
+                });
+                
+                likeButton.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '';
+                        this.style.backgroundColor = '';
                     }
                 });
             }
-
-            // Ajouter le gestionnaire d'événement pour le formulaire de commentaire
+            
+            if (dislikeButton) {
+                dislikeButton.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '#dc3545';
+                        this.style.backgroundColor = 'rgba(220, 53, 69, 0.05)';
+                    }
+                });
+                
+                dislikeButton.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '';
+                        this.style.backgroundColor = '';
+                    }
+                });
+            }
+            
+            // -------------------- VALIDATION DES COMMENTAIRES --------------------
             const commentForm = document.getElementById('comment-form');
             const commentInput = document.getElementById('comment-input');
-            const commentsList = document.getElementById('comments-list');
+            const errorMessage = document.getElementById('empty-comment-error');
             
-            if (commentForm) {
-                commentForm.addEventListener('submit', function(event) {
-                    event.preventDefault();
+            if (commentForm && commentInput && errorMessage) {
+                // Fonction de validation
+                function validateComment() {
+                    const content = commentInput.value.trim();
                     
-                    if (!commentInput.value.trim()) {
-                        showNotification('Le commentaire ne peut pas être vide', 'warning');
-                        return;
+                    if (!content) {
+                        commentInput.classList.add('is-invalid');
+                        errorMessage.textContent = 'Le commentaire ne peut pas être vide.';
+                        errorMessage.style.display = 'block';
+                        return false;
+                    } else if (content.length < 5) {
+                        commentInput.classList.add('is-invalid');
+                        errorMessage.textContent = 'Le commentaire doit contenir au moins 5 caractères.';
+                        errorMessage.style.display = 'block';
+                        return false;
+                    } else {
+                        commentInput.classList.remove('is-invalid');
+                        errorMessage.style.display = 'none';
+                        return true;
                     }
-                    
-                    const submitButton = document.getElementById('submit-comment');
-                    submitButton.disabled = true;
-                    
-                    const formData = new FormData(commentForm);
-                    
-                    fetch(commentForm.getAttribute('action'), {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .catch(error => {
-                        // En cas d'erreur de parsing JSON (comme une redirection), on traite comme un succès
-                        // et on recharge la page
-                        return { success: false, reload: true };
-                    })
-                    .then(data => {
-                        submitButton.disabled = false;
-                        
-                        if (data.reload) {
-                            // Si on ne peut pas traiter la réponse JSON, on recharge la page
-                            window.location.reload();
-                            return;
-                        }
-                        
-                        if (data.success) {
-                            // Vider le champ de saisie
-                            commentInput.value = '';
-                            
-                            // Recharger juste la liste des commentaires
-                            window.location.reload();
-                            
-                            // Afficher un message de succès
-                            showNotification(data.message || 'Commentaire ajouté avec succès !', 'success');
-                        } else {
-                            showNotification(data.error || 'Erreur lors de l\\'ajout du commentaire', 'danger');
-                        }
-                    })
-                    .catch(error => {
-                        submitButton.disabled = false;
-                        console.error('Error:', error);
-                        showNotification('Erreur de connexion', 'danger');
-                    });
-                });
-            }
-
-            // Ajouter le gestionnaire d'événement pour les likes de commentaires
-            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
-            
-            if (commentLikeButtons.length > 0) {
-                console.log('Found', commentLikeButtons.length, 'comment like buttons');
+                }
                 
-                commentLikeButtons.forEach(button => {
-                    button.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        
-                        const commentId = this.dataset.commentId;
-                        console.log('Like clicked for comment ID:', commentId);
-                        
-                        const likeForm = document.getElementById(`like-comment-form-\${commentId}`);
-                        
-                        if (!likeForm) {
-                            console.error(`Form not found for comment ID: \${commentId}`);
-                            showNotification('Erreur: formulaire introuvable', 'danger');
-                            return;
-                        }
-                        
-                        const formData = new FormData(likeForm);
-                        console.log('Submitting form to:', likeForm.getAttribute('action'));
-                        
-                        fetch(likeForm.getAttribute('action'), {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => {
-                            console.log('Response status:', response.status);
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: \${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Success data:', data);
-                            if (data.success) {
-                                // Mise à jour visuelle du bouton
-                                if (data.isLiked) {
-                                    this.classList.add('active', 'text-primary');
-                                    this.querySelector('i').classList.replace('bi-heart', 'bi-heart-fill');
-                                } else {
-                                    this.classList.remove('active', 'text-primary');
-                                    this.querySelector('i').classList.replace('bi-heart-fill', 'bi-heart');
-                                }
-                                
-                                // Mise à jour du compteur de likes
-                                let countSpan = this.querySelector('.comment-like-count');
-                                if (data.likeCount > 0) {
-                                    if (countSpan) {
-                                        countSpan.textContent = data.likeCount;
-                                    } else {
-                                        countSpan = document.createElement('span');
-                                        countSpan.className = 'comment-like-count';
-                                        countSpan.textContent = data.likeCount;
-                                        this.appendChild(countSpan);
-                                    }
-                                } else if (countSpan) {
-                                    countSpan.remove();
-                                }
-                                
-                                // Afficher un message de succès
-                                showNotification(data.message, 'success');
-                            } else {
-                                console.error('Action failed:', data.error);
-                                showNotification(data.error || 'Une erreur est survenue', 'danger');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showNotification('Erreur de connexion avec le serveur: ' + error.message, 'danger');
-                        });
-                    });
+                // Validation en temps réel
+                commentInput.addEventListener('input', validateComment);
+                
+                // Validation à la soumission
+                commentForm.addEventListener('submit', function(e) {
+                    if (!validateComment()) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    return true;
                 });
-            } else {
-                console.log('No comment like buttons found on the page');
             }
+            
+            // -------------------- ANIMATIONS --------------------
+            // Animation image de publication
+            const postImage = document.querySelector('.post-image-container img');
+            if (postImage) {
+                postImage.style.opacity = '0';
+                setTimeout(() => {
+                    postImage.style.opacity = '1';
+                }, 300);
+            }
+            
+            // Animation bouton retour
+            const backButton = document.querySelector('.btn-back');
+            if (backButton) {
+                backButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    
+                    document.querySelector('.post-card').style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 300);
+                });
+            }
+            
+            // Animation des boutons like des commentaires
+            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
+            commentLikeButtons.forEach(button => {
+                if (button.classList.contains('active')) {
+                    button.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
+                }
+                
+                button.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.backgroundColor = '';
+                    }
+                });
+            });
         });
     </script>
 ";
@@ -1678,13 +1580,14 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  1433 => 961,  1415 => 946,  1368 => 902,  1363 => 900,  1357 => 897,  1352 => 895,  1343 => 889,  1338 => 887,  1330 => 882,  1326 => 881,  1316 => 874,  1311 => 872,  1254 => 817,  1251 => 816,  1246 => 814,  1243 => 813,  1241 => 812,  1237 => 811,  1234 => 810,  1231 => 809,  1228 => 808,  1226 => 807,  1113 => 698,  1100 => 697,  1081 => 687,  1072 => 679,  1065 => 674,  1062 => 673,  1045 => 669,  1039 => 666,  1033 => 665,  1027 => 662,  1017 => 656,  1015 => 655,  1009 => 652,  1003 => 651,  1000 => 650,  994 => 648,  992 => 647,  983 => 645,  979 => 644,  973 => 643,  970 => 642,  964 => 638,  960 => 636,  957 => 634,  952 => 631,  949 => 630,  945 => 628,  937 => 626,  935 => 625,  930 => 622,  924 => 618,  920 => 617,  917 => 616,  910 => 614,  907 => 613,  904 => 612,  886 => 611,  884 => 610,  881 => 609,  877 => 606,  869 => 600,  865 => 599,  857 => 594,  853 => 593,  844 => 591,  836 => 586,  833 => 585,  831 => 584,  828 => 583,  823 => 579,  819 => 576,  810 => 570,  805 => 569,  797 => 564,  795 => 563,  792 => 562,  786 => 557,  779 => 552,  773 => 551,  769 => 550,  764 => 549,  757 => 544,  751 => 543,  747 => 542,  742 => 541,  739 => 539,  733 => 534,  727 => 533,  720 => 528,  713 => 524,  709 => 523,  705 => 521,  703 => 520,  700 => 519,  696 => 517,  694 => 516,  691 => 515,  684 => 511,  680 => 510,  676 => 508,  674 => 507,  670 => 505,  664 => 501,  661 => 500,  658 => 498,  652 => 495,  648 => 494,  645 => 493,  642 => 492,  636 => 488,  633 => 487,  625 => 481,  621 => 479,  617 => 477,  609 => 475,  607 => 474,  599 => 469,  595 => 468,  592 => 467,  590 => 466,  587 => 465,  584 => 463,  578 => 458,  565 => 457,  108 => 9,  103 => 8,  90 => 7,  66 => 5,  43 => 2,);
+        return array (  1382 => 930,  1369 => 929,  1350 => 919,  1341 => 911,  1334 => 906,  1331 => 905,  1314 => 901,  1308 => 898,  1302 => 897,  1296 => 894,  1286 => 888,  1284 => 887,  1278 => 884,  1272 => 883,  1269 => 882,  1263 => 880,  1261 => 879,  1252 => 877,  1248 => 876,  1244 => 875,  1238 => 874,  1235 => 873,  1228 => 867,  1225 => 865,  1220 => 862,  1217 => 861,  1213 => 859,  1205 => 857,  1203 => 856,  1198 => 853,  1192 => 849,  1188 => 848,  1185 => 847,  1178 => 845,  1175 => 844,  1172 => 843,  1154 => 842,  1152 => 841,  1149 => 840,  1145 => 837,  1136 => 830,  1132 => 829,  1127 => 827,  1123 => 826,  1114 => 820,  1110 => 819,  1100 => 817,  1092 => 811,  1089 => 810,  1087 => 809,  1084 => 808,  1081 => 806,  1077 => 804,  1073 => 802,  1069 => 800,  1067 => 799,  1064 => 798,  1062 => 797,  1057 => 796,  1055 => 795,  1050 => 794,  1048 => 793,  1045 => 792,  1043 => 791,  1040 => 790,  1037 => 789,  1034 => 788,  1029 => 784,  1024 => 780,  1014 => 773,  1009 => 772,  1001 => 767,  998 => 765,  995 => 764,  989 => 759,  983 => 754,  979 => 752,  977 => 751,  973 => 749,  969 => 747,  967 => 746,  961 => 745,  956 => 743,  951 => 742,  945 => 737,  941 => 735,  939 => 734,  935 => 732,  931 => 730,  929 => 729,  923 => 728,  918 => 726,  913 => 725,  909 => 722,  903 => 717,  897 => 716,  886 => 708,  879 => 704,  873 => 700,  867 => 696,  864 => 695,  861 => 693,  855 => 690,  851 => 689,  847 => 688,  844 => 687,  841 => 686,  834 => 681,  827 => 677,  824 => 676,  816 => 670,  812 => 668,  808 => 666,  800 => 664,  798 => 663,  790 => 658,  786 => 657,  783 => 656,  781 => 655,  778 => 654,  775 => 652,  768 => 647,  762 => 643,  749 => 642,  108 => 10,  103 => 9,  90 => 8,  66 => 6,  43 => 2,);
     }
 
     public function getSourceContext(): Source
     {
         return new Source("{# Fichier : templates/social_media/show.html.twig #}
-{% extends 'base.html.twig' %} {# Hérite de votre base partagée #}
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
 
 {# Définit le titre de la page #}
 {% block title %}{{ social_media.getTitre() }} - Détails{% endblock %}
@@ -1740,28 +1643,66 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         }
         
         .post-image-container {
-            max-height: 350px;
+            max-height: 250px;
             overflow: hidden;
+            position: relative;
+            border-radius: 10px;
+            margin: 0.5rem auto 1.25rem;
+            max-width: 75%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 0.25rem;
+            background-color: #f9f9f9;
         }
         
         .post-image-container img {
-            transition: all 0.6s ease;
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
             object-fit: cover;
             width: 100%;
-            max-height: 350px;
+            max-height: 250px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
         
         .post-image-container:hover img {
-            transform: scale(1.03);
+            transform: scale(1.05);
+        }
+        
+        /* Effet de brillance au survol */
+        .post-image-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 100%);
+            transform: skewX(-25deg);
+            z-index: 1;
+            transition: left 0.8s ease-out;
+        }
+        
+        .post-image-container:hover::before {
+            left: 150%;
+        }
+        
+        .post-actions {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            background-color: #fbfbfd;
         }
         
         .btn-action {
             border-radius: 30px;
             transition: all var(--transition-speed) ease;
-            padding: 0.4rem 0.75rem;
+            padding: 0.5rem 0.5rem;
             font-weight: 500;
             font-size: 0.9rem;
             border: none;
+            text-align: center;
+            white-space: nowrap;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 2px;
         }
         
         .btn-action:hover {
@@ -1771,6 +1712,7 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
         
         .like-button:hover, .like-button.active {
             color: var(--main-accent) !important;
+            background-color: rgba(74, 107, 218, 0.1);
         }
         
         /* Style pour l'icône Flaticon du bouton like */
@@ -1785,9 +1727,9 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
             filter: drop-shadow(0px 0px 3px rgba(74, 107, 218, 0.5));
         }
         
-        .dislike-button:hover img, .dislike-button.active img {
-            transform: scale(1.15);
-            filter: drop-shadow(0px 0px 3px rgba(220, 53, 69, 0.5));
+        .dislike-button:hover, .dislike-button.active {
+            color: var(--danger-color) !important;
+            background-color: rgba(220, 53, 69, 0.1);
         }
         
         .like-count-badge img {
@@ -1871,22 +1813,33 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
             position: absolute;
             right: 10px;
             bottom: 10px;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
-            background-color: var(--main-accent);
-            border-color: var(--main-accent);
-            box-shadow: 0 2px 5px rgba(74, 107, 218, 0.3);
+            background: linear-gradient(45deg, #5e72e4, #3f51b5);
+            border: none;
+            box-shadow: 0 3px 8px rgba(94, 114, 228, 0.4);
+            transition: all 0.3s ease;
         }
         
         .btn-send-comment:hover, 
         .btn-send-comment:focus {
-            background-color: var(--main-accent-hover);
-            border-color: var(--main-accent-hover);
-            transform: translateY(-1px);
+            background: linear-gradient(45deg, #4a6bda, #3949ab);
+            transform: translateY(-2px) rotate(15deg);
+            box-shadow: 0 5px 12px rgba(94, 114, 228, 0.5);
+        }
+        
+        .btn-send-comment i {
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-send-comment:hover i {
+            transform: scale(1.1);
         }
         
         .comment-action-link {
@@ -2135,6 +2088,140 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
             min-width: 18px;
             height: 18px;
         }
+        
+        /* Style du bouton retour */
+        .btn-back {
+            transition: all 0.3s ease;
+            border-radius: 50px;
+            padding: 0.5rem 1.2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn-back:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+        
+        .btn-back i {
+            transition: transform 0.3s ease;
+        }
+        
+        .btn-back:hover i {
+            transform: translateX(-3px);
+        }
+        
+        /* Style badge lieu */
+        .location-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: #f8f9fa;
+            color: #495057;
+            padding: 0.35rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .location-badge i {
+            margin-right: 0.4rem;
+            color: var(--main-accent);
+        }
+        
+        /* Style pour le bouton j'aime/je n'aime pas */
+        .like-button, .dislike-button {
+            transition: all 0.3s ease;
+        }
+        
+        .like-button:hover, .like-button.active {
+            color: var(--main-accent) !important;
+        }
+        
+        .dislike-button:hover, .dislike-button.active {
+            color: var(--danger-color) !important;
+        }
+        
+        .like-button:hover i, .like-button.active i,
+        .dislike-button:hover i, .dislike-button.active i {
+            transform: scale(1.15);
+        }
+        
+        .like-button:hover i, .like-button.active i {
+            filter: drop-shadow(0px 0px 3px rgba(74, 107, 218, 0.5));
+        }
+        
+        .dislike-button:hover i, .dislike-button.active i {
+            filter: drop-shadow(0px 0px 3px rgba(220, 53, 69, 0.5));
+        }
+        
+        /* Style pour les boutons de like des commentaires */
+        .comment-action-link.comment-like-btn {
+            transition: all 0.3s ease;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        
+        .comment-action-link.comment-like-btn:hover,
+        .comment-action-link.comment-like-btn.active {
+            background-color: rgba(74, 107, 218, 0.1);
+            color: var(--main-accent) !important;
+        }
+        
+        .comment-action-link.comment-like-btn i {
+            transition: all 0.3s ease;
+        }
+        
+        .comment-action-link.comment-like-btn:hover i,
+        .comment-action-link.comment-like-btn.active i {
+            transform: scale(1.15);
+            color: var(--main-accent);
+        }
+        
+        .comment-like-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--main-accent);
+            background-color: rgba(74, 107, 218, 0.1);
+            border-radius: 10px;
+            padding: 0 6px;
+            min-width: 18px;
+            height: 18px;
+        }
+        
+        .like-button.active {
+            color: var(--main-accent) !important;
+            background-color: rgba(74, 107, 218, 0.15) !important;
+            font-weight: 500;
+        }
+        
+        .like-button.active i {
+            transform: scale(1.15);
+        }
+        
+        .dislike-button.active {
+            color: var(--danger-color) !important;
+            background-color: rgba(220, 53, 69, 0.15) !important;
+            font-weight: 500;
+        }
+        
+        .dislike-button.active i {
+            transform: scale(1.15);
+        }
+        
+        /* Styles inline pour forcer la coloration des boutons actifs */
+        button.like-button.active {
+            color: #4a6bda !important;
+            background-color: rgba(74, 107, 218, 0.15) !important;
+        }
+        
+        button.dislike-button.active {
+            color: #dc3545 !important;
+            background-color: rgba(220, 53, 69, 0.15) !important;
+        }
     </style>
 {% endblock %}
 
@@ -2143,6 +2230,10 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
 <div class=\"container my-4 my-lg-5\">
     <div class=\"row justify-content-center\">
         <div class=\"col-md-10 col-lg-8 col-xl-7\">
+            <!-- Bouton de retour -->
+            <a href=\"{{ path('socialVoyageurs_page') }}\" class=\"btn btn-outline-primary btn-back mb-3\">
+                <i class=\"fas fa-arrow-left me-2\"></i> Retour aux publications
+            </a>
 
             {# --- Card unique contenant le post et les commentaires --- #}
             <div class=\"post-card bg-white overflow-hidden\">
@@ -2171,13 +2262,19 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
                 {# Contenu du Post (Titre) #}
                 <div class=\"post-content pb-0\">
                     <h3 class=\"post-title\">{{ social_media.getTitre() }}</h3>
+                    
+                    <!-- Badge lieu -->
+                    <div class=\"location-badge\">
+                        <i class=\"fas fa-map-marker-alt\"></i> {{ social_media.getLieu() }}
+                    </div>
                 </div>
 
                 {# Image du Post (si présente) #}
                 {% if social_media.getImagemedia() %}
-                    <div class=\"post-image-container\">
-                        <img src=\"{{ asset('uploads/' ~ social_media.getImagemedia()) }}\"
-                             alt=\"Image pour {{ social_media.getTitre() }}\">
+                    <div class=\"post-image-container d-flex justify-content-center align-items-center bg-light\">
+                        <img src=\"{{ asset('http://localhost/ImageSocialMedia/' ~ social_media.getImagemedia()) }}\"
+                             alt=\"Image pour {{ social_media.getTitre() }}\" class=\"img-fluid\"
+                             onerror=\"this.onerror=null; this.src='{{ asset('images/image-not-found.png') }}'; this.alt='Image non disponible';\">
                     </div>
                 {% endif %}
 
@@ -2186,30 +2283,18 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
                     <div class=\"post-text\">{{ social_media.getContenu()|nl2br }}</div>
                 </div>
 
-                {# Statistiques (Likes/Dislikes) #}
+                {# Statistiques (Likes/Dislikes) - version simplifiée #}
                 <div class=\"post-stats d-flex justify-content-between align-items-center\">
                     <div class=\"d-flex align-items-center gap-3\">
-                         {% if social_media.getLikee() > 0 %}
                             <div class=\"d-flex align-items-center\">
-                                <span class=\"like-count-badge d-flex align-items-center justify-content-center rounded-pill\">
-                                    <img src=\"{{ asset('images/icons/like-button.png') }}\" alt=\"J'aime\" width=\"18\" height=\"18\" class=\"me-1\">
-                                    <span class=\"fw-medium text-white\">{{ social_media.getLikee() }}</span>
+                            <span class=\"badge rounded-pill bg-primary me-2\">
+                                <i class=\"fas fa-thumbs-up me-1\"></i> {{ social_media.getLikee() }}
+                                </span>
+                            
+                            <span class=\"badge rounded-pill bg-danger\">
+                                <i class=\"fas fa-thumbs-down me-1\"></i> {{ social_media.getDislike() }}
                                 </span>
                             </div>
-                         {% endif %}
-                         
-                         {% if social_media.getLikee() > 0 and social_media.getDislike() > 0 %}
-                            <div class=\"stats-separator mx-1\"></div>
-                         {% endif %}
-                        
-                          {% if social_media.getDislike() > 0 %}
-                            <div class=\"d-flex align-items-center\">
-                                <span class=\"dislike-count-badge d-flex align-items-center justify-content-center rounded-pill\">
-                                    <img src=\"{{ asset('images/icons/dislike-button.png') }}\" alt=\"Je n'aime pas\" width=\"18\" height=\"18\" class=\"me-1\">
-                                    <span class=\"fw-medium text-white\">{{ social_media.getDislike() }}</span>
-                                </span>
-                            </div>
-                          {% endif %}
                     </div>
                     
                     <div>
@@ -2221,48 +2306,90 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
                  </div>
 
                {# Barre d'actions J'aime/Commenter/Modifier/Supprimer #}
-                <div class=\"post-actions d-flex justify-content-around align-items-center flex-wrap\">
+                <div class=\"post-actions d-flex justify-content-between align-items-center\">
+                    <div class=\"d-flex flex-grow-1 mx-n1\">
                     {# Like Button (Form) #}
-                    <form action=\"{{ path('app_social_media_like', {idEB: social_media.idEB}) }}\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 mx-1 my-1 like-form\">
+                        <form action=\"{{ path('app_social_media_like', {idEB: social_media.idEB}) }}\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 px-1 like-form\">
                         <input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token('like-post') }}\">
-                        <button type=\"submit\" class=\"btn btn-action w-100 text-muted like-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}active{% endif %}\">
-                            <img src=\"{{ asset('images/icons/like-button.png') }}\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>
+                        <button type=\"submit\" 
+                               class=\"btn btn-action w-100 text-muted like-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}active{% endif %}\"
+                               {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}
+                                  style=\"color: #4a6bda !important; background-color: rgba(74, 107, 218, 0.15) !important; font-weight: 500;\"
+                               {% endif %}
+                        >
+                                <i class=\"fas fa-thumbs-up me-1\" 
+                                   {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'like' %}
+                                       style=\"transform: scale(1.15);\"
+                                   {% endif %}
+                                ></i> <span class=\"action-text\">J'aime</span>
                         </button>
                     </form>
 
                     {# Dislike Button (Form) #}
-                    <form action=\"{{ path('app_social_media_dislike', {idEB: social_media.idEB}) }}\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 mx-1 my-1 dislike-form\">
+                        <form action=\"{{ path('app_social_media_dislike', {idEB: social_media.idEB}) }}\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 px-1 dislike-form\">
                         <input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token('dislike-post') }}\">
-                        <button type=\"submit\" class=\"btn btn-action w-100 text-muted dislike-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}active{% endif %}\">
-                            <img src=\"{{ asset('images/icons/dislike-button.png') }}\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>
+                        <button type=\"submit\" 
+                                class=\"btn btn-action w-100 text-muted dislike-button {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}active{% endif %}\"
+                                {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}
+                                   style=\"color: #dc3545 !important; background-color: rgba(220, 53, 69, 0.15) !important; font-weight: 500;\"
+                                {% endif %}
+                        >
+                                <i class=\"fas fa-thumbs-down me-1\"
+                                   {% if app.session.get('user_post_actions')[social_media.idEB] is defined and app.session.get('user_post_actions')[social_media.idEB] == 'dislike' %}
+                                       style=\"transform: scale(1.15);\"
+                                   {% endif %}
+                                ></i> <span class=\"action-text\">Je n'aime pas</span>
                         </button>
                     </form>
 
     {# Comment Link/Button #}
-                    <a href=\"#comments-area\" class=\"btn btn-action flex-grow-1 text-muted mx-1 my-1\">
+                        <a href=\"#comments-area\" class=\"btn btn-action flex-grow-1 text-muted mx-1\">
                         <i class=\"bi bi-chat-dots me-1\"></i> <span class=\"action-text\">Commenter</span>
     </a>
 
                     {# Admin Actions #}
     {% if post_author and post_author.getIdU() == default_user_id %}
+                            <div class=\"d-flex flex-grow-1\">
                         {# Edit Button #}
-                        <a href=\"{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}\" class=\"btn btn-action flex-grow-1 text-muted mx-1 my-1\">
+                                <a href=\"{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}\" class=\"btn btn-action flex-grow-1 text-muted mx-1\">
                             <i class=\"bi bi-pencil-square me-1\"></i> <span class=\"action-text\">Éditer</span>
                         </a>
 
                         {# Delete Button #}
-                        <form action=\"{{ path('app_social_media_delete', {idEB: social_media.idEB}) }}\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 mx-1 my-1\" onsubmit=\"return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');\">
+                                <form action=\"{{ path('app_social_media_delete', {idEB: social_media.idEB}) }}\" method=\"POST\" class=\"d-inline m-0 flex-grow-1 px-1\" onsubmit=\"return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');\">
             <input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token('delete' ~ social_media.idEB) }}\">
             <button type=\"submit\" class=\"btn btn-action w-100 text-danger\">
                                 <i class=\"bi bi-trash me-1\"></i> <span class=\"action-text\">Supprimer</span>
             </button>
         </form>
+                            </div>
     {% endif %}
+                    </div>
 </div>
 
                 {# --- Section Commentaires intégrée --- #}
                 <div id=\"comments-area\" class=\"comments-section p-3\">
                     <h3 class=\"section-title fs-5\">Commentaires</h3>
+
+                    {# Affichage des erreurs basé sur les paramètres d'URL #}
+                    {% if app.request.query.get('error') %}
+                        {% set error_type = app.request.query.get('error') %}
+                        <div class=\"alert alert-danger mb-3\">
+                            {% if error_type == 'empty_comment' %}
+                                <strong>Erreur :</strong> Le commentaire ne peut pas être vide.
+                            {% elseif error_type == 'validation_failed' %}
+                                <strong>Erreur :</strong> {{ app.request.query.get('message', 'Erreur de validation du formulaire.') }}
+                            {% elseif error_type == 'forbidden_words' %}
+                                <strong>Erreur :</strong> Votre commentaire contient des mots interdits: {{ app.request.query.get('words') }}
+                            {% elseif error_type == 'database_error' %}
+                                <strong>Erreur :</strong> Une erreur s'est produite lors de l'enregistrement du commentaire.
+                            {% elseif error_type == 'form_not_submitted' %}
+                                <strong>Erreur :</strong> Le formulaire n'a pas été soumis correctement.
+                            {% else %}
+                                <strong>Erreur :</strong> Une erreur est survenue.
+                            {% endif %}
+                        </div>
+                    {% endif %}
 
                 {# Formulaire Ajout Commentaire #}
                     <div class=\"add-comment-form-container d-flex align-items-start\">
@@ -2273,16 +2400,22 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
                                 class=\"comment-author-img rounded-circle\" width=\"32\" height=\"32\">
                      </div>
                      <div class=\"flex-grow-1\">
-                        <form name=\"{{ comment_form.vars.name }}\" method=\"{{ comment_form.vars.method }}\" action=\"{{ comment_form.vars.action }}\" class=\"add-comment-form\" id=\"comment-form\">
+                        {# Noter que la route 'ajouter_commentaire' est dépréciée. Utiliser 'app_social_media_ajouter_commentaire' à la place #}
+                        <form name=\"{{ comment_form.vars.name }}\" method=\"{{ comment_form.vars.method }}\" action=\"{{ comment_form.vars.action }}\" class=\"add-comment-form\" id=\"comment-form\" novalidate>
                             <div class=\"position-relative\">
-                                {{ form_widget(comment_form.description, {'attr': {'rows': 1, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control comment-input py-2 px-3', 'id': 'comment-input'}}) }}
+                                {{ form_widget(comment_form.description, {'attr': {'rows': 2, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control comment-input py-2 px-3', 'id': 'comment-input', 'required': 'required', 'minlength': '5'}}) }}
                                 {{ form_errors(comment_form.description) }}
+                                <div id=\"empty-comment-error\" class=\"alert alert-danger mt-2\" style=\"display: none;\">Le commentaire ne peut pas être vide.</div>
                                 <button type=\"submit\" class=\"btn btn-primary btn-send-comment\" id=\"submit-comment\" aria-label=\"Publier le commentaire\">
-                                    <i class=\"bi bi-send-fill\"></i>
+                                    <i class=\"fas fa-paper-plane\"></i>
                                 </button>
                             </div>
                             {{ form_rest(comment_form) }}
                             <input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token('comment_token') }}\">
+                            <div class=\"d-none\">
+                                <p>DEBUG - Nom du formulaire: {{ comment_form.vars.name }}</p>
+                                <p>DEBUG - Nom du champ description: {{ comment_form.description.vars.full_name }}</p>
+                            </div>
                         </form>
                      </div>
                 </div>
@@ -2319,15 +2452,16 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
                                         <div class=\"comment-meta mt-1 ps-2 d-flex align-items-center flex-wrap\">
                         {# Date #}
                                             <small class=\"text-muted me-3\">
-                                                <i class=\"bi bi-clock\"></i>
-                                                Commentaire #{{ commentaire.idC }}
+                                                <i class=\"fas fa-clock me-1\"></i>
+                                                Il y a quelques instants
                         </small>
 
                                             {# Actions simplifiées #}
                                             <a href=\"#\" 
                                                class=\"comment-action-link small me-3 comment-like-btn {% if app.session.get('user_comment_actions')[commentaire.idC] is defined and app.session.get('user_comment_actions')[commentaire.idC] == 'like' %}active text-primary{% endif %}\"
+                                               onclick=\"event.preventDefault(); document.getElementById('like-comment-form-{{ commentaire.idC }}').submit();\"
                                                data-comment-id=\"{{ commentaire.idC }}\">
-                                                <i class=\"bi {% if app.session.get('user_comment_actions')[commentaire.idC] is defined and app.session.get('user_comment_actions')[commentaire.idC] == 'like' %}bi-heart-fill{% else %}bi-heart{% endif %}\"></i> 
+                                                <i class=\"{% if app.session.get('user_comment_actions')[commentaire.idC] is defined and app.session.get('user_comment_actions')[commentaire.idC] == 'like' %}fas fa-heart{% else %}far fa-heart{% endif %}\"></i> 
                                                 <span class=\"like-label\">J'aime</span>
                                                 {% if commentaire.numberlike > 0 %}
                                                     <span class=\"comment-like-count\">{{ commentaire.numberlike }}</span>
@@ -2338,14 +2472,14 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
                                             </form>
                                             
                                             {% if comment_author and comment_author.getIdU() == default_user_id %}
-                                                <a href=\"#\" class=\"comment-action-link small me-3 edit-comment-btn\" data-comment-id=\"{{ commentaire.idC }}\">
-                                                    <i class=\"bi bi-pencil-square\"></i> Modifier
+                                                <a href=\"{{ path('app_commentaire_edit', {'idC': commentaire.idC}) }}\" class=\"comment-action-link small me-3\">
+                                                    <i class=\"fas fa-pencil-alt\"></i> Modifier
                                                 </a>
 
                                                 <a href=\"#\" 
                                                    class=\"comment-action-link small text-danger\"
                                                    onclick=\"event.preventDefault(); if(confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) { document.getElementById('delete-form-{{ commentaire.idC }}').submit(); }\">
-                                                    <i class=\"bi bi-trash\"></i> Supprimer
+                                                    <i class=\"fas fa-trash-alt\"></i> Supprimer
                                                 </a>
                                                 <form id=\"delete-form-{{ commentaire.idC }}\" action=\"{{ path('app_commentaire_delete', {'idC': commentaire.idC}) }}\" method=\"POST\" class=\"d-none\">
                                                     <input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token('delete' ~ commentaire.idC) }}\">
@@ -2383,483 +2517,172 @@ class __TwigTemplate_33909d2e27521a8a42eddc87b9dd8944 extends Template
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Add AJAX functionality to like and dislike forms
-            const likeForm = document.querySelector('.like-form');
-            const dislikeForm = document.querySelector('.dislike-form');
-            const likeButton = document.querySelector('.like-button');
-            const dislikeButton = document.querySelector('.dislike-button');
-            
-            // Édition des commentaires in-line
-            const editCommentButtons = document.querySelectorAll('.edit-comment-btn');
-            if (editCommentButtons.length > 0) {
-                console.log('Found', editCommentButtons.length, 'edit comment buttons');
-                editCommentButtons.forEach(button => {
-                    button.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        
-                        const commentId = this.dataset.commentId;
-                        console.log('Edit clicked for comment ID:', commentId);
-                        
-                        // Trouver le conteneur de commentaire
-                        const commentContainer = document.getElementById('comment-' + commentId);
-                        if (!commentContainer) {
-                            console.error('Comment container not found for ID:', commentId);
-                            return;
-                        }
-                        
-                        // Trouver la bulle de commentaire
-                        const commentBubble = commentContainer.querySelector('.comment-bubble');
-                        const commentText = commentBubble.querySelector('.comment-text').innerHTML;
-                        
-                        // Sauvegarder le contenu original
-                        commentBubble.setAttribute('data-original-content', commentBubble.innerHTML);
-                        
-                        // Créer le formulaire d'édition
-                        const formHtml = `
-                            <div class=\"edit-comment-form\">
-                                <div class=\"form-group\">
-                                    <textarea class=\"form-control mb-2\" rows=\"3\" id=\"edit-comment-textarea-\${commentId}\">\${commentText.trim()}</textarea>
-                                </div>
-                                <div class=\"d-flex\">
-                                    <button type=\"button\" class=\"btn btn-primary btn-sm me-2 save-edit-btn\" data-comment-id=\"\${commentId}\">Enregistrer</button>
-                                    <button type=\"button\" class=\"btn btn-secondary btn-sm cancel-edit-btn\" data-comment-id=\"\${commentId}\">Annuler</button>
-                                </div>
-                            </div>
-                        `;
-                        
-                        // Remplacer le contenu de la bulle par le formulaire
-                        commentBubble.innerHTML = formHtml;
-                        
-                        // Focus sur le textarea
-                        document.getElementById(`edit-comment-textarea-\${commentId}`).focus();
-                        
-                        // Gérer l'annulation de l'édition
-                        commentBubble.querySelector('.cancel-edit-btn').addEventListener('click', function() {
-                            commentBubble.innerHTML = commentBubble.getAttribute('data-original-content');
-                        });
-                        
-                        // Gérer la sauvegarde de l'édition
-                        commentBubble.querySelector('.save-edit-btn').addEventListener('click', function() {
-                            const newContent = document.getElementById(`edit-comment-textarea-\${commentId}`).value;
-                            if (newContent.trim() === '') {
-                                showNotification('Le commentaire ne peut pas être vide', 'warning');
-                                return;
-                            }
-                            
-                            // Préparer les données
-                            const formData = new FormData();
-                            formData.append('description', newContent);
-                            
-                            // Envoyer la requête AJAX
-                            fetch(`/commentaire/\${commentId}/edit-ajax`, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                }
-                            })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`HTTP error! Status: \${response.status}`);
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                if (data.success) {
-                                    // Mettre à jour le commentaire
-                                    commentBubble.innerHTML = commentBubble.getAttribute('data-original-content');
-                                    commentBubble.querySelector('.comment-text').innerHTML = data.description;
-                                    
-                                    // Afficher une notification de succès
-                                    showNotification('Commentaire modifié avec succès', 'success');
-                                } else {
-                                    showNotification(data.error || 'Une erreur est survenue', 'danger');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                showNotification('Erreur lors de la modification du commentaire', 'danger');
-                                
-                                // Restaurer le formulaire en cas d'erreur
-                                commentBubble.innerHTML = commentBubble.getAttribute('data-original-content');
-                            });
-                        });
-                    });
-                });
-            }
-            
-            // Vérifiez l'état initial des boutons (via une requête au serveur ou des données injectées)
-            {% if app.session.get('user_post_actions')[social_media.idEB] is defined %}
-                {% set userAction = app.session.get('user_post_actions')[social_media.idEB] %}
-                {% if userAction == 'like' %}
-                    likeButton.classList.add('active');
-                    likeButton.innerHTML = `<img src=\"{{ asset('images/icons/like-button.png') }}\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                {% elseif userAction == 'dislike' %}
-                    dislikeButton.classList.add('active');
-                    dislikeButton.innerHTML = `<img src=\"{{ asset('images/icons/dislike-button.png') }}\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                {% endif %}
-            {% endif %}
-            
-            // Add animation to comments when they come into view
-            const commentEntries = document.querySelectorAll('.comment-entry');
-            
-            if (commentEntries.length > 0) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.style.opacity = \"1\";
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, {
-                    threshold: 0.1
-                });
+            // Force style des boutons actifs (like/dislike)
+            function applyActiveStyles() {
+                // Gestion du bouton like
+                const likeButton = document.querySelector('.like-button');
+                if (likeButton && likeButton.classList.contains('active')) {
+                    likeButton.style.color = '#4a6bda';
+                    likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
+                    likeButton.style.fontWeight = '500';
+                    const icon = likeButton.querySelector('i');
+                    if (icon) icon.style.transform = 'scale(1.15)';
+                }
                 
-                // Set initial opacity to 0 for smooth animation
-                commentEntries.forEach(entry => {
-                    entry.style.opacity = \"0\";
-                    observer.observe(entry);
-                });
-            }
-            
-            // Function to handle form submission
-            function handleFormSubmit(form, action) {
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    
-                    const button = form.querySelector('button');
-                    button.disabled = true;
-                    
-                    // Create FormData object
-                    const formData = new FormData(form);
-                    
-                    // Get the action URL from the form
-                    const url = form.getAttribute('action');
-                    
-                    // Create fetch request
-                    fetch(url, {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        button.disabled = false;
-                        
-                        if (data.success) {
-                            const oppositeButton = action === 'like' 
-                                ? document.querySelector('.dislike-button')
-                                : document.querySelector('.like-button');
-                            
-                            // Vérifier l'action retournée par le serveur
-                            if (data.action === action) {
-                                // L'action a été appliquée (ajout)
-                                if (action === 'like') {
-                                    button.innerHTML = `<img src=\"{{ asset('images/icons/like-button.png') }}\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                                } else {
-                                    button.innerHTML = `<img src=\"{{ asset('images/icons/dislike-button.png') }}\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                }
-                                button.classList.add('active');
-                                
-                                // S'assurer que l'autre bouton est désactivé
-                                oppositeButton.classList.remove('active');
-                                oppositeButton.innerHTML = action === 'like'
-                                    ? `<img src=\"{{ asset('images/icons/like-button.png') }}\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`
-                                    : `<img src=\"{{ asset('images/icons/dislike-button.png') }}\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                
-                            } else if (data.action === null) {
-                                // L'action a été retirée (toggle off)
-                                if (action === 'like') {
-                                    button.innerHTML = `<img src=\"{{ asset('images/icons/like-button.png') }}\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                                } else {
-                                    button.innerHTML = `<img src=\"{{ asset('images/icons/dislike-button.png') }}\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                }
-                                button.classList.remove('active');
-                            } else {
-                                // On a changé d'avis (like -> dislike ou dislike -> like)
-                                if (data.action === 'like') {
-                                    document.querySelector('.like-button').innerHTML = `<img src=\"{{ asset('images/icons/like-button.png') }}\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                                    document.querySelector('.like-button').classList.add('active');
-                                    document.querySelector('.dislike-button').innerHTML = `<img src=\"{{ asset('images/icons/dislike-button.png') }}\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                    document.querySelector('.dislike-button').classList.remove('active');
-                                } else {
-                                    document.querySelector('.dislike-button').innerHTML = `<img src=\"{{ asset('images/icons/dislike-button.png') }}\" alt=\"Je n'aime pas\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">Je n'aime pas</span>`;
-                                    document.querySelector('.dislike-button').classList.add('active');
-                                    document.querySelector('.like-button').innerHTML = `<img src=\"{{ asset('images/icons/like-button.png') }}\" alt=\"J'aime\" width=\"16\" height=\"16\" class=\"me-1\"> <span class=\"action-text\">J'aime</span>`;
-                                    document.querySelector('.like-button').classList.remove('active');
-                                }
-                            }
-                            
-                            // Update stats
-                            updateStats(data.likeCount, data.dislikeCount);
-                            
-                            // Add a subtle feedback animation
-                            button.classList.add('pulsate');
-                            setTimeout(() => {
-                                button.classList.remove('pulsate');
-                            }, 1000);
-                            
-                            // Show success notification
-                            showNotification(data.message, 'success');
-                        } else {
-                            console.error('Action failed:', data.error);
-                            // Show error notification
-                            showNotification('Une erreur est survenue', 'danger');
-                        }
-                    })
-                    .catch(error => {
-                        button.disabled = false;
-                        console.error('Error:', error);
-                        showNotification('Erreur de connexion', 'danger');
-                    });
-                });
-            }
-            
-            // Apply handlers
-            if (likeForm) handleFormSubmit(likeForm, 'like');
-            if (dislikeForm) handleFormSubmit(dislikeForm, 'dislike');
-            
-            // Function to update stats display
-            function updateStats(likeCount, dislikeCount) {
-                const statsElement = document.querySelector('.post-stats');
-                if (statsElement) {
-                    let html = '<div class=\"d-flex align-items-center gap-3\">';
-                    
-                    if (likeCount > 0) {
-                        html += `
-                            <div class=\"d-flex align-items-center\">
-                                <span class=\"like-count-badge d-flex align-items-center justify-content-center rounded-pill\">
-                                    <img src=\"{{ asset('images/icons/like-button.png') }}\" alt=\"J'aime\" width=\"18\" height=\"18\" class=\"me-1\">
-                                    <span class=\"fw-medium text-white\">\${likeCount}</span>
-                                </span>
-                            </div>
-                        `;
-                    }
-                    
-                    if (likeCount > 0 && dislikeCount > 0) {
-                        html += `<div class=\"stats-separator mx-1\"></div>`;
-                    }
-                    
-                    if (dislikeCount > 0) {
-                        html += `
-                            <div class=\"d-flex align-items-center\">
-                                <span class=\"dislike-count-badge d-flex align-items-center justify-content-center rounded-pill\">
-                                    <img src=\"{{ asset('images/icons/dislike-button.png') }}\" alt=\"Je n'aime pas\" width=\"18\" height=\"18\" class=\"me-1\">
-                                    <span class=\"fw-medium text-white\">\${dislikeCount}</span>
-                                </span>
-                            </div>
-                        `;
-                    }
-                    
-                    html += '</div>';
-                    html += `
-                        <div>
-                            <small class=\"text-muted d-flex align-items-center\">
-                                <i class=\"bi bi-chat-dots me-1\"></i>
-                                <span class=\"comments-count\">\${document.querySelectorAll('.comment-entry').length}</span> 
-                                commentaire\${document.querySelectorAll('.comment-entry').length !== 1 ? 's' : ''}
-                            </small>
-                        </div>
-                    `;
-                    
-                    // Create a flash effect on update
-                    statsElement.classList.add('highlight');
-                    statsElement.innerHTML = html;
-                    
-                    setTimeout(() => {
-                        statsElement.classList.remove('highlight');
-                    }, 1000);
+                // Gestion du bouton dislike
+                const dislikeButton = document.querySelector('.dislike-button');
+                if (dislikeButton && dislikeButton.classList.contains('active')) {
+                    dislikeButton.style.color = '#dc3545';
+                    dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
+                    dislikeButton.style.fontWeight = '500';
+                    const icon = dislikeButton.querySelector('i');
+                    if (icon) icon.style.transform = 'scale(1.15)';
                 }
             }
             
-            // Function to show notification
-            function showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `alert alert-\${type} position-fixed start-50 translate-middle-x`;
-                notification.style.top = '20px';
-                notification.style.zIndex = '9999';
-                notification.style.maxWidth = '90%';
-                notification.style.width = '350px';
-                notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateY(-20px)';
-                notification.style.transition = 'all 0.3s ease';
-                notification.innerHTML = message;
-                
-                document.body.appendChild(notification);
-                
-                // Trigger animation
-                setTimeout(() => {
-                    notification.style.opacity = '1';
-                    notification.style.transform = 'translateY(0)';
-                }, 10);
-                
-                setTimeout(() => {
-                    notification.style.opacity = '0';
-                    notification.style.transform = 'translateY(-20px)';
-                    
-                    setTimeout(() => {
-                        document.body.removeChild(notification);
-                    }, 300);
-                }, 3000);
+            // Appliquer les styles immédiatement
+            applyActiveStyles();
+            
+            // Appliquer les styles à nouveau après un court délai (pour être sûr que le DOM est entièrement chargé)
+            setTimeout(applyActiveStyles, 100);
+            
+            // -------------------- GESTION DES LIKES/DISLIKES --------------------
+            const likeButton = document.querySelector('.like-button');
+            const dislikeButton = document.querySelector('.dislike-button');
+            
+            // Mettre en évidence les boutons actifs
+            if (likeButton && likeButton.classList.contains('active')) {
+                likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
+                likeButton.style.color = '#4a6bda';
+                const icon = likeButton.querySelector('i');
+                if (icon) icon.style.transform = 'scale(1.15)';
             }
             
-            // Smooth scroll for comment link
-            const commentLink = document.querySelector('a[href=\"#comments-area\"]');
-            if (commentLink) {
-                commentLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const commentsSection = document.getElementById('comments-area');
-                    if (commentsSection) {
-                        commentsSection.scrollIntoView({
-                            behavior: 'smooth'
-                        });
+            if (dislikeButton && dislikeButton.classList.contains('active')) {
+                dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
+                dislikeButton.style.color = '#dc3545';
+                const icon = dislikeButton.querySelector('i');
+                if (icon) icon.style.transform = 'scale(1.15)';
+            }
+            
+            // Effets au survol
+            if (likeButton) {
+                likeButton.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '#4a6bda';
+                        this.style.backgroundColor = 'rgba(74, 107, 218, 0.05)';
+                    }
+                });
+                
+                likeButton.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '';
+                        this.style.backgroundColor = '';
                     }
                 });
             }
-
-            // Ajouter le gestionnaire d'événement pour le formulaire de commentaire
+            
+            if (dislikeButton) {
+                dislikeButton.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '#dc3545';
+                        this.style.backgroundColor = 'rgba(220, 53, 69, 0.05)';
+                    }
+                });
+                
+                dislikeButton.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.color = '';
+                        this.style.backgroundColor = '';
+                    }
+                });
+            }
+            
+            // -------------------- VALIDATION DES COMMENTAIRES --------------------
             const commentForm = document.getElementById('comment-form');
             const commentInput = document.getElementById('comment-input');
-            const commentsList = document.getElementById('comments-list');
+            const errorMessage = document.getElementById('empty-comment-error');
             
-            if (commentForm) {
-                commentForm.addEventListener('submit', function(event) {
-                    event.preventDefault();
+            if (commentForm && commentInput && errorMessage) {
+                // Fonction de validation
+                function validateComment() {
+                    const content = commentInput.value.trim();
                     
-                    if (!commentInput.value.trim()) {
-                        showNotification('Le commentaire ne peut pas être vide', 'warning');
-                        return;
+                    if (!content) {
+                        commentInput.classList.add('is-invalid');
+                        errorMessage.textContent = 'Le commentaire ne peut pas être vide.';
+                        errorMessage.style.display = 'block';
+                        return false;
+                    } else if (content.length < 5) {
+                        commentInput.classList.add('is-invalid');
+                        errorMessage.textContent = 'Le commentaire doit contenir au moins 5 caractères.';
+                        errorMessage.style.display = 'block';
+                        return false;
+                    } else {
+                        commentInput.classList.remove('is-invalid');
+                        errorMessage.style.display = 'none';
+                        return true;
                     }
-                    
-                    const submitButton = document.getElementById('submit-comment');
-                    submitButton.disabled = true;
-                    
-                    const formData = new FormData(commentForm);
-                    
-                    fetch(commentForm.getAttribute('action'), {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .catch(error => {
-                        // En cas d'erreur de parsing JSON (comme une redirection), on traite comme un succès
-                        // et on recharge la page
-                        return { success: false, reload: true };
-                    })
-                    .then(data => {
-                        submitButton.disabled = false;
-                        
-                        if (data.reload) {
-                            // Si on ne peut pas traiter la réponse JSON, on recharge la page
-                            window.location.reload();
-                            return;
-                        }
-                        
-                        if (data.success) {
-                            // Vider le champ de saisie
-                            commentInput.value = '';
-                            
-                            // Recharger juste la liste des commentaires
-                            window.location.reload();
-                            
-                            // Afficher un message de succès
-                            showNotification(data.message || 'Commentaire ajouté avec succès !', 'success');
-                        } else {
-                            showNotification(data.error || 'Erreur lors de l\\'ajout du commentaire', 'danger');
-                        }
-                    })
-                    .catch(error => {
-                        submitButton.disabled = false;
-                        console.error('Error:', error);
-                        showNotification('Erreur de connexion', 'danger');
-                    });
-                });
-            }
-
-            // Ajouter le gestionnaire d'événement pour les likes de commentaires
-            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
-            
-            if (commentLikeButtons.length > 0) {
-                console.log('Found', commentLikeButtons.length, 'comment like buttons');
+                }
                 
-                commentLikeButtons.forEach(button => {
-                    button.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        
-                        const commentId = this.dataset.commentId;
-                        console.log('Like clicked for comment ID:', commentId);
-                        
-                        const likeForm = document.getElementById(`like-comment-form-\${commentId}`);
-                        
-                        if (!likeForm) {
-                            console.error(`Form not found for comment ID: \${commentId}`);
-                            showNotification('Erreur: formulaire introuvable', 'danger');
-                            return;
-                        }
-                        
-                        const formData = new FormData(likeForm);
-                        console.log('Submitting form to:', likeForm.getAttribute('action'));
-                        
-                        fetch(likeForm.getAttribute('action'), {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => {
-                            console.log('Response status:', response.status);
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: \${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Success data:', data);
-                            if (data.success) {
-                                // Mise à jour visuelle du bouton
-                                if (data.isLiked) {
-                                    this.classList.add('active', 'text-primary');
-                                    this.querySelector('i').classList.replace('bi-heart', 'bi-heart-fill');
-                                } else {
-                                    this.classList.remove('active', 'text-primary');
-                                    this.querySelector('i').classList.replace('bi-heart-fill', 'bi-heart');
-                                }
-                                
-                                // Mise à jour du compteur de likes
-                                let countSpan = this.querySelector('.comment-like-count');
-                                if (data.likeCount > 0) {
-                                    if (countSpan) {
-                                        countSpan.textContent = data.likeCount;
-                                    } else {
-                                        countSpan = document.createElement('span');
-                                        countSpan.className = 'comment-like-count';
-                                        countSpan.textContent = data.likeCount;
-                                        this.appendChild(countSpan);
-                                    }
-                                } else if (countSpan) {
-                                    countSpan.remove();
-                                }
-                                
-                                // Afficher un message de succès
-                                showNotification(data.message, 'success');
-                            } else {
-                                console.error('Action failed:', data.error);
-                                showNotification(data.error || 'Une erreur est survenue', 'danger');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showNotification('Erreur de connexion avec le serveur: ' + error.message, 'danger');
-                        });
-                    });
+                // Validation en temps réel
+                commentInput.addEventListener('input', validateComment);
+                
+                // Validation à la soumission
+                commentForm.addEventListener('submit', function(e) {
+                    if (!validateComment()) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    return true;
                 });
-            } else {
-                console.log('No comment like buttons found on the page');
             }
+            
+            // -------------------- ANIMATIONS --------------------
+            // Animation image de publication
+            const postImage = document.querySelector('.post-image-container img');
+            if (postImage) {
+                postImage.style.opacity = '0';
+                setTimeout(() => {
+                    postImage.style.opacity = '1';
+                }, 300);
+            }
+            
+            // Animation bouton retour
+            const backButton = document.querySelector('.btn-back');
+            if (backButton) {
+                backButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    
+                    document.querySelector('.post-card').style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 300);
+                });
+            }
+            
+            // Animation des boutons like des commentaires
+            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
+            commentLikeButtons.forEach(button => {
+                if (button.classList.contains('active')) {
+                    button.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
+                }
+                
+                button.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.backgroundColor = '';
+                    }
+                });
+            });
         });
     </script>
 {% endblock %}
-", "social_media/show.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\social_media\\show.html.twig");
+", "social_media/show.html.twig", "C:\\Users\\meria\\OneDrive - ESPRIT\\Bureau\\Airmess_Web\\templates\\social_media\\show.html.twig");
     }
 }
