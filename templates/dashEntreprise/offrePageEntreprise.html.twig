@@ -27,6 +27,7 @@
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de Fin</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre Limite</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                 </tr>
               </thead>
@@ -36,8 +37,8 @@
                     <td>
                       {% if offre.imagePath %}
                         <img src="{{ asset(offre.imagePath) }}" alt="Image de l'offre" class="img-fluid" style="max-width: 100px; max-height: 100px;">
-                      {% else %}
-                        <p class="text-xs font-weight-bold mb-0">Aucune image</p>
+                {% else %}
+                  <p class="text-xs font-weight-bold mb-0">Aucune image</p>
                       {% endif %}
                     </td>
                     <td>
@@ -61,24 +62,42 @@
                     <td>
                       <p class="text-xs font-weight-bold mb-0">{{ offre.description }}</p>
                     </td>
-                    <td class="align-middle">
+<td class="align-middle">
+                      <span class="badge {% if offre.statusoff.value == 'Confirmé' %}bg-success{% elseif offre.statusoff.value == 'Rejeté' %}bg-danger{% else %}bg-warning{% endif %}">
+                        {{ offre.statusoff.value }}
+                      </span>
+                    </td>
+<td class="align-middle">
                       <!-- Bouton Modifier -->
-                      <a href="{{ path('app_offre_edit', {'idO': offre.idO}) }}" class="btn btn-info btn-xs" title="Modifier" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
-                        Modifier
-                      </a>
+<a href="{{ path('app_offre_edit', {'idO': offre.idO}) }}" class="btn btn-info btn-xs" title="Modifier" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+Modifier
+</a>
 
-                      <!-- Bouton Supprimer -->
-                      <form action="{{ path('app_offre_delete', {'idO': offre.idO}) }}" method="post" style="display: inline-block;">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ offre.idO) }}">
-                        <button type="submit" class="btn btn-danger btn-xs" title="Supprimer" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+<!-- Bouton Supprimer -->
+<form action="{{ path('app_offre_delete', {'idO': offre.idO}) }}" method="post" style="display: inline-block;">
+<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ offre.idO) }}">
+<button type="submit" class="btn btn-danger btn-xs" title="Supprimer" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
                           Supprimer
                         </button>
                       </form>
-                    </td>
-                  </tr>
-                {% else %}
-                  <tr>
-                    <td colspan="9" class="text-center">Aucune offre trouvée.</td>
+
+<td class="align-middle">
+                      {% if offre.statusoff.value == 'En attente' %}
+                        <form action="{{ path('app_offre_confirm', {'idO': offre.idO}) }}" method="post" style="display: inline-block;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ offre.idO) }}">
+                            <button type="submit" class="btn btn-success btn-sm">Confirmer</button>
+                          </form>
+                          <form action="{{ path('app_offre_reject', {'idO': offre.idO}) }}" method="post" style="display: inline-block;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ offre.idO) }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Rejeter</button>
+                          </form>
+                        {% elseif offre.statusoff.value == 'Confirmé' %}
+                          <span class="badge bg-success">Confirmé</span>
+                        {% elseif offre.statusoff.value == 'Rejeté' %}
+                          <span class="badge bg-danger">Rejeté</span>
+                        {% endif %}
+                      </td>
+</td>
                   </tr>
                 {% endfor %}
               </tbody>

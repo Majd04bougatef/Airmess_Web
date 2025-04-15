@@ -13,6 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Enum\OffreStatus;
 
 class OffreType extends AbstractType
 {
@@ -56,6 +58,15 @@ class OffreType extends AbstractType
             ])
             ->add('aidesc', TextareaType::class, [
                 'label' => 'Aide Description',
+                'attr' => ['class' => 'form-control'],
+            ])
+            ->add('statusoff', ChoiceType::class, [
+                'choices' => [
+                    'En attente' => OffreStatus::EN_ATTENTE,
+                    'Confirmé' => OffreStatus::CONFIRME,
+                    'Rejeté' => OffreStatus::REJETE,
+                ],
+                'label' => 'Statut de l\'offre',
                 'attr' => ['class' => 'form-control'],
             ]);
     }

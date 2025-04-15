@@ -6,6 +6,7 @@ use App\Repository\OffreRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Enum\OffreStatus;
 
 #[ORM\Entity(repositoryClass: OffreRepository::class)]
 class Offre
@@ -58,6 +59,9 @@ class Offre
 
     #[ORM\Column(type: Types::TEXT)]
     private string $aidesc = '';
+
+    #[ORM\Column(type: 'string', enumType: OffreStatus::class, options: ['default' => OffreStatus::EN_ATTENTE])]
+    private OffreStatus $statusoff = OffreStatus::EN_ATTENTE;
 
     public function getIdO(): ?int
     {
@@ -180,6 +184,18 @@ class Offre
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getStatusoff(): OffreStatus
+    {
+        return $this->statusoff;
+    }
+
+    public function setStatusoff(OffreStatus $statusoff): static
+    {
+        $this->statusoff = $statusoff;
 
         return $this;
     }

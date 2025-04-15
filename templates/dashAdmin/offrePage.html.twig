@@ -1,6 +1,6 @@
 {% extends 'dashAdmin/dashboard.html.twig' %}
 
-{% block title %}Offers Management{% endblock %}
+{% block title %}Gestion des Offres{% endblock %}
 
 {% block content %}
 <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
@@ -27,46 +27,89 @@
   <div class="row">
     <div class="col-12">
       <div class="card mb-4">
-        <div class="card-header pb-0">
-          <h6>Offres Table</h6>
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+          <h6>Gestion des Offres</h6>
+          <!-- Bouton pour ajouter une nouvelle offre -->
+          <button type="button" class="btn btn-primary">
+            <a href="{{ path('app_offre_new') }}" style="color: white; text-decoration: none;">Nouvelle Offre</a>
+          </button>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
-          <div class="table-responsive p-0">
+          <div class="table-responsive p-4">
             <table class="table align-items-center mb-0">
               <thead>
                 <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Titre</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Description</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
-                  <th class="text-secondary opacity-7"></th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Image</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lieu</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix Initial</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix Après Réduction</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de Début</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de Fin</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre Limite</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <!-- Example row, to be replaced with actual data -->
-                <tr>
-                  <td>
-                    <div class="d-flex px-2 py-1">
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="mb-0 text-sm">Special Offer</h6>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p class="text-xs font-weight-bold mb-0">Description de l'offre</p>
-                  </td>
-                  <td class="align-middle text-center text-sm">
-                    <span class="text-secondary text-xs font-weight-bold">€99.99</span>
-                  </td>
-                  <td class="align-middle text-center">
-                    <span class="text-secondary text-xs font-weight-bold">23/04/2022</span>
-                  </td>
-                  <td class="align-middle">
-                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                      Edit
-                    </a>
-                  </td>
-                </tr>
+                {% for offre in offres %}
+                  <tr>
+                    <td>
+                      {% if offre.imagePath %}
+                        <img src="{{ asset(offre.imagePath) }}" alt="Image de l'offre" class="img-fluid" style="max-width: 100px; max-height: 100px;">
+                      {% else %}
+                        <p class="text-xs font-weight-bold mb-0">Aucune image</p>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.place }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.priceInit }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.priceAfter }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.startDate ? offre.startDate|date('Y-m-d H:i:s') : '' }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.endDate ? offre.endDate|date('Y-m-d H:i:s') : '' }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.numberLimit }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.description }}</p>
+                    </td>
+                    <td class="align-middle">
+                      <span class="badge {% if offre.statusoff.value == 'Confirmé' %}bg-success{% elseif offre.statusoff.value == 'Rejeté' %}bg-danger{% else %}bg-warning{% endif %}">
+                        {{ offre.statusoff.value }}
+                      </span>
+                    </td>
+                    <td class="align-middle">
+                      <!-- Boutons Confirmer/Rejeter -->
+                      {% if offre.statusoff.value == 'En attente' %}
+                        <form action="{{ path('app_offre_confirm', {'idO': offre.idO}) }}" method="post" style="display: inline-block;">
+                          <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ offre.idO) }}">
+                          <button type="submit" class="btn btn-success btn-sm">Confirmer</button>
+                        </form>
+                        <form action="{{ path('app_offre_reject', {'idO': offre.idO}) }}" method="post" style="display: inline-block;">
+                          <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ offre.idO) }}">
+                          <button type="submit" class="btn btn-danger btn-sm">Rejeter</button>
+                        </form>
+                      {% elseif offre.statusoff.value == 'Confirmé' %}
+                        <span class="badge bg-success">Confirmé</span>
+                      {% elseif offre.statusoff.value == 'Rejeté' %}
+                        <span class="badge bg-danger">Rejeté</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="10" class="text-center">Aucune offre trouvée.</td>
+                  </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>

@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Enum\OffreStatus;
 
 #[Route('/offres')]
 final class OffreController extends AbstractController
@@ -85,5 +86,31 @@ final class OffreController extends AbstractController
         }
 
         return $this->redirectToRoute('offreEntreprise_page');
+    }
+
+    #[Route('/offre/{idO}/confirm', name: 'app_offre_confirm', methods: ['POST'])]
+    public function confirm(Request $request, Offre $offre, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('confirm' . $offre->getIdO(), $request->request->get('_token'))) {
+            $offre->setStatusoff(OffreStatus::CONFIRME);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Offre confirmée avec succès.');
+        }
+
+        return $this->redirectToRoute('app_offre_page');
+    }
+
+    #[Route('/offre/{idO}/reject', name: 'app_offre_reject', methods: ['POST'])]
+    public function reject(Request $request, Offre $offre, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('reject' . $offre->getIdO(), $request->request->get('_token'))) {
+            $offre->setStatusoff(OffreStatus::REJETE);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Offre rejetée avec succès.');
+        }
+
+        return $this->redirectToRoute('app_offre_page');
     }
 }

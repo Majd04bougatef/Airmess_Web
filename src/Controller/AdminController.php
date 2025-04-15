@@ -3,6 +3,8 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\OffreRepository;
+use Symfony\Component\HttpFoundation\Response;
 
 class AdminController extends AbstractController
 {
@@ -34,11 +36,16 @@ class AdminController extends AbstractController
         return $this->render('dashAdmin/bonplanPage.html.twig');
     }
 
-    #[Route('/OffrePage', name: 'offre_page')]
-    public function offrePage()
+    #[Route('/admin/offres', name: 'app_offre_page', methods: ['GET'])]
+    public function offrePage(OffreRepository $offreRepository): Response
     {
-        // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashAdmin/offrePage.html.twig');
+        // Récupérer toutes les offres depuis le repository
+        $offres = $offreRepository->findAll();
+
+        // Transmettre les offres au template
+        return $this->render('dashAdmin/offrePage.html.twig', [
+            'offres' => $offres,
+        ]);
     }
 
     #[Route('/SocialPage', name: 'social_page')]
