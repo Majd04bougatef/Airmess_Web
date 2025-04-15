@@ -792,12 +792,12 @@
                       <div class="social-post-footer">
                           <div class="social-interactions">
                               <span><i class="bi bi-heart"></i> {{ publication.likee }}</span>
-                              <span><i class="bi bi-chat"></i> {% if publication.commentaires is defined %}{{ publication.commentaires|length }}{% else %}0{% endif %}</span>
+                              <span><i class="bi bi-chat"></i> 0</span>
                               <span><i class="bi bi-share"></i> {{ publication.dislike }}</span>
                           </div>
                       </div>
                       <div class="mt-2 text-center">
-                          <a href="{% if app.user %}{{ path('socialVoyageurs_page') }}{% else %}{{ path('app_login') }}{% endif %}" class="btn btn-sm btn-outline-primary">
+                          <a href="{% if app.user %}{{ path('socialVoyageurs_page') }}{% else %}{{ path('login') }}{% endif %}" class="btn btn-sm btn-outline-primary">
                               <i class="bi bi-eye"></i> Voir plus
                           </a>
                       </div>
@@ -832,7 +832,7 @@
                               </div>
                           </div>
                           <div class="mt-2 text-center">
-                              <a href="{% if app.user %}{{ path('socialVoyageurs_page') }}{% else %}{{ path('app_login') }}{% endif %}" class="btn btn-sm btn-outline-primary">
+                              <a href="{% if app.user %}{{ path('socialVoyageurs_page') }}{% else %}{{ path('login') }}{% endif %}" class="btn btn-sm btn-outline-primary">
                                   <i class="bi bi-eye"></i> Voir plus
                               </a>
                           </div>
@@ -844,7 +844,7 @@
         
         <div class="row mt-4">
           <div class="col-12 text-center">
-            <a href="{% if app.user %}{{ path('socialVoyageurs_page') }}{% else %}{{ path('app_login') }}{% endif %}" class="btn btn-primary">Voir plus de publications</a>
+            <a href="{% if app.user %}{{ path('socialVoyageurs_page') }}{% else %}{{ path('login') }}{% endif %}" class="btn btn-primary">Voir plus de publications</a>
           </div>
         </div>
       </div>
