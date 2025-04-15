@@ -70,11 +70,15 @@ class AdminController extends AbstractController
         $projectDir = $this->getParameter('kernel.project_dir');
         
         foreach ($results['items'] as $user) {
-            $imagePath = $projectDir . '/public/images/users/' . $user->getImagesU();
+            $imagePath = $projectDir . '/public/uploads/users/' . $user->getImagesU();
             
             // If user image doesn't exist or is empty, set to default
-            if (empty($user->getImagesU()) || !file_exists($imagePath)) {
-                $user->setImagesU('default.jpg');
+            if (empty($user->getImagesU()) || 
+                $user->getImagesU() === 'default.jpg' || 
+                !file_exists($imagePath)) {
+                
+                // Always use default.png for missing images
+                $user->setImagesU('default.png');
                 $updateDb = true;
             }
         }
@@ -162,7 +166,7 @@ class AdminController extends AbstractController
                 $user->setDeleteFlag(0);
                 
                 // Default image if no upload
-                $user->setImagesU('default.jpg');
+                $user->setImagesU('default.png');
                 
                 // Set current date as registration date
                 $user->setDateNaiss(new \DateTime());
@@ -181,7 +185,7 @@ class AdminController extends AbstractController
                     // Move the file to the directory where user photos are stored
                     try {
                         $photoFile->move(
-                            $this->getParameter('kernel.project_dir').'/public/images/users',
+                            $this->getParameter('kernel.project_dir').'/public/uploads/users',
                             $newFilename
                         );
                         // Update the 'imagesU' property to store the photo filename
@@ -254,7 +258,7 @@ class AdminController extends AbstractController
                     // Move the file to the directory where user photos are stored
                     try {
                         $photoFile->move(
-                            $this->getParameter('kernel.project_dir').'/public/images/users',
+                            $this->getParameter('kernel.project_dir').'/public/uploads/users',
                             $newFilename
                         );
                         // Update the 'imagesU' property to store the photo filename

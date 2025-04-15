@@ -47,25 +47,8 @@ class TestEmailCommand extends Command
             
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            $io->error('Failed to send test email: ' . $e->getMessage());
-            $io->section('Exception Type');
-            $io->text(get_class($e));
-            
-            $io->section('Stack Trace (First Few Lines)');
-            $stackTrace = explode("\n", $e->getTraceAsString());
-            foreach (array_slice($stackTrace, 0, 10) as $line) {
-                $io->text($line);
-            }
-            
-            // Suggestion for possible fixes
-            $io->section('Possible Solutions');
-            $io->listing([
-                'Check if the Gmail account has allowed "Less secure app access" or is using App Password',
-                'Verify that the SMTP credentials are correct',
-                'Make sure the Gmail account is not blocked for suspicious activity',
-                'Try changing port from 587 to 465 with ssl:// instead of smtp://',
-                'Check your firewall settings to ensure SMTP traffic is allowed'
-            ]);
+            $io->error('Failed to send email: ' . $e->getMessage());
+            $io->text('Stack trace: ' . $e->getTraceAsString());
             
             return Command::FAILURE;
         }

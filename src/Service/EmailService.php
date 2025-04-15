@@ -131,13 +131,16 @@ class EmailService
             
             return true;
         } catch (\Exception $e) {
-            // Log error
+            // Log detailed error information
             $errorMsg = 'Failed to send password reset code to ' . $emailAddress . ': ' . $e->getMessage();
+            $errorTrace = $e->getTraceAsString();
             
             if ($this->logger) {
                 $this->logger->error($errorMsg);
+                $this->logger->error('Error trace: ' . $errorTrace);
             } else {
                 error_log($errorMsg);
+                error_log('Error trace: ' . $errorTrace);
             }
             
             return false;

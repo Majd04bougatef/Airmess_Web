@@ -1,0 +1,35 @@
+/* Forbidden Words Alert Styling */
+.forbidden-words-alert {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.forbidden-words-alert h5 {
+    margin-top: 0;
+    color: #721c24;
+    font-weight: bold;
+}
+
+.forbidden-words-alert p {
+    margin-bottom: 5px;
+}
+
+.forbidden-word-highlight {
+    background-color: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 3px;
+    text-decoration: underline wavy red;
+}
+
+.forbidden-words-preview {
+    min-height: 20px;
+    padding: 5px;
+    margin-top: 5px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+}
