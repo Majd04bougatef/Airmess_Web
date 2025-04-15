@@ -4,15 +4,182 @@
 {% block title %}Social Media Feed{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }} {# Include any base styles #}
-    {# === Styles remain here === #}
-    
+    {{ parent() }}
+    <style>
+        :root {
+            --main-accent: #4a6bda;
+            --main-accent-hover: #3d58b3;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --light-bg: #f8f9fa;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+        }
+        
+        .feed-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+        
+        .search-form {
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .publication-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            background-color: white;
+        }
+        
+        .publication-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-img-top {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-text {
+            max-height: 4.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            color: #555;
+        }
+        
+        .location-badge {
+            background-color: #f8f9fa;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .location-badge i {
+            margin-right: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .card-footer {
+            background-color: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.75rem 1.25rem;
+        }
+        
+        .date-info {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .author-info {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .interaction-icons {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .interaction-icons .badge {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+        }
+        
+        .badge-like {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--success-color);
+        }
+        
+        .badge-dislike {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: var(--danger-color);
+        }
+        
+        .feed-header {
+            margin-bottom: 2rem;
+            text-align: center;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .add-post-btn {
+            margin-top: 1rem;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(74, 107, 218, 0.2);
+        }
+        
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--main-accent);
+            border-color: var(--main-accent);
+        }
+        
+        .page-link {
+            color: var(--main-accent);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
 <div class="container feed-container mt-4 mb-4">
 
-    <h1 class="text-center mb-4">📢 Social Feed</h1>
+    <div class="feed-header">
+        <h1 class="display-5 fw-bold">📢 Social Feed</h1>
+        <p class="text-muted">Découvrez et partagez des expériences avec la communauté</p>
+        <a href="{{ path('app_social_media_new') }}" class="btn btn-primary add-post-btn">
+            <i class="fas fa-plus-circle me-2"></i>Nouvelle publication
+        </a>
+    </div>
     
     {# Barre de recherche par lieu #}
     <div class="row justify-content-center mb-4">
@@ -38,175 +205,74 @@
         </div>
     </div>
 
-    <!-- Scrollable Pane for Posts - THIS is the container with the ID -->
+    <!-- Filtres de recherche -->
     {% if app.request.query.get('lieu') %}
         <div class="alert alert-info text-center mb-3">
             Résultats pour le lieu : <strong>{{ app.request.query.get('lieu') }}</strong>
         </div>
     {% endif %}
-    <div class="posts-scroll-pane" id="posts-list">
 
-        {# === THE INCLUDE TAG HAS BEEN REMOVED === #}
-        {# === THE FOR LOOP IS NOW DIRECTLY HERE === #}
-        {% for post in pagination %}
-            <div class="card post-card">
-                {# Image miniature #}
-                {% if post.imagemedia %}
-                    {% set imagePath = 'uploads/' ~ post.imagemedia %}
-                    <img src="{{ asset(imagePath) }}" class="card-img-top post-thumbnail" style="max-height: 300px; width: auto; margin: 20px auto; display: block; border-radius: 2px; border: 1px solid #e9ecef; max-width: 50%;" alt="Miniature : {{ post.titre | default('') }}">
-                {% endif %}
-
-                <div class="card-body">
-                    {# Post Author Display #}
-                    <div class="post-author">
-                         <i class="fas fa-user-circle"></i>
-                         <span>
-                             {% if post.user is defined and post.user is not null %}
-                                 {{ (post.user.prenom | default('') ~ ' ' ~ post.user.name | default('')) | trim | default('Utilisateur inconnu') }}
-                             {% else %}
-                                 Utilisateur inconnu
-                             {% endif %}
-                         </span>
-                    </div>
-
-                    {# Post Title #}
-                    <h5 class="card-title">{{ post.titre | default('Sans titre') }}</h5>
-
-                    {# Post Content #}
-                    <p class="card-text">{{ post.contenu | default('') | nl2br }}</p>
-
-                    {# Post Metadata #}
-                    <div class="post-meta">
-                        {% if post.lieu %}
-                            <div><strong><i class="fas fa-map-marker-alt"></i> Lieu:</strong> {{ post.lieu }}</div>
-                        {% endif %}
-                        <div><strong><i class="fas fa-calendar-alt"></i> Publié le:</strong> {{ post.publicationDate ? post.publicationDate|date('d M Y, H:i') : 'Date inconnue' }}</div>
-                    </div>
-
-                    {# Action Buttons #}
-                    <div class="post-actions">
-                        <a href="{{ path('app_social_media_show', {'idEB': post.idEB}) }}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-eye"></i> Voir
-                        </a>
-                        <button class="btn btn-outline-success btn-sm like-button" data-post-id="{{ post.idEB }}">
-                             <i class="fas fa-thumbs-up"></i> J'aime
-                        </button>
-                        <button class="btn btn-outline-info btn-sm comment-button" data-post-id="{{ post.idEB }}">
-                             <i class="fas fa-comment"></i> Commenter
-                        </button>
-
-                        {# Delete Form #}
-                        {% if is_granted('POST_DELETE', post) or (app.user and app.user == post.user) %}
-                            <form method="post" action="{{ path('app_social_media_delete', {'idEB': post.idEB}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette publication ?');" class="ms-auto d-inline">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.idEB) }}">
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                     <i class="fas fa-trash-alt"></i> Supprimer
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div> {# End post-actions #}
-                </div> {# End card-body #}
-            </div> {# End post-card #}
+    <!-- Grille de publications -->
+    <div class="row g-4">
+        {% if pagination.items is empty %}
+            <div class="col-12">
+                <div class="no-results">
+                    <i class="fas fa-newspaper fa-3x mb-3 text-muted"></i>
+                    <h4>Aucune publication trouvée</h4>
+                    <p class="text-muted">Essayez de modifier votre recherche ou créez une nouvelle publication.</p>
+                    <a href="{{ path('app_social_media_new') }}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus me-1"></i> Créer une publication
+                    </a>
+                </div>
+            </div>
         {% else %}
-            {# Message shown if 'pagination' is empty #}
-            <p class="no-posts-message">Aucune publication trouvée pour le moment.</p>
-        {% endfor %}
-        {# === END OF POST LOOP === #}
+            {% for social_media in pagination %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="publication-card card h-100">
+                        <div class="card-img-container">
+                            {% if social_media.imagemedia %}
+                                <img src="http://localhost/ImageSocialMedia/{{ social_media.imagemedia }}" 
+                                     class="card-img-top" 
+                                     alt="{{ social_media.titre }}"
+                                     onerror="this.onerror=null; this.src='{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}'; this.alt='Image non disponible';">
+                            {% else %}
+                                <img src="{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}" class="card-img-top" alt="Publication image">
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <span class="author-info">
+                                <i class="fas fa-user me-1"></i> {{ social_media.user.name }} {{ social_media.user.prenom }}
+                            </span>
+                            <span class="location-badge">
+                                <i class="fas fa-map-marker-alt"></i> {{ social_media.lieu }}
+                            </span>
+                            <h5 class="card-title">{{ social_media.titre }}</h5>
+                            <p class="card-text">{{ social_media.contenu }}</p>
+                            
+                            <div class="interaction-icons">
+                                <span class="badge badge-like">
+                                    <i class="fas fa-thumbs-up me-1"></i> {{ social_media.likee }}
+                                </span>
+                                <span class="badge badge-dislike">
+                                    <i class="fas fa-thumbs-down me-1"></i> {{ social_media.dislike }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <span class="date-info"><i class="far fa-calendar-alt me-1"></i> {{ social_media.publicationDate|date("d/m/Y") }}</span>
+                            <a href="{{ path('app_social_media_show', {'idEB': social_media.idEB}) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i> Voir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-    </div> {# End posts-scroll-pane #}
-
-    <!-- Pagination - Only shown if needed - ADDED ID -->
-    {% if pagination.getTotalItemCount > 0 and pagination.pageCount > 1 %}
-    <div class="pagination-controls" id="pagination-controls">
+    <!-- Pagination -->
+    <div class="mt-4">
         {{ knp_pagination_render(pagination) }}
     </div>
-    {% endif %}
-
-    <!-- Bouton Ajouter une publication -->
-    <div class="add-post-section">
-        <a href="{{ path('app_social_media_new') }}" class="btn btn-success btn-lg">
-             <i class="fas fa-plus-circle"></i> Ajouter une publication
-        </a>
-    </div>
-
-</div> {# End container #}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }} {# Include JS from base.html.twig if any #}
-    {# === ROBUST AJAX JAVASCRIPT (Same as before) === #}
-    <script>
-        function handlePaginationClick(event) {
-            event.preventDefault(); // Prevent default link navigation
-            const url = event.currentTarget.getAttribute('href');
-            const postsContainer = document.getElementById('posts-list'); // Target the container
-            const paginationContainer = document.getElementById('pagination-controls');
-
-            if (!postsContainer || !paginationContainer) {
-                console.error('Error: Could not find posts or pagination container elements.');
-                return;
-            }
-
-            // Optional: Show loading state
-            postsContainer.style.opacity = '0.5';
-
-            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }}) // Identify as AJAX
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text(); // Fetch the FULL HTML of the next page
-                })
-                .then(html => {
-                    // Use DOMParser to safely parse the fetched FULL HTML
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-
-                    // Find the NEW content container within the parsed HTML document
-                    const newPostsContentElement = doc.getElementById('posts-list');
-                    const newPaginationContentElement = doc.getElementById('pagination-controls');
-
-                    // Update the current page's container's INNER HTML
-                    if (newPostsContentElement) {
-                        postsContainer.innerHTML = newPostsContentElement.innerHTML; // Replace content
-                        postsContainer.scrollTop = 0; // Scroll to top
-                    } else {
-                        console.error('Could not find #posts-list content in fetched data.');
-                         postsContainer.innerHTML = '<p class="no-posts-message text-danger">Error loading posts content.</p>';
-                    }
-
-                    if (newPaginationContentElement) {
-                        paginationContainer.innerHTML = newPaginationContentElement.innerHTML; // Replace pagination
-                    } else {
-                        paginationContainer.innerHTML = ''; // Clear pagination if not found
-                         console.warn('Could not find #pagination-controls content in fetched data.');
-                    }
-
-                    // Re-attach event listeners to the *new* pagination links
-                    attachPaginationListeners();
-
-                })
-                .catch(error => {
-                    console.error('Error fetching posts:', error);
-                    postsContainer.innerHTML = `<p class="no-posts-message text-danger">Failed to load content: ${error.message}</p>`;
-                })
-                .finally(() => {
-                    // Optional: Remove loading state
-                    postsContainer.style.opacity = '1';
-                });
-        }
-
-        function attachPaginationListeners() {
-            const paginationLinks = document.querySelectorAll('#pagination-controls a');
-            paginationLinks.forEach(link => {
-                link.removeEventListener('click', handlePaginationClick);
-                link.addEventListener('click', handlePaginationClick);
-            });
-        }
-
-        // Initial attachment of listeners when the page fully loads
-        document.addEventListener('DOMContentLoaded', function() {
-            attachPaginationListeners();
-        });
-    </script>
+</div>
 {% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'dashAdmin/dashboard.html.twig' %}
+
+{% block title %}Détails de la Publication{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
+  <div class="container-fluid py-1 px-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="{{ path('social_page') }}">Réseaux Sociaux</a></li>
+        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Détails Publication</li>
+      </ol>
+      <h6 class="font-weight-bolder text-white mb-0">Détails de la Publication</h6>
+    </nav>
+  </div>
+</nav>
+<!-- End Navbar -->
+
+<div class="container-fluid py-4">
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+          <h6>Détails de la Publication</h6>
+          <div>
+            <a href="{{ path('admin_social_media_edit', {'idEB': social_media.idEB}) }}" class="btn btn-sm btn-info me-2">
+              <i class="fas fa-edit me-1"></i>Modifier
+            </a>
+            <a href="{{ path('admin_social_media_comments', {'idEB': social_media.idEB}) }}" class="btn btn-sm btn-primary me-2">
+              <i class="fas fa-comments me-1"></i>Commentaires ({{ social_media.commentaires|length }})
+            </a>
+            <form method="post" action="{{ path('admin_social_media_delete', {'idEB': social_media.idEB}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication?');" style="display: inline-block;">
+              <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
+              <button type="submit" class="btn btn-sm btn-danger">
+                <i class="fas fa-trash me-1"></i>Supprimer
+              </button>
+            </form>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <h4 class="mb-3">{{ social_media.titre }}</h4>
+              
+              <div class="mb-4">
+                <span class="badge bg-gradient-info me-2">
+                  <i class="fas fa-map-marker-alt me-1"></i>{{ social_media.lieu }}
+                </span>
+                <span class="badge bg-gradient-dark">
+                  <i class="fas fa-calendar me-1"></i>{{ social_media.publicationDate|date('d/m/Y') }}
+                </span>
+              </div>
+              
+              <div class="mb-4">
+                <p class="text-justify">{{ social_media.contenu|nl2br }}</p>
+              </div>
+              
+              <div class="d-flex align-items-center">
+                <div class="me-4">
+                  <span class="badge bg-success me-1"><i class="fas fa-thumbs-up"></i></span>
+                  <span class="font-weight-bold">{{ social_media.likee }}</span>
+                </div>
+                <div>
+                  <span class="badge bg-danger me-1"><i class="fas fa-thumbs-down"></i></span>
+                  <span class="font-weight-bold">{{ social_media.dislike }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header p-3 pb-0">
+                  <h6 class="mb-0">Auteur</h6>
+                </div>
+                <div class="card-body p-3 pt-1">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-xl bg-gradient-primary border-radius-md p-2 me-3">
+                      <i class="fas fa-user" style="font-size: 24px;"></i>
+                    </div>
+                    <div class="ms-3">
+                      <h6 class="mb-0">{{ social_media.user ? social_media.user.name ~ ' ' ~ social_media.user.prenom : 'Utilisateur inconnu' }}</h6>
+                      <p class="text-sm mb-0">ID: {{ social_media.user ? social_media.user.idU : 'N/A' }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {% if social_media.imagemedia %}
+                <div class="card mt-4">
+                  <div class="card-header p-3 pb-0">
+                    <h6 class="mb-0">Image</h6>
+                  </div>
+                  <div class="card-body p-3 pt-1">
+                  
+                                            <img src="{{ asset('http://localhost/ImageSocialMedia/' ~ social_media.getImagemedia()) }}" alt="Image de la publication" class="img-fluid rounded">
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          
+          <div class="row">
+            <div class="col-12">
+              <h5 class="mb-3">Commentaires récents ({{ commentaires|length }})</h5>
+              
+              {% if commentaires|length > 0 %}
+                <div class="list-group">
+                  {% for commentaire in commentaires|slice(0, 5) %}
+                    <div class="list-group-item">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">{{ commentaire.user ? commentaire.user.name ~ ' ' ~ commentaire.user.prenom : 'Utilisateur inconnu' }}</h6>
+                        <div>
+                          <span class="badge bg-success me-1"><i class="fas fa-thumbs-up"></i> {{ commentaire.numberlike }}</span>
+                          <span class="badge bg-danger"><i class="fas fa-thumbs-down"></i> {{ commentaire.numberdislike }}</span>
+                        </div>
+                      </div>
+                      <p class="mb-1 mt-2">{{ commentaire.description }}</p>
+                      <div class="d-flex justify-content-end">
+                        <a href="{{ path('admin_comment_edit', {'idC': commentaire.idC}) }}" class="btn btn-link text-info p-0 me-3">
+                          <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <form method="post" action="{{ path('admin_comment_delete', {'idC': commentaire.idC}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire?');">
+                          <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ commentaire.idC) }}">
+                          <button type="submit" class="btn btn-link text-danger p-0">
+                            <i class="fas fa-trash"></i> Supprimer
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+                
+                {% if commentaires|length > 5 %}
+                  <div class="mt-3 text-center">
+                    <a href="{{ path('admin_social_media_comments', {'idEB': social_media.idEB}) }}" class="btn btn-sm btn-primary">
+                      Voir tous les commentaires
+                    </a>
+                  </div>
+                {% endif %}
+              {% else %}
+                <p class="text-muted">Aucun commentaire pour cette publication</p>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="mt-4">
+            <a href="{{ path('admin_social_media_index') }}" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

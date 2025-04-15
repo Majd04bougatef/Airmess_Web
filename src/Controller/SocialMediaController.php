@@ -38,9 +38,13 @@ class SocialMediaController extends AbstractController
         private UserRepository $userRepository,
         private SluggerInterface $slugger,
         private PaginatorInterface $paginator,
-        private string $uploadsDirectory = __DIR__.'/../../assets/imagemedia',
+        private string $uploadsDirectory = 'C:/xampp/htdocs/ImageSocialMedia',
         private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker
     ) {
+        // Vérifier que le répertoire d'upload existe et est accessible
+        if (!file_exists($this->uploadsDirectory)) {
+            mkdir($this->uploadsDirectory, 0777, true);
+        }
     }
 
     private function getDefaultUser(): User
@@ -349,44 +353,101 @@ class SocialMediaController extends AbstractController
         }
     }
 
+    /**
+     * Ajoute un commentaire à une publication sociale
+     * 
+     * Cette méthode est la méthode principale pour l'ajout de commentaires dans l'application.
+     * Elle remplace complètement la méthode équivalente qui était dans CommentaireController.
+     *
+     * @param Request $request La requête HTTP
+     * @param SocialMedia $socialMedia L'objet publication sociale auquel ajouter le commentaire
+     * @return RedirectResponse
+     */
     #[Route('/{idEB}/commentaire', name: 'app_social_media_ajouter_commentaire', methods: ['POST'], requirements: ['idEB' => '\d+'])]
     public function ajouterCommentaire(Request $request, SocialMedia $socialMedia): RedirectResponse
     {
+        // Vérification du token CSRF
         $submittedToken = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('comment_token', $submittedToken)) {
-            $this->addFlash('error', 'Token CSRF invalide pour la soumission du commentaire.');
+            $this->addFlash('danger', 'Token CSRF invalide pour la soumission du commentaire.');
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
         }
         
+        // Debug: Afficher toutes les données de la requête pour comprendre la structure
+        $allRequestData = $request->request->all();
+        
+        // Récupérer les données du formulaire
         $commentaire = new Commentaire();
         $form = $this->createForm(CommentaireType::class, $commentaire);
         $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+        
+        // Vérification directe des données brutes pour les commentaires vides
+        $formName = $form->getName();
+        $descriptionKey = $formName ? $formName . '[description]' : 'description';
+        $rawDescription = $request->request->get($descriptionKey) ?? 
+                         ($allRequestData[$formName]['description'] ?? '');
+        
+        if (empty(trim($rawDescription))) {
+            // Redirection sans message flash pour éviter la confusion
+            return $this->redirectToRoute('app_social_media_show', [
+                'idEB' => $socialMedia->getIdEB(),
+                'error' => 'empty_comment' // Paramètre d'URL pour indiquer l'erreur au template
+            ]);
+        }
+        
+        if ($form->isSubmitted()) {
+            if (!$form->isValid()) {
+                $errorMessage = 'Erreur de validation du formulaire.';
+                foreach ($form->getErrors(true) as $error) {
+                    $errorMessage = $error->getMessage();
+                    break; // On prend juste la première erreur
+                }
+                return $this->redirectToRoute('app_social_media_show', [
+                    'idEB' => $socialMedia->getIdEB(), 
+                    'error' => 'validation_failed',
+                    'message' => $errorMessage
+                ]);
+            }
+            
+            // Vérification supplémentaire du contenu après validation du formulaire
+            if (empty(trim($commentaire->getDescription() ?? ''))) {
+                return $this->redirectToRoute('app_social_media_show', [
+                    'idEB' => $socialMedia->getIdEB(),
+                    'error' => 'empty_comment'
+                ]);
+            }
+            
+            // Si on arrive ici, le formulaire est valide
+            // Préparation du commentaire
             $defaultUser = $this->getDefaultUser();
             $commentaire->setUser($defaultUser);
             $commentaire->setSocialMedia($socialMedia);
             $commentaire->setNumberlike(0);
             $commentaire->setNumberdislike(0);
             
-            // Vérifier si le contenu du commentaire est vide
-            if (empty(trim($commentaire->getDescription()))) {
-                $this->addFlash('error', 'Le commentaire ne peut pas être vide.');
-                return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
-            }
-            
             // Vérifier les mots interdits
             $forbiddenWords = $this->forbiddenWordsChecker->containsForbiddenWords($commentaire->getDescription());
             if (!empty($forbiddenWords)) {
-                $this->addFlash('error', 'Votre commentaire contient des mots interdits: ' . implode(', ', $forbiddenWords));
-                return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+                return $this->redirectToRoute('app_social_media_show', [
+                    'idEB' => $socialMedia->getIdEB(),
+                    'error' => 'forbidden_words',
+                    'words' => implode(', ', $forbiddenWords)
+                ]);
             }
-
-            $this->entityManager->persist($commentaire);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Commentaire ajouté avec succès !');
             
+            // Enregistrement du commentaire
+            try {
+                $this->entityManager->persist($commentaire);
+                $this->entityManager->flush();
+                $this->addFlash('success', 'Commentaire ajouté avec succès !');
+            } catch (\Exception $e) {
+                return $this->redirectToRoute('app_social_media_show', [
+                    'idEB' => $socialMedia->getIdEB(),
+                    'error' => 'database_error'
+                ]);
+            }
+            
+            // Gestion de la réponse AJAX si nécessaire
             if ($request->isXmlHttpRequest()) {
                 return $this->json([
                     'success' => true,
@@ -395,14 +456,13 @@ class SocialMediaController extends AbstractController
                 ]);
             }
         } else {
-            foreach ($form->getErrors(true) as $error) {
-                $this->addFlash('error', $error->getMessage());
-            }
-            if (!$form->isSubmitted()) { 
-                $this->addFlash('error', 'Impossible d\'ajouter le commentaire (non soumis).');
-            }
+            return $this->redirectToRoute('app_social_media_show', [
+                'idEB' => $socialMedia->getIdEB(),
+                'error' => 'form_not_submitted'
+            ]);
         }
-
+        
+        // Redirection
         return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
     }
 
@@ -437,46 +497,98 @@ class SocialMediaController extends AbstractController
 
         return $isAjax
             ? $this->renderUpdatedIndex()
-            : $this->redirectToRoute('app_social_media_index', [], Response::HTTP_SEE_OTHER);
+            : $this->redirectToRoute('socialVoyageurs_page', [], Response::HTTP_SEE_OTHER);
     }
 
     private function handleImageUpload($form, SocialMedia $socialMedia, Request $request, ?string $originalImage = null): void
     {
         if (!$form->has('imagemedia')) {
+            $this->addFlash('error', 'Le champ imagemedia n\'existe pas dans le formulaire');
             return;
         }
+        
+        /** @var UploadedFile|null $imageFile */
         $imageFile = $form->get('imagemedia')->getData();
-
-        if ($imageFile instanceof UploadedFile) {
-            $newFilename = $this->uploadImage($imageFile);
-            $socialMedia->setImagemedia($newFilename);
-
-            if ($originalImage && $originalImage !== $newFilename) {
-                 @unlink($this->uploadsDirectory . '/' . $originalImage);
+        
+        // Debug information
+        if ($imageFile) {
+            $this->addFlash('info', 'Fichier détecté: ' . $imageFile->getClientOriginalName() . ' (' . $imageFile->getSize() . ' octets)');
+            
+            // Vérifier si le fichier est valide
+            if (!$imageFile->isValid()) {
+                $this->addFlash('error', 'Le fichier uploadé n\'est pas valide. Code d\'erreur: ' . $imageFile->getError());
+                return;
             }
-        } elseif ($request->request->get('remove_imagemedia')) { 
-             $this->handleImageDeletion($socialMedia);
-             $socialMedia->setImagemedia(null);
         } else {
-             if ($originalImage && !$socialMedia->getImagemedia() && !$request->files->has($form->get('imagemedia')->getName())) {
-                 $socialMedia->setImagemedia($originalImage);
-             }
+            $this->addFlash('warning', 'Aucun fichier n\'a été téléchargé');
+            if ($originalImage) {
+                $socialMedia->setImagemedia($originalImage);
+            }
+            return;
         }
-    }
-
-    private function uploadImage(UploadedFile $imageFile): string
-    {
-        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $this->slugger->slug($originalFilename);
-        $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-
+        
         try {
-            $imageFile->move($this->uploadsDirectory, $newFilename);
-        } catch (FileException $e) {
-            $this->addFlash('error', 'L\'upload de l\'image a échoué. Veuillez réessayer.');
-            throw $e;
+            // Vérifier que le répertoire d'upload existe et est accessible en écriture
+            if (!is_dir($this->uploadsDirectory)) {
+                $this->addFlash('error', 'Le répertoire d\'upload n\'existe pas: ' . $this->uploadsDirectory);
+                if (!mkdir($this->uploadsDirectory, 0777, true) && !is_dir($this->uploadsDirectory)) {
+                    throw new \Exception("Impossible de créer le répertoire d'upload: " . $this->uploadsDirectory);
+                }
+                $this->addFlash('info', 'Répertoire d\'upload créé: ' . $this->uploadsDirectory);
+            } elseif (!is_writable($this->uploadsDirectory)) {
+                throw new \Exception("Le répertoire d'upload n'est pas accessible en écriture: " . $this->uploadsDirectory);
+            } else {
+                $this->addFlash('info', 'Répertoire d\'upload valide et accessible: ' . $this->uploadsDirectory);
+            }
+            
+            // Informations sur le fichier
+            $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $this->slugger->slug($originalFilename);
+            $extension = $imageFile->getClientOriginalExtension();
+            
+            if (empty($extension)) {
+                $extension = $imageFile->guessExtension() ?: 'jpg';
+                $this->addFlash('info', 'Extension déterminée: ' . $extension);
+            }
+            
+            // Générer un nom de fichier unique
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $extension;
+            $fullPath = $this->uploadsDirectory . '/' . $newFilename;
+            
+            $this->addFlash('info', 'Tentative de déplacement du fichier vers: ' . $fullPath);
+            
+            // Déplacer le fichier
+            try {
+                $imageFile->move($this->uploadsDirectory, $newFilename);
+                $this->addFlash('success', 'Fichier déplacé avec succès: ' . $newFilename);
+            } catch (\Exception $e) {
+                throw new \Exception('Erreur lors du déplacement du fichier: ' . $e->getMessage());
+            }
+            
+            // Vérifier que le fichier a bien été déplacé et est accessible
+            if (!file_exists($fullPath)) {
+                throw new \Exception("Le fichier n'a pas été correctement déplacé vers " . $fullPath);
+            }
+            
+            // Mettre à jour l'entité avec le nouveau nom de fichier
+            $socialMedia->setImagemedia($newFilename);
+            
+            // Supprimer l'ancien fichier si nécessaire
+            if ($originalImage && $originalImage !== $newFilename) {
+                $oldPath = $this->uploadsDirectory . '/' . $originalImage;
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                    $this->addFlash('info', 'Ancien fichier supprimé: ' . $originalImage);
+                }
+            }
+            
+        } catch (\Exception $e) {
+            // En cas d'erreur, conserver l'image originale
+            if ($originalImage) {
+                $socialMedia->setImagemedia($originalImage);
+            }
+            $this->addFlash('error', 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage());
         }
-        return $newFilename;
     }
 
     private function handleImageDeletion(SocialMedia $socialMedia): void
@@ -498,7 +610,7 @@ class SocialMediaController extends AbstractController
 
         return $request->isXmlHttpRequest()
             ? $this->renderUpdatedIndex()
-            : $this->redirectToRoute('app_social_media_index', [], Response::HTTP_SEE_OTHER);
+            : $this->redirectToRoute('socialVoyageurs_page', [], Response::HTTP_SEE_OTHER);
     }
 
     private function renderUpdatedIndex(): Response
@@ -520,7 +632,7 @@ class SocialMediaController extends AbstractController
         ]);
     }
 
-    protected function renderCustomForm(Request $request, string $template, SocialMedia $socialMedia, $form, string $buttonLabel): Response
+    protected function renderCustomForm(Request $request, string $template, SocialMedia $socialMedia, $form, string $buttonLabel, array $forbiddenWords = []): Response
     {
         $usePartial = $request->isXmlHttpRequest();
         $view = $usePartial ? 'social_media/_form.html.twig' : $template;
@@ -533,6 +645,38 @@ class SocialMediaController extends AbstractController
             'social_media' => $socialMedia,
             'form' => $form->createView(),
             'button_label' => $buttonLabel,
+            'forbidden_words' => $forbiddenWords
         ], new Response(null, $status));
+    }
+
+    #[Route('/random-publications', name: 'app_social_media_random', methods: ['GET'])]
+    public function randomPublications(Request $request, SocialMediaRepository $socialMediaRepository, int $limit = 4): Response
+    {
+        // Try to get most liked publications first
+        $mostLiked = $socialMediaRepository->findMostLiked($limit);
+        
+        // If we don't have enough, get some random ones
+        if (count($mostLiked) < $limit) {
+            $random = $socialMediaRepository->findRandom($limit - count($mostLiked));
+            $publications = array_merge($mostLiked, $random);
+            
+            // Prevent duplicates
+            $uniquePublications = [];
+            foreach ($publications as $pub) {
+                $uniquePublications[$pub->getIdEB()] = $pub;
+                if (count($uniquePublications) >= $limit) {
+                    break;
+                }
+            }
+            $publications = array_values($uniquePublications);
+        } else {
+            // Shuffle to get random ones from the most liked
+            shuffle($mostLiked);
+            $publications = array_slice($mostLiked, 0, $limit);
+        }
+        
+        return $this->render('social_media/_random_publications.html.twig', [
+            'publications' => $publications,
+        ]);
     }
 }

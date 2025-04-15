@@ -6,6 +6,10 @@ use App\Service\AuthService;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+
+use App\Repository\SocialMediaRepository;
+use Knp\Component\Pager\PaginatorInterface;
+
 use App\Repository\BonPlanRepository;
 use App\Entity\BonPlan;
 use Doctrine\ORM\EntityManagerInterface;
@@ -121,15 +125,27 @@ class VoyageursController extends AuthenticatedController
     }
 
     #[Route('/SocialVoyageursPage', name: 'socialVoyageurs_page')]
-    public function socialVoyageursPage(): Response
+    public function socialVoyageursPage(Request $request, SocialMediaRepository $socialMediaRepository, PaginatorInterface $paginator)
     {
-        // Check if user is authenticated
-        if ($redirectResponse = $this->checkAuthentication()) {
-            return $redirectResponse;
-        }
-        
-        // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashVoyageurs/socialPageVoyageurs.html.twig');
+        // Récupérer toutes les publications
+        $query = $socialMediaRepository->createQueryBuilder('s')
+            ->leftJoin('s.user', 'u')
+            ->select('s', 'u')
+            ->orderBy('s.publicationDate', 'DESC')
+            ->getQuery();
+            
+        // Paginer les résultats
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1), // Numéro de page, 1 par défaut
+            6 // Nombre d'éléments par page
+        );
+            
+        // Passer les publications paginées à la vue
+        return $this->render('dashVoyageurs/socialPageVoyageurs.html.twig', [
+            'publications' => $pagination
+        ]);
+
     }
     
     #[Route('/OffreForm', name: 'offre_form')]

@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 class AdminController extends AbstractController
 {
@@ -42,10 +43,10 @@ class AdminController extends AbstractController
     }
 
     #[Route('/SocialPage', name: 'social_page')]
-    public function socialPage()
+    public function socialPage(): Response
     {
-        // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashAdmin/socialPage.html.twig');
+        // Redirection vers le nouveau contrôleur de gestion des médias sociaux
+        return $this->redirectToRoute('admin_social_media_index');
     }
 }
 
