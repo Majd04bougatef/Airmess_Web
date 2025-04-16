@@ -6,6 +6,7 @@ use App\Service\AuthService;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\OffreRepository;
 
 use App\Repository\SocialMediaRepository;
 use Knp\Component\Pager\PaginatorInterface;
@@ -358,6 +359,18 @@ class VoyageursController extends AuthenticatedController
                 'message' => 'Une erreur est survenue: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    #[Route('/voyageurs/offres', name: 'app_offre_voyageurs')]
+    public function offrePageVoyageurs(OffreRepository $offreRepository): Response
+    {
+        // Récupérer toutes les offres depuis le repository
+        $offres = $offreRepository->findAll();
+
+        // Rendre la vue avec les offres
+        return $this->render('dashVoyageurs/offrePageVoyageurs.html.twig', [
+            'offres' => $offres,
+        ]);
     }
 }
 

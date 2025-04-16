@@ -1,0 +1,14 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Récapitulatif de Réservation{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Récapitulatif de votre réservation</h2>
+    <ul>
+        <li>Offre : {{ reservation.offre.place }}</li>
+        <li>Date de réservation : {{ reservation.dateRes|date('d/m/Y H:i') }}</li>
+    </ul>
+    <a href="{{ path('app_reservation_payment', {'idR': reservation.idR}) }}" class="btn btn-primary">Passer au paiement</a>
+</div>
+{% endblock %}
