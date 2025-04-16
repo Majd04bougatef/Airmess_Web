@@ -69,7 +69,8 @@ final class CommentaireController extends AbstractController
     public function edit(Request $request, Commentaire $commentaire, EntityManagerInterface $entityManager): Response
     {
         // Check if the user is allowed to edit this comment
-        if ($commentaire->getUser()->getIdU() != 1) {
+        $session = $request->getSession();
+        if (!$session->has('user_id') || $commentaire->getUser()->getIdU() != $session->get('user_id')) {
             $this->addFlash('error', 'Vous n\'êtes pas autorisé à modifier ce commentaire.');
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $commentaire->getSocialMedia()->getIdEB()]);
         }
@@ -96,7 +97,8 @@ final class CommentaireController extends AbstractController
         $socialMediaId = $commentaire->getSocialMedia()->getIdEB();
         
         // Check if the user is allowed to delete this comment
-        if ($commentaire->getUser()->getIdU() != 1) {
+        $session = $request->getSession();
+        if (!$session->has('user_id') || $commentaire->getUser()->getIdU() != $session->get('user_id')) {
             $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer ce commentaire.');
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMediaId]);
         }
@@ -177,17 +179,19 @@ final class CommentaireController extends AbstractController
     /**
      * Helper method to check if the current user is allowed to modify/delete a comment
      */
-    private function isUserAllowedToModifyComment(Commentaire $commentaire): bool
+    private function isUserAllowedToModifyComment(Commentaire $commentaire, Request $request): bool
     {
-        // Vérifier si le commentaire appartient à l'utilisateur avec l'ID 1 (utilisateur par défaut)
-        return $commentaire->getUser()->getIdU() === 1;
+        $session = $request->getSession();
+        // Check if user is logged in and is the owner of the comment
+        return $session->has('user_id') && $commentaire->getUser()->getIdU() === $session->get('user_id');
     }
 
     #[Route('/{idC}/edit-ajax', name: 'app_commentaire_edit_ajax', methods: ['POST'])]
     public function editAjax(Request $request, Commentaire $commentaire, EntityManagerInterface $entityManager): Response
     {
         // Check if the user is allowed to edit this comment
-        if ($commentaire->getUser()->getIdU() != 1) {
+        $session = $request->getSession();
+        if (!$session->has('user_id') || $commentaire->getUser()->getIdU() != $session->get('user_id')) {
             return $this->json([
                 'success' => false,
                 'error' => 'Vous n\'êtes pas autorisé à modifier ce commentaire.'
