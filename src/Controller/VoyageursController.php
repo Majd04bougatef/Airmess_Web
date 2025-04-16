@@ -16,6 +16,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
+use App\Repository\ExpenseRepository;
+use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 class VoyageursController extends AuthenticatedController
 {
     public function __construct(AuthService $authService)
@@ -46,15 +50,25 @@ class VoyageursController extends AuthenticatedController
     }
 
     #[Route('/UserVoyageursPage', name: 'userVoyageurs_page')]
-    public function UserVoyageursPage(): Response
+    public function UserVoyageursPage(ExpenseRepository $expenseRepository, UserRepository $userRepository, SessionInterface $session): Response
     {
         // Check if user is authenticated
         if ($redirectResponse = $this->checkAuthentication()) {
             return $redirectResponse;
         }
         
-        // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashVoyageurs/userPageVoyageurs.html.twig');
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        // If admin, show all expenses, otherwise only user's expenses
+        $expenses = ($user && $user->getRoleUser() === 'Admin') 
+            ? $expenseRepository->findAll() 
+            : $expenseRepository->findBy(['user' => $user]);
+            
+        return $this->render('expense/index.html.twig', [
+            'expenses' => $expenses,
+            'in_voyageurs_dashboard' => true,
+        ]);
     }
 
     #[Route('/StationVoyageursPage', name: 'stationVoyageurs_page')]

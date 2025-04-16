@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Image Examples{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1 class="mb-4">User Image Display Options</h1>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Option 1: Using Symlink</h5>
+                </div>
+                <div class="card-body">
+                    <img src="{{ asset('user_images/' ~ app.session.get('user_image')) }}" 
+                         class="img-fluid rounded-circle" 
+                         alt="User Image"
+                         onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                </div>
+                <div class="card-footer">
+                    <code>asset('user_images/' ~ user.imagesU)</code>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Option 2: Using Upload Symlink</h5>
+                </div>
+                <div class="card-body">
+                    <img src="{{ asset('uploads/users_images/' ~ app.session.get('user_image')) }}" 
+                         class="img-fluid rounded-circle" 
+                         alt="User Image"
+                         onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                </div>
+                <div class="card-footer">
+                    <code>asset('uploads/users_images/' ~ user.imagesU)</code>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Option 3: Using Controller</h5>
+                </div>
+                <div class="card-body">
+                    <img src="{{ path('app_user_image', {'filename': app.session.get('user_image')}) }}" 
+                         class="img-fluid rounded-circle" 
+                         alt="User Image"
+                         onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                </div>
+                <div class="card-footer">
+                    <code>path('app_user_image', {'filename': user.imagesU})</code>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-info mt-4">
+        <h5 class="alert-heading">Notes:</h5>
+        <ul>
+            <li>All three methods are accessing the same files from <code>C:\xampp\htdocs\images_users</code></li>
+            <li>The <code>onerror</code> attribute provides a fallback for missing images</li>
+            <li>Choose the method that works best in your templates</li>
+        </ul>
+    </div>
+</div>
+{% endblock %} 

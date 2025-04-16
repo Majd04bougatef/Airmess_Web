@@ -470,10 +470,10 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ path('userVoyageurs_page') }}" id="user-button" data-section="user-section">
-                <span class="nav-link-icon">
-                  <img src="{{ asset('images/user-icon.png') }}" alt="Users" onerror="this.src='{{ asset('images/user-icon.svg') }}'; this.onerror='';">
-                </span>
-                Utilisateurs
+                <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                  <i class="ni ni-credit-card text-primary text-lg opacity-10" aria-hidden="true"></i>
+                </div>
+                <span class="nav-link-text ms-1">Expenses</span>
               </a>
             </li>
             <li class="nav-item nav-item-dropdown">
@@ -519,10 +519,10 @@
           </ul>
           
           <div class="user-profile">
-            <div class="dropdown">
-              <img src="{{ app.session.get('user_image') ? asset('uploads/users/' ~ app.session.get('user_image')) : asset('images/user-avatar.svg') }}" alt="{{ app.session.get('user_name') }}" class="user-img" id="userDropdown" onerror="this.src='{{ asset('images/user-avatar.svg') }}'; this.onerror='';">
+            <div class="user-info d-flex align-items-center">
+                <img src="{{ app.session.get('user_image') ? asset('uploads/users_images/' ~ app.session.get('user_image')) : asset('images/user-avatar.svg') }}" alt="{{ app.session.get('user_name') }}" class="user-img" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="fs-sm fw-medium ms-2">{{ app.session.get('user_name') }}</span>
             </div>
-            <span class="user-name" style="margin-left: 10px; font-weight: 600; color: #344767;">{{ app.session.get('user_name') }}</span>
             <div class="dropdown-menu" id="userMenu">
               <a class="dropdown-item" href="#">Profile</a>
               <a class="dropdown-item" href="#">Settings</a>

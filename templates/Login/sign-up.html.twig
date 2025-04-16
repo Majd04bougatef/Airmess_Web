@@ -213,6 +213,42 @@
             font-size: 0.85rem;
             margin-top: 5px;
             display: none;
+            background-color: #f8d7da;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+        
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: 2.25rem;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .form-control.is-valid {
+            border-color: #28a745;
+            padding-right: 2.25rem;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .photo-btn.is-invalid {
+            border: 1px solid #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
+        .photo-btn.is-valid {
+            border: 1px solid #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        
+        #photo-error {
+            text-align: center;
+            margin-top: 10px;
         }
 </style>
 </head>
@@ -293,6 +329,7 @@
                                             <input type="file" class="custom-file-input" name="photo" accept="image/*">
                                             <button type="button" class="photo-btn">Ajouter une photo</button>
                                         </div>
+                                        <div id="photo-error" class="field-error"></div>
                                     </div>
                                 </div>
                                 <div class="col-12">
@@ -342,6 +379,7 @@
                                             <input type="file" class="custom-file-input" name="photo" accept="image/*">
                                             <button type="button" class="photo-btn">Ajouter une photo</button>
                                         </div>
+                                        <div id="photo-error" class="field-error"></div>
                                     </div>
                                 </div>
                                 <div class="col-12">
@@ -397,40 +435,56 @@
                 }
             });
             
-            // Add error container for photo
-            $('.photo-upload-container').each(function() {
-                if ($(this).find('.field-error').length === 0) {
-                    $(this).append('<div id="photo-error" class="field-error"></div>');
-                }
+            // Show the correct form tab
+            $("#voyageur-tab").click(function() {
+                $(this).addClass("active");
+                $("#entreprise-tab").removeClass("active");
+                $("#voyageur").addClass("show active");
+                $("#entreprise").removeClass("show active");
             });
             
-            // Handle tab clicks
-            $('#voyageur-tab').on('click', function(e) {
-                e.preventDefault();
-                $(this).tab('show');
-                $('.btn-tab').removeClass('active');
-                $(this).addClass('active');
-                $('#voyageur').addClass('show active');
-                $('#entreprise').removeClass('show active');
-            });
-            
-            $('#entreprise-tab').on('click', function(e) {
-                e.preventDefault();
-                $(this).tab('show');
-                $('.btn-tab').removeClass('active');
-                $(this).addClass('active');
-                $('#entreprise').addClass('show active');
-                $('#voyageur').removeClass('show active');
+            $("#entreprise-tab").click(function() {
+                $(this).addClass("active");
+                $("#voyageur-tab").removeClass("active");
+                $("#entreprise").addClass("show active");
+                $("#voyageur").removeClass("show active");
             });
             
             // Toggle password visibility
-            $('.password-toggle-icon').on('click', function() {
-                const passwordField = $(this).closest('.password-field-container').find('.password-field');
-                const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
-                passwordField.attr('type', type);
+            $(".password-toggle-icon").click(function() {
+                const passwordField = $(this).siblings('input');
+                const fieldType = passwordField.attr('type');
                 
-                // Toggle eye icon
-                $(this).toggleClass('fa-eye-slash fa-eye');
+                if (fieldType === 'password') {
+                    passwordField.attr('type', 'text');
+                    $(this).removeClass('fa-eye-slash').addClass('fa-eye');
+                } else {
+                    passwordField.attr('type', 'password');
+                    $(this).removeClass('fa-eye').addClass('fa-eye-slash');
+                }
+            });
+            
+            // Make the photo button trigger the file input
+            $(".photo-btn").click(function() {
+                $(this).siblings('.custom-file-input').click();
+            });
+            
+            // File input handling with preview
+            $(".custom-file-input").change(function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    const photoPreview = $(this).closest('.custom-file').siblings('.photo-preview');
+                    
+                    reader.onload = function(e) {
+                        photoPreview.css('background-image', 'url(' + e.target.result + ')');
+                        photoPreview.css('display', 'block');
+                    }
+                    
+                    reader.readAsDataURL(file);
+                }
+                // Validate photo on change
+                validatePhoto($(this));
             });
             
             // Helper function to calculate age from date
@@ -447,148 +501,224 @@
             }
             
             // Helper function to show field error
-            function showFieldError(form, fieldName, message) {
-                const errorElement = form.find('#' + fieldName + '-error');
+            function showFieldError(field, message) {
+                const errorElement = $('#' + field + '-error');
                 errorElement.text(message).show();
+                $('input[name="' + field + '"]').addClass('is-invalid').removeClass('is-valid');
             }
             
-            // Clear all errors in a form
-            function clearFormErrors(form) {
-                form.find('.field-error').hide();
+            // Helper function to clear field error
+            function clearFieldError(field) {
+                $('#' + field + '-error').hide();
+                $('input[name="' + field + '"]').removeClass('is-invalid').addClass('is-valid');
             }
             
-            // Form validation for Voyageur form
-            $('#voyageur form').on('submit', function(e) {
-                let isValid = true;
-                const form = $(this);
-                
-                // Clear previous errors
-                clearFormErrors(form);
-                
-                const name = form.find('input[name="name"]').val().trim();
-                const prenom = form.find('input[name="prenom"]').val().trim();
-                const email = form.find('input[name="email"]').val().trim();
-                const phone = form.find('input[name="phoneNumber"]').val().trim();
-                const password = form.find('input[name="password"]').val();
-                const confirmPassword = form.find('input[name="password_confirm"]').val();
-                const dateNaiss = form.find('input[name="dateNaiss"]').val();
-                const photoInput = form.find('input[type="file"]')[0];
-                
-                // Validate name
-                if (name.length < 2 || name === '') {
-                    showFieldError(form, 'name', 'Le nom doit contenir au moins 2 caractères');
-                    isValid = false;
-                }
-                
-                // Validate prenom
-                if (prenom.length < 2 || prenom === '') {
-                    showFieldError(form, 'prenom', 'Le prénom doit contenir au moins 2 caractères');
-                    isValid = false;
-                }
-                
-                // Validate email
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email) || email === '') {
-                    showFieldError(form, 'email', 'Veuillez entrer une adresse email valide');
-                    isValid = false;
-                }
-                
-                // Validate phone number - now 8 digits
-                const phoneRegex = /^[0-9]{8}$/;
-                if (!phoneRegex.test(phone) || phone === '') {
-                    showFieldError(form, 'phoneNumber', 'Le numéro de téléphone doit contenir exactement 8 chiffres');
-                    isValid = false;
-                }
-                
-                // Validate password
-                if (password.length < 6 || password === '') {
-                    showFieldError(form, 'password', 'Le mot de passe doit contenir au moins 6 caractères');
-                    isValid = false;
-                }
-                
-                // Validate password confirmation
-                if (password !== confirmPassword || confirmPassword === '') {
-                    showFieldError(form, 'password_confirm', 'Les mots de passe ne correspondent pas');
-                    isValid = false;
-                }
-                
-                // Validate date of birth and check if user is at least 15 years old
-                if (!dateNaiss) {
-                    showFieldError(form, 'dateNaiss', 'Veuillez entrer votre date de naissance');
-                    isValid = false;
+            // Real-time validation functions
+            function validateName(input) {
+                const name = input.val().trim();
+                if (name.length < 2) {
+                    showFieldError('name', 'Le nom doit faire au moins 2 caractères');
+                    return false;
+                } else if (name.length > 50) {
+                    showFieldError('name', 'Le nom ne peut pas dépasser 50 caractères');
+                    return false;
                 } else {
-                    const birthDate = new Date(dateNaiss);
+                    clearFieldError('name');
+                    return true;
+                }
+            }
+            
+            function validatePrenom(input) {
+                const prenom = input.val().trim();
+                if (prenom.length > 0 && prenom.length < 2) {
+                    showFieldError('prenom', 'Le prénom doit faire au moins 2 caractères');
+                    return false;
+                } else if (prenom.length > 50) {
+                    showFieldError('prenom', 'Le prénom ne peut pas dépasser 50 caractères');
+                    return false;
+                } else {
+                    clearFieldError('prenom');
+                    return true;
+                }
+            }
+            
+            function validateEmail(input) {
+                const email = input.val().trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email) {
+                    showFieldError('email', 'L\'email est obligatoire');
+                    return false;
+                } else if (!emailRegex.test(email)) {
+                    showFieldError('email', 'L\'email n\'est pas valide');
+                    return false;
+                } else if (email.length > 180) {
+                    showFieldError('email', 'L\'email ne peut pas dépasser 180 caractères');
+                    return false;
+                } else {
+                    clearFieldError('email');
+                    return true;
+                }
+            }
+            
+            function validatePhone(input) {
+                const phone = input.val().trim();
+                const phoneRegex = /^[0-9]{8}$/;
+                if (!phone) {
+                    showFieldError('phoneNumber', 'Le numéro de téléphone est obligatoire');
+                    return false;
+                } else if (!phoneRegex.test(phone)) {
+                    showFieldError('phoneNumber', 'Le numéro de téléphone doit contenir exactement 8 chiffres');
+                    return false;
+                } else {
+                    clearFieldError('phoneNumber');
+                    return true;
+                }
+            }
+            
+            function validatePassword(input) {
+                const password = input.val();
+                if (!password) {
+                    showFieldError('password', 'Le mot de passe est obligatoire');
+                    return false;
+                } else if (password.length < 6) {
+                    showFieldError('password', 'Le mot de passe doit faire au moins 6 caractères');
+                    return false;
+                } else {
+                    clearFieldError('password');
+                    return true;
+                }
+            }
+            
+            function validatePasswordConfirm(input, passwordField) {
+                const confirmPassword = input.val();
+                const password = passwordField.val();
+                
+                if (confirmPassword !== password) {
+                    showFieldError('password_confirm', 'Les mots de passe ne correspondent pas');
+                    return false;
+                } else {
+                    clearFieldError('password_confirm');
+                    return true;
+                }
+            }
+            
+            function validateDate(input) {
+                const dateStr = input.val();
+                if (!dateStr && input.closest('#voyageur').length > 0) {
+                    showFieldError('dateNaiss', 'La date de naissance est obligatoire pour les voyageurs');
+                    return false;
+                } else if (dateStr) {
+                    const birthDate = new Date(dateStr);
                     const age = calculateAge(birthDate);
                     
                     if (age < 15) {
-                        showFieldError(form, 'dateNaiss', 'Vous devez avoir au moins 15 ans pour vous inscrire');
-                        isValid = false;
+                        showFieldError('dateNaiss', 'Vous devez avoir au moins 15 ans pour vous inscrire');
+                        return false;
+                    } else {
+                        clearFieldError('dateNaiss');
+                        return true;
                     }
+                } else {
+                    clearFieldError('dateNaiss');
+                    return true;
                 }
+            }
+            
+            function validatePhoto(input) {
+                const photoInput = input[0];
+                const form = $(input).closest('form');
+                const errorElement = form.find('#photo-error');
+                const photoBtn = form.find('.photo-btn');
                 
-                // Validate photo
                 if (!photoInput || !photoInput.files || photoInput.files.length === 0) {
-                    form.find('#photo-error').text('Une photo est requise pour l\'inscription').show();
-                    isValid = false;
+                    errorElement.text('Une photo est obligatoire').show();
+                    photoBtn.addClass('is-invalid').removeClass('is-valid');
+                    return false;
+                } else {
+                    errorElement.hide();
+                    photoBtn.removeClass('is-invalid').addClass('is-valid');
+                    return true;
                 }
-                
-                if (!isValid) {
-                    e.preventDefault();
+            }
+            
+            // Attach real-time validation to form fields
+            $('input[name="name"]').on('input blur', function() {
+                validateName($(this));
+            });
+            
+            $('input[name="prenom"]').on('input blur', function() {
+                validatePrenom($(this));
+            });
+            
+            $('input[name="email"]').on('input blur', function() {
+                validateEmail($(this));
+            });
+            
+            $('input[name="phoneNumber"]').on('input blur', function() {
+                validatePhone($(this));
+            });
+            
+            $('input[name="password"]').on('input blur', function() {
+                validatePassword($(this));
+                // Also validate confirmation if it has a value
+                const confirmField = $(this).closest('form').find('input[name="password_confirm"]');
+                if (confirmField.val()) {
+                    validatePasswordConfirm(confirmField, $(this));
                 }
             });
             
-            // Form validation for Entreprise form
-            $('#entreprise form').on('submit', function(e) {
-                let isValid = true;
+            $('input[name="password_confirm"]').on('input blur', function() {
+                const passwordField = $(this).closest('form').find('input[name="password"]');
+                validatePasswordConfirm($(this), passwordField);
+            });
+            
+            $('input[name="dateNaiss"]').on('change blur', function() {
+                validateDate($(this));
+            });
+            
+            // Validate forms on submit
+            $('#voyageur form, #entreprise form').on('submit', function(e) {
                 const form = $(this);
+                let isValid = true;
                 
-                // Clear previous errors
-                clearFormErrors(form);
-                
-                const name = form.find('input[name="name"]').val().trim();
-                const email = form.find('input[name="email"]').val().trim();
-                const phone = form.find('input[name="phoneNumber"]').val().trim();
-                const password = form.find('input[name="password"]').val();
-                const confirmPassword = form.find('input[name="password_confirm"]').val();
-                const photoInput = form.find('input[type="file"]')[0];
-                
-                // Validate company name
-                if (name.length < 2 || name === '') {
-                    showFieldError(form, 'name', 'Le nom de l\'entreprise doit contenir au moins 2 caractères');
-                    isValid = false;
+                // Validate all fields
+                const nameField = form.find('input[name="name"]');
+                if (nameField.length) {
+                    isValid = validateName(nameField) && isValid;
                 }
                 
-                // Validate email
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email) || email === '') {
-                    showFieldError(form, 'email', 'Veuillez entrer une adresse email professionnelle valide');
-                    isValid = false;
+                const prenomField = form.find('input[name="prenom"]');
+                if (prenomField.length && form.closest('#voyageur').length > 0) {
+                    isValid = validatePrenom(prenomField) && isValid;
                 }
                 
-                // Validate phone number - now 8 digits
-                const phoneRegex = /^[0-9]{8}$/;
-                if (!phoneRegex.test(phone) || phone === '') {
-                    showFieldError(form, 'phoneNumber', 'Le numéro de téléphone doit contenir exactement 8 chiffres');
-                    isValid = false;
+                const emailField = form.find('input[name="email"]');
+                if (emailField.length) {
+                    isValid = validateEmail(emailField) && isValid;
                 }
                 
-                // Validate password
-                if (password.length < 6 || password === '') {
-                    showFieldError(form, 'password', 'Le mot de passe doit contenir au moins 6 caractères');
-                    isValid = false;
+                const phoneField = form.find('input[name="phoneNumber"]');
+                if (phoneField.length) {
+                    isValid = validatePhone(phoneField) && isValid;
                 }
                 
-                // Validate password confirmation
-                if (password !== confirmPassword || confirmPassword === '') {
-                    showFieldError(form, 'password_confirm', 'Les mots de passe ne correspondent pas');
-                    isValid = false;
+                const passwordField = form.find('input[name="password"]');
+                if (passwordField.length) {
+                    isValid = validatePassword(passwordField) && isValid;
                 }
                 
-                // Validate photo
-                if (!photoInput || !photoInput.files || photoInput.files.length === 0) {
-                    form.find('#photo-error').text('Une photo est requise pour l\'inscription').show();
-                    isValid = false;
+                const confirmField = form.find('input[name="password_confirm"]');
+                if (confirmField.length) {
+                    isValid = validatePasswordConfirm(confirmField, passwordField) && isValid;
                 }
+                
+                const dateField = form.find('input[name="dateNaiss"]');
+                if (dateField.length && form.closest('#voyageur').length > 0) {
+                    isValid = validateDate(dateField) && isValid;
+                }
+                
+                const photoInput = form.find('input[type="file"]');
+                isValid = validatePhoto(photoInput) && isValid;
                 
                 if (!isValid) {
                     e.preventDefault();
