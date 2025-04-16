@@ -50,13 +50,9 @@ final class StationController extends AbstractController
         
         // Get user from session
         $userId = $session->get('user_id');
-        $user = $userRepository->find($userId);
-        $userRole = $session->get('user_role');
         
-        // Get stations based on user role
-        $stations = ($userRole === 'Admin') 
-            ? $stationRepository->findAll()
-            : $stationRepository->findBy(['user' => $user]);
+        // Get active stations for the logged-in user
+        $stations = $stationRepository->findActiveStationsByUser($userId);
 
         return $this->render('station/index.html.twig', [
             'stations' => $stations,
