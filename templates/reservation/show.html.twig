@@ -165,16 +165,16 @@
         </div>
         
         <div class="reservation-card">
-            <img src="{{ asset(reservation.offre.imagePath ?: 'images/default-offer.jpg') }}" alt="Image de l'offre" class="reservation-image">
+            <img src="{{ 'http://localhost/imageOffre/' ~ (reservation.offre.imagePath ?: 'default-offer.jpg') }}" alt="Image de l'offre" class="reservation-image">
             
             <div class="reservation-details">
-                <h3 class="reservation-title">{{ reservation.offre.place }}</h3>
+                <h3 class="reservation-title">{{ reservation.offre.description }}</h3>
                 
                 <div class="info-section">
                     <h4 class="section-title">Informations sur l'offre</h4>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">Destination</div>
+                            <div class="info-label">Lieu</div>
                             <div class="info-value">{{ reservation.offre.place }}</div>
                         </div>
                         
@@ -201,6 +201,15 @@
                         <div class="info-item">
                             <div class="info-label">Limite de participants</div>
                             <div class="info-value">{{ reservation.offre.numberLimit }} personnes</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Statut</div>
+                            <div class="info-value">
+                                <span class="badge {% if reservation.offre.statusoff.value == 'Confirmé' %}bg-success{% elseif reservation.offre.statusoff.value == 'Rejeté' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ reservation.offre.statusoff.value }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

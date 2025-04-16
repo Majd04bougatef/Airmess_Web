@@ -14,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 use App\Enum\OffreStatus;
 
 class OffreType extends AbstractType
@@ -21,6 +23,10 @@ class OffreType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('description', TextareaType::class, [
+                'label' => 'Titre',
+                'attr' => ['class' => 'form-control'],
+            ])
             ->add('place', TextType::class, [
                 'label' => 'Lieu',
                 'attr' => ['class' => 'form-control'],
@@ -47,14 +53,27 @@ class OffreType extends AbstractType
                 'label' => 'Nombre Limite',
                 'attr' => ['class' => 'form-control'],
             ])
-            ->add('description', TextareaType::class, [
-                'label' => 'Description',
-                'attr' => ['class' => 'form-control'],
-            ])
-            ->add('imagePath', TextType::class, [
-                'label' => 'Chemin de l\'Image',
-                'required' => false,
-                'attr' => ['class' => 'form-control'],
+            ->add('imageFile', FileType::class, [
+                'label' => 'Image de l\'offre',
+                'mapped' => false,
+                'required' => true,
+                'attr' => [
+                    'class' => 'form-control',
+                    'accept' => 'image/jpeg, image/jpg, image/png, image/webp'
+                ],
+                'constraints' => [
+                    new File([
+                        'maxSize' => '5M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/jpg',
+                            'image/png',
+                            'image/webp'
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPG, PNG, WEBP)',
+                    ])
+                ],
+                'help' => 'L\'image est obligatoire pour créer une offre'
             ])
             ->add('aidesc', TextareaType::class, [
                 'label' => 'Aide Description',
