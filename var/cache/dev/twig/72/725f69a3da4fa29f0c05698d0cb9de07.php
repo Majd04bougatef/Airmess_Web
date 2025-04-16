@@ -188,7 +188,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
       <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
       <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"";
         // line 110
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
+        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_base");
         yield "\" type=\"button\">Se déconnecter</a>
     </div>
   </aside>
@@ -554,7 +554,7 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
         </div>
       </div>
       <a href=\"https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard\" target=\"_blank\" class=\"btn btn-dark btn-sm w-100 mb-3\">Airmess Pro</a>
-      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"{{path('app_logout')}}\" type=\"button\">Se déconnecter</a>
+      <a class=\"btn btn-primary btn-sm mb-0 w-100\" href=\"{{path('app_base')}}\" type=\"button\">Se déconnecter</a>
     </div>
   </aside>
   <main class=\"main-content position-relative border-radius-lg \" id=\"content\">
@@ -690,6 +690,6 @@ class __TwigTemplate_7a4283cd8bf16bbca34f23684acff1eb extends Template
   <script src=\"{{asset('js/argon-dashboard.min.js')}}\"></script>
 </body>
 
-</html>", "dashAdmin/dashboard.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashAdmin\\dashboard.html.twig");
+</html>", "dashAdmin/dashboard.html.twig", "C:\\Users\\arijt\\Desktop\\Airmess_Web\\templates\\dashAdmin\\dashboard.html.twig");
     }
 }

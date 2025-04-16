@@ -37,7 +37,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
 
     protected function doGetParent(array $context): bool|string|Template|TemplateWrapper
     {
-        // line 1
+        // line 2
         return "dashAdmin/dashboard.html.twig";
     }
 
@@ -50,7 +50,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "dashAdmin/userPage.html.twig"));
 
-        $this->parent = $this->loadTemplate("dashAdmin/dashboard.html.twig", "dashAdmin/userPage.html.twig", 1);
+        $this->parent = $this->loadTemplate("dashAdmin/dashboard.html.twig", "dashAdmin/userPage.html.twig", 2);
         yield from $this->parent->unwrap()->yield($context, array_merge($this->blocks, $blocks));
         
         $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
@@ -60,7 +60,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
 
     }
 
-    // line 3
+    // line 4
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -83,7 +83,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
         yield from [];
     }
 
-    // line 5
+    // line 6
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -96,7 +96,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "content"));
 
-        // line 6
+        // line 7
         yield "<nav class=\"navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl \" id=\"navbarBlur\" data-scroll=\"false\">
       <div class=\"container-fluid py-1 px-3\">
         <nav aria-label=\"breadcrumb\">
@@ -144,7 +144,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                     <div class=\"d-flex py-1\">
                       <div class=\"my-auto\">
                         <img src=\"";
-        // line 52
+        // line 53
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/team-2.jpg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm  me-3 \">
                       </div>
@@ -165,7 +165,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                     <div class=\"d-flex py-1\">
                       <div class=\"my-auto\">
                         <img src=\"";
-        // line 70
+        // line 71
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/small-logos/logo-spotify.svg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm bg-gradient-dark  me-3 \">
                       </div>
@@ -243,7 +243,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2 py-1\">
                           <div>
                             <img src=\"";
-        // line 145
+        // line 146
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/team-2.jpg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm me-3\" alt=\"user1\">
                           </div>
@@ -274,7 +274,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2 py-1\">
                           <div>
                             <img src=\"";
-        // line 173
+        // line 174
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/team-3.jpg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm me-3\" alt=\"user2\">
                           </div>
@@ -305,7 +305,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2 py-1\">
                           <div>
                             <img src=\"";
-        // line 201
+        // line 202
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/team-4.jpg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm me-3\" alt=\"user3\">
                           </div>
@@ -336,7 +336,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2 py-1\">
                           <div>
                             <img src=\"";
-        // line 229
+        // line 230
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/team-3.jpg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm me-3\" alt=\"user4\">
                           </div>
@@ -367,7 +367,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2 py-1\">
                           <div>
                             <img src=\"";
-        // line 257
+        // line 258
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/team-2.jpg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm me-3\" alt=\"user5\">
                           </div>
@@ -398,7 +398,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2 py-1\">
                           <div>
                             <img src=\"";
-        // line 285
+        // line 286
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/team-4.jpg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm me-3\" alt=\"user6\">
                           </div>
@@ -455,7 +455,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2\">
                           <div>
                             <img src=\"";
-        // line 339
+        // line 340
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/small-logos/logo-spotify.svg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm rounded-circle me-2\" alt=\"spotify\">
                           </div>
@@ -491,7 +491,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2\">
                           <div>
                             <img src=\"";
-        // line 372
+        // line 373
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/small-logos/logo-invision.svg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm rounded-circle me-2\" alt=\"invision\">
                           </div>
@@ -527,7 +527,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2\">
                           <div>
                             <img src=\"";
-        // line 405
+        // line 406
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/small-logos/logo-jira.svg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm rounded-circle me-2\" alt=\"jira\">
                           </div>
@@ -563,7 +563,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2\">
                           <div>
                             <img src=\"";
-        // line 438
+        // line 439
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/small-logos/logo-slack.svg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm rounded-circle me-2\" alt=\"slack\">
                           </div>
@@ -599,7 +599,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2\">
                           <div>
                             <img src=\"";
-        // line 471
+        // line 472
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/small-logos/logo-webdev.svg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm rounded-circle me-2\" alt=\"webdev\">
                           </div>
@@ -635,7 +635,7 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
                         <div class=\"d-flex px-2\">
                           <div>
                             <img src=\"";
-        // line 504
+        // line 505
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("img/small-logos/logo-xd.svg"), "html", null, true);
         yield "\" class=\"avatar avatar-sm rounded-circle me-2\" alt=\"xd\">
                           </div>
@@ -737,12 +737,13 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  639 => 504,  603 => 471,  567 => 438,  531 => 405,  495 => 372,  459 => 339,  402 => 285,  371 => 257,  340 => 229,  309 => 201,  278 => 173,  247 => 145,  169 => 70,  148 => 52,  100 => 6,  87 => 5,  64 => 3,  41 => 1,);
+        return array (  639 => 505,  603 => 472,  567 => 439,  531 => 406,  495 => 373,  459 => 340,  402 => 286,  371 => 258,  340 => 230,  309 => 202,  278 => 174,  247 => 146,  169 => 71,  148 => 53,  100 => 7,  87 => 6,  64 => 4,  41 => 2,);
     }
 
     public function getSourceContext(): Source
     {
-        return new Source("{% extends 'dashAdmin/dashboard.html.twig' %}
+        return new Source("
+{% extends 'dashAdmin/dashboard.html.twig' %}
 
 {% block title %}User Management{% endblock %}
 
@@ -1314,6 +1315,6 @@ class __TwigTemplate_cd7e5b8382845211a452a5b5483c4d31 extends Template
         </div>
       </footer>
     </div>
-{% endblock %}", "dashAdmin/userPage.html.twig", "C:\\Users\\MSI\\Desktop\\Airmess_Web\\templates\\dashAdmin\\userPage.html.twig");
+{% endblock %}", "dashAdmin/userPage.html.twig", "C:\\Users\\arijt\\Desktop\\Airmess_Web\\templates\\dashAdmin\\userPage.html.twig");
     }
 }
