@@ -92,7 +92,7 @@ class Station
         choices: ["active", "inactive"],
         message: "Le statut doit être 'active' ou 'inactive'"
     )]
-    private string $statut = "active";
+    private string $statut = "inactive";
 
     // Getters et Setters
 
