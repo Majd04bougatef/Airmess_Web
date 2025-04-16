@@ -761,7 +761,7 @@
     </a>
 
                     {# Admin Actions #}
-    {% if post_author and post_author.getIdU() == default_user_id %}
+    {% if post_author and post_author.getIdU() == current_user_id %}
                             <div class="d-flex flex-grow-1">
                         {# Edit Button #}
                                 <a href="{{ path('app_social_media_edit', {idEB: social_media.idEB}) }}" class="btn btn-action flex-grow-1 text-muted mx-1">
@@ -884,7 +884,7 @@
                                                 <input type="hidden" name="_token" value="{{ csrf_token('like_commentaire' ~ commentaire.idC) }}">
                                             </form>
                                             
-                                            {% if comment_author and comment_author.getIdU() == default_user_id %}
+                                            {% if comment_author and comment_author.getIdU() == current_user_id %}
                                                 <a href="{{ path('app_commentaire_edit', {'idC': commentaire.idC}) }}" class="comment-action-link small me-3">
                                                     <i class="fas fa-pencil-alt"></i> Modifier
                                                 </a>
