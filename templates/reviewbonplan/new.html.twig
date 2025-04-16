@@ -1,11 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New ReviewBonPlan{% endblock %}
+{% block title %}Ajouter un nouvel avis{% endblock %}
 
 {% block body %}
-    <h1>Create new ReviewBonPlan</h1>
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3">Ajouter un nouvel avis</h1>
+            <p class="text-muted">Créez un nouvel avis pour un bon plan</p>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Formulaire d'ajout</h5>
+        </div>
+        
+        {{ include('reviewbonplan/_form.html.twig') }}
+    </div>
+</div>
+{% endblock %}
 
-    {{ include('reviewbonplan/_form.html.twig') }}
-
-    <a href="{{ path('app_reviewbonplan_index') }}">back to list</a>
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .form-range::-webkit-slider-thumb {
+        background: #0d6efd;
+    }
+    
+    .form-range::-moz-range-thumb {
+        background: #0d6efd;
+    }
+    
+    .form-range::-ms-thumb {
+        background: #0d6efd;
+    }
+</style>
 {% endblock %}

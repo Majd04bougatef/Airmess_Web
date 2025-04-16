@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BonPlanRepository;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: BonPlanRepository::class)]
 #[ORM\Table(name: "bonplan")]
@@ -32,6 +34,14 @@ class BonPlan
 
     #[ORM\Column(name: 'imageBP', type: 'string', length: 500, nullable: true)]
     private ?string $imageBP = null;
+
+    #[ORM\OneToMany(mappedBy: 'bonPlan', targetEntity: ReviewBonPlan::class, cascade: ['persist', 'remove'])]
+    private Collection $reviews;
+
+    public function __construct()
+    {
+        $this->reviews = new ArrayCollection();
+    }
 
     // Getters and setters
     public function getId(): ?int
@@ -107,6 +117,36 @@ class BonPlan
     public function setImageBP(?string $imageBP): self
     {
         $this->imageBP = $imageBP;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ReviewBonPlan>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(ReviewBonPlan $review): self
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setBonPlan($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(ReviewBonPlan $review): self
+    {
+        if ($this->reviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getBonPlan() === $this) {
+                $review->setBonPlan(null);
+            }
+        }
+
         return $this;
     }
 }

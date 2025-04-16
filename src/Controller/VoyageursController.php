@@ -84,7 +84,6 @@ class VoyageursController extends AuthenticatedController
     }
 
     #[Route('/BonplanVoyageursPage', name: 'bonplanVoyageurs_page')]
-
     public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager)
     {
         // Récupérer tous les bons plans
@@ -93,6 +92,7 @@ class VoyageursController extends AuthenticatedController
         // Récupérer les notes moyennes pour chaque bon plan
         $ratings = [];
         $reviewsCount = [];
+        $reviewsByBonPlan = [];
         
         foreach ($bonplans as $bonplan) {
             // Requête pour calculer la note moyenne
@@ -113,18 +113,29 @@ class VoyageursController extends AuthenticatedController
             ->setParameter('bonplanId', $bonplan->getIdP())
             ->getSingleScalarResult();
             
+            // Récupérer tous les avis pour ce bon plan
+            $reviews = $entityManager->createQuery(
+                'SELECT r
+                FROM App\Entity\ReviewBonPlan r
+                WHERE r.bonPlan = :bonplanId
+                ORDER BY r.idR DESC'
+            )
+            ->setParameter('bonplanId', $bonplan->getIdP())
+            ->getResult();
+            
             // Stocker les résultats
             $ratings[$bonplan->getIdP()] = $averageRating ? round($averageRating, 1) : 0;
             $reviewsCount[$bonplan->getIdP()] = $count;
+            $reviewsByBonPlan[$bonplan->getIdP()] = $reviews;
         }
         
         // Passer les bons plans et les notes moyennes à la vue
         return $this->render('dashVoyageurs/bonplanPageVoyageurs.html.twig', [
             'bonplans' => $bonplans,
             'ratings' => $ratings,
-            'reviewsCount' => $reviewsCount
+            'reviewsCount' => $reviewsCount,
+            'reviewsByBonPlan' => $reviewsByBonPlan
         ]);
-
     }
 
     #[Route('/OffreVoyageursPage', name: 'offreVoyageurs_page')]

@@ -1,34 +1,169 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ReviewBonPlan{% endblock %}
+{% block title %}Détail de l'avis{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .stars-outer {
+        position: relative;
+        display: inline-block;
+        font-size: 24px;
+    }
+    
+    .stars-outer::before {
+        content: "\f005 \f005 \f005 \f005 \f005";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 400;
+        color: #ccc;
+    }
+    
+    .stars-inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 0;
+    }
+    
+    .stars-inner::before {
+        content: "\f005 \f005 \f005 \f005 \f005";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        color: #f8ce0b;
+    }
+    
+    .detail-card {
+        border-left: 5px solid #0d6efd;
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    <h1>ReviewBonPlan</h1>
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3">Détail de l'avis #{{ reviewbonplan.idR }}</h1>
+            <p class="text-muted">Consultez les informations détaillées de cet avis</p>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group" role="group">
+                <a href="{{ path('app_reviewbonplan_edit', {'idR': reviewbonplan.idR}) }}" class="btn btn-primary">
+                    <i class="fas fa-edit me-1"></i> Modifier
+                </a>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="fas fa-trash me-1"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm detail-card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Informations de l'avis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">ID de l'avis</div>
+                        <div class="col-md-8"><strong>{{ reviewbonplan.idR }}</strong></div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">ID de l'utilisateur</div>
+                        <div class="col-md-8"><strong>{{ reviewbonplan.idU }}</strong></div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">Note</div>
+                        <div class="col-md-8">
+                            <div class="stars-outer">
+                                <div class="stars-inner" style="width: {{ (reviewbonplan.rating * 20) }}%"></div>
+                            </div>
+                            <span class="ms-2"><strong>{{ reviewbonplan.rating }}/5</strong></span>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">Commentaire</div>
+                        <div class="col-md-8">
+                            <p class="mb-0">{{ reviewbonplan.commente }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            {% if bonplan %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Bon Plan associé</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ bonplan.nomplace }}</h6>
+                    
+                    {% if bonplan.localisation %}
+                    <p class="mb-2">
+                        <i class="fas fa-map-marker-alt me-2 text-primary"></i> {{ bonplan.localisation }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if bonplan.typePlace %}
+                    <p class="mb-2">
+                        <i class="fas fa-tag me-2 text-primary"></i> {{ bonplan.typePlace }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if bonplan.description %}
+                    <hr>
+                    <p class="small text-muted">{{ bonplan.description|slice(0, 200) }}{% if bonplan.description|length > 200 %}...{% endif %}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_reviewbonplan_admin') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                        <a href="{{ path('app_reviewbonplan_edit', {'idR': reviewbonplan.idR}) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i> Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>IdR</th>
-                <td>{{ reviewbonplan.idR }}</td>
-            </tr>
-            <tr>
-                <th>Id_U</th>
-                <td>{{ reviewbonplan.idU }}</td>
-            </tr>
-            <tr>
-                <th>Commente</th>
-                <td>{{ reviewbonplan.commente }}</td>
-            </tr>
-            <tr>
-                <th>Rating</th>
-                <td>{{ reviewbonplan.rating }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_reviewbonplan_index') }}">back to list</a>
-
-    <a href="{{ path('app_reviewbonplan_edit', {'idR': reviewbonplan.idR}) }}">edit</a>
-
-    {{ include('reviewbonplan/_delete_form.html.twig') }}
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmation de suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cet avis ?</p>
+                <p class="text-danger"><strong>Attention:</strong> Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path('app_reviewbonplan_delete', {'idR': reviewbonplan.idR}) }}" style="display:inline-block">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reviewbonplan.idR) }}">
+                    <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
