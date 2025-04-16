@@ -1,0 +1,302 @@
+{% extends 'dashEntreprise/dashboardEntreprise.html.twig' %}
+
+{% block title %}Réservations des Offres{% endblock %}
+
+{% block body %}
+<style>
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .table-striped-custom > tbody > tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .table-hover-custom > tbody > tr:hover {
+        background-color: rgba(60, 140, 231, 0.05);
+    }
+    
+    .stat-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-7px);
+    }
+    
+    .banner-gradient {
+        background: linear-gradient(135deg, #5B86E5, #36D1DC);
+    }
+    
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .section-title {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, #3C8CE7, #00EAFF);
+        bottom: -10px;
+        left: 0;
+        border-radius: 3px;
+    }
+</style>
+
+<!-- Bannière stylisée -->
+<div class="row mb-4 fade-in">
+    <div class="col-12">
+        <div class="card banner-gradient" style="border: none; box-shadow: 0 15px 35px rgba(60, 140, 231, 0.2);">
+            <div class="card-body p-5 text-white">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h2 class="text-white mb-3" style="font-weight: 700; letter-spacing: 0.5px;">Gestion des Réservations</h2>
+                        <p class="mb-4 opacity-8" style="font-size: 1.1rem; max-width: 600px;">Consultez et suivez toutes les réservations effectuées par vos clients pour optimiser votre gestion commerciale.</p>
+                        <a href="{{ path('offreEntreprise_page') }}" class="btn btn-white btn-icon" style="border-radius: 8px; padding: 10px 20px; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
+                            <i class="fas fa-arrow-left me-2"></i> Retour aux offres
+                        </a>
+                    </div>
+                    <div class="col-md-4 d-flex justify-content-end align-items-center">
+                        <div class="icon icon-shape bg-white shadow text-center border-radius-md" style="width: 100px; height: 100px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-calendar-check text-info fa-4x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid py-4">
+    <!-- Statistiques des réservations -->
+    <div class="row fade-in" style="animation-delay: 0.2s;">
+        <div class="col-12">
+            <h4 class="section-title">Aperçu des Performances</h4>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card mb-4 hover-shadow" style="border: none; box-shadow: 0 7px 20px rgba(0, 0, 0, 0.05);">
+                <div class="card-body p-3" style="background: linear-gradient(135deg, #6B73FF, #000DFF); border-radius: 15px;">
+                    <div class="d-flex">
+                        <div>
+                            <h5 class="text-white mb-0" style="font-weight: 700;">Réservations totales</h5>
+                            <p class="text-white opacity-8 mb-0">Performance globale</p>
+                        </div>
+                        <div class="ms-auto">
+                            <div class="bg-white text-center rounded-circle d-flex align-items-center justify-content-center shadow-primary" style="width: 60px; height: 60px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;">
+                                <span class="text-primary fw-bold" style="font-size: 1.3rem;">
+                                    {% if reservations is defined and reservations is not null %}
+                                        {{ reservations|length }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card mb-4 hover-shadow" style="border: none; box-shadow: 0 7px 20px rgba(0, 0, 0, 0.05);">
+                <div class="card-body p-3" style="background: linear-gradient(135deg, #FF057C, #8D0B93); border-radius: 15px;">
+                    <div class="d-flex">
+                        <div>
+                            <h5 class="text-white mb-0" style="font-weight: 700;">Revenus</h5>
+                            <p class="text-white opacity-8 mb-0">Total des ventes</p>
+                        </div>
+                        <div class="ms-auto">
+                            <div class="bg-white text-center rounded-circle d-flex align-items-center justify-content-center shadow-info" style="width: 60px; height: 60px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;">
+                                <span class="fw-bold" style="font-size: 1.3rem; color: #8D0B93;">€</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card mb-4 hover-shadow" style="border: none; box-shadow: 0 7px 20px rgba(0, 0, 0, 0.05);">
+                <div class="card-body p-3" style="background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 15px;">
+                    <div class="d-flex">
+                        <div>
+                            <h5 class="text-white mb-0" style="font-weight: 700;">Taux de conversion</h5>
+                            <p class="text-white opacity-8 mb-0">Performance hebdomadaire</p>
+                        </div>
+                        <div class="ms-auto">
+                            <div class="bg-white text-center rounded-circle d-flex align-items-center justify-content-center shadow-success" style="width: 60px; height: 60px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;">
+                                <span class="fw-bold" style="font-size: 1.3rem; color: #11998e;">+12%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des réservations -->
+    <div class="row mt-2 fade-in" style="animation-delay: 0.4s;">
+        <div class="col-12">
+            <div class="card mb-4 hover-shadow" style="border: none; border-radius: 15px; box-shadow: 0 7px 20px rgba(0, 0, 0, 0.05);">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center" style="background-color: transparent; border-bottom: none;">
+                    <h4 class="section-title mb-0">Réservations clients</h4>
+                    <div class="d-flex">
+                        <button class="btn btn-sm me-2" style="background: rgba(60, 140, 231, 0.1); color: #3C8CE7; border: none; font-weight: 500; border-radius: 8px;">
+                            <i class="fas fa-filter me-1"></i> Filtrer
+                        </button>
+                        <button class="btn btn-sm" style="background: rgba(60, 140, 231, 0.1); color: #3C8CE7; border: none; font-weight: 500; border-radius: 8px;">
+                            <i class="fas fa-download me-1"></i> Exporter
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0 table-striped-custom table-hover-custom">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary ps-4" style="color: #3C8CE7 !important; font-size: 0.65rem; padding-top: 1rem; padding-bottom: 1rem;">ID</th>
+                                    <th class="text-uppercase text-secondary ps-2" style="color: #3C8CE7 !important; font-size: 0.65rem; padding-top: 1rem; padding-bottom: 1rem;">Client</th>
+                                    <th class="text-uppercase text-secondary ps-2" style="color: #3C8CE7 !important; font-size: 0.65rem; padding-top: 1rem; padding-bottom: 1rem;">Offre</th>
+                                    <th class="text-uppercase text-secondary ps-2" style="color: #3C8CE7 !important; font-size: 0.65rem; padding-top: 1rem; padding-bottom: 1rem;">Date de Réservation</th>
+                                    <th class="text-uppercase text-secondary ps-2" style="color: #3C8CE7 !important; font-size: 0.65rem; padding-top: 1rem; padding-bottom: 1rem;">Prix</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if reservations is empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5" style="color: #8898aa;">
+                                            <i class="fas fa-calendar-times mb-3" style="font-size: 2rem;"></i>
+                                            <p class="mb-0 mt-2">Aucune réservation trouvée</p>
+                                            <p class="text-xs text-muted">Les réservations de vos clients s'afficheront ici.</p>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    {% for reservation in reservations %}
+                                        <tr>
+                                            <td class="ps-4">
+                                                <p class="text-xs font-weight-bold mb-0" style="color: #344767;">#{{ reservation.idR }}</p>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm" style="font-weight: 600; color: #344767;">
+                                                            {% if reservation.user is not null %}
+                                                                {{ reservation.user.prenom }} {{ reservation.user.nom }}
+                                                            {% else %}
+                                                                <span class="text-muted">Utilisateur inconnu</span>
+                                                            {% endif %}
+                                                        </h6>
+                                                        <p class="text-xs text-secondary mb-0">
+                                                            {% if reservation.user is not null %}
+                                                                <i class="fas fa-envelope me-1" style="font-size: 0.6rem;"></i> {{ reservation.user.email }}
+                                                            {% else %}
+                                                                <span class="text-muted">Email non disponible</span>
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0" style="color: #344767;">
+                                                    {% if reservation.offre is not null %}
+                                                        <i class="fas fa-map-marker-alt me-1" style="color: #f5365c;"></i> {{ reservation.offre.place }}
+                                                    {% else %}
+                                                        <span class="text-muted">Lieu non disponible</span>
+                                                    {% endif %}
+                                                </p>
+                                                <p class="text-xs text-secondary mb-0">
+                                                    {% if reservation.offre is not null and reservation.offre.description is not null %}
+                                                        {{ reservation.offre.description|slice(0, 30) }}{% if reservation.offre.description|length > 30 %}...{% endif %}
+                                                    {% else %}
+                                                        <span class="text-muted">Description non disponible</span>
+                                                    {% endif %}
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0" style="color: #344767;">
+                                                    {% if reservation.dateRes is not null %}
+                                                        <i class="fas fa-calendar me-1" style="color: #3C8CE7;"></i> {{ reservation.dateRes|date('d/m/Y') }}
+                                                    {% else %}
+                                                        <span class="text-muted">Date inconnue</span>
+                                                    {% endif %}
+                                                </p>
+                                                <p class="text-xs text-secondary mb-0">
+                                                    {% if reservation.dateRes is not null %}
+                                                        <i class="fas fa-clock me-1" style="color: #3C8CE7;"></i> {{ reservation.dateRes|date('H:i') }}
+                                                    {% else %}
+                                                        <span class="text-muted">Heure inconnue</span>
+                                                    {% endif %}
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0" style="color: #344767;">
+                                                    {% if reservation.offre is not null and reservation.offre.priceAfter is not null %}
+                                                        <i class="fas fa-tag me-1" style="color: #2dce89;"></i> {{ reservation.offre.priceAfter }} €
+                                                    {% else %}
+                                                        <span class="text-muted">Prix non disponible</span>
+                                                    {% endif %}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation des statistiques - compteur
+        const countElement = document.querySelector('.text-primary.fw-bold');
+        if (countElement) {
+            const finalCount = parseInt(countElement.textContent.trim());
+            if (!isNaN(finalCount) && finalCount > 0) {
+                let currentCount = 0;
+                const duration = 1500; // ms
+                const interval = Math.floor(duration / finalCount);
+                
+                const counter = setInterval(() => {
+                    currentCount++;
+                    countElement.textContent = currentCount;
+                    
+                    if (currentCount >= finalCount) {
+                        clearInterval(counter);
+                    }
+                }, interval);
+            }
+        }
+        
+        // Ajout de l'effet hover sur les lignes du tableau
+        const tableRows = document.querySelectorAll('tbody tr');
+        tableRows.forEach(row => {
+            row.style.transition = 'all 0.3s ease';
+        });
+    });
+</script>
+{% endblock %} 

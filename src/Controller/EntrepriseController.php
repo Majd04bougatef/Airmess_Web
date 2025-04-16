@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Offre;
 use App\Form\OffreType;
 use App\Repository\OffreRepository;
+use App\Repository\ReservationRepository;
 
 class EntrepriseController extends AbstractController{
 
@@ -69,6 +70,17 @@ class EntrepriseController extends AbstractController{
     {
         // Vous pouvez ajouter ici des données à passer à la vue
         return $this->render('dashEntreprise/socialPageEntreprise.html.twig');
+    }
+
+    #[Route('/reservations-offres', name: 'reservations_offres_page')]
+    public function reservationsOffresPage(ReservationRepository $reservationRepository): Response
+    {
+        // Récupérer toutes les réservations
+        $reservations = $reservationRepository->findAll();
+        
+        return $this->render('dashEntreprise/reservationsOffresPage.html.twig', [
+            'reservations' => $reservations
+        ]);
     }
 }
 
