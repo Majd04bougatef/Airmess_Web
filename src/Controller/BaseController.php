@@ -6,12 +6,13 @@ use App\Repository\SocialMediaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\StationRepository;
 
 class BaseController extends AbstractController
 {
     #[Route('/', name: 'homepage')]
     #[Route('/base', name: 'app_base')]
-    public function index(SocialMediaRepository $socialMediaRepository): Response
+    public function index(SocialMediaRepository $socialMediaRepository, StationRepository $stationRepository): Response
     {
         // Récupérer les 4 publications sociales les plus aimées
         $mostLiked = $socialMediaRepository->findMostLiked(8);
@@ -37,9 +38,52 @@ class BaseController extends AbstractController
         } else {
             $socialMedia = $randomPublications;
         }
+
+        // Get station statistics
+        $totalStations = $stationRepository->count([]);
+        $electricStations = $stationRepository->count(['typeVelo' => 'velo électrique']);
+        $regularStations = $stationRepository->count(['typeVelo' => 'velo urbain']);
+        $chargingPoints = $stationRepository->createQueryBuilder('s')
+            ->select('SUM(s.capacite)')
+            ->where('s.typeVelo = :type')
+            ->setParameter('type', 'velo électrique')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0;
         
         return $this->render('base.html.twig', [
-            'socialMedia' => $socialMedia
+            'socialMedia' => $socialMedia,
+            'totalStations' => $totalStations,
+            'electricStations' => $electricStations,
+            'regularStations' => $regularStations,
+            'chargingPoints' => $chargingPoints
+        ]);
+    }
+
+    #[Route('/station-stats', name: 'app_station_stats')]
+    public function getStationStats(StationRepository $stationRepository): Response
+    {
+        // Get total number of stations
+        $totalStations = $stationRepository->count([]);
+        
+        // Get number of electric stations
+        $electricStations = $stationRepository->count(['type' => 'electric']);
+        
+        // Get number of regular stations
+        $regularStations = $stationRepository->count(['type' => 'regular']);
+        
+        // Get total number of charging points
+        $chargingPoints = $stationRepository->createQueryBuilder('s')
+            ->select('SUM(s.chargingPoints)')
+            ->where('s.type = :type')
+            ->setParameter('type', 'electric')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0;
+
+        return $this->render('base.html.twig', [
+            'totalStations' => $totalStations,
+            'electricStations' => $electricStations,
+            'regularStations' => $regularStations,
+            'chargingPoints' => $chargingPoints
         ]);
     }
 }
