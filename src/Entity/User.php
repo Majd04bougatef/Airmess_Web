@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Entity;
@@ -151,7 +150,6 @@ class User
         return $this->id_U;
     }
     
-
     public function getName(): string
     {
         return $this->name;
@@ -273,7 +271,7 @@ class User
         return $this;
     }
 
-     /**
+    /**
      * @return Collection<int, Station>
      */
     public function getStations(): Collection
@@ -284,7 +282,7 @@ class User
     public function addStation(Station $station): self
     {
         if (!$this->stations->contains($station)) {
-            $this->stations->add($station);
+            $this->stations[] = $station;
             $station->setUser($this);
         }
 
@@ -294,6 +292,7 @@ class User
     public function removeStation(Station $station): self
     {
         if ($this->stations->removeElement($station)) {
+            // set the owning side to null (unless already changed)
             if ($station->getUser() === $this) {
                 $station->setUser(null);
             }
@@ -313,7 +312,7 @@ class User
     public function addReservation(ReservationTransport $reservation): self
     {
         if (!$this->reservations->contains($reservation)) {
-            $this->reservations->add($reservation);
+            $this->reservations[] = $reservation;
             $reservation->setUser($this);
         }
 
@@ -323,7 +322,7 @@ class User
     public function removeReservation(ReservationTransport $reservation): self
     {
         if ($this->reservations->removeElement($reservation)) {
-            // Set the owning side to null (unless already changed)
+            // set the owning side to null (unless already changed)
             if ($reservation->getUser() === $this) {
                 $reservation->setUser(null);
             }
@@ -343,7 +342,7 @@ class User
     public function addSentMessage(Message $message): self
     {
         if (!$this->sentMessages->contains($message)) {
-            $this->sentMessages->add($message);
+            $this->sentMessages[] = $message;
             $message->setSender($this);
         }
 
@@ -353,7 +352,7 @@ class User
     public function removeSentMessage(Message $message): self
     {
         if ($this->sentMessages->removeElement($message)) {
-            // Définir le côté propriétaire à null (sauf si déjà modifié)
+            // set the owning side to null (unless already changed)
             if ($message->getSender() === $this) {
                 $message->setSender(null);
             }
@@ -373,7 +372,7 @@ class User
     public function addReceivedMessage(Message $message): self
     {
         if (!$this->receivedMessages->contains($message)) {
-            $this->receivedMessages->add($message);
+            $this->receivedMessages[] = $message;
             $message->setReceiver($this);
         }
 
@@ -383,7 +382,7 @@ class User
     public function removeReceivedMessage(Message $message): self
     {
         if ($this->receivedMessages->removeElement($message)) {
-            // Définir le côté propriétaire à null (sauf si déjà modifié)
+            // set the owning side to null (unless already changed)
             if ($message->getReceiver() === $this) {
                 $message->setReceiver(null);
             }
@@ -392,7 +391,7 @@ class User
         return $this;
     }
 
-     /**
+    /**
      * @return Collection<int, SocialMedia>
      */
     public function getSocialMedias(): Collection
@@ -403,7 +402,7 @@ class User
     public function addSocialMedia(SocialMedia $socialMedia): self
     {
         if (!$this->socialMedias->contains($socialMedia)) {
-            $this->socialMedias->add($socialMedia);
+            $this->socialMedias[] = $socialMedia;
             $socialMedia->setUser($this);
         }
 
@@ -413,7 +412,7 @@ class User
     public function removeSocialMedia(SocialMedia $socialMedia): self
     {
         if ($this->socialMedias->removeElement($socialMedia)) {
-            // Set the owning side to null (unless already changed)
+            // set the owning side to null (unless already changed)
             if ($socialMedia->getUser() === $this) {
                 $socialMedia->setUser(null);
             }
@@ -433,7 +432,7 @@ class User
     public function addCommentaire(Commentaire $commentaire): self
     {
         if (!$this->commentaires->contains($commentaire)) {
-            $this->commentaires->add($commentaire);
+            $this->commentaires[] = $commentaire;
             $commentaire->setUser($this);
         }
 
@@ -443,7 +442,7 @@ class User
     public function removeCommentaire(Commentaire $commentaire): self
     {
         if ($this->commentaires->removeElement($commentaire)) {
-            // Set the owning side to null (unless already changed)
+            // set the owning side to null (unless already changed)
             if ($commentaire->getUser() === $this) {
                 $commentaire->setUser(null);
             }
@@ -451,5 +450,4 @@ class User
 
         return $this;
     }
-
 }
