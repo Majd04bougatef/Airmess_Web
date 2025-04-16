@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RegistrationController extends AbstractController
 {
@@ -32,30 +33,97 @@ class RegistrationController extends AbstractController
     public function register(
         Request $request, 
         SluggerInterface $slugger,
-        SessionInterface $session
+        SessionInterface $session,
+        ValidatorInterface $validator
     ): Response
     {
         if ($request->isMethod('POST')) {
             try {
-                // Validate form data
-                $errors = $this->validateFormData($request);
+                // Create a new User object and set its properties
+                $user = new User();
+                $user->setName($request->request->get('name'));
+                $user->setEmail($request->request->get('email'));
+                $user->setPassword(password_hash($request->request->get('password'), PASSWORD_BCRYPT));
+                $user->setRoleUser($request->request->get('roleUser'));
+                $user->setPhoneNumber($request->request->get('phoneNumber'));
+                $user->setStatut('actif');
+                $user->setDiamond(0);
+                $user->setDeleteFlag(0);
                 
-                if (!empty($errors)) {
+                // Set additional fields for Voyageurs
+                if ($request->request->get('roleUser') === 'Voyageurs') {
+                    $user->setPrenom($request->request->get('prenom'));
+                    $dateNaiss = $request->request->get('dateNaiss');
+                    if ($dateNaiss) {
+                        $user->setDateNaiss(new \DateTime($dateNaiss));
+                    }
+                }
+
+                // Process photo upload
+                $photoFile = $request->files->get('photo');
+                if ($photoFile) {
+                    $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $photoFile->guessExtension();
+                    
+                    try {
+                        $photoFile->move(
+                            $this->getParameter('user_images_directory'),
+                            $newFilename
+                        );
+                        $user->setImagesU($newFilename);
+                    } catch (FileException $e) {
+                        // If file upload fails, set default image
+                        $user->setImagesU('default-avatar.jpg');
+                    }
+                } else {
+                    $user->setImagesU('default-avatar.jpg');
+                }
+
+                // Validate the User object using the constraints
+                $errors = $validator->validate($user);
+                
+                // Add password confirmation validation (not in entity)
+                $password = $request->request->get('password');
+                $confirmPassword = $request->request->get('password_confirm');
+                if ($password !== $confirmPassword) {
+                    $this->addFlash('error', 'Les mots de passe ne correspondent pas');
+                    return $this->redirectToRoute('app_signup');
+                }
+
+                if (count($errors) > 0) {
+                    // Afficher les erreurs de validation
                     foreach ($errors as $error) {
-                        $this->addFlash('error', $error);
+                        $this->addFlash('error', $error->getMessage());
                     }
                     return $this->redirectToRoute('app_signup');
                 }
+
+                // Store user data in session for verification
+                $userData = [
+                    'name' => $user->getName(),
+                    'prenom' => $user->getPrenom(),
+                    'email' => $user->getEmail(),
+                    'password' => $user->getPassword(),
+                    'roleUser' => $user->getRoleUser(),
+                    'phoneNumber' => $user->getPhoneNumber(),
+                    'statut' => $user->getStatut(),
+                    'diamond' => $user->getDiamond(),
+                    'deleteFlag' => $user->getDeleteFlag(),
+                    'imagesU' => $user->getImagesU(),
+                ];
                 
-                // Process and store form data in session
-                $userData = $this->processFormData($request, $slugger);
+                if ($user->getDateNaiss()) {
+                    $userData['dateNaiss'] = $user->getDateNaiss()->format('Y-m-d');
+                }
+                
                 $session->set('temp_user_data', $userData);
                 
                 // Generate verification code
-                $code = $this->verificationService->generateCode($userData['email']);
+                $code = $this->verificationService->generateCode($user->getEmail());
                 
                 // Send verification code
-                $emailSent = $this->verificationService->sendVerificationCode($userData['email'], $code);
+                $emailSent = $this->verificationService->sendVerificationCode($user->getEmail(), $code);
                 
                 if (!$emailSent) {
                     $this->addFlash('error', 'Nous n\'avons pas pu envoyer le code de vérification. Veuillez réessayer.');
@@ -73,111 +141,5 @@ class RegistrationController extends AbstractController
         
         // If not a POST request, redirect to signup page
         return $this->redirectToRoute('app_signup');
-    }
-
-    private function validateFormData(Request $request): array
-    {
-        $errors = [];
-        
-        // Name validation
-        $name = $request->request->get('name');
-        if (empty($name) || strlen($name) < 2) {
-            $errors[] = 'Le nom doit contenir au moins 2 caractères.';
-        }
-        
-        // Email validation
-        $email = $request->request->get('email');
-        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'Veuillez fournir une adresse email valide.';
-        }
-        
-        // Password validation
-        $password = $request->request->get('password');
-        $confirmPassword = $request->request->get('password_confirm');
-        
-        if (empty($password) || strlen($password) < 6) {
-            $errors[] = 'Le mot de passe doit contenir au moins 6 caractères.';
-        } elseif ($password !== $confirmPassword) {
-            $errors[] = 'Les mots de passe ne correspondent pas.';
-        }
-        
-        // Phone validation
-        $phone = $request->request->get('phoneNumber');
-        if (empty($phone) || !preg_match('/^[0-9]{8}$/', $phone)) {
-            $errors[] = 'Le numéro de téléphone doit contenir exactement 8 chiffres.';
-        }
-        
-        // Photo validation
-        $photoFile = $request->files->get('photo');
-        if (!$photoFile) {
-            $errors[] = 'Veuillez télécharger une photo.';
-        }
-        
-        // Date of birth validation for Voyageurs
-        if ($request->request->get('roleUser') === 'Voyageurs') {
-            $dateNaiss = $request->request->get('dateNaiss');
-            if (empty($dateNaiss)) {
-                $errors[] = 'Veuillez entrer votre date de naissance.';
-            } else {
-                $birthDate = new \DateTime($dateNaiss);
-                $today = new \DateTime();
-                $age = $today->diff($birthDate)->y;
-                
-                if ($age < 15) {
-                    $errors[] = 'Vous devez avoir au moins 15 ans pour vous inscrire.';
-                }
-            }
-            
-            // Prenom validation for Voyageurs
-            $prenom = $request->request->get('prenom');
-            if (empty($prenom) || strlen($prenom) < 2) {
-                $errors[] = 'Le prénom doit contenir au moins 2 caractères.';
-            }
-        }
-        
-        return $errors;
-    }
-    
-    private function processFormData(Request $request, SluggerInterface $slugger): array
-    {
-        $userData = [
-            'name' => $request->request->get('name'),
-            'email' => $request->request->get('email'),
-            'password' => password_hash($request->request->get('password'), PASSWORD_BCRYPT),
-            'roleUser' => $request->request->get('roleUser'),
-            'phoneNumber' => $request->request->get('phoneNumber'),
-            'statut' => 'active',
-            'diamond' => 0,
-            'deleteFlag' => 0
-        ];
-        
-        // Add prenom for Voyageurs
-        if ($request->request->get('roleUser') === 'Voyageurs') {
-            $userData['prenom'] = $request->request->get('prenom');
-            $userData['dateNaiss'] = $request->request->get('dateNaiss');
-        }
-        
-        // Process photo upload
-        $photoFile = $request->files->get('photo');
-        if ($photoFile) {
-            $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename . '-' . uniqid() . '.' . $photoFile->guessExtension();
-            
-            try {
-                $photoFile->move(
-                    $this->getParameter('uploads_directory'),
-                    $newFilename
-                );
-                $userData['imagesU'] = $newFilename;
-            } catch (FileException $e) {
-                // If file upload fails, set default image
-                $userData['imagesU'] = 'default-avatar.jpg';
-            }
-        } else {
-            $userData['imagesU'] = 'default-avatar.jpg';
-        }
-        
-        return $userData;
     }
 } 
