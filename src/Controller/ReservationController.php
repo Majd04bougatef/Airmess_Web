@@ -49,7 +49,7 @@ class ReservationController extends AbstractController
         ]);
     }
 
-    #[Route('/{idR}', name: 'app_reservation_show', methods: ['GET'])]
+    #[Route('/{idR}/show', name: 'app_reservation_show', methods: ['GET'])]
     public function show(Reservation $reservation): Response
     {
         return $this->render('reservation/show.html.twig', [
@@ -75,7 +75,7 @@ class ReservationController extends AbstractController
         ]);
     }
 
-    #[Route('/{idR}', name: 'app_reservation_delete', methods: ['POST'])]
+    #[Route('/{idR}/delete', name: 'app_reservation_delete', methods: ['POST'])]
     public function delete(Request $request, Reservation $reservation, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$reservation->getIdR(), $request->getPayload()->getString('_token'))) {
@@ -94,7 +94,7 @@ class ReservationController extends AbstractController
         ]);
     }
 
-    #[Route('/payment/{idR}', name: 'app_reservation_payment', methods: ['GET', 'POST'])]
+    #[Route('/paymentoffre/{idR}', name: 'app_reservation_payment', methods: ['GET', 'POST'])]
     public function payment(Request $request, Reservation $reservation, EntityManagerInterface $entityManager): Response
     {
         if ($request->isMethod('POST')) {
@@ -114,7 +114,7 @@ class ReservationController extends AbstractController
         ]);
     }
 
-    #[Route('/confirmation/{idR}', name: 'app_reservation_confirmation', methods: ['GET'])]
+    #[Route('/confirmationoffre/{idR}', name: 'app_reservation_confirmation', methods: ['GET'])]
     public function confirmation(Reservation $reservation): Response
     {
         return $this->render('reservation/confirmation.html.twig', [
