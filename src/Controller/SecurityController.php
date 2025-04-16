@@ -150,7 +150,7 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('login');
         }
         
-        return $this->render('dashVoyageurs/dashboardVoyageursPage.html.twig');
+        return $this->render('dashVoyageurs/dashboardVoyageurs.html.twig');
     }
     
     #[Route('/logout', name: 'app_logout')]

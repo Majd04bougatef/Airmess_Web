@@ -19,6 +19,9 @@
                 <div class="bg-light p-4 rounded-3 border shadow-sm mb-4">
                     <p class="text-muted">
                         <i class="fas fa-info-circle me-1"></i> Update the expense details below. All fields marked with * are required.
+                        {% if expense.imagedepense and expense.imagedepense != 'default-receipt.jpg' %}
+                            <br><i class="fas fa-image me-1 mt-2"></i> <strong>Note:</strong> Uploading a new receipt image is optional. If you don't upload a new image, your current receipt image will be kept.
+                        {% endif %}
                     </p>
                 </div>
 

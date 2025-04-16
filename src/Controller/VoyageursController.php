@@ -50,7 +50,7 @@ class VoyageursController extends AuthenticatedController
             }
         }
         
-        return $this->render('dashVoyageurs/dashboardVoyageursPage.html.twig');
+        return $this->render('dashVoyageurs/dashboardVoyageurs.html.twig');
     }
 
     #[Route('/UserVoyageursPage', name: 'userVoyageurs_page')]
@@ -549,7 +549,12 @@ class VoyageursController extends AuthenticatedController
             }
         }
         
-        return new BinaryFileResponse($filePath);
+        // Create a response with appropriate headers
+        $response = new BinaryFileResponse($filePath);
+        $response->headers->set('Content-Type', mime_content_type($filePath));
+        $response->headers->set('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+        
+        return $response;
     }
 }
 

@@ -29,7 +29,7 @@ class loginController extends AbstractController
     #[Route('/dashVoyageurs', name: 'app_dashVoyageurs')]
     public function dashVoyageurs(): Response
     {
-        return $this->render('dashVoyageurs/dashboardVoyageursPage.html.twig');
+        return $this->render('dashVoyageurs/dashboardVoyageurs.html.twig');
     }
 }
 ?>
