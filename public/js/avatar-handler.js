@@ -3,8 +3,8 @@
  * Provides a proper fallback mechanism for missing user images
  */
 function handleImageError(img) {
-  // Try to load the default avatar from users directory
-  img.src = '/uploads/users/default.png';
+  // Try to load the default avatar from the correct directory
+  img.src = '/images_users/default.png';
   
   // If that fails, try the general user icon
   img.onerror = function() {

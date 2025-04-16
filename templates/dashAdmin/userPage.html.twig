@@ -84,8 +84,8 @@
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-0">
             <table class="table align-items-center mb-0" id="usersTable" 
-                  data-edit-path="{{ path('admin_user_edit', {'id': 0}) }}"
-                  data-delete-path="{{ path('admin_user_delete', {'id': 0}) }}">
+                  data-edit-path="{{ path('admin_user_edit', {'id_U': 0}) }}"
+                  data-delete-path="{{ path('admin_user_delete', {'id_U': 0}) }}">
               <thead>
                 <tr>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Utilisateur</th>
@@ -102,7 +102,7 @@
                     <td>
                       <div class="d-flex px-2 py-1">
                         <div>
-                          <img src="{{ asset('uploads/users_images/' ~ user.imagesU) }}" class="avatar avatar-sm me-3"
+                          <img src="{{ '/images_users/' ~ user.imagesU }}" class="avatar avatar-sm me-3"
                             alt="{{ user.name }}" onerror="handleImageError(this)">
                         </div>
                         <div class="d-flex flex-column justify-content-center">
@@ -259,30 +259,30 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="addUserForm" action="{{ path('admin_user_add') }}">
+        <form id="addUserForm" method="post" action="{{ path('admin_user_add') }}" enctype="multipart/form-data">
           <div class="mb-3">
             <label for="name" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="name" required>
+            <input type="text" class="form-control" id="name" name="name" required>
           </div>
           <div class="mb-3">
             <label for="prenom" class="form-label">Prénom</label>
-            <input type="text" class="form-control" id="prenom" required>
+            <input type="text" class="form-control" id="prenom" name="prenom" required>
           </div>
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" required>
+            <input type="email" class="form-control" id="email" name="email" required>
           </div>
           <div class="mb-3">
             <label for="password" class="form-label">Mot de passe</label>
-            <input type="password" class="form-control" id="password" required>
+            <input type="password" class="form-control" id="password" name="password" required>
           </div>
           <div class="mb-3">
             <label for="phone" class="form-label">Téléphone</label>
-            <input type="tel" class="form-control" id="phone">
+            <input type="tel" class="form-control" id="phone" name="phone">
           </div>
           <div class="mb-3">
             <label for="role" class="form-label">Rôle</label>
-            <select class="form-select" id="role" required>
+            <select class="form-select" id="role" name="role" required>
               <option value="Voyageurs">Voyageurs</option>
               <option value="Entreprise">Entreprise</option>
               <option value="Admin">Admin</option>
@@ -290,13 +290,13 @@
           </div>
           <div class="mb-3">
             <label for="photo" class="form-label">Photo de profil</label>
-            <input type="file" class="form-control" id="photo" accept="image/*">
+            <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn bg-gradient-primary" id="saveNewUser">Enregistrer</button>
+        <button type="button" class="btn bg-gradient-primary" id="saveNewUser" onclick="submitAddForm()">Enregistrer</button>
       </div>
     </div>
   </div>
@@ -312,27 +312,27 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="editUserForm{{ user.idU }}" action="{{ path('admin_user_edit', {'id': user.idU}) }}">
-          <input type="hidden" id="editUserId{{ user.idU }}" value="{{ user.idU }}">
+        <form id="editUserForm{{ user.idU }}" method="post" action="{{ path('admin_user_edit', {'id_U': user.idU}) }}" enctype="multipart/form-data">
+          <input type="hidden" id="editUserId{{ user.idU }}" name="id" value="{{ user.idU }}">
           <div class="mb-3">
             <label for="editName{{ user.idU }}" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="editName{{ user.idU }}" value="{{ user.name }}" required>
+            <input type="text" class="form-control" id="editName{{ user.idU }}" name="name" value="{{ user.name }}" required>
           </div>
           <div class="mb-3">
             <label for="editPrenom{{ user.idU }}" class="form-label">Prénom</label>
-            <input type="text" class="form-control" id="editPrenom{{ user.idU }}" value="{{ user.prenom }}" required>
+            <input type="text" class="form-control" id="editPrenom{{ user.idU }}" name="prenom" value="{{ user.prenom }}" required>
           </div>
           <div class="mb-3">
             <label for="editEmail{{ user.idU }}" class="form-label">Email</label>
-            <input type="email" class="form-control" id="editEmail{{ user.idU }}" value="{{ user.email }}" required>
+            <input type="email" class="form-control" id="editEmail{{ user.idU }}" name="email" value="{{ user.email }}" required>
           </div>
           <div class="mb-3">
             <label for="editPhone{{ user.idU }}" class="form-label">Téléphone</label>
-            <input type="tel" class="form-control" id="editPhone{{ user.idU }}" value="{{ user.phoneNumber }}">
+            <input type="tel" class="form-control" id="editPhone{{ user.idU }}" name="phone" value="{{ user.phoneNumber }}">
           </div>
           <div class="mb-3">
             <label for="editRole{{ user.idU }}" class="form-label">Rôle</label>
-            <select class="form-select" id="editRole{{ user.idU }}">
+            <select class="form-select" id="editRole{{ user.idU }}" name="role">
               <option value="Voyageurs" {% if user.roleUser == 'Voyageurs' %}selected{% endif %}>Voyageurs</option>
               <option value="Entreprise" {% if user.roleUser == 'Entreprise' %}selected{% endif %}>Entreprise</option>
               <option value="Admin" {% if user.roleUser == 'Admin' %}selected{% endif %}>Admin</option>
@@ -340,7 +340,7 @@
           </div>
           <div class="mb-3">
             <label for="editStatus{{ user.idU }}" class="form-label">Statut</label>
-            <select class="form-select" id="editStatus{{ user.idU }}">
+            <select class="form-select" id="editStatus{{ user.idU }}" name="status">
               <option value="actif" {% if user.statut == 'actif' or user.statut == 'active' %}selected{% endif %}>Actif</option>
               <option value="inactif" {% if user.statut == 'inactif' or user.statut == 'inactive' %}selected{% endif %}>Inactif</option>
             </select>
@@ -348,16 +348,16 @@
           <div class="form-group mb-3">
             <label for="editPhoto{{ user.idU }}" class="form-label">Photo de profil</label>
             <div class="mb-3">
-              <img src="{{ asset('uploads/users_images/' ~ user.imagesU) }}" alt="Photo de profil actuelle"
+              <img src="{{ '/images_users/' ~ user.imagesU }}" alt="Photo de profil actuelle"
                 class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
             </div>
-            <input type="file" class="form-control" id="editPhoto{{ user.idU }}" accept="image/*">
+            <input type="file" class="form-control" id="editPhoto{{ user.idU }}" name="photo" accept="image/*">
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn bg-gradient-primary" id="saveEditUser-{{ user.idU }}" onclick="saveUser({{ user.idU }})">Enregistrer</button>
+        <button type="button" class="btn bg-gradient-primary" id="saveEditUser-{{ user.idU }}" onclick="submitEditForm({{ user.idU }})">Enregistrer</button>
       </div>
     </div>
   </div>
@@ -465,44 +465,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Enregistrement d'un nouvel utilisateur
-  document.getElementById('saveNewUser').addEventListener('click', function() {
-    var name = document.getElementById('name').value;
-    var prenom = document.getElementById('prenom').value;
-    var email = document.getElementById('email').value;
-    var password = document.getElementById('password').value;
-    var phone = document.getElementById('phone').value;
-    var role = document.getElementById('role').value;
-    var photoInput = document.getElementById('photo');
+  // Fonction pour soumettre le formulaire d'ajout d'utilisateur
+  function submitAddForm() {
+    var form = document.getElementById('addUserForm');
     
-    if (!name || !prenom || !email || !password) {
+    if (!form) {
+      console.error('Form not found: addUserForm');
+      alert('Erreur: Formulaire non trouvé');
+      return;
+    }
+    
+    // Check required fields
+    var name = form.querySelector('[name="name"]');
+    var prenom = form.querySelector('[name="prenom"]');
+    var email = form.querySelector('[name="email"]');
+    var password = form.querySelector('[name="password"]');
+    
+    if (!name.value || !prenom.value || !email.value || !password.value) {
       alert('Veuillez remplir tous les champs obligatoires');
       return;
     }
     
-    // Use FormData for file uploads
-    var formData = new FormData();
-    formData.append('name', name);
-    formData.append('prenom', prenom);
-    formData.append('email', email);
-    formData.append('password', password);
-    formData.append('phone', phone);
-    formData.append('role', role);
+    // Create FormData from the form
+    var formData = new FormData(form);
     
-    // Add photo if selected
-    if (photoInput && photoInput.files.length > 0) {
-      formData.append('photo', photoInput.files[0]);
+    // Debug form data
+    console.log('Add user form data:');
+    for (var pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
     }
     
-    fetch('{{ path('admin_user_add') }}', {
-      method: 'POST',
+    // Use fetch API to submit the form
+    fetch(form.action, {
+      method: form.method,
       headers: {
         'X-Requested-With': 'XMLHttpRequest'
       },
       body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+      console.log('Response status:', response.status);
+      return response.json();
+    })
     .then(data => {
+      console.log('Response data:', data);
       if (data.success) {
         alert('Utilisateur créé avec succès');
         // Reload page to see the new user, staying on current page
@@ -515,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error:', error);
       alert('Une erreur est survenue');
     });
-  });
+  }
 
   // Fonction pour activer tous les utilisateurs
   document.getElementById('activateAllButton').addEventListener('click', function() {
@@ -574,45 +580,49 @@ function confirmDelete(userId) {
 }
 
 // Fonction pour enregistrer les modifications d'un utilisateur
-function saveUser(userId) {
-  var name = document.getElementById('editName' + userId).value;
-  var prenom = document.getElementById('editPrenom' + userId).value;
-  var email = document.getElementById('editEmail' + userId).value;
-  var phone = document.getElementById('editPhone' + userId).value;
-  var role = document.getElementById('editRole' + userId).value;
-  var status = document.getElementById('editStatus' + userId).value;
-  var photoInput = document.getElementById('editPhoto' + userId);
+function submitEditForm(userId) {
+  // Get the form element directly
+  var form = document.getElementById('editUserForm' + userId);
   
-  if (!name || !prenom || !email) {
+  if (!form) {
+    console.error('Form not found:', 'editUserForm' + userId);
+    alert('Erreur: Formulaire non trouvé');
+    return;
+  }
+  
+  // Check required fields
+  var name = form.querySelector('[name="name"]');
+  var prenom = form.querySelector('[name="prenom"]');
+  var email = form.querySelector('[name="email"]');
+  
+  if (!name.value || !prenom.value || !email.value) {
     alert('Veuillez remplir tous les champs obligatoires');
     return;
   }
   
-  // Prepare form data for multipart/form-data (file upload)
-  var formData = new FormData();
-  formData.append('name', name);
-  formData.append('prenom', prenom);
-  formData.append('email', email);
-  formData.append('phone', phone);
-  formData.append('role', role);
-  formData.append('status', status);
+  // Create FormData from the form
+  var formData = new FormData(form);
   
-  // Add the file if one was selected
-  if (photoInput.files.length > 0) {
-    formData.append('photo', photoInput.files[0]);
+  // Debug form data
+  console.log('Form data entries:');
+  for (var pair of formData.entries()) {
+    console.log(pair[0] + ': ' + pair[1]);
   }
   
-  const editPath = document.getElementById('usersTable').dataset.editPath.replace('/0', '/' + userId);
-  
-  fetch(editPath, {
-    method: 'POST',
+  // Use fetch API to submit the form
+  fetch(form.action, {
+    method: form.method,
     headers: {
       'X-Requested-With': 'XMLHttpRequest'
     },
     body: formData
   })
-  .then(response => response.json())
+  .then(response => {
+    console.log('Response status:', response.status);
+    return response.json();
+  })
   .then(data => {
+    console.log('Response data:', data);
     if (data.success) {
       alert('Utilisateur modifié avec succès');
       // Reload page to see the updated user, keeping the current page

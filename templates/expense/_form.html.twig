@@ -1,21 +1,35 @@
-{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'id': 'expense-form'}}) }}
+    {% if form_errors(form) %}
+    <div class="alert alert-danger">
+        {{ form_errors(form) }}
+    </div>
+    {% endif %}
+    
     <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light py-3">
+            <h5 class="mb-0 text-gray-800"><i class="fas fa-clipboard-list me-2"></i>Expense Information</h5>
+            <small class="text-muted">Fields marked with * are required</small>
+        </div>
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-6">
                     <div class="form-group">
                         {{ form_label(form.nameEx, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                        {{ form_widget(form.nameEx, {'attr': {'class': 'form-control'}}) }}
+                        <span class="text-danger">*</span>
+                        {{ form_widget(form.nameEx, {'attr': {'class': 'form-control expense-input', 'data-validate': 'true', 'data-min-length': '3', 'data-max-length': '100'}}) }}
+                        <div class="invalid-feedback" id="feedback-nameEx"></div>
                         {{ form_errors(form.nameEx) }}
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         {{ form_label(form.amount, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        <span class="text-danger">*</span>
                         <div class="input-group">
-                            {{ form_widget(form.amount, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_widget(form.amount, {'attr': {'class': 'form-control expense-input', 'data-validate': 'true', 'data-type': 'number', 'data-min': '0.01', 'data-max': '100000', 'step': '0.01'}}) }}
                             <span class="input-group-text">€</span>
                         </div>
+                        <div class="invalid-feedback" id="feedback-amount"></div>
                         {{ form_errors(form.amount) }}
                     </div>
                 </div>
@@ -25,14 +39,18 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         {{ form_label(form.category, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                        {{ form_widget(form.category, {'attr': {'class': 'form-select'}}) }}
+                        <span class="text-danger">*</span>
+                        {{ form_widget(form.category, {'attr': {'class': 'form-select expense-input', 'data-validate': 'true', 'data-type': 'select'}}) }}
+                        <div class="invalid-feedback" id="feedback-category"></div>
                         {{ form_errors(form.category) }}
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         {{ form_label(form.dateE, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                        {{ form_widget(form.dateE, {'attr': {'class': 'form-control'}}) }}
+                        <span class="text-danger">*</span>
+                        {{ form_widget(form.dateE, {'attr': {'class': 'form-control expense-input', 'data-validate': 'true', 'data-type': 'date', 'max': 'today'}}) }}
+                        <div class="invalid-feedback" id="feedback-dateE"></div>
                         {{ form_errors(form.dateE) }}
                     </div>
                 </div>
@@ -40,23 +58,50 @@
 
             <div class="form-group mb-3">
                 {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+                <span class="text-danger">*</span>
+                {{ form_widget(form.description, {'attr': {'class': 'form-control expense-input', 'data-validate': 'true', 'data-min-length': '5', 'data-max-length': '500', 'rows': 4}}) }}
+                <div class="invalid-feedback" id="feedback-description"></div>
+                <div class="d-flex justify-content-end">
+                    <small class="text-muted"><span id="descriptionCharCount">0</span>/500 characters</small>
+                </div>
                 {{ form_errors(form.description) }}
             </div>
 
             <div class="form-group mb-3">
                 {{ form_label(form.imageFile, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                <div class="input-group mb-3">
-                    {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                <span class="text-danger">*</span>
+                <div class="input-group mb-1">
+                    {{ form_widget(form.imageFile, {'attr': {'class': 'form-control expense-input', 'data-validate': 'true', 'data-type': 'file', 'data-optional': 'false', 'accept': 'image/jpeg,image/png,image/gif,image/webp', 'required': 'required'}}) }}
+                    <button class="btn btn-outline-secondary" type="button" id="clear-image-btn" style="display: none;">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
                 </div>
+                <div class="invalid-feedback" id="feedback-imageFile"></div>
                 <small class="text-muted">Accepted formats: JPEG, PNG, GIF, WEBP. Max size: 5MB</small>
+                
+                <div id="image-preview-wrapper" class="d-none mt-3">
+                    <div class="card">
+                        <div class="card-header bg-light py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-image me-2"></i>Image Preview</span>
+                                <span id="file-info" class="badge bg-info"></span>
+                            </div>
+                        </div>
+                        <div class="card-body text-center p-2">
+                            <img id="image-preview" src="#" alt="Receipt Preview" class="img-fluid" style="max-height: 250px; width: auto;">
+                        </div>
+                    </div>
+                </div>
+                
                 {{ form_errors(form.imageFile) }}
             </div>
 
             {% if form.user is defined %}
             <div class="form-group mb-3">
                 {{ form_label(form.user, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                {{ form_widget(form.user, {'attr': {'class': 'form-select'}}) }}
+                <span class="text-danger">*</span>
+                {{ form_widget(form.user, {'attr': {'class': 'form-select expense-input', 'data-validate': 'true', 'data-type': 'select'}}) }}
+                <div class="invalid-feedback" id="feedback-user"></div>
                 {{ form_errors(form.user) }}
             </div>
             {% endif %}
@@ -64,10 +109,305 @@
             {{ form_rest(form) }}
         </div>
         <div class="card-footer bg-white d-flex justify-content-between">
-            <a href="{{ app.request.headers.get('referer') }}" class="btn btn-outline-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">
+            <a href="{{ app.request.headers.get('referer') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-1"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-primary" id="submit-button">
                 <i class="fas fa-save me-1"></i> {{ button_label|default('Save') }}
             </button>
         </div>
     </div>
 {{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation variables
+    const form = document.getElementById('expense-form');
+    const submitButton = document.getElementById('submit-button');
+    const formInputs = document.querySelectorAll('.expense-input');
+    let formIsValid = false;
+    
+    // Character counter for description
+    const descriptionTextarea = document.querySelector('#{{ form.description.vars.id }}');
+    const charCountElement = document.getElementById('descriptionCharCount');
+    
+    if (descriptionTextarea && charCountElement) {
+        // Update initial count
+        charCountElement.textContent = descriptionTextarea.value.length;
+        
+        // Add event listener for input changes
+        descriptionTextarea.addEventListener('input', function() {
+            charCountElement.textContent = this.value.length;
+            
+            // Change color if approaching limit
+            if (this.value.length > 450) {
+                charCountElement.classList.add('text-danger');
+                charCountElement.classList.add('fw-bold');
+            } else {
+                charCountElement.classList.remove('text-danger');
+                charCountElement.classList.remove('fw-bold');
+            }
+        });
+    }
+    
+    // Image preview
+    const imageInput = document.querySelector('#{{ form.imageFile.vars.id }}');
+    const imagePreviewWrapper = document.getElementById('image-preview-wrapper');
+    const imagePreview = document.getElementById('image-preview');
+    const fileInfo = document.getElementById('file-info');
+    const clearImageBtn = document.getElementById('clear-image-btn');
+    
+    if (imageInput) {
+        // Check if there's a current image (for edit form)
+        if (imageInput.dataset.currentImage) {
+            showImagePreview(imageInput.dataset.currentImage, 'Current Image');
+        }
+        
+        imageInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                
+                // Validate file size
+                if (file.size > 5 * 1024 * 1024) {
+                    this.classList.add('is-invalid');
+                    document.getElementById('feedback-imageFile').textContent = 'File is too large. Maximum size is 5MB.';
+                    hideImagePreview();
+                    return;
+                }
+                
+                // Validate file type
+                const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!acceptedTypes.includes(file.type)) {
+                    this.classList.add('is-invalid');
+                    document.getElementById('feedback-imageFile').textContent = 'Invalid file type. Accepted formats: JPEG, PNG, GIF, WEBP.';
+                    hideImagePreview();
+                    return;
+                }
+                
+                // Reset validation
+                this.classList.remove('is-invalid');
+                document.getElementById('feedback-imageFile').textContent = '';
+                
+                // Show clear button
+                clearImageBtn.style.display = 'block';
+                
+                // Format file size
+                const fileSize = formatFileSize(file.size);
+                
+                // Create object URL for preview
+                const imageURL = URL.createObjectURL(file);
+                showImagePreview(imageURL, `${file.name} (${fileSize})`);
+                
+                // Clean up object URL when no longer needed
+                imagePreview.onload = function() {
+                    URL.revokeObjectURL(imageURL);
+                };
+            } else {
+                hideImagePreview();
+            }
+        });
+        
+        // Clear button functionality
+        clearImageBtn.addEventListener('click', function() {
+            imageInput.value = '';
+            hideImagePreview();
+            validateInput(imageInput);
+            updateFormValidity();
+        });
+    }
+    
+    // Helper function to format file size
+    function formatFileSize(bytes) {
+        if (bytes < 1024) {
+            return bytes + ' B';
+        } else if (bytes < 1024 * 1024) {
+            return (bytes / 1024).toFixed(1) + ' KB';
+        } else {
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+    }
+    
+    // Helper function to show image preview
+    function showImagePreview(src, info) {
+        imagePreview.src = src;
+        fileInfo.textContent = info;
+        imagePreviewWrapper.classList.remove('d-none');
+        clearImageBtn.style.display = 'block';
+    }
+    
+    // Helper function to hide image preview
+    function hideImagePreview() {
+        imagePreviewWrapper.classList.add('d-none');
+        imagePreview.src = '#';
+        fileInfo.textContent = '';
+        clearImageBtn.style.display = 'none';
+    }
+    
+    // Real-time validation for all inputs
+    formInputs.forEach(input => {
+        if (input.dataset.validate === 'true') {
+            // Add initial validation on page load
+            validateInput(input);
+            
+            // Add input event listeners
+            input.addEventListener('input', function() {
+                validateInput(this);
+                updateFormValidity();
+            });
+            
+            input.addEventListener('change', function() {
+                validateInput(this);
+                updateFormValidity();
+            });
+            
+            input.addEventListener('blur', function() {
+                validateInput(this);
+                updateFormValidity();
+            });
+        }
+    });
+    
+    // Validate the entire form
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        formInputs.forEach(input => {
+            if (input.dataset.validate === 'true') {
+                const inputIsValid = validateInput(input);
+                isValid = isValid && inputIsValid;
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            
+            // Scroll to first invalid field
+            const firstInvalid = document.querySelector('.expense-input.is-invalid');
+            if (firstInvalid) {
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalid.focus();
+            }
+        }
+    });
+    
+    // Validate a single input based on its data attributes
+    function validateInput(input) {
+        // Skip validation for optional fields if empty
+        if (input.dataset.optional === 'true' && (input.value === '' || input.files.length === 0)) {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            document.getElementById('feedback-' + input.id.split('_').pop()).textContent = '';
+            return true;
+        }
+        
+        const type = input.dataset.type || 'text';
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Get the field name for error messages
+        const fieldName = input.previousElementSibling ? 
+            input.previousElementSibling.previousElementSibling.textContent.trim() : 
+            'This field';
+        
+        // Basic required validation
+        if (input.value === '' || (type === 'select' && input.value === '') || (type === 'file' && input.files.length === 0 && !input.dataset.optional)) {
+            isValid = false;
+            errorMessage = fieldName + ' is required';
+        } 
+        // Type-specific validations
+        else {
+            switch(type) {
+                case 'text':
+                    if (input.dataset.minLength && input.value.length < parseInt(input.dataset.minLength)) {
+                        isValid = false;
+                        errorMessage = fieldName + ' must be at least ' + input.dataset.minLength + ' characters';
+                    } else if (input.dataset.maxLength && input.value.length > parseInt(input.dataset.maxLength)) {
+                        isValid = false;
+                        errorMessage = fieldName + ' cannot exceed ' + input.dataset.maxLength + ' characters';
+                    }
+                    break;
+                    
+                case 'number':
+                    const value = parseFloat(input.value);
+                    if (isNaN(value)) {
+                        isValid = false;
+                        errorMessage = fieldName + ' must be a valid number';
+                    } else if (input.dataset.min && value < parseFloat(input.dataset.min)) {
+                        isValid = false;
+                        errorMessage = fieldName + ' must be at least ' + input.dataset.min;
+                    } else if (input.dataset.max && value > parseFloat(input.dataset.max)) {
+                        isValid = false;
+                        errorMessage = fieldName + ' cannot exceed ' + input.dataset.max;
+                    }
+                    break;
+                    
+                case 'date':
+                    const date = new Date(input.value);
+                    if (isNaN(date.getTime())) {
+                        isValid = false;
+                        errorMessage = fieldName + ' must be a valid date';
+                    } else if (input.dataset.max === 'today' && date > new Date()) {
+                        isValid = false;
+                        errorMessage = fieldName + ' cannot be in the future';
+                    }
+                    break;
+                    
+                case 'file':
+                    if (input.files.length > 0) {
+                        const file = input.files[0];
+                        
+                        // Check file size
+                        if (file.size > 5 * 1024 * 1024) {
+                            isValid = false;
+                            errorMessage = 'File is too large. Maximum size is 5MB.';
+                        }
+                        
+                        // Check file type
+                        const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                        if (!acceptedTypes.includes(file.type)) {
+                            isValid = false;
+                            errorMessage = 'Invalid file type. Accepted formats: JPEG, PNG, GIF, WEBP.';
+                        }
+                    }
+                    break;
+                    
+                case 'select':
+                    if (input.value === '') {
+                        isValid = false;
+                        errorMessage = 'Please select a ' + fieldName.toLowerCase();
+                    }
+                    break;
+            }
+        }
+        
+        // Set validation state
+        if (isValid) {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            document.getElementById('feedback-' + input.id.split('_').pop()).textContent = '';
+        } else {
+            input.classList.remove('is-valid');
+            input.classList.add('is-invalid');
+            document.getElementById('feedback-' + input.id.split('_').pop()).textContent = errorMessage;
+        }
+        
+        return isValid;
+    }
+    
+    // Check if the whole form is valid
+    function updateFormValidity() {
+        formIsValid = true;
+        
+        formInputs.forEach(input => {
+            if (input.dataset.validate === 'true' && input.classList.contains('is-invalid')) {
+                formIsValid = false;
+            }
+        });
+        
+        submitButton.disabled = !formIsValid;
+    }
+    
+    // Run initial validation
+    updateFormValidity();
+});
+</script>

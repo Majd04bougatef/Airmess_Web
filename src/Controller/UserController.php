@@ -5,11 +5,13 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Repository\ExpenseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 #[Route('/user')]
 final class UserController extends AbstractController
@@ -19,6 +21,34 @@ final class UserController extends AbstractController
     {
         return $this->render('user/index.html.twig', [
             'users' => $userRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/UserPage', name: 'user_expenses_page')]
+    public function userExpensesPage(ExpenseRepository $expenseRepository, UserRepository $userRepository, SessionInterface $session): Response
+    {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('login');
+        }
+        
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        // Error handling for missing user
+        if (!$user) {
+            $this->addFlash('error', 'User not found. Please log in again.');
+            return $this->redirectToRoute('login');
+        }
+        
+        // If admin, show all expenses, otherwise only user's expenses
+        $expenses = ($user && ($user->getRoleUser() === 'Admin' || $user->getRoleUser() === 'ROLE_ADMIN')) 
+            ? $expenseRepository->findAll() 
+            : $expenseRepository->findBy(['user' => $user]);
+        
+        return $this->render('expense/index.html.twig', [
+            'expenses' => $expenses,
+            'in_voyageurs_dashboard' => false
         ]);
     }
 
