@@ -10,13 +10,13 @@
         <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
         <li class="breadcrumb-item text-sm text-white active" aria-current="page">Stations</li>
       </ol>
-      <h6 class="font-weight-bolder text-white mb-0">Gestion des Stations</h6>
+      <h6 class="font-weight-bolder text-white mb-0">Stations en attente d'approbation</h6>
     </nav>
     <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
       <div class="ms-md-auto pe-md-3 d-flex align-items-center">
         <div class="input-group">
           <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-          <input type="text" class="form-control" placeholder="Type here...">
+          <input type="text" class="form-control" id="searchInput" placeholder="Rechercher une station...">
         </div>
       </div>
     </div>
@@ -28,45 +28,69 @@
     <div class="col-12">
       <div class="card mb-4">
         <div class="card-header pb-0">
-          <h6>Stations Table</h6>
+          <h6>Stations en attente d'approbation</h6>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-0">
-            <table class="table align-items-center mb-0">
+            <table class="table align-items-center mb-0" id="stationsTable">
               <thead>
                 <tr>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Station</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Location</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Created Date</th>
-                  <th class="text-secondary opacity-7"></th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Propriétaire</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Capacité</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Type de Vélo</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix/Heure</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Pays</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <!-- Example row, to be replaced with actual data -->
-                <tr>
-                  <td>
-                    <div class="d-flex px-2 py-1">
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="mb-0 text-sm">Station Center</h6>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p class="text-xs font-weight-bold mb-0">City Center</p>
-                  </td>
-                  <td class="align-middle text-center text-sm">
-                    <span class="badge badge-sm bg-gradient-success">Active</span>
-                  </td>
-                  <td class="align-middle text-center">
-                    <span class="text-secondary text-xs font-weight-bold">23/04/2022</span>
-                  </td>
-                  <td class="align-middle">
-                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                      Edit
-                    </a>
-                  </td>
-                </tr>
+                {% if stations is empty %}
+                  <tr>
+                    <td colspan="7" class="text-center py-4">
+                      <p class="text-sm mb-0">Aucune station en attente d'approbation</p>
+                    </td>
+                  </tr>
+                {% else %}
+                  {% for station in stations %}
+                    <tr>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm">{{ station.nom }}</h6>
+                            <p class="text-xs text-secondary mb-0">
+                              Lat: {{ station.latitude }}, Long: {{ station.longitude }}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0">{{ station.user.name }} {{ station.user.prenom }}</p>
+                        <p class="text-xs text-secondary mb-0">{{ station.user.email }}</p>
+                      </td>
+                      <td class="align-middle text-center">
+                        <span class="text-secondary text-xs font-weight-bold">{{ station.capacite }}</span>
+                      </td>
+                      <td class="align-middle text-center">
+                        <span class="text-secondary text-xs font-weight-bold">{{ station.typeVelo }}</span>
+                      </td>
+                      <td class="align-middle text-center">
+                        <span class="text-secondary text-xs font-weight-bold">{{ station.prixHeure }}€</span>
+                      </td>
+                      <td class="align-middle text-center">
+                        <span class="text-secondary text-xs font-weight-bold">{{ station.pays }}</span>
+                      </td>
+                      <td class="align-middle text-center">
+                        <button onclick="approveStation({{ station.idS }})" class="btn btn-sm btn-success">
+                          <i class="fas fa-check"></i> Approuver
+                        </button>
+                        <button onclick="showStationDetails({{ station.idS }})" class="btn btn-sm btn-info ms-2">
+                          <i class="fas fa-eye"></i> Détails
+                        </button>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% endif %}
               </tbody>
             </table>
           </div>
@@ -75,4 +99,68 @@
     </div>
   </div>
 </div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Search functionality
+  document.getElementById('searchInput').addEventListener('keyup', function() {
+    var input = this.value.toLowerCase();
+    var table = document.getElementById('stationsTable');
+    var rows = table.getElementsByTagName('tr');
+
+    for (var i = 1; i < rows.length; i++) {
+      var showRow = false;
+      var cells = rows[i].getElementsByTagName('td');
+      
+      for (var j = 0; j < cells.length; j++) {
+        if (cells[j].textContent.toLowerCase().indexOf(input) > -1) {
+          showRow = true;
+          break;
+        }
+      }
+      
+      rows[i].style.display = showRow ? '' : 'none';
+    }
+  });
+});
+
+function approveStation(stationId) {
+  if (confirm('Êtes-vous sûr de vouloir approuver cette station ?')) {
+    // Send approval request to backend
+    fetch(`/admin/station/${stationId}/approve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Remove the row from the table
+        const row = document.querySelector(`tr[data-station-id="${stationId}"]`);
+        if (row) {
+          row.remove();
+        }
+        // Show success message
+        alert('Station approuvée avec succès !');
+        // Reload the page to update the table
+        location.reload();
+      } else {
+        alert('Erreur lors de l\'approbation de la station');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Une erreur est survenue');
+    });
+  }
+}
+
+function showStationDetails(stationId) {
+  // Redirect to station details page
+  window.location.href = `/admin/station/${stationId}`;
+}
+</script>
+{% endblock %}
 {% endblock %}
