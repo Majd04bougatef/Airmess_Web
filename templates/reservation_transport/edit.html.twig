@@ -1,13 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit ReservationTransport{% endblock %}
+{% block title %}Modifier une Offre{% endblock %}
 
 {% block body %}
-    <h1>Edit ReservationTransport</h1>
+    <h1>Modifier l'Offre</h1>
 
-    {{ include('reservation_transport/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ form_start(form) }}
+        {{ form_errors(form) }}
 
-    <a href="{{ path('app_reservation_transport_index') }}">back to list</a>
+        <div>
+            {{ form_label(form.place) }}
+            {{ form_widget(form.place) }}
+            {{ form_errors(form.place) }}
+        </div>
 
-    {{ include('reservation_transport/_delete_form.html.twig') }}
+        <div>
+            {{ form_label(form.priceInit) }}
+            {{ form_widget(form.priceInit) }}
+            {{ form_errors(form.priceInit) }}
+        </div>
+
+        <div>
+            {{ form_label(form.priceAfter) }}
+            {{ form_widget(form.priceAfter) }}
+            {{ form_errors(form.priceAfter) }}
+        </div>
+
+        <div>
+            {{ form_label(form.startDate) }}
+            {{ form_widget(form.startDate) }}
+            {{ form_errors(form.startDate) }}
+        </div>
+
+        <div>
+            {{ form_label(form.endDate) }}
+            {{ form_widget(form.endDate) }}
+            {{ form_errors(form.endDate) }}
+        </div>
+
+        <div>
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div>
+            {{ form_label(form.imagePath) }}
+            {{ form_widget(form.imagePath) }}
+            {{ form_errors(form.imagePath) }}
+        </div>
+
+        <button type="submit">Enregistrer les modifications</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_offre_index') }}">Retour à la liste</a>
 {% endblock %}
