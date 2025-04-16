@@ -22,9 +22,14 @@ final class ReservationTransportController extends AbstractController
     #[Route(name: 'app_reservation_transport_index', methods: ['GET'])]
     public function index(ReservationTransportRepository $reservationTransportRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
         
-        $user = $userRepository->find(40);
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
         
+      
         $reservations = $reservationTransportRepository->findByUserId($user->getIdU());
 
         return $this->render('reservation_transport/index.html.twig', [
@@ -54,7 +59,8 @@ final class ReservationTransportController extends AbstractController
         $reservationTransport = new ReservationTransport();
         $reservationTransport->setUser($user);
         $reservationTransport->setStation($station);
-        $reservationTransport->setReference($this->generateReference($user));
+        $reference = $this->generateReference($session, $userRepository);
+        $reservationTransport->setReference($reference);
         $reservationTransport->setStatut('en cours');
         $reservationTransport->setPrix(0);
 
@@ -62,11 +68,18 @@ final class ReservationTransportController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($reservationTransport);
-            $entityManager->flush();
-
-            $nombreVeloReserve = $reservationTransport->getNombreVelo();
-            $stationRepository->decrementNbVelosDispo($station->getIdS(), $nombreVeloReserve);
+            // Store reservation data in session instead of database
+            $tempData = [
+                'user_id' => $user->getIdU(),
+                'station_id' => $station->getIdS(),
+                'date_res' => $reservationTransport->getDateRes()->format('Y-m-d H:i:s'),
+                'date_fin' => $reservationTransport->getDateFin()->format('Y-m-d H:i:s'),
+                'nombre_velo' => $reservationTransport->getNombreVelo(),
+                'prix' => $reservationTransport->getPrix(),
+                'reference' => $reference
+            ];
+            
+            $session->set('temp_reservation', $tempData);
     
             if ($request->isXmlHttpRequest()) {
                 return new JsonResponse([
@@ -126,7 +139,7 @@ final class ReservationTransportController extends AbstractController
         $reservationTransport = new ReservationTransport();
         $reservationTransport->setUser($user);
         $reservationTransport->setStation($station);
-        $reservationTransport->setReference($this->generateReference($user));
+        $reservationTransport->setReference($this->generateReference($this->getSession(), $userRepository));
         $reservationTransport->setStatut('en cours');
         $reservationTransport->setPrix(0);
 
@@ -146,8 +159,20 @@ final class ReservationTransportController extends AbstractController
         ]);
     }
 
-    private function generateReference(User $user): string
+    private function generateReference(SessionInterface $session, UserRepository $userRepository): string
     {
+        // Get user from session
+        if (!$session->has('user_id')) {
+            throw new \Exception('User not found in session');
+        }
+        
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        if (!$user) {
+            throw new \Exception('User not found in database');
+        }
+        
         $dateRes = new \DateTime(); 
         $nom = strtoupper(substr($user->getName(), 0, 2)); // 2 premières lettres du nom
         $prenom = strtoupper(substr($user->getPrenom(), -2)); // 2 dernières lettres du prénom
@@ -172,26 +197,54 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_reservation_transport_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ReservationTransport $reservationTransport, EntityManagerInterface $entityManager,StationRepository $stationRepository): Response
+    public function edit(Request $request, ReservationTransport $reservationTransport, EntityManagerInterface $entityManager, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        // Check if the user is the owner of the reservation
+        if ($reservationTransport->getUser()->getIdU() !== $user->getIdU()) {
+            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier cette réservation.');
+        }
+
+        $station = $stationRepository->find($reservationTransport->getStation()->getIdS());
+        
+        // Calculate current duration and price
+        $interval = $reservationTransport->getDateRes()->diff($reservationTransport->getDateFin());
+        $currentHeures = $interval->h + ($interval->days * 24);
+        $currentPrix = $station->getPrixHeure() * $currentHeures * $reservationTransport->getNombreVelo();
+
         $form = $this->createForm(ReservationTransportType::class, $reservationTransport);
         $form->handleRequest($request);
 
-        $station = $stationRepository->find($reservationTransport->getStation()->getIdS());
-
         if ($form->isSubmitted() && $form->isValid()) {
+            // Calculate new duration and price
+            $newInterval = $reservationTransport->getDateRes()->diff($reservationTransport->getDateFin());
+            $newHeures = $newInterval->h + ($newInterval->days * 24);
+            $newPrix = $station->getPrixHeure() * $newHeures * $reservationTransport->getNombreVelo();
+            
+            // Update the price
+            $reservationTransport->setPrix($newPrix);
+            
+            // Save changes
             $entityManager->flush();
 
+            $this->addFlash('success', 'La réservation a été mise à jour avec succès.');
             return $this->redirectToRoute('app_reservation_transport_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('reservation_transport/edit.html.twig', [
             'reservation_transport' => $reservationTransport,
             'form' => $form,
-            'idS' => $station->getIdS(),
-            'nom' => $station->getNom(),
-            'prix' => $station->getPrixHeure(),
-            'nombreVelo' => $station->getNombreVelo(),
+            'station' => $station,
+            'currentHeures' => $currentHeures,
+            'currentPrix' => $currentPrix,
         ]);
     }
 
@@ -208,15 +261,14 @@ final class ReservationTransportController extends AbstractController
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
 
-        // Récupérer les données du formulaire
-        $stationId = $request->request->get('station_id');
-        $dateRes = $request->request->get('date_res');
-        $dateFin = $request->request->get('date_fin');
-        $nombreVelo = $request->request->get('nombre_velo');
-        $prix = $request->request->get('prix');
+        // Get temporary reservation data from session
+        $tempData = $session->get('temp_reservation');
+        if (!$tempData) {
+            return $this->redirectToRoute('app_reservation_transport_station');
+        }
         
         // Récupérer la station
-        $station = $stationRepository->find($stationId);
+        $station = $stationRepository->find($tempData['station_id']);
         
         if (!$station) {
             throw $this->createNotFoundException('Station non trouvée');
@@ -228,11 +280,11 @@ final class ReservationTransportController extends AbstractController
         // Configuration de la réservation
         $reservation->setUser($user);
         $reservation->setStation($station);
-        $reservation->setDateRes(new \DateTime($dateRes));
-        $reservation->setDateFin(new \DateTime($dateFin));
-        $reservation->setNombreVelo($nombreVelo);
-        $reservation->setPrix($prix);
-        $reservation->setReference($this->generateReference($user));
+        $reservation->setDateRes(new \DateTime($tempData['date_res']));
+        $reservation->setDateFin(new \DateTime($tempData['date_fin']));
+        $reservation->setNombreVelo($tempData['nombre_velo']);
+        $reservation->setPrix($tempData['prix']);
+        $reservation->setReference($tempData['reference']);
         $reservation->setStatut('confirmé');
         
         // Enregistrer dans la base de données
@@ -240,16 +292,19 @@ final class ReservationTransportController extends AbstractController
         $entityManager->flush();
         
         // Mettre à jour le nombre de vélos disponibles à la station
-        $stationRepository->decrementNbVelosDispo($station->getIdS(), $nombreVelo);
+        $stationRepository->decrementNbVelosDispo($station->getIdS(), $tempData['nombre_velo']);
         
         // Stocker les données de réservation pour la page de confirmation
-        $request->getSession()->set('confirmed_reservation', [
+        $session->set('confirmed_reservation', [
             'reference' => $reservation->getReference(),
             'station' => $station->getNom(),
-            'date' => $dateRes,
-            'nombreVelo' => $nombreVelo,
-            'prix' => $prix
+            'date' => $tempData['date_res'],
+            'nombreVelo' => $tempData['nombre_velo'],
+            'prix' => $tempData['prix']
         ]);
+        
+        // Clear the temporary reservation data
+        $session->remove('temp_reservation');
         
         // Rediriger vers la page de confirmation
         return $this->redirectToRoute('app_reservation_transport_confirmation');
@@ -272,7 +327,7 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/payment/{id}', name: 'app_reservation_transport_payment', methods: ['GET'])]
-    public function payment(Request $request, $id, StationRepository $stationRepository, UserRepository $userRepository): Response
+    public function payment(Request $request, $id, StationRepository $stationRepository, UserRepository $userRepository, SessionInterface $session): Response
     {
         // Pour cette méthode, l'ID est l'identifiant de la station
         $tempData = $request->getSession()->get('temp_reservation');
@@ -297,7 +352,7 @@ final class ReservationTransportController extends AbstractController
         $reservation->setDateFin(new \DateTime($tempData['date_fin']));
         $reservation->setNombreVelo($tempData['nombre_velo']);
         $reservation->setPrix($tempData['prix']);
-        $reservation->setReference($this->generateReference($user));
+        $reservation->setReference($tempData['reference']); // Use the stored reference
         
         return $this->render('reservation_transport/payment.html.twig', [
             'reservation' => $reservation
@@ -306,7 +361,7 @@ final class ReservationTransportController extends AbstractController
 
     #[Route('/confirm', name: 'app_reservation_transport_confirm', methods: ['POST'])]
     public function confirm(Request $request, EntityManagerInterface $entityManager, 
-                        StationRepository $stationRepository, UserRepository $userRepository): Response
+                        StationRepository $stationRepository, UserRepository $userRepository, SessionInterface $session): Response
     {
         // Récupérer les données du formulaire
         $userId = $request->request->get('user_id');
@@ -316,6 +371,18 @@ final class ReservationTransportController extends AbstractController
         $nombreVelo = $request->request->get('nombre_velo');
         $prix = $request->request->get('prix');
         
+        // Get user
+        $user = $userRepository->find($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé');
+        }
+        
+        // Get the stored reference from session
+        $tempData = $session->get('temp_reservation');
+        if (!$tempData || !isset($tempData['reference'])) {
+            throw new \Exception('Reference not found in session');
+        }
+        
         // Stocker dans la session pour traitement ultérieur après paiement
         $tempData = [
             'user_id' => $userId,
@@ -323,7 +390,8 @@ final class ReservationTransportController extends AbstractController
             'date_res' => $dateRes,
             'date_fin' => $dateFin,
             'nombre_velo' => $nombreVelo,
-            'prix' => $prix
+            'prix' => $prix,
+            'reference' => $tempData['reference'] // Use the stored reference
         ];
         
         $request->getSession()->set('temp_reservation', $tempData);
@@ -335,7 +403,7 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/recap/{id}', name: 'app_reservation_transport_recap', methods: ['GET', 'POST'])]
-    public function recap(Request $request, $id, EntityManagerInterface $entityManager, StationRepository $stationRepository): Response
+    public function recap(Request $request, $id, EntityManagerInterface $entityManager, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
         // Récupérer la station avec l'ID reçu
         $station = $stationRepository->find($id);
@@ -366,6 +434,22 @@ final class ReservationTransportController extends AbstractController
         // Récupérer l'utilisateur
         $user = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
     
+        // Generate reference once
+        $reference = $this->generateReference($session, $userRepository);
+    
+        // Store all data in session
+        $tempData = [
+            'user_id' => $user->getIdU(),
+            'station_id' => $station->getIdS(),
+            'date_res' => $dateRes->format('Y-m-d H:i:s'),
+            'date_fin' => $dateFin->format('Y-m-d H:i:s'),
+            'nombre_velo' => $nombreVelo,
+            'prix' => $prixTotal,
+            'reference' => $reference
+        ];
+        
+        $session->set('temp_reservation', $tempData);
+    
         // Créer une réservation temporaire pour affichage
         $reservation = new ReservationTransport();
         $reservation->setUser($user);
@@ -374,7 +458,7 @@ final class ReservationTransportController extends AbstractController
         $reservation->setDateFin($dateFin);
         $reservation->setNombreVelo($nombreVelo);
         $reservation->setPrix($prixTotal);
-        $reservation->setReference($this->generateReference($user));
+        $reservation->setReference($reference);
         $reservation->setStatut('en attente');
     
         return $this->render('reservation_transport/recap.html.twig', [

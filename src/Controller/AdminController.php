@@ -337,10 +337,14 @@ class AdminController extends AbstractController
     }
 
     #[Route('/StationPage', name: 'station_page')]
-    public function stationPage(): Response
+    public function stationPage(StationRepository $stationRepository): Response
     {
-        // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashAdmin/stationPage.html.twig');
+        // Get inactive stations
+        $inactiveStations = $stationRepository->findBy(['statut' => 'inactive']);
+        
+        return $this->render('dashAdmin/stationPage.html.twig', [
+            'stations' => $inactiveStations
+        ]);
     }
 
     #[Route('/BonplanPage', name: 'bonplan_page')]
@@ -391,6 +395,30 @@ class AdminController extends AbstractController
         }
         
         return $roleCount;
+    }
+
+    #[Route('/admin/station/{id}/approve', name: 'admin_station_approve', methods: ['POST'])]
+    public function approveStation(
+        int $id,
+        StationRepository $stationRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse
+    {
+        try {
+            $station = $stationRepository->find($id);
+            
+            if (!$station) {
+                return new JsonResponse(['success' => false, 'message' => 'Station non trouvée'], 404);
+            }
+            
+            // Update station status to active
+            $station->setStatut('active');
+            $entityManager->flush();
+            
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }
 

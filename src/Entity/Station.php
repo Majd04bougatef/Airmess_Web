@@ -86,6 +86,14 @@ class Station
     #[Assert\NotBlank(message: "Le pays est obligatoire")]
     private string $pays;
 
+    #[ORM\Column(name: "statut", type: "string", length: 50)]
+    #[Assert\NotBlank(message: "Le statut est obligatoire")]
+    #[Assert\Choice(
+        choices: ["active", "inactive"],
+        message: "Le statut doit être 'active' ou 'inactive'"
+    )]
+    private string $statut = "inactive";
+
     // Getters et Setters
 
     public function getIdS(): int
@@ -190,6 +198,17 @@ class Station
     public function setPays(string $pays): self
     {
         $this->pays = $pays;
+        return $this;
+    }
+
+    public function getStatut(): string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(string $statut): self
+    {
+        $this->statut = $statut;
         return $this;
     }
 

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Station;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -59,4 +60,33 @@ class StationRepository extends ServiceEntityRepository
         $em->flush();
     }
 
+    /**
+     * Find all active stations
+     * @return Station[] Returns an array of active Station objects
+     */
+    public function findActiveStations(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.statut = :statut')
+            ->setParameter('statut', 'active')
+            ->orderBy('s.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find active stations for a specific user
+     * @return Station[] Returns an array of active Station objects for the given user
+     */
+    public function findActiveStationsByUser(int $userId): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.user = :userId')
+            ->andWhere('s.statut = :statut')
+            ->setParameter('userId', $userId)
+            ->setParameter('statut', 'active')
+            ->orderBy('s.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
