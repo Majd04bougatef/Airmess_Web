@@ -64,7 +64,12 @@ final class ExpenseController extends AbstractController
         $expense = new Expense();
         $expense->setUser($user);
         
-        $form = $this->createForm(ExpenseType::class, $expense);
+        // Check if user is admin
+        $isAdmin = $user->getRoleUser() === 'Admin' || $user->getRoleUser() === 'ROLE_ADMIN';
+        
+        $form = $this->createForm(ExpenseType::class, $expense, [
+            'is_admin' => $isAdmin
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -162,7 +167,12 @@ final class ExpenseController extends AbstractController
             return $this->redirectToRoute('app_expense_index');
         }
         
-        $form = $this->createForm(ExpenseType::class, $expense);
+        // Check if user is admin
+        $isAdmin = $user->getRoleUser() === 'Admin' || $user->getRoleUser() === 'ROLE_ADMIN';
+        
+        $form = $this->createForm(ExpenseType::class, $expense, [
+            'is_admin' => $isAdmin
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
