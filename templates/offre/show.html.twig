@@ -1,58 +1,434 @@
-{% extends 'base.html.twig' %}
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
 
-{% block title %}Offre{% endblock %}
+{% block title %}{{ offre.place }} - Détails de l'offre{% endblock %}
 
 {% block body %}
-    <h1>Offre</h1>
+<style>
+    .offer-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .offer-header {
+        padding: 1.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+        color: #67748e;
+        font-size: 1rem;
+    }
+    
+    .offer-hero {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .offer-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+    
+    .offer-hero-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 2rem;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+        color: white;
+    }
+    
+    .offer-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .offer-location {
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .offer-location i {
+        margin-right: 0.5rem;
+    }
+    
+    .offer-price-tag {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background-color: #5e72e4;
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(50, 50, 93, 0.1);
+    }
+    
+    .offer-price-tag i {
+        margin-right: 0.5rem;
+    }
+    
+    .offer-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+    
+    .offer-details {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .offer-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .offer-section, .offer-card {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eaecf0;
+    }
+    
+    .offer-description {
+        color: #67748e;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+    }
+    
+    .offer-description p {
+        margin-bottom: 1rem;
+    }
+    
+    .offer-highlights {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .highlight-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .highlight-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #5e72e4;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .highlight-text {
+        font-weight: 500;
+        color: #344767;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+    
+    .info-item {
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-label {
+        font-size: 0.875rem;
+        color: #67748e;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+    
+    .info-value {
+        font-size: 1rem;
+        color: #344767;
+        font-weight: 600;
+    }
+    
+    .pricing-card {
+        text-align: center;
+        padding: 1.5rem;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        color: #67748e;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .current-price {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #344767;
+        margin-bottom: 1rem;
+    }
+    
+    .price-savings {
+        font-size: 0.875rem;
+        color: #2dce89;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+    
+    .btn {
+        padding: 0.65rem 1.5rem;
+        border-radius: 7px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+    
+    .btn i {
+        margin-right: 0.5rem;
+    }
+    
+    .btn-primary {
+        background-color: #5e72e4;
+        border-color: #5e72e4;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: #324cdd;
+        border-color: #324cdd;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(94, 114, 228, 0.2);
+    }
+    
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid #cbd5e1;
+        color: #344767;
+    }
+    
+    .btn-outline:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+    }
+    
+    .offer-features {
+        margin-top: 1rem;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: #67748e;
+    }
+    
+    .feature-item i {
+        color: #2dce89;
+        margin-right: 0.75rem;
+    }
+    
+    @media (max-width: 992px) {
+        .offer-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .offer-highlights {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>IdO</th>
-                <td>{{ offre.idO }}</td>
-            </tr>
-            <tr>
-                <th>PriceInit</th>
-                <td>{{ offre.priceInit }}</td>
-            </tr>
-            <tr>
-                <th>PriceAfter</th>
-                <td>{{ offre.priceAfter }}</td>
-            </tr>
-            <tr>
-                <th>StartDate</th>
-                <td>{{ offre.startDate ? offre.startDate|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>EndDate</th>
-                <td>{{ offre.endDate ? offre.endDate|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>NumberLimit</th>
-                <td>{{ offre.numberLimit }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ offre.description }}</td>
-            </tr>
-            <tr>
-                <th>Place</th>
-                <td>{{ offre.place }}</td>
-            </tr>
-            <tr>
-                <th>ImagePath</th>
-                <td>{{ offre.imagePath }}</td>
-            </tr>
-            <tr>
-                <th>Aidesc</th>
-                <td>{{ offre.aidesc }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_offre_index') }}">back to list</a>
-
-    <a href="{{ path('app_offre_edit', {'idO': offre.idO}) }}">edit</a>
-
-    {{ include('offre/_delete_form.html.twig') }}
+<div class="container-fluid py-4">
+    <div class="offer-container">
+        <div class="offer-header">
+            <h2 class="page-title">Détails de l'Offre</h2>
+            <p class="page-subtitle">Découvrez toutes les informations sur cette destination</p>
+        </div>
+        
+        <div class="offer-hero">
+            <img src="{{ asset(offre.imagePath ?: 'images/default-offer.jpg') }}" alt="{{ offre.place }}" class="offer-image">
+            <div class="offer-hero-content">
+                <h1 class="offer-title">{{ offre.place }}</h1>
+                <div class="offer-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ offre.place }}</span>
+                </div>
+                <span class="offer-price-tag">
+                    <i class="fas fa-tag"></i>
+                    {{ offre.priceAfter }}€
+                </span>
+            </div>
+        </div>
+        
+        <div class="offer-content">
+            <div class="offer-details">
+                <div class="offer-section">
+                    <h3 class="section-title">À propos de cette offre</h3>
+                    <div class="offer-description">
+                        {% if offre.description %}
+                            <p>{{ offre.description|nl2br }}</p>
+                        {% else %}
+                            <p>Aucune description disponible pour cette offre.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <h3 class="section-title">Points forts</h3>
+                    <div class="offer-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="highlight-text">
+                                Disponible du {{ offre.startDate|date('d/m/Y') }} au {{ offre.endDate|date('d/m/Y') }}
+                            </div>
+                        </div>
+                        
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="highlight-text">
+                                Limite de {{ offre.numberLimit }} participants
+                            </div>
+                        </div>
+                        
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="highlight-text">
+                                Économisez {{ (offre.priceInit - offre.priceAfter)|round }}€ sur le prix initial
+                            </div>
+                        </div>
+                        
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="highlight-text">
+                                {% if offre.user is not null %}Proposé par {{ offre.user.username }}{% else %}Offre exclusive{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="section-title">Détails supplémentaires</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Identifiant</div>
+                            <div class="info-value">{{ offre.idO }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Destination</div>
+                            <div class="info-value">{{ offre.place }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Date de début</div>
+                            <div class="info-value">{{ offre.startDate|date('d/m/Y') }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Date de fin</div>
+                            <div class="info-value">{{ offre.endDate|date('d/m/Y') }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Prix initial</div>
+                            <div class="info-value">{{ offre.priceInit }}€</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Prix réduit</div>
+                            <div class="info-value">{{ offre.priceAfter }}€</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="offer-sidebar">
+                <div class="offer-card pricing-card">
+                    <div class="original-price">{{ offre.priceInit }}€</div>
+                    <div class="current-price">{{ offre.priceAfter }}€</div>
+                    <span class="price-savings">Économisez {{ ((offre.priceInit - offre.priceAfter) / offre.priceInit * 100)|round }}%</span>
+                    
+                    <a href="{{ path('app_reservation_new', {'idO': offre.idO}) }}" class="btn btn-primary">
+                        <i class="fas fa-calendar-check"></i>
+                        Réserver maintenant
+                    </a>
+                    
+                    <a href="{{ path('app_offre_voyageurs') }}" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i>
+                        Retour aux offres
+                    </a>
+                </div>
+                
+                <div class="offer-card">
+                    <h3 class="section-title">Ce qui est inclus</h3>
+                    <div class="offer-features">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Destination : {{ offre.place }}</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Période de {{ (offre.startDate.diff(offre.endDate)).days }} jours</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Disponibilité pour {{ offre.numberLimit }} personnes</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Assistance voyage</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

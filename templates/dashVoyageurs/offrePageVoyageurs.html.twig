@@ -74,6 +74,42 @@
     .offer-price {
         font-weight: 600;
         color: #344767;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .price-initial {
+        text-decoration: line-through;
+        color: #8392ab;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 2px;
+    }
+    
+    .price-after {
+        color: #2dce89;
+        font-weight: 700;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .price-after i {
+        margin-right: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .discount-badge {
+        background-color: #f5365c;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.2rem 0.5rem;
+        border-radius: 20px;
+        margin-left: 8px;
+        display: inline-flex;
+        align-items: center;
     }
 
     .btn-view,
@@ -105,10 +141,46 @@
     .btn-reserve {
         margin-left: 0.5rem;
     }
+    
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-mes-reservations {
+        background-color: #5e72e4;
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 7px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+    }
+    
+    .btn-mes-reservations:hover {
+        background-color: #324cdd;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
+    }
+    
+    .btn-mes-reservations i {
+        margin-right: 8px;
+    }
 </style>
 
 <div class="container-fluid py-4">
-    <h2 class="text-center mb-4">Offres Disponibles</h2>
+    <div class="header-actions">
+        <h2 class="mb-0">Offres Disponibles</h2>
+        <a href="{{ path('app_reservation_index') }}" class="btn-mes-reservations">
+            <i class="fas fa-list-ul"></i>
+            Mes Réservations
+        </a>
+    </div>
     <div class="offer-container">
         {% for offre in offres %}
             <div class="offer-card">
@@ -130,7 +202,14 @@
                 </div>
                 <div class="offer-footer">
                     <div class="offer-price">
-                        {{ offre.priceAfter ? offre.priceAfter ~ '€' : 'Prix non défini' }}
+                        <div class="price-initial">{{ offre.priceInit }}€</div>
+                        <div class="price-after">
+                            <i class="fas fa-tag"></i>
+                            {{ offre.priceAfter }}€
+                            <span class="discount-badge">
+                                -{{ ((offre.priceInit - offre.priceAfter) / offre.priceInit * 100)|round }}%
+                            </span>
+                        </div>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
                         <a href="{{ path('app_offre_show', {'idO': offre.idO}) }}" class="btn-view">
