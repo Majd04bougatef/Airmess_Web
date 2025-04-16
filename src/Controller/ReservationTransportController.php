@@ -22,20 +22,10 @@ final class ReservationTransportController extends AbstractController
     #[Route(name: 'app_reservation_transport_index', methods: ['GET'])]
     public function index(ReservationTransportRepository $reservationTransportRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
-        // Check if user is logged in
-        if (!$session->has('user_id')) {
-            return $this->redirectToRoute('app_login');
-        }
         
-        // Get user from session
-        $userId = $session->get('user_id');
-        $user = $userRepository->find($userId);
-        $userRole = $session->get('user_role');
+        $user = $userRepository->find(40);
         
-        // Get reservations based on user role
-        $reservations = ($userRole === 'Admin') 
-            ? $reservationTransportRepository->findAll()
-            : $reservationTransportRepository->findByUserId($userId);
+        $reservations = $reservationTransportRepository->findByUserId($user->getIdU());
 
         return $this->render('reservation_transport/index.html.twig', [
             'reservation_transports' => $reservations,
