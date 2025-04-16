@@ -42,15 +42,6 @@ class BaseController extends AbstractController
             'socialMedia' => $socialMedia
         ]);
     }
-
-    #[Route('/login', name: 'app_login')]
-    public function login(): Response
-    {
-        return $this->render('login/login.html.twig');
-    }
-
-    
-
 }
 
 ?>

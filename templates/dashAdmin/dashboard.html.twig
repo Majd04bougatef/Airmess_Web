@@ -28,6 +28,15 @@
         <img src="{{asset('images/logo-airmess.png')}}" width="40px" height="45px" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">Airmess</span>
       </a>
+      <div class="user-info mt-3 d-flex align-items-center ps-3">
+        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="{{ asset('uploads/users/' ~ app.session.get('user_image')) }}" alt="{{ app.session.get('user_name') }}" class="rounded-circle" width="40" height="40" onerror="this.src='{{ asset('images/user-avatar.svg') }}';">
+        </a>
+        <div class="ms-2">
+          <span class="font-weight-bold text-sm">{{ app.session.get('user_name') }}</span>
+          <small class="d-block text-secondary">{{ app.session.get('user_role') }}</small>
+        </div>
+      </div>
     </div>
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
@@ -107,7 +116,7 @@
         </div>
       </div>
       <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard" target="_blank" class="btn btn-dark btn-sm w-100 mb-3">Airmess Pro</a>
-      <a class="btn btn-primary btn-sm mb-0 w-100" href="{{path('app_base')}}" type="button">Se déconnecter</a>
+      <a class="btn btn-primary btn-sm mb-0 w-100" href="{{path('app_logout')}}" type="button">Se déconnecter</a>
     </div>
   </aside>
   <main class="main-content position-relative border-radius-lg " id="content">
@@ -234,6 +243,16 @@
         e.preventDefault();
         window.location.href = "{{ path('social_page') }}";
       });
+
+      // Initialize user management features if on the user page
+      if (document.getElementById('usersTable')) {
+        userManagement.init();
+      }
+
+      // Initialize charts if needed
+      if (document.getElementById('userRoleChart')) {
+        initCharts();
+      }
     });
   </script>
   
@@ -241,6 +260,8 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="{{asset('js/argon-dashboard.min.js')}}"></script>
+  <!-- Custom JS for Dashboard -->
+  <script src="{{asset('js/dashAdmin.js')}}"></script>
 </body>
 
 </html>
