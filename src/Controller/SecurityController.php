@@ -46,6 +46,9 @@ class SecurityController extends AbstractController
                     $session->set('user_name', $user->getName() . ($user->getPrenom() ? ' ' . $user->getPrenom() : ''));
                     $session->set('user_image', $user->getImagesU());
                     
+                    $session->set('user_post_actions', []);
+                    $session->set('user_comment_actions', []);
+                    
                     // Force session write
                     $session->save();
                     

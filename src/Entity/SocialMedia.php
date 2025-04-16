@@ -58,8 +58,8 @@ class SocialMedia
     #[ORM\Column(type: "integer")]
     private int $dislike;
 
-    #[ORM\Column(type: "string", length: 500, nullable: true)]
-    private ?string $imagemedia = null;
+    #[ORM\Column(type: "string", length: 500, nullable: true, options: ["default" => ""])]
+    private ?string $imagemedia = "";
 
     // Getters et Setters...
 

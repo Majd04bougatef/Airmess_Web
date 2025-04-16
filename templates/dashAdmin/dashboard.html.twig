@@ -31,7 +31,7 @@
       </a>
       <div class="user-info mt-3 d-flex align-items-center ps-3">
         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="{{ asset('uploads/users/' ~ app.session.get('user_image')) }}" alt="{{ app.session.get('user_name') }}" class="rounded-circle" width="40" height="40" onerror="this.src='{{ asset('images/user-avatar.svg') }}';">
+          <img src="{{ asset('uploads/users_images/' ~ app.session.get('user_image')) }}" alt="{{ app.session.get('user_name') }}" class="rounded-circle" width="40" height="40" onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
         </a>
         <div class="ms-2">
           <span class="font-weight-bold text-sm">{{ app.session.get('user_name') }}</span>
@@ -234,10 +234,10 @@
         e.preventDefault();
         window.location.href = "{{ path('bonplan_page') }}";
       });
-      
+    
       document.getElementById("offre-button").addEventListener("click", function(e) {
         e.preventDefault();
-        window.location.href = "{{ path('offre_page') }}";
+        window.location.href = "{{ path('app_offre_page') }}";
       });
       
       document.getElementById("social-button").addEventListener("click", function(e) {

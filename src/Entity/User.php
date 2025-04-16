@@ -7,9 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: "users")]
+#[UniqueEntity(fields: ['email'], message: 'Cette adresse email est déjà utilisée')]
 class User
 {
     #[ORM\Id]
@@ -17,37 +20,100 @@ class User
     #[ORM\Column(name: "id_U", type: "integer")]
     private ?int $id_U = null;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: "string", length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire")]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "Le nom doit faire au moins {{ limit }} caractères",
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $name;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "Le prénom doit faire au moins {{ limit }} caractères",
+        maxMessage: "Le prénom ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $prenom = null;
 
-    #[ORM\Column(type: "string", length: 255, unique: true)]
+    #[ORM\Column(type: "string", length: 255, unique: true, nullable: false)]
+    #[Assert\NotBlank(message: "L'email est obligatoire")]
+    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide")]
+    #[Assert\Length(
+        max: 180,
+        maxMessage: "L'email ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $email;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: "string", length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire")]
+    #[Assert\Length(
+        min: 6,
+        minMessage: "Le mot de passe doit faire au moins {{ limit }} caractères"
+    )]
     private string $password;
 
-    #[ORM\Column(name: "roleUser", type: "string", length: 50)]
+    #[ORM\Column(name: "roleUser", type: "string", length: 50, nullable: false)]
+    #[Assert\NotBlank(message: "Le rôle est obligatoire")]
+    #[Assert\Choice(
+        choices: ["Voyageurs", "Entreprise", "Admin"],
+        message: "Le rôle doit être 'Voyageurs', 'Entreprise' ou 'Admin'"
+    )]
     private string $roleUser;
 
-    #[ORM\Column(name: "dateNaiss", type: "date")]
+    #[ORM\Column(name: "dateNaiss", type: "date", nullable: true)]
+    #[Assert\Type(
+        type: "\DateTimeInterface",
+        message: "La date n'est pas au format valide"
+    )]
+    #[Assert\LessThanOrEqual(
+        value: "-15 years",
+        message: "Vous devez avoir au moins 15 ans pour vous inscrire"
+    )]
     private ?\DateTimeInterface $dateNaiss = null;
 
-    #[ORM\Column(name: "phoneNumber", type: "string", length: 20)]
+    #[ORM\Column(name: "phoneNumber", type: "string", length: 20, nullable: false)]
+    #[Assert\NotBlank(message: "Le numéro de téléphone est obligatoire")]
+    #[Assert\Regex(
+        pattern: "/^[0-9]{8}$/",
+        message: "Le numéro de téléphone doit contenir exactement 8 chiffres"
+    )]
     private string $phoneNumber;
 
-    #[ORM\Column(name: "statut", type: "string", length: 10)]
+    #[ORM\Column(name: "statut", type: "string", length: 10, nullable: false)]
+    #[Assert\NotBlank(message: "Le statut est obligatoire")]
+    #[Assert\Choice(
+        choices: ["actif", "inactif"],
+        message: "Le statut doit être 'actif' ou 'inactif'"
+    )]
     private string $statut;
 
-    #[ORM\Column(name: "diamond", type: "integer")]
+    #[ORM\Column(name: "diamond", type: "integer", nullable: false)]
+    #[Assert\NotNull(message: "Le nombre de diamants est obligatoire")]
+    #[Assert\PositiveOrZero(message: "Le nombre de diamants ne peut pas être négatif")]
+    #[Assert\LessThan(
+        value: 1000000,
+        message: "Le nombre de diamants ne peut pas dépasser {{ compared_value }}"
+    )]
     private int $diamond;
 
-    #[ORM\Column(name: "deleteFlag", type: "integer")]
+    #[ORM\Column(name: "deleteFlag", type: "integer", nullable: false)]
+    #[Assert\NotNull(message: "Le deleteFlag est obligatoire")]
+    #[Assert\Choice(
+        choices: [0, 1],
+        message: "Le deleteFlag doit être 0 ou 1"
+    )]
     private int $deleteFlag;
 
-    #[ORM\Column(name: "imagesU", type: "string", length: 255)]
+    #[ORM\Column(name: "imagesU", type: "string", length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "L'image est obligatoire")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Le nom de l'image ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $imagesU;
 
     #[ORM\OneToMany(mappedBy: "user", targetEntity: Station::class, cascade: ["persist", "remove"])]
