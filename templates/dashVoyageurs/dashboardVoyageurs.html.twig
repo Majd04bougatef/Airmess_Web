@@ -545,7 +545,7 @@
   <main class="main-content">
     <div class="container" style="width: 90%; max-width: 90%;">
       <!-- Regular Content Card - For normal pages -->
-      <div class="content-card content-section" id="default-section">
+      <div class="content-card content-section active" id="default-section">
         {% block body %}{% endblock %}
       </div>
 
@@ -578,6 +578,11 @@
         // Set active based on URL for initial load
         if (link.getAttribute('href') && currentUrl.includes(link.getAttribute('href'))) {
           link.classList.add('active');
+          
+          // If this is for the expense page (userVoyageurs_page), keep the default section active
+          if (link.id === 'user-button') {
+            defaultSection.classList.add('active');
+          }
         } else {
           link.classList.remove('active');
         }

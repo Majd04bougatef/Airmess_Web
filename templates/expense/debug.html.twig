@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Expense Debug{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <h1>Expense Debug Information</h1>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Session & User Info</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Session User ID:</strong> {{ debug.session_user_id }}</li>
+                    <li><strong>User Found:</strong> {{ debug.user_found }}</li>
+                    {% if debug.user_found == 'Yes' %}
+                        <li><strong>User Role:</strong> {{ debug.user_role }}</li>
+                        <li><strong>User Name:</strong> {{ debug.user_name }}</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        
+        {% if debug.expenses is defined %}
+            <div class="card">
+                <div class="card-header">
+                    <h5>Expenses ({{ debug.expenses_count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if debug.expenses_count > 0 %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in debug.expenses %}
+                                    <tr>
+                                        <td>{{ expense.id }}</td>
+                                        <td>{{ expense.name }}</td>
+                                        <td>{{ expense.amount }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No expenses found for this user.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        
+        <a href="{{ path('userVoyageurs_page') }}" class="btn btn-primary mt-3">Go to Expenses Dashboard</a>
+    </div>
+{% endblock %} 

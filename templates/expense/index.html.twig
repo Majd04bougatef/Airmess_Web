@@ -9,6 +9,12 @@
             <a href="{{ path('app_expense_new') }}{% if in_voyageurs_dashboard is defined and in_voyageurs_dashboard %}?dashboard=voyageurs{% endif %}" class="btn btn-primary">Create new</a>
         </div>
 
+        {% if debug_info is defined %}
+        <div class="alert alert-info">
+            <strong>Debug:</strong> {{ debug_info }}
+        </div>
+        {% endif %}
+        
         {% for label, messages in app.flashes %}
             {% for message in messages %}
                 <div class="alert alert-{{ label }}">

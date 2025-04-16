@@ -12,9 +12,12 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ExpenseType extends AbstractType
 {
@@ -67,24 +70,30 @@ class ExpenseType extends AbstractType
                 ],
                 'attr' => ['class' => 'form-control-file']
             ])
-            ->add('user', EntityType::class, [
+        ;
+        
+        // Only add the user field if we're in admin mode
+        // Otherwise, the user will be set automatically from the session in the controller
+        if (isset($options['is_admin']) && $options['is_admin']) {
+            $builder->add('user', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => function (User $user) {
                     return $user->getName() . ' ' . ($user->getPrenom() ?? '');
                 },
                 'placeholder' => 'Select a user',
                 'required' => true,
-            ])
-        ;
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Expense::class,
+            'is_admin' => false,
         ]);
         
-        // Add the 'user' option
-        $resolver->setDefined(['user']);
+        // Add the 'user' and 'is_admin' options
+        $resolver->setDefined(['user', 'is_admin']);
     }
 }

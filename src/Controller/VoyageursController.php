@@ -61,14 +61,28 @@ class VoyageursController extends AuthenticatedController
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
         
+        // Debug info
+        if (!$user) {
+            $this->addFlash('error', 'User not found with ID: ' . $userId);
+            return $this->render('expense/index.html.twig', [
+                'expenses' => [],
+                'in_voyageurs_dashboard' => true,
+                'debug_info' => 'No user found with ID: ' . $userId
+            ]);
+        }
+        
         // If admin, show all expenses, otherwise only user's expenses
         $expenses = ($user && $user->getRoleUser() === 'Admin') 
             ? $expenseRepository->findAll() 
             : $expenseRepository->findBy(['user' => $user]);
-            
+        
+        // Debug info
+        $expensesCount = count($expenses);
+        
         return $this->render('expense/index.html.twig', [
             'expenses' => $expenses,
             'in_voyageurs_dashboard' => true,
+            'debug_info' => 'Found ' . $expensesCount . ' expenses for user ID: ' . $userId . ' with role: ' . $user->getRoleUser()
         ]);
     }
 
