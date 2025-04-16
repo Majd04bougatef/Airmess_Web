@@ -100,15 +100,22 @@ final class ExpenseController extends AbstractController
                 $expense->setImagedepense('default-receipt.jpg');
             }
             
-            $entityManager->persist($expense);
-            $entityManager->flush();
-            
-            $this->addFlash('success', 'Expense created successfully!');
-            
-            $inVoyageursDashboard = $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs';
-            $redirectRoute = $inVoyageursDashboard ? 'userVoyageurs_page' : 'app_expense_index';
-            
-            return $this->redirectToRoute($redirectRoute, [], Response::HTTP_SEE_OTHER);
+            try {
+                $entityManager->persist($expense);
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'Expense created successfully!');
+                
+                $inVoyageursDashboard = $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs';
+                $redirectRoute = $inVoyageursDashboard ? 'userVoyageurs_page' : 'app_expense_index';
+                
+                return $this->redirectToRoute($redirectRoute, [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'An error occurred while saving the expense: ' . $e->getMessage());
+            }
+        } else if ($form->isSubmitted()) {
+            // Add a general error message when the form is submitted but not valid
+            $this->addFlash('error', 'There are errors in your form. Please check the fields and try again.');
         }
 
         $inVoyageursDashboard = $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs';
@@ -208,14 +215,21 @@ final class ExpenseController extends AbstractController
                 }
             }
             
-            $entityManager->flush();
-            
-            $this->addFlash('success', 'Expense updated successfully!');
-            
-            $inVoyageursDashboard = $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs';
-            $redirectRoute = $inVoyageursDashboard ? 'userVoyageurs_page' : 'app_expense_index';
-            
-            return $this->redirectToRoute($redirectRoute, [], Response::HTTP_SEE_OTHER);
+            try {
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'Expense updated successfully!');
+                
+                $inVoyageursDashboard = $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs';
+                $redirectRoute = $inVoyageursDashboard ? 'userVoyageurs_page' : 'app_expense_index';
+                
+                return $this->redirectToRoute($redirectRoute, [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'An error occurred while updating the expense: ' . $e->getMessage());
+            }
+        } else if ($form->isSubmitted()) {
+            // Add a general error message when the form is submitted but not valid
+            $this->addFlash('error', 'There are errors in your form. Please check the fields and try again.');
         }
 
         $inVoyageursDashboard = $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs';
