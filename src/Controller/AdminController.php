@@ -189,7 +189,7 @@ class AdminController extends AbstractController
                     // Move the file to the directory where user photos are stored
                     try {
                         $photoFile->move(
-                            $this->getParameter('kernel.project_dir').'/public/uploads/users',
+                            $this->getParameter('user_images_directory'),
                             $newFilename
                         );
                         // Update the 'imagesU' property to store the photo filename
@@ -262,7 +262,7 @@ class AdminController extends AbstractController
                     // Move the file to the directory where user photos are stored
                     try {
                         $photoFile->move(
-                            $this->getParameter('kernel.project_dir').'/public/uploads/users',
+                            $this->getParameter('user_images_directory'),
                             $newFilename
                         );
                         // Update the 'imagesU' property to store the photo filename
