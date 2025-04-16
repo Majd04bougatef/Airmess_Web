@@ -4,32 +4,14 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        # Define your user provider to load users from the database
-        app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: email # The property used to lookup the user (usually email or username)
+        users_in_memory: { memory: null }
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: app_user_provider # Use the entity provider we defined above
-
-            # Configure form login
-            form_login:
-                # "app_login" is the name of the route created previously
-                login_path: login # Route name for the login page
-                check_path: login # Route name Symfony listens on for form submission
-                default_target_path: app_home # Route name to redirect to after successful login
-                # You might want to enable this for a better UX
-                # always_use_default_target_path: true
-
-            logout:
-                path: app_logout # Route name for the logout action
-                # where to redirect after logout
-                # target: app_any_route
+            provider: users_in_memory
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -38,12 +20,10 @@ security:
             # switch_user: true
 
     # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+    # Note: Only the first access control that matches will be used
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
-        # Add access control rules here, e.g.:
-        # - { path: ^/dashboard, roles: ROLE_USER } # Example: require login for /dashboard
 
 when@test:
     security:
