@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0;url={{ path('app_profile') }}">
+    <title>Redirecting to profile...</title>
+    <script>
+        window.location.href = "{{ path('app_profile') }}";
+    </script>
+</head>
+<body>
+    <p>Redirecting to your profile page... If you are not redirected automatically, <a href="{{ path('app_profile') }}">click here</a>.</p>
+</body>
+</html> 

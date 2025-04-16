@@ -17,6 +17,13 @@
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <!-- CSS Files -->
   <link id="pagestyle" href="{{asset('css/argon-dashboard.css')}}" rel="stylesheet" />
+  <style>
+    /* Style for direct navigation links */
+    .nav-link.direct-link:hover {
+      background-color: rgba(199, 199, 199, 0.2);
+      transition: all 0.15s ease;
+    }
+  </style>
   
   {% block stylesheets %}
   <!-- Additional stylesheets can be added here -->
@@ -106,12 +113,13 @@
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" id="profile-button">
+          <button onclick="goToProfile()" class="nav-link w-100 text-start" style="background-color: rgba(23, 152, 255, 0.05); border: none; border-radius: 8px; cursor:pointer;">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
             </div>
             <span class="nav-link-text ms-1">Profile</span>
-          </a>
+            <i class="fas fa-external-link-alt ms-2" style="font-size: 0.8em;"></i>
+          </button>
         </li>
       
       </ul>
@@ -133,7 +141,11 @@
     </div>
   </aside>
   <main class="main-content position-relative border-radius-lg ">
-
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+      <a href="{{ path('goto_profile') }}" class="btn btn-primary btn-sm" target="_self">
+        <i class="ni ni-single-02 me-1"></i> Go to Profile
+      </a>
+    </div>
    
 <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
       <div class="container-fluid py-1 px-3">
@@ -294,20 +306,22 @@
     document.addEventListener("DOMContentLoaded", function() {
       // Mark the current page as active
       markActiveLink();
+      
+      // Profile button now uses direct link, no event handler needed
     });
     
     function markActiveLink() {
       // Get the current URL
       var currentUrl = window.location.pathname;
       
-      // Find all navigation links
-      var navLinks = document.querySelectorAll('.nav-link');
+      // Find all navigation links (excluding forms)
+      var navLinks = document.querySelectorAll('.nav-link:not(button)');
       
       // Loop through links and check if the href matches the current URL
       navLinks.forEach(function(link) {
         var linkUrl = link.getAttribute('href');
         
-        // Check if the current URL contains the link URL
+        // Check if the link has an href attribute and if the current URL contains the link URL
         if (linkUrl && currentUrl.includes(linkUrl) && linkUrl !== '#') {
           // Remove active class from all links
           navLinks.forEach(function(l) {
@@ -317,12 +331,23 @@
           // Add active class to matching link
           link.classList.add('active');
           
-          // Update breadcrumb
-          var pageName = link.querySelector('.nav-link-text').innerText;
-          document.querySelector('.breadcrumb-item.active').innerText = pageName;
-          document.querySelector('.font-weight-bolder.text-white.mb-0').innerText = pageName;
+          // Update breadcrumb if elements exist
+          var breadcrumbItem = document.querySelector('.breadcrumb-item.active');
+          var headerTitle = document.querySelector('.font-weight-bolder.text-white.mb-0');
+          
+          if (breadcrumbItem && link.querySelector('.nav-link-text')) {
+            var pageName = link.querySelector('.nav-link-text').innerText;
+            breadcrumbItem.innerText = pageName;
+            if (headerTitle) headerTitle.innerText = pageName;
+          }
         }
       });
+      
+      // Special case for profile page
+      if (currentUrl.includes('/profile')) {
+        document.querySelector('.breadcrumb-item.active').innerText = 'Profile';
+        document.querySelector('.font-weight-bolder.text-white.mb-0').innerText = 'Profile';
+      }
     }
 
     var win = navigator.platform.indexOf('Win') > -1;
@@ -331,6 +356,11 @@
         damping: '0.5'
       }
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+    
+    function goToProfile() {
+      // Navigate directly to profile URL
+      window.location.href = "{{ path('goto_profile') }}";
     }
   </script>
   

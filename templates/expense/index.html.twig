@@ -8,12 +8,6 @@
             <h1>Expense Management</h1>
             <a href="{{ path('app_expense_new') }}{% if in_voyageurs_dashboard is defined and in_voyageurs_dashboard %}?dashboard=voyageurs{% endif %}" class="btn btn-primary">Create new</a>
         </div>
-
-        {% if debug_info is defined %}
-        <div class="alert alert-info">
-            <strong>Debug:</strong> {{ debug_info }}
-        </div>
-        {% endif %}
         
         {% for label, messages in app.flashes %}
             {% for message in messages %}
@@ -23,7 +17,7 @@
             {% endfor %}
         {% endfor %}
         
-        <div class="card">
+        <div class="card shadow-sm mb-4">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">All Expenses</h5>

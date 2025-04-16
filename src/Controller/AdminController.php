@@ -2,6 +2,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserType;
+use App\Form\AdminUserType;
 use App\Repository\UserRepository;
 use App\Repository\StationRepository;
 use App\Repository\ReservationTransportRepository;
@@ -12,7 +14,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\OffreRepository;
 use Symfony\Component\HttpFoundation\Response;
-
+use App\Repository\ExpenseRepository;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -71,10 +74,11 @@ class AdminController extends AbstractController
         
         // Check if user images exist, fix in database if not
         $updateDb = false;
-        $projectDir = $this->getParameter('kernel.project_dir');
+        // Use the correct external path for images
+        $userImagesDir = 'C:/xampp/htdocs/images_users/';
         
         foreach ($results['items'] as $user) {
-            $imagePath = $projectDir . '/public/uploads/users/' . $user->getImagesU();
+            $imagePath = $userImagesDir . $user->getImagesU();
             
             // If user image doesn't exist or is empty, set to default
             if (empty($user->getImagesU()) || 
@@ -135,6 +139,37 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/ExpensePage', name: 'expense_page')]
+    public function ExpensePage(
+        ExpenseRepository $expenseRepository, 
+        UserRepository $userRepository, 
+        SessionInterface $session
+    ): Response
+    {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('login');
+        }
+        
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        // Error handling for missing user
+        if (!$user) {
+            $this->addFlash('error', 'User not found. Please log in again.');
+            return $this->redirectToRoute('login');
+        }
+        
+        // If admin, show all expenses, otherwise only user's expenses
+        $expenses = ($user && ($user->getRoleUser() === 'Admin' || $user->getRoleUser() === 'ROLE_ADMIN')) 
+            ? $expenseRepository->findAll() 
+            : $expenseRepository->findBy(['user' => $user]);
+        
+        return $this->render('expense/index.html.twig', [
+            'expenses' => $expenses
+        ]);
+    }
+
     #[Route('/UserPage/add', name: 'admin_user_add', methods: ['POST'])]
     public function addUser(
         Request $request, 
@@ -179,17 +214,15 @@ class AdminController extends AbstractController
                 $photoFile = $request->files->get('photo');
                 if ($photoFile) {
                     $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    // Generate a unique name for the file
-                    $safeFilename = transliterator_transliterate(
-                        'Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()',
-                        $originalFilename
-                    );
+                    // Generate a unique name for the file without using transliterator_transliterate
+                    $safeFilename = preg_replace('/[^A-Za-z0-9_]/', '', $originalFilename);
+                    $safeFilename = strtolower($safeFilename);
                     $newFilename = $safeFilename.'-'.uniqid().'.'.$photoFile->guessExtension();
                     
                     // Move the file to the directory where user photos are stored
                     try {
                         $photoFile->move(
-                            $this->getParameter('user_images_directory'),
+                            'C:/xampp/htdocs/images_users',
                             $newFilename
                         );
                         // Update the 'imagesU' property to store the photo filename
@@ -218,79 +251,97 @@ class AdminController extends AbstractController
         return new JsonResponse(['success' => false, 'message' => 'Invalid request'], 400);
     }
 
-    #[Route('/UserPage/edit/{id}', name: 'admin_user_edit', methods: ['POST'])]
+    #[Route('/UserPage/edit/{id_U}', name: 'admin_user_edit', methods: ['POST'])]
     public function editUser(
         Request $request, 
         User $user, 
         EntityManagerInterface $entityManager
     ): Response
     {
-        if ($request->isXmlHttpRequest()) {
-            try {
-                // For form-data requests
-                $name = $request->request->get('name');
-                $prenom = $request->request->get('prenom');
-                $email = $request->request->get('email');
-                $phone = $request->request->get('phone');
-                $role = $request->request->get('role');
-                $status = $request->request->get('status');
+        try {
+            // Get all parameters from request
+            $name = $request->request->get('name');
+            $prenom = $request->request->get('prenom');
+            $email = $request->request->get('email');
+            $phone = $request->request->get('phone');
+            $role = $request->request->get('role');
+            $status = $request->request->get('status');
+            
+            // Debug request
+            $allParams = $request->request->all();
+            $debug = 'Request params: ' . json_encode($allParams);
+            error_log($debug);
+            
+            // Validate required fields
+            if (empty($name) || empty($prenom) || empty($email)) {
+                $missingFields = [];
+                if (empty($name)) $missingFields[] = 'name';
+                if (empty($prenom)) $missingFields[] = 'prenom';
+                if (empty($email)) $missingFields[] = 'email';
                 
-                // Update user basic info
-                $user->setName($name);
-                $user->setPrenom($prenom);
-                $user->setEmail($email);
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Champs requis manquants: ' . implode(', ', $missingFields)
+                ], 400);
+            }
+            
+            // Update user fields
+            $user->setName($name);
+            $user->setPrenom($prenom);
+            $user->setEmail($email);
+            
+            if (!empty($phone)) {
                 $user->setPhoneNumber($phone);
+            }
+            
+            if (!empty($role)) {
                 $user->setRoleUser($role);
-                
-                // Normalize status value for consistency
+            }
+            
+            if (!empty($status)) {
+                // Normalize status
                 $status = strtolower($status);
                 if ($status == 'active') $status = 'actif';
                 if ($status == 'inactive') $status = 'inactif';
                 $user->setStatut($status);
-                
-                // Handle file upload if present
-                $photoFile = $request->files->get('photo');
-                if ($photoFile) {
-                    $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    // Generate a unique name for the file
-                    $safeFilename = transliterator_transliterate(
-                        'Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()',
-                        $originalFilename
-                    );
-                    $newFilename = $safeFilename.'-'.uniqid().'.'.$photoFile->guessExtension();
-                    
-                    // Move the file to the directory where user photos are stored
-                    try {
-                        $photoFile->move(
-                            $this->getParameter('user_images_directory'),
-                            $newFilename
-                        );
-                        // Update the 'imagesU' property to store the photo filename
-                        $user->setImagesU($newFilename);
-                    } catch (\Exception $e) {
-                        return new JsonResponse([
-                            'success' => false,
-                            'message' => 'Erreur lors du téléchargement de l\'image: '.$e->getMessage()
-                        ], 500);
-                    }
-                }
-                
-                // Save changes
-                $entityManager->flush();
-                
-                return new JsonResponse(['success' => true]);
-            } catch (\Exception $e) {
-                return new JsonResponse([
-                    'success' => false,
-                    'message' => 'Erreur lors de la mise à jour: '.$e->getMessage()
-                ], 500);
             }
+            
+            // Handle photo upload if present
+            $photoFile = $request->files->get('photo');
+            if ($photoFile) {
+                $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = preg_replace('/[^A-Za-z0-9_]/', '', $originalFilename);
+                $safeFilename = strtolower($safeFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$photoFile->guessExtension();
+                
+                try {
+                    $photoFile->move(
+                        'C:/xampp/htdocs/images_users',
+                        $newFilename
+                    );
+                    $user->setImagesU($newFilename);
+                } catch (\Exception $e) {
+                    return new JsonResponse([
+                        'success' => false,
+                        'message' => 'Erreur lors du téléchargement de l\'image: '.$e->getMessage()
+                    ], 500);
+                }
+            }
+            
+            // Save changes
+            $entityManager->flush();
+            
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            error_log('Error in editUser: ' . $e->getMessage());
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour: '.$e->getMessage()
+            ], 500);
         }
-        
-        return new JsonResponse(['success' => false, 'message' => 'Invalid request'], 400);
     }
 
-    #[Route('/UserPage/delete/{id}', name: 'admin_user_delete', methods: ['POST'])]
+    #[Route('/UserPage/delete/{id_U}', name: 'admin_user_delete', methods: ['POST'])]
     public function deleteUser(
         User $user, 
         EntityManagerInterface $entityManager
