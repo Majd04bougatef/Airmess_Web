@@ -1,0 +1,44 @@
+{% extends 'profile/profile.html.twig' %}
+
+{% block sidebar_content %}
+    <div class="mt-4">
+        <div class="d-grid gap-2">
+            <a href="{{ path('app_dashEntreprise') }}" class="btn btn-sm btn-outline-primary mb-2">
+                <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord Entreprise
+            </a>
+            <a href="#" class="btn btn-sm btn-outline-info mb-2">
+                <i class="fas fa-building me-2"></i> Mes offres
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block main_content %}
+    <div class="mt-4 pt-4 border-top">
+        <h5>Informations Entreprise</h5>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <tbody>
+                    <tr>
+                        <th>Date d'inscription</th>
+                        <td>{{ user.dateNaiss|date('d/m/Y') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Statut du compte</th>
+                        <td>
+                            {% if user.statut == 'actif' %}
+                                <span class="badge bg-success">Actif</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactif</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Type d'entreprise</th>
+                        <td>{{ user.roleUser }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %} 

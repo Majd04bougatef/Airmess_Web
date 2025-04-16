@@ -1,0 +1,433 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div id="alert-container">
+        <!-- Alerts will be dynamically inserted here -->
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Edit Profile</h3>
+        </div>
+        <div class="card-body">
+            <form id="profile-edit-form" method="post" action="{{ path('app_profile_update_ajax') }}" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-4">
+                        <div class="profile-image-container">
+                            <div class="position-relative mx-auto" style="width: 200px;">
+                                <div class="profile-image-wrapper rounded-circle border overflow-hidden" style="width: 200px; height: 200px;">
+                                    {% if user.imagesU %}
+                                        <img src="{{ path('app_profile_image', {'filename': user.imagesU}) }}" 
+                                             alt="{{ user.name }}" id="profile-image-preview" class="img-fluid w-100 h-100" 
+                                             style="object-fit: cover;"
+                                             onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                                    {% else %}
+                                        <img src="{{ asset('images/user-avatar.svg') }}" alt="Default profile" 
+                                             id="profile-image-preview" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                                    {% endif %}
+                                    
+                                    <div class="overlay-controls position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" 
+                                         style="background-color: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s ease;">
+                                        <button type="button" id="change-photo-btn" class="btn btn-light btn-sm rounded-circle">
+                                            <i class="fas fa-camera"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <input type="file" id="photo" name="photo" class="d-none" accept="image/jpeg,image/png,image/gif,image/webp">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button type="button" id="upload-photo-btn" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-upload me-1"></i> Upload Photo
+                                        </button>
+                                        <button type="button" id="remove-photo-btn" class="btn btn-sm btn-outline-danger" style="display: none;">
+                                            <i class="fas fa-times me-1"></i> Remove
+                                        </button>
+                                    </div>
+                                    <div id="photo-error" class="text-danger mt-2 small"></div>
+                                    <div id="photo-info" class="text-muted mt-2 small">
+                                        Accepted formats: JPG, PNG, GIF, WEBP<br>
+                                        Max size: 5MB
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
+                                <div class="invalid-feedback">Please enter your last name.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="prenom" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="prenom" name="prenom" value="{{ user.prenom }}" required>
+                                <div class="invalid-feedback">Please enter your first name.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                                <div class="invalid-feedback">Please enter a valid email address.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phoneNumber }}">
+                                <div class="invalid-feedback">Please enter a valid phone number.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-success me-2" id="save-profile-btn">
+                            <i class="fas fa-save me-1"></i> Save Changes
+                        </button>
+                        <a href="{{ path('profileVoyageurs_page') }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-arrow-left me-1"></i> Cancel
+                        </a>
+                        <button type="button" class="btn btn-danger" id="deleteProfileBtn">
+                            <i class="fas fa-trash me-1"></i> Delete Profile
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const photoInput = document.getElementById('photo');
+        const photoPreview = document.getElementById('profile-image-preview');
+        const uploadPhotoBtn = document.getElementById('upload-photo-btn');
+        const removePhotoBtn = document.getElementById('remove-photo-btn');
+        const photoError = document.getElementById('photo-error');
+        const profileImageWrapper = document.querySelector('.profile-image-wrapper');
+        const overlay = document.querySelector('.overlay-controls');
+        const changePhotoBtn = document.getElementById('change-photo-btn');
+        
+        // Form elements
+        const form = document.getElementById('profile-edit-form');
+        const saveBtn = document.getElementById('save-profile-btn');
+        
+        // Show overlay on hover
+        profileImageWrapper.addEventListener('mouseenter', function() {
+            overlay.style.opacity = '1';
+        });
+        
+        profileImageWrapper.addEventListener('mouseleave', function() {
+            overlay.style.opacity = '0';
+        });
+        
+        // Handle image upload
+        changePhotoBtn.addEventListener('click', function() {
+            photoInput.click();
+        });
+        
+        uploadPhotoBtn.addEventListener('click', function() {
+            photoInput.click();
+        });
+        
+        // Preview image immediately after selection
+        photoInput.addEventListener('change', function(e) {
+            photoError.textContent = '';
+            
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                
+                // Validate file size (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    photoError.textContent = 'Image too large! Maximum size is 5MB.';
+                    this.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    photoError.textContent = 'Invalid file type. Please use JPG, PNG, GIF, or WEBP.';
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.src = e.target.result;
+                    removePhotoBtn.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Handle remove photo button
+        removePhotoBtn.addEventListener('click', function() {
+            photoInput.value = '';
+            photoPreview.src = "{{ asset('images/user-avatar.svg') }}";
+            removePhotoBtn.style.display = 'none';
+        });
+        
+        // Upload profile image via AJAX
+        photoInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                
+                // Skip validation here since we already validated in the change event above
+                uploadProfileImage(file);
+            }
+        });
+        
+        function uploadProfileImage(file) {
+            const formData = new FormData();
+            formData.append('profile_image', file);
+            
+            // Show loading state
+            uploadPhotoBtn.disabled = true;
+            uploadPhotoBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Uploading...';
+            
+            fetch('{{ path('update_profile_image_ajax') }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Reset button
+                uploadPhotoBtn.disabled = false;
+                uploadPhotoBtn.innerHTML = '<i class="fas fa-upload me-1"></i> Upload Photo';
+                
+                if (data.success) {
+                    // Show success message
+                    showAlert('success', 'Profile image updated successfully!');
+                    
+                    // Update preview with the server path to ensure it's using the saved image
+                    photoPreview.src = data.image_path;
+                    removePhotoBtn.style.display = 'block';
+                } else {
+                    showAlert('danger', data.message || 'Failed to upload image');
+                    photoError.textContent = data.message || 'Failed to upload image';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                uploadPhotoBtn.disabled = false;
+                uploadPhotoBtn.innerHTML = '<i class="fas fa-upload me-1"></i> Upload Photo';
+                showAlert('danger', 'Network error while uploading image');
+                photoError.textContent = 'Network error while uploading image';
+            });
+        }
+        
+        // Handle form submission with AJAX
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Basic validation
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            // Validate email format
+            const emailField = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailField.value && !emailRegex.test(emailField.value)) {
+                emailField.classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                // Scroll to first invalid field
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+                return;
+            }
+            
+            // Show loading state
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+            
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Reset button
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save me-1"></i> Save Changes';
+                
+                if (data.success) {
+                    showAlert('success', 'Profile updated successfully!');
+                    
+                    // Redirect after a short delay
+                    setTimeout(() => {
+                        window.location.href = "{{ path('profileVoyageurs_page') }}";
+                    }, 1500);
+                } else {
+                    showAlert('danger', data.message || 'Failed to update profile');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save me-1"></i> Save Changes';
+                showAlert('danger', 'Network error while updating profile');
+            });
+        });
+        
+        // Helper function to show alerts
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alert-container');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.innerHTML = message + 
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            
+            // Scroll to alert
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const bsAlert = bootstrap.Alert.getInstance(alertDiv);
+                if (bsAlert) {
+                    bsAlert.close();
+                } else {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Delete profile button handler
+        document.getElementById('deleteProfileBtn').addEventListener('click', function() {
+            // Create and show a custom confirmation modal instead of using confirm()
+            const confirmModalHTML = `
+                <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Account Deactivation</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="mb-2">Are you sure you want to deactivate your account? This action has the following consequences:</p>
+                                <ul class="mb-3">
+                                    <li>Your profile will be deactivated</li>
+                                    <li>You will be logged out immediately</li>
+                                    <li>You'll need to contact support to reactivate your account</li>
+                                </ul>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="confirmDeactivation">
+                                    <label class="form-check-label" for="confirmDeactivation">
+                                        I understand this action cannot be easily undone
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>Deactivate Account</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add the modal to the document if it doesn't exist
+            if (!document.getElementById('confirmDeleteModal')) {
+                const modalContainer = document.createElement('div');
+                modalContainer.innerHTML = confirmModalHTML;
+                document.body.appendChild(modalContainer.firstChild);
+                
+                // Set up checkbox behavior
+                document.getElementById('confirmDeactivation').addEventListener('change', function() {
+                    document.getElementById('confirmDeleteBtn').disabled = !this.checked;
+                });
+            }
+
+            // Show the modal
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            confirmModal.show();
+
+            // Handle the confirmation
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function confirmHandler() {
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+                
+                // Send deactivation request
+                fetch('{{ path('deactivate_profile_ajax') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || 'Server returned error ' + response.status);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Hide the modal
+                        confirmModal.hide();
+                        
+                        // Show success message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-info alert-dismissible fade show';
+                        alertDiv.setAttribute('role', 'alert');
+                        alertDiv.innerHTML = 
+                            '<strong>Account Deactivated!</strong> ' + 
+                            'Your account has been deactivated successfully. You will be redirected to the login page shortly.' +
+                            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+                        
+                        document.querySelector('.container').prepend(alertDiv);
+                        
+                        // Redirect to login page after a short delay
+                        setTimeout(() => {
+                            window.location.href = "{{ path('app_logout') }}";
+                        }, 3000);
+                    } else {
+                        throw new Error(data.message || 'An error occurred while deactivating your account.');
+                    }
+                })
+                .catch(error => {
+                    // Reset button
+                    this.disabled = false;
+                    this.innerHTML = 'Deactivate Account';
+                    
+                    // Hide the confirmation modal
+                    confirmModal.hide();
+                    
+                    // Show error message
+                    showAlert('danger', error.message || 'An error occurred while deactivating your account.');
+                });
+                
+                // Remove this event listener to prevent multiple submissions
+                this.removeEventListener('click', confirmHandler);
+            });
+        });
+    });
+</script>
+{% endblock %} 

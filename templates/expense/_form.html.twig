@@ -69,11 +69,30 @@
 
             <div class="form-group mb-3">
                 {{ form_label(form.imageFile, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                <span class="text-danger">*</span>
                 <div class="input-group mb-1">
-                    {{ form_widget(form.imageFile, {'attr': {'class': 'form-control expense-input', 'data-validate': 'true', 'data-type': 'file', 'data-optional': 'true', 'accept': 'image/jpeg,image/png,image/gif,image/webp'}}) }}
+                    {{ form_widget(form.imageFile, {'attr': {'class': 'form-control expense-input', 'data-validate': 'true', 'data-type': 'file', 'data-optional': 'false', 'accept': 'image/jpeg,image/png,image/gif,image/webp', 'required': 'required'}}) }}
+                    <button class="btn btn-outline-secondary" type="button" id="clear-image-btn" style="display: none;">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
                 </div>
                 <div class="invalid-feedback" id="feedback-imageFile"></div>
                 <small class="text-muted">Accepted formats: JPEG, PNG, GIF, WEBP. Max size: 5MB</small>
+                
+                <div id="image-preview-wrapper" class="d-none mt-3">
+                    <div class="card">
+                        <div class="card-header bg-light py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-image me-2"></i>Image Preview</span>
+                                <span id="file-info" class="badge bg-info"></span>
+                            </div>
+                        </div>
+                        <div class="card-body text-center p-2">
+                            <img id="image-preview" src="#" alt="Receipt Preview" class="img-fluid" style="max-height: 250px; width: auto;">
+                        </div>
+                    </div>
+                </div>
+                
                 {{ form_errors(form.imageFile) }}
             </div>
 
@@ -133,16 +152,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Image preview
     const imageInput = document.querySelector('#{{ form.imageFile.vars.id }}');
+    const imagePreviewWrapper = document.getElementById('image-preview-wrapper');
+    const imagePreview = document.getElementById('image-preview');
+    const fileInfo = document.getElementById('file-info');
+    const clearImageBtn = document.getElementById('clear-image-btn');
     
     if (imageInput) {
+        // Check if there's a current image (for edit form)
+        if (imageInput.dataset.currentImage) {
+            showImagePreview(imageInput.dataset.currentImage, 'Current Image');
+        }
+        
         imageInput.addEventListener('change', function(e) {
-            // Remove any existing preview
-            const existingPreview = document.getElementById('image-preview-container');
-            if (existingPreview) {
-                existingPreview.remove();
-            }
-            
-            // Create new preview if file is selected
             if (this.files && this.files[0]) {
                 const file = this.files[0];
                 
@@ -150,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (file.size > 5 * 1024 * 1024) {
                     this.classList.add('is-invalid');
                     document.getElementById('feedback-imageFile').textContent = 'File is too large. Maximum size is 5MB.';
+                    hideImagePreview();
                     return;
                 }
                 
@@ -158,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!acceptedTypes.includes(file.type)) {
                     this.classList.add('is-invalid');
                     document.getElementById('feedback-imageFile').textContent = 'Invalid file type. Accepted formats: JPEG, PNG, GIF, WEBP.';
+                    hideImagePreview();
                     return;
                 }
                 
@@ -165,25 +188,59 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.remove('is-invalid');
                 document.getElementById('feedback-imageFile').textContent = '';
                 
-                const reader = new FileReader();
+                // Show clear button
+                clearImageBtn.style.display = 'block';
                 
-                reader.onload = function(e) {
-                    const previewContainer = document.createElement('div');
-                    previewContainer.id = 'image-preview-container';
-                    previewContainer.className = 'mt-2 text-center';
-                    
-                    const previewImage = document.createElement('img');
-                    previewImage.src = e.target.result;
-                    previewImage.className = 'img-thumbnail';
-                    previewImage.style.maxHeight = '200px';
-                    
-                    previewContainer.appendChild(previewImage);
-                    imageInput.parentNode.after(previewContainer);
-                }
+                // Format file size
+                const fileSize = formatFileSize(file.size);
                 
-                reader.readAsDataURL(file);
+                // Create object URL for preview
+                const imageURL = URL.createObjectURL(file);
+                showImagePreview(imageURL, `${file.name} (${fileSize})`);
+                
+                // Clean up object URL when no longer needed
+                imagePreview.onload = function() {
+                    URL.revokeObjectURL(imageURL);
+                };
+            } else {
+                hideImagePreview();
             }
         });
+        
+        // Clear button functionality
+        clearImageBtn.addEventListener('click', function() {
+            imageInput.value = '';
+            hideImagePreview();
+            validateInput(imageInput);
+            updateFormValidity();
+        });
+    }
+    
+    // Helper function to format file size
+    function formatFileSize(bytes) {
+        if (bytes < 1024) {
+            return bytes + ' B';
+        } else if (bytes < 1024 * 1024) {
+            return (bytes / 1024).toFixed(1) + ' KB';
+        } else {
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+    }
+    
+    // Helper function to show image preview
+    function showImagePreview(src, info) {
+        imagePreview.src = src;
+        fileInfo.textContent = info;
+        imagePreviewWrapper.classList.remove('d-none');
+        clearImageBtn.style.display = 'block';
+    }
+    
+    // Helper function to hide image preview
+    function hideImagePreview() {
+        imagePreviewWrapper.classList.add('d-none');
+        imagePreview.src = '#';
+        fileInfo.textContent = '';
+        clearImageBtn.style.display = 'none';
     }
     
     // Real-time validation for all inputs

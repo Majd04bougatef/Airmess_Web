@@ -93,11 +93,20 @@ final class ExpenseController extends AbstractController
                 } catch (FileException $e) {
                     // Handle file upload error
                     $this->addFlash('error', 'Error uploading file: ' . $e->getMessage());
-                    $expense->setImagedepense('default-receipt.jpg'); // Set a default image
+                    return $this->renderForm('expense/new.html.twig', [
+                        'expense' => $expense,
+                        'form' => $form,
+                        'in_voyageurs_dashboard' => $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs',
+                    ]);
                 }
             } else {
-                // No image uploaded, set default
-                $expense->setImagedepense('default-receipt.jpg');
+                // Should not happen due to validation, but just in case
+                $this->addFlash('error', 'A receipt image is required.');
+                return $this->renderForm('expense/new.html.twig', [
+                    'expense' => $expense,
+                    'form' => $form,
+                    'in_voyageurs_dashboard' => $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs',
+                ]);
             }
             
             try {
@@ -177,9 +186,21 @@ final class ExpenseController extends AbstractController
         // Check if user is admin
         $isAdmin = $user->getRoleUser() === 'Admin' || $user->getRoleUser() === 'ROLE_ADMIN';
         
-        $form = $this->createForm(ExpenseType::class, $expense, [
+        // Store original image filename
+        $originalImage = $expense->getImagedepense();
+        $hasExistingImage = $originalImage && $originalImage !== 'default-receipt.jpg';
+        
+        // Create the form with custom validation for edit
+        $options = [
             'is_admin' => $isAdmin
-        ]);
+        ];
+        
+        // If there's already an image, make the field optional in edit mode
+        if ($hasExistingImage) {
+            $options['image_required'] = false;
+        }
+        
+        $form = $this->createForm(ExpenseType::class, $expense, $options);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -199,9 +220,8 @@ final class ExpenseController extends AbstractController
                     );
                     
                     // Delete old image if it exists and is not the default
-                    $oldImage = $expense->getImagedepense();
-                    if ($oldImage && $oldImage !== 'default-receipt.jpg') {
-                        $oldImagePath = $this->getParameter('expense_images_directory') . '/' . $oldImage;
+                    if ($hasExistingImage) {
+                        $oldImagePath = $this->getParameter('expense_images_directory') . '/' . $originalImage;
                         if (file_exists($oldImagePath)) {
                             unlink($oldImagePath);
                         }
@@ -212,7 +232,20 @@ final class ExpenseController extends AbstractController
                 } catch (FileException $e) {
                     // Handle file upload error
                     $this->addFlash('error', 'Error uploading file: ' . $e->getMessage());
+                    return $this->renderForm('expense/edit.html.twig', [
+                        'expense' => $expense,
+                        'form' => $form,
+                        'in_voyageurs_dashboard' => $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs',
+                    ]);
                 }
+            } else if (!$hasExistingImage) {
+                // No image uploaded and no existing image
+                $this->addFlash('error', 'A receipt image is required.');
+                return $this->renderForm('expense/edit.html.twig', [
+                    'expense' => $expense,
+                    'form' => $form,
+                    'in_voyageurs_dashboard' => $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs',
+                ]);
             }
             
             try {

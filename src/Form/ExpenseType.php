@@ -40,14 +40,6 @@ class ExpenseType extends AbstractType
                     new NotBlank([
                         'message' => 'Please enter an amount',
                     ]),
-                    new GreaterThan([
-                        'value' => 0,
-                        'message' => 'Amount must be greater than zero',
-                    ]),
-                    new LessThanOrEqual([
-                        'value' => 100000,
-                        'message' => 'Amount cannot exceed 100,000',
-                    ]),
                 ],
                 'html5' => true,
             ])
@@ -61,12 +53,6 @@ class ExpenseType extends AbstractType
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter a description',
-                    ]),
-                    new Length([
-                        'min' => 5,
-                        'max' => 500,
-                        'minMessage' => 'Description must be at least {{ limit }} characters long',
-                        'maxMessage' => 'Description cannot be longer than {{ limit }} characters',
                     ]),
                 ],
             ])
@@ -97,10 +83,6 @@ class ExpenseType extends AbstractType
                     new NotBlank([
                         'message' => 'Please select a date',
                     ]),
-                    new LessThanOrEqual([
-                        'value' => 'today',
-                        'message' => 'The date cannot be in the future',
-                    ]),
                 ],
                 'html5' => true,
             ])
@@ -114,38 +96,43 @@ class ExpenseType extends AbstractType
                     new NotBlank([
                         'message' => 'Please enter an expense name',
                     ]),
-                    new Length([
-                        'min' => 3,
-                        'max' => 100,
-                        'minMessage' => 'Expense name must be at least {{ limit }} characters long',
-                        'maxMessage' => 'Expense name cannot be longer than {{ limit }} characters',
-                    ]),
                 ],
-            ])
-            ->add('imageFile', FileType::class, [
-                'label' => 'Receipt Image',
-                'mapped' => false,
-                'required' => false,
-                'constraints' => [
-                    new File([
-                        'maxSize' => '5M',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                            'image/gif',
-                            'image/webp',
-                        ],
-                        'mimeTypesMessage' => 'Please upload a valid image (JPEG, PNG, GIF, WEBP)',
-                        'maxSizeMessage' => 'The file is too large ({{ size }} {{ suffix }}). Maximum allowed size is {{ limit }} {{ suffix }}.',
-                    ])
-                ],
-                'attr' => [
-                    'class' => 'form-control-file',
-                    'accept' => 'image/jpeg,image/png,image/gif,image/webp'
-                ],
-                'help' => 'Upload a receipt image (JPEG, PNG, GIF, WEBP). Max size: 5MB',
             ])
         ;
+        
+        // Add the image file field with minimal constraints
+        $imageConstraints = [
+            new File([
+                'maxSize' => '5M',
+                'mimeTypes' => [
+                    'image/jpeg',
+                    'image/png',
+                    'image/gif',
+                    'image/webp',
+                ],
+                'mimeTypesMessage' => 'Please upload a valid image (JPEG, PNG, GIF, WEBP)',
+                'maxSizeMessage' => 'The file is too large ({{ size }} {{ suffix }}). Maximum allowed size is {{ limit }} {{ suffix }}.',
+            ])
+        ];
+        
+        // Add NotBlank constraint if image is required
+        if (!isset($options['image_required']) || $options['image_required']) {
+            $imageConstraints[] = new NotBlank([
+                'message' => 'Please upload a receipt image',
+            ]);
+        }
+        
+        $builder->add('imageFile', FileType::class, [
+            'label' => 'Receipt Image',
+            'mapped' => false,
+            'required' => !isset($options['image_required']) || $options['image_required'],
+            'constraints' => $imageConstraints,
+            'attr' => [
+                'class' => 'form-control-file',
+                'accept' => 'image/jpeg,image/png,image/gif,image/webp'
+            ],
+            'help' => 'Upload a receipt image (JPEG, PNG, GIF, WEBP). Max size: 5MB',
+        ]);
         
         // Only add the user field if we're in admin mode
         // Otherwise, the user will be set automatically from the session in the controller
@@ -172,9 +159,10 @@ class ExpenseType extends AbstractType
             'data_class' => Expense::class,
             'is_admin' => false,
             'validation_groups' => ['Default'],
+            'image_required' => true,
         ]);
         
-        // Add the 'user' and 'is_admin' options
-        $resolver->setDefined(['user', 'is_admin']);
+        // Add the options
+        $resolver->setDefined(['user', 'is_admin', 'image_required']);
     }
 }

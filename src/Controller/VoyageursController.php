@@ -20,6 +20,9 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use App\Repository\ExpenseRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class VoyageursController extends AuthenticatedController
 {
@@ -61,14 +64,10 @@ class VoyageursController extends AuthenticatedController
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
         
-        // Debug info
+        // Error handling for missing user
         if (!$user) {
-            $this->addFlash('error', 'User not found with ID: ' . $userId);
-            return $this->render('expense/index.html.twig', [
-                'expenses' => [],
-                'in_voyageurs_dashboard' => true,
-                'debug_info' => 'No user found with ID: ' . $userId
-            ]);
+            $this->addFlash('error', 'User not found. Please log in again.');
+            return $this->redirectToRoute('login');
         }
         
         // If admin, show all expenses, otherwise only user's expenses
@@ -76,13 +75,9 @@ class VoyageursController extends AuthenticatedController
             ? $expenseRepository->findAll() 
             : $expenseRepository->findBy(['user' => $user]);
         
-        // Debug info
-        $expensesCount = count($expenses);
-        
         return $this->render('expense/index.html.twig', [
             'expenses' => $expenses,
-            'in_voyageurs_dashboard' => true,
-            'debug_info' => 'Found ' . $expensesCount . ' expenses for user ID: ' . $userId . ' with role: ' . $user->getRoleUser()
+            'in_voyageurs_dashboard' => true
         ]);
     }
 
@@ -98,47 +93,9 @@ class VoyageursController extends AuthenticatedController
     }
 
     #[Route('/BonplanVoyageursPage', name: 'bonplanVoyageurs_page')]
-
-    public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager)
+    public function bonplanVoyageursPage(): Response
     {
-        // Récupérer tous les bons plans
-        $bonplans = $bonPlanRepository->findAll();
-        
-        // Récupérer les notes moyennes pour chaque bon plan
-        $ratings = [];
-        $reviewsCount = [];
-        
-        foreach ($bonplans as $bonplan) {
-            // Requête pour calculer la note moyenne
-            $averageRating = $entityManager->createQuery(
-                'SELECT AVG(r.rating) as average
-                FROM App\Entity\ReviewBonPlan r
-                WHERE r.bonPlan = :bonplanId'
-            )
-            ->setParameter('bonplanId', $bonplan->getIdP())
-            ->getSingleScalarResult();
-            
-            // Requête pour compter le nombre d'avis
-            $count = $entityManager->createQuery(
-                'SELECT COUNT(r.idR) as count
-                FROM App\Entity\ReviewBonPlan r
-                WHERE r.bonPlan = :bonplanId'
-            )
-            ->setParameter('bonplanId', $bonplan->getIdP())
-            ->getSingleScalarResult();
-            
-            // Stocker les résultats
-            $ratings[$bonplan->getIdP()] = $averageRating ? round($averageRating, 1) : 0;
-            $reviewsCount[$bonplan->getIdP()] = $count;
-        }
-        
-        // Passer les bons plans et les notes moyennes à la vue
-        return $this->render('dashVoyageurs/bonplanPageVoyageurs.html.twig', [
-            'bonplans' => $bonplans,
-            'ratings' => $ratings,
-            'reviewsCount' => $reviewsCount
-        ]);
-
+        return $this->render('dashVoyageurs/bonplanVoyageursPage.html.twig');
     }
 
     #[Route('/OffreVoyageursPage', name: 'offreVoyageurs_page')]
@@ -174,7 +131,6 @@ class VoyageursController extends AuthenticatedController
         return $this->render('dashVoyageurs/socialPageVoyageurs.html.twig', [
             'publications' => $pagination
         ]);
-
     }
     
     #[Route('/OffreForm', name: 'offre_form')]
@@ -399,6 +355,201 @@ class VoyageursController extends AuthenticatedController
         return $this->render('dashVoyageurs/offrePageVoyageurs.html.twig', [
             'offres' => $offres,
         ]);
+    }
+
+    #[Route('/profileVoyageursPage', name: 'profileVoyageurs_page')]
+    public function profileVoyageursPage(UserRepository $userRepository, SessionInterface $session, EntityManagerInterface $entityManager): Response
+    {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('login');
+        }
+        
+        // Get current user
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        if (!$user) {
+            return $this->render('dashVoyageurs/error.html.twig', [
+                'error' => 'User not found. Please log in again.'
+            ]);
+        }
+        
+        return $this->render('dashVoyageurs/profileVoyageursPage.html.twig', [
+            'user' => $user
+        ]);
+    }
+
+    #[Route('/profileVoyageursEdit', name: 'profileVoyageurs_edit')]
+    public function profileVoyageursEdit(UserRepository $userRepository, SessionInterface $session): Response
+    {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('login');
+        }
+        
+        // Get current user
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        if (!$user) {
+            return $this->render('dashVoyageurs/error.html.twig', [
+                'error' => 'User not found. Please log in again.'
+            ]);
+        }
+        
+        return $this->render('dashVoyageurs/profileVoyageursEdit.html.twig', [
+            'user' => $user
+        ]);
+    }
+
+    #[Route('/update-profile-image', name: 'update_profile_image_ajax', methods: ['POST'])]
+    public function updateProfileImage(Request $request, UserRepository $userRepository, 
+                                       SessionInterface $session, EntityManagerInterface $entityManager,
+                                       SluggerInterface $slugger): JsonResponse
+    {
+        try {
+            // Check if user is logged in
+            if (!$session->has('user_id')) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'You must be logged in to update your profile image.'
+                ], 401);
+            }
+            
+            // Get current user
+            $userId = $session->get('user_id');
+            $user = $userRepository->find($userId);
+            
+            if (!$user) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'User not found. Please log in again.'
+                ], 404);
+            }
+            
+            // Get uploaded file
+            $imageFile = $request->files->get('profile_image');
+            
+            if (!$imageFile) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'No image file provided.'
+                ], 400);
+            }
+            
+            // Validate file type
+            $mimeType = $imageFile->getMimeType();
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            
+            if (!in_array($mimeType, $allowedTypes)) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Invalid file type. Allowed types: JPG, PNG, GIF, WEBP.'
+                ], 400);
+            }
+            
+            // Validate file size (max 5MB)
+            if ($imageFile->getSize() > 5 * 1024 * 1024) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'File is too large. Maximum size is 5MB.'
+                ], 400);
+            }
+            
+            // Process the uploaded file
+            $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+            
+            // Move the file to the uploads directory
+            try {
+                // Use the absolute path to the images_users directory
+                $uploadsDirectory = 'C:/xampp/htdocs/images_users';
+                
+                // Make sure the directory exists
+                if (!file_exists($uploadsDirectory) && !is_dir($uploadsDirectory)) {
+                    mkdir($uploadsDirectory, 0755, true);
+                }
+                
+                // Delete old profile image if it exists and is not the default
+                $oldFilename = $user->getImagesU();
+                if ($oldFilename && $oldFilename !== 'default.jpg' && $oldFilename !== 'user-avatar.svg') {
+                    $oldFilePath = $uploadsDirectory . '/' . $oldFilename;
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+                }
+                
+                $imageFile->move($uploadsDirectory, $newFilename);
+                
+                // Copy the image to the public web directory to make it accessible
+                $publicDir = $this->getParameter('kernel.project_dir') . '/public/images_users';
+                if (!file_exists($publicDir) && !is_dir($publicDir)) {
+                    mkdir($publicDir, 0755, true);
+                }
+                
+                // Copy the file to public directory so it's accessible via web
+                if (file_exists($uploadsDirectory . '/' . $newFilename)) {
+                    copy($uploadsDirectory . '/' . $newFilename, $publicDir . '/' . $newFilename);
+                }
+                
+                // Update user profile image
+                $user->setImagesU($newFilename);
+                $entityManager->flush();
+                
+                return $this->json([
+                    'success' => true,
+                    'message' => 'Profile image updated successfully',
+                    'image_path' => '/images_users/' . $newFilename
+                ]);
+                
+            } catch (FileException $e) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Error uploading file: ' . $e->getMessage()
+                ], 500);
+            }
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'An error occurred: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Add this new method to serve user profile images
+    #[Route('/profile-image/{filename}', name: 'app_profile_image')]
+    public function serveProfileImage(string $filename): Response
+    {
+        // Check in public directory first (web accessible)
+        $publicImagesDir = $this->getParameter('kernel.project_dir') . '/public/images_users';
+        $filePath = $publicImagesDir . '/' . $filename;
+        
+        // If not in public directory, check the C:/xampp/htdocs/images_users directory
+        if (!file_exists($filePath)) {
+            $externalImagesDir = 'C:/xampp/htdocs/images_users';
+            $filePath = $externalImagesDir . '/' . $filename;
+        }
+        
+        // If still not found, check in public/images directory for default images
+        if (!file_exists($filePath)) {
+            $defaultImageDir = $this->getParameter('kernel.project_dir') . '/public/images';
+            $filePath = $defaultImageDir . '/user-avatar.svg';
+            
+            // If even the default image doesn't exist, try another default
+            if (!file_exists($filePath)) {
+                $filePath = $defaultImageDir . '/default.png';
+                
+                // If no defaults are found, throw 404
+                if (!file_exists($filePath)) {
+                    throw new NotFoundHttpException('Profile image not found');
+                }
+            }
+        }
+        
+        return new BinaryFileResponse($filePath);
     }
 }
 

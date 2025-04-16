@@ -519,11 +519,11 @@
           
           <div class="user-profile">
             <div class="user-info d-flex align-items-center">
-                <img src="{{ app.session.get('user_image') ? asset('uploads/users_images/' ~ app.session.get('user_image')) : asset('images/user-avatar.svg') }}" alt="{{ app.session.get('user_name') }}" class="user-img" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="{{ app.session.get('user_image') ? asset('images_users/' ~ app.session.get('user_image')) : asset('images/user-avatar.svg') }}" alt="{{ app.session.get('user_name') }}" class="user-img" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <span class="fs-sm fw-medium ms-2">{{ app.session.get('user_name') }}</span>
             </div>
             <div class="dropdown-menu" id="userMenu">
-              <a class="dropdown-item" href="#">Profile</a>
+              <a class="dropdown-item" href="{{ path('profileVoyageurs_page') }}">Profile</a>
               <a class="dropdown-item" href="#">Settings</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{{ path('app_logout') }}">Se déconnecter</a>
@@ -700,5 +700,8 @@
       }
     });
   </script>
+  
+  <!-- Bootstrap 5 JavaScript Bundle (Popper.js included) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 </html>

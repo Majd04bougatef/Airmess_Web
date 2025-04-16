@@ -67,7 +67,13 @@ class GoogleController extends AbstractController
             $existingUser = $this->userRepository->findOneBy(['email' => $email]);
             
             if ($existingUser) {
-                // User exists - log them in
+                // Check if user account is active
+                if ($existingUser->getStatut() === 'inactif') {
+                    $this->addFlash('error', 'Votre compte a été désactivé. Veuillez contacter un administrateur pour le réactiver.');
+                    return $this->redirectToRoute('login');
+                }
+                
+                // User exists and is active - log them in
                 $request->getSession()->set('user_id', $existingUser->getIdU());
                 $request->getSession()->set('user_role', $existingUser->getRoleUser());
                 $request->getSession()->set('user_name', $existingUser->getName() . ($existingUser->getPrenom() ? ' ' . $existingUser->getPrenom() : ''));
@@ -105,7 +111,7 @@ class GoogleController extends AbstractController
                 $newUser->setRoleUser('Voyageurs'); // Default role
                 $newUser->setPassword('google_oauth_no_password'); // Placeholder password
                 $newUser->setPhoneNumber('00000000'); // Placeholder phone
-                $newUser->setStatut('active');
+                $newUser->setStatut('actif');
                 $newUser->setDiamond(0);
                 $newUser->setDeleteFlag(0);
                 $newUser->setDateNaiss(new \DateTime());
