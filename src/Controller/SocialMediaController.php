@@ -501,8 +501,8 @@ class SocialMediaController extends AbstractController
                 
                 $this->addFlash('success', 'Publication supprimée avec succès !');
                 
-                // Redirect to index
-                return $this->redirectToRoute('app_social_media_index');
+                // Redirect to socialVoyageurs_page instead of app_social_media_index
+                return $this->redirectToRoute('socialVoyageurs_page');
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Erreur lors de la suppression: ' . $e->getMessage());
             }
