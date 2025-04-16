@@ -197,26 +197,54 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_reservation_transport_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ReservationTransport $reservationTransport, EntityManagerInterface $entityManager,StationRepository $stationRepository): Response
+    public function edit(Request $request, ReservationTransport $reservationTransport, EntityManagerInterface $entityManager, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        // Check if the user is the owner of the reservation
+        if ($reservationTransport->getUser()->getIdU() !== $user->getIdU()) {
+            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier cette réservation.');
+        }
+
+        $station = $stationRepository->find($reservationTransport->getStation()->getIdS());
+        
+        // Calculate current duration and price
+        $interval = $reservationTransport->getDateRes()->diff($reservationTransport->getDateFin());
+        $currentHeures = $interval->h + ($interval->days * 24);
+        $currentPrix = $station->getPrixHeure() * $currentHeures * $reservationTransport->getNombreVelo();
+
         $form = $this->createForm(ReservationTransportType::class, $reservationTransport);
         $form->handleRequest($request);
 
-        $station = $stationRepository->find($reservationTransport->getStation()->getIdS());
-
         if ($form->isSubmitted() && $form->isValid()) {
+            // Calculate new duration and price
+            $newInterval = $reservationTransport->getDateRes()->diff($reservationTransport->getDateFin());
+            $newHeures = $newInterval->h + ($newInterval->days * 24);
+            $newPrix = $station->getPrixHeure() * $newHeures * $reservationTransport->getNombreVelo();
+            
+            // Update the price
+            $reservationTransport->setPrix($newPrix);
+            
+            // Save changes
             $entityManager->flush();
 
+            $this->addFlash('success', 'La réservation a été mise à jour avec succès.');
             return $this->redirectToRoute('app_reservation_transport_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('reservation_transport/edit.html.twig', [
             'reservation_transport' => $reservationTransport,
             'form' => $form,
-            'idS' => $station->getIdS(),
-            'nom' => $station->getNom(),
-            'prix' => $station->getPrixHeure(),
-            'nombreVelo' => $station->getNombreVelo(),
+            'station' => $station,
+            'currentHeures' => $currentHeures,
+            'currentPrix' => $currentPrix,
         ]);
     }
 

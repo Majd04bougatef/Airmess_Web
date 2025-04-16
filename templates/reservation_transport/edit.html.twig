@@ -1,57 +1,310 @@
-{% extends 'base.html.twig' %}
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
 
-{% block title %}Modifier une Offre{% endblock %}
+{% block title %}Modifier la réservation{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .reservation-edit {
+        padding: 2rem 0;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+        border-radius: 15px;
+        color: white;
+        box-shadow: 0 4px 20px rgba(94, 114, 228, 0.2);
+    }
+
+    .page-header h3 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 600;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        height: 100%;
+        transition: transform 0.2s;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .info-card .card-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        background: transparent;
+    }
+
+    .info-card .card-header h5 {
+        color: #344767;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .info-card .card-body {
+        padding: 1.25rem;
+    }
+
+    .info-card .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .info-card .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-item .info-label {
+        color: #8898aa;
+        font-size: 0.875rem;
+        min-width: 140px;
+    }
+
+    .info-item .info-value {
+        color: #344767;
+        font-weight: 600;
+        margin-left: 1rem;
+    }
+
+    .edit-form {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        margin-top: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        border-color: #5e72e4;
+        box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.15);
+    }
+
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(94, 114, 228, 0.3);
+    }
+
+    .btn-secondary {
+        background: #f6f9fc;
+        color: #8898aa;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background: #e9ecef;
+        color: #344767;
+    }
+
+    .price-alert {
+        padding: 1rem;
+        background: #fff8f0;
+        border-radius: 10px;
+        margin-top: 1rem;
+        border-left: 4px solid #ffa41b;
+        display: none;
+    }
+
+    .price-alert.show {
+        display: block;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    <h1>Modifier l'Offre</h1>
-
-    {{ form_start(form) }}
-        {{ form_errors(form) }}
-
-        <div>
-            {{ form_label(form.place) }}
-            {{ form_widget(form.place) }}
-            {{ form_errors(form.place) }}
+<div class="reservation-edit">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h3>Modifier la réservation</h3>
         </div>
 
-        <div>
-            {{ form_label(form.priceInit) }}
-            {{ form_widget(form.priceInit) }}
-            {{ form_errors(form.priceInit) }}
+        <div class="row g-4">
+            <!-- Station Info Card -->
+            <div class="col-md-6">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-map-marker-alt me-2"></i>Informations de la station</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">Nom de la station</span>
+                            <span class="info-value">{{ station.nom }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Prix par heure</span>
+                            <span class="info-value">{{ station.prixHeure }} DT</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Vélos disponibles</span>
+                            <span class="info-value">{{ station.nombreVelo }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reservation Details Card -->
+            <div class="col-md-6">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle me-2"></i>Détails de la réservation</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">Référence</span>
+                            <span class="info-value">{{ reservation_transport.reference }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Durée actuelle</span>
+                            <span class="info-value">{{ currentHeures }} heures</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Prix actuel</span>
+                            <span class="info-value">{{ currentPrix }} DT</span>
+                        </div>
+                        <div id="newPrice" class="price-alert">
+                            <i class="fas fa-calculator me-2"></i>
+                            <strong>Nouveau prix estimé:</strong> <span></span> DT
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="col-12">
+                <div class="edit-form">
+                    {{ form_start(form, {'attr': {'class': 'modern-form'}}) }}
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.dateRes, 'Date de début', {'label_attr': {'class': 'form-label'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                    {{ form_widget(form.dateRes, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.dateFin, 'Date de fin', {'label_attr': {'class': 'form-label'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                    {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.nombreVelo, 'Nombre de vélos', {'label_attr': {'class': 'form-label'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-bicycle"></i></span>
+                                    {{ form_widget(form.nombreVelo, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions mt-4">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                        </button>
+                        <a href="{{ path('app_reservation_transport_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
         </div>
+    </div>
+</div>
+{% endblock %}
 
-        <div>
-            {{ form_label(form.priceAfter) }}
-            {{ form_widget(form.priceAfter) }}
-            {{ form_errors(form.priceAfter) }}
-        </div>
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateResInput = document.getElementById('reservation_transport_dateRes');
+        const dateFinInput = document.getElementById('reservation_transport_dateFin');
+        const nombreVeloInput = document.getElementById('reservation_transport_nombreVelo');
+        const prixParHeure = {{ station.prixHeure }};
+        const newPriceElement = document.getElementById('newPrice');
+        const newPriceSpan = newPriceElement.querySelector('span');
 
-        <div>
-            {{ form_label(form.startDate) }}
-            {{ form_widget(form.startDate) }}
-            {{ form_errors(form.startDate) }}
-        </div>
+        function calculatePrice() {
+            const dateRes = new Date(dateResInput.value);
+            const dateFin = new Date(dateFinInput.value);
+            const nombreVelo = parseInt(nombreVeloInput.value);
 
-        <div>
-            {{ form_label(form.endDate) }}
-            {{ form_widget(form.endDate) }}
-            {{ form_errors(form.endDate) }}
-        </div>
+            if (dateRes && dateFin && !isNaN(nombreVelo)) {
+                const diffTime = Math.abs(dateFin - dateRes);
+                const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+                const totalPrice = diffHours * prixParHeure * nombreVelo;
 
-        <div>
-            {{ form_label(form.description) }}
-            {{ form_widget(form.description) }}
-            {{ form_errors(form.description) }}
-        </div>
+                newPriceSpan.textContent = totalPrice.toFixed(2);
+                newPriceElement.classList.add('show');
+            }
+        }
 
-        <div>
-            {{ form_label(form.imagePath) }}
-            {{ form_widget(form.imagePath) }}
-            {{ form_errors(form.imagePath) }}
-        </div>
-
-        <button type="submit">Enregistrer les modifications</button>
-    {{ form_end(form) }}
-
-    <a href="{{ path('app_offre_index') }}">Retour à la liste</a>
+        dateResInput.addEventListener('change', calculatePrice);
+        dateFinInput.addEventListener('change', calculatePrice);
+        nombreVeloInput.addEventListener('change', calculatePrice);
+    });
+</script>
 {% endblock %}
