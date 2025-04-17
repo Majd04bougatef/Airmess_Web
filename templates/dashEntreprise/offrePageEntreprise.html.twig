@@ -9,10 +9,16 @@
       <div class="card mb-4">
         <div class="card-header pb-0 d-flex justify-content-between align-items-center">
           <h6>Gestion des Offres</h6>
-          <!-- Bouton pour ouvrir le modal -->
-          <button type="button" class="btn btn-primary">
-            <a href="{{ path('app_offre_new') }}" style="color: white; text-decoration: none;">Nouvelle Offre</a>
-          </button>
+          <div>
+            <!-- Bouton pour voir les réservations -->
+            <a href="{{ path('reservations_offres_page') }}" class="btn me-2" style="background: linear-gradient(135deg, #3C8CE7 0%, #00EAFF 100%); color: white; border: none; box-shadow: 0 10px 20px rgba(0, 234, 255, 0.2); transition: all 0.3s ease; border-radius: 8px; padding: 10px 16px; font-weight: 600; letter-spacing: 0.5px;">
+              <i class="fas fa-calendar-check me-2"></i> Voir les Réservations
+            </a>
+            <!-- Bouton pour ouvrir le modal -->
+            <button type="button" class="btn btn-primary">
+              <a href="{{ path('app_offre_new') }}" style="color: white; text-decoration: none;">Nouvelle Offre</a>
+            </button>
+          </div>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-4">
@@ -20,13 +26,14 @@
               <thead>
                 <tr>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Image</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Titre</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lieu</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix Initial</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix Après Réduction</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de Début</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de Fin</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre Limite</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+                  
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                 </tr>
@@ -34,12 +41,22 @@
               <tbody>
                 {% for offre in offres %}
                   <tr>
+                    <td class="p-2">
+                      <div class="d-flex align-items-center justify-content-center">
+                        <div style="width: 100px; height: 70px; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                          {% if offre.imagePath %}
+                            <img src="{{ 'http://localhost/imageOffre/' ~ offre.imagePath }}" alt="Image de l'offre" 
+                               style="width: 100%; height: 100%; object-fit: cover;">
+                          {% else %}
+                            <div class="d-flex align-items-center justify-content-center bg-light" style="width: 100%; height: 100%;">
+                              <i class="fas fa-image text-secondary" style="font-size: 1.5rem;"></i>
+                            </div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
                     <td>
-                      {% if offre.imagePath %}
-                        <img src="{{ asset(offre.imagePath) }}" alt="Image de l'offre" class="img-fluid" style="max-width: 100px; max-height: 100px;">
-                      {% else %}
-                        <p class="text-xs font-weight-bold mb-0">Aucune image</p>
-                      {% endif %}
+                      <p class="text-xs font-weight-bold mb-0">{{ offre.description }}</p>
                     </td>
                     <td>
                       <p class="text-xs font-weight-bold mb-0">{{ offre.place }}</p>
@@ -58,9 +75,6 @@
                     </td>
                     <td>
                       <p class="text-xs font-weight-bold mb-0">{{ offre.numberLimit }}</p>
-                    </td>
-                    <td>
-                      <p class="text-xs font-weight-bold mb-0">{{ offre.description }}</p>
                     </td>
                     <td class="align-middle">
                       <span class="badge {% if offre.statusoff.value == 'Confirmé' %}bg-success{% elseif offre.statusoff.value == 'Rejeté' %}bg-danger{% else %}bg-warning{% endif %}">

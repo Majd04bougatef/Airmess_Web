@@ -2,10 +2,10 @@
 // src/Entity/Reservation.php
 namespace App\Entity;
 
-use App\Enum\PaymentMode;
 use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 class Reservation
@@ -15,21 +15,25 @@ class Reservation
     #[ORM\Column(name: 'idR', type: 'integer')]
     private ?int $idR = null;
 
-    #[ORM\ManyToOne(targetEntity: Offre::class)]
-    #[ORM\JoinColumn(name: 'idO', referencedColumnName: 'idO')]
+    #[ORM\ManyToOne(inversedBy: 'reservations')]
+    #[ORM\JoinColumn(name: 'idO', referencedColumnName: 'idO', nullable: false)]
+    #[Assert\NotNull(message: 'L\'offre est obligatoire.')]
     private ?Offre $offre = null;
 
+    #[Assert\NotBlank(message: 'La date de réservation est obligatoire.')]
+    #[Assert\Type(
+        type: \DateTimeInterface::class,
+        message: 'La date de réservation doit être une date valide.'
+    )]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTimeInterface $dateRes;
 
-    #[ORM\Column(type: Types::STRING, enumType: PaymentMode::class)]
-    private PaymentMode $modePaiement;
+    #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]
+    private ?string $modePaiement = 'carte';
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'id_U', referencedColumnName: 'id_U')]
+    #[ORM\JoinColumn(name: 'id_U', referencedColumnName: 'id_U', nullable: true)]
     private ?User $user = null;
-
-    // Getters/setters...
 
     public function getIdR(): ?int
     {
@@ -48,12 +52,12 @@ class Reservation
         return $this;
     }
 
-    public function getModePaiement(): ?PaymentMode
+    public function getModePaiement(): ?string
     {
         return $this->modePaiement;
     }
 
-    public function setModePaiement(PaymentMode $modePaiement): static
+    public function setModePaiement(?string $modePaiement): static
     {
         $this->modePaiement = $modePaiement;
 
@@ -84,3 +88,4 @@ class Reservation
         return $this;
     }
 }
+

@@ -1,13 +1,296 @@
-{% extends 'base.html.twig' %}
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
 
-{% block title %}Edit Reservation{% endblock %}
+{% block title %}Modifier ma réservation{% endblock %}
 
 {% block body %}
-    <h1>Edit Reservation</h1>
+<style>
+    .edit-reservation-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .edit-header {
+        padding: 1.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+        color: #67748e;
+        font-size: 1rem;
+    }
+    
+    .reservation-form-card {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .form-header {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-bottom: 1px solid #eaecf0;
+    }
+    
+    .form-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #344767;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-title i {
+        margin-right: 10px;
+        color: #5e72e4;
+    }
+    
+    .form-body {
+        padding: 2rem;
+    }
+    
+    .offer-summary {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    
+    .offer-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        object-fit: cover;
+        margin-right: 1rem;
+    }
+    
+    .offer-details {
+        flex-grow: 1;
+    }
+    
+    .offer-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 0.25rem;
+    }
+    
+    .offer-location {
+        font-size: 0.9rem;
+        color: #67748e;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .offer-location i {
+        margin-right: 5px;
+        color: #5e72e4;
+    }
+    
+    .offer-dates {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.85rem;
+        color: #67748e;
+    }
+    
+    .offer-date {
+        display: flex;
+        align-items: center;
+    }
+    
+    .offer-date i {
+        margin-right: 5px;
+        color: #5e72e4;
+    }
+    
+    .offer-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2dce89;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #e9ecef;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+    }
+    
+    .form-control:focus {
+        color: #495057;
+        background-color: #fff;
+        border-color: #5e72e4;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.65rem 1.5rem;
+        border-radius: 7px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    
+    .btn i {
+        margin-right: 0.5rem;
+    }
+    
+    .btn-primary {
+        background-color: #5e72e4;
+        border: 1px solid #5e72e4;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: #324cdd;
+        border-color: #324cdd;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(94, 114, 228, 0.1);
+    }
+    
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid #cbd5e1;
+        color: #344767;
+    }
+    
+    .btn-outline:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+        background-color: #fb6340;
+        border: 1px solid #fb6340;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background-color: #ea4c2d;
+        border-color: #ea4c2d;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(251, 99, 64, 0.1);
+    }
+</style>
 
-    {{ include('reservation/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_reservation_index') }}">back to list</a>
-
-    {{ include('reservation/_delete_form.html.twig') }}
+<div class="container-fluid py-4">
+    <div class="edit-reservation-container">
+        <div class="edit-header">
+            <h2 class="page-title">Modifier ma réservation</h2>
+            <p class="page-subtitle">Modifiez les détails de votre réservation</p>
+        </div>
+        
+        <div class="reservation-form-card">
+            <div class="form-header">
+                <h3 class="form-title"><i class="fas fa-edit"></i> Formulaire de modification</h3>
+            </div>
+            
+            <div class="form-body">
+                <!-- Résumé de l'offre -->
+                <div class="offer-summary">
+                    <img src="{{ 'http://localhost/imageOffre/' ~ (reservation.offre.imagePath ?: 'default-offer.jpg') }}" alt="Image de l'offre" class="offer-image">
+                    
+                    <div class="offer-details">
+                        <h4 class="offer-title">{{ reservation.offre.description }}</h4>
+                        <div class="offer-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ reservation.offre.place }}</span>
+                        </div>
+                        <div class="offer-dates">
+                            <div class="offer-date">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Du: {{ reservation.offre.startDate|date('d/m/Y') }}</span>
+                            </div>
+                            <div class="offer-date">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Au: {{ reservation.offre.endDate|date('d/m/Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="offer-price">
+                        {{ reservation.offre.priceAfter }}€
+                    </div>
+                </div>
+                
+                <!-- Formulaire -->
+                {{ form_start(form, {'attr': {'class': 'reservation-edit-form'}}) }}
+                    <div class="form-group">
+                        {{ form_label(form.dateRes) }}
+                        {{ form_widget(form.dateRes, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.dateRes) }}
+                    </div>
+                    
+                    <div class="form-actions">
+                        <div class="action-left">
+                            <a href="{{ path('app_reservation_index') }}" class="btn btn-outline">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                        </div>
+                        
+                        <div class="action-right">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                {{ form_end(form) }}
+                
+                <div class="mt-4">
+                    <form method="post" action="{{ path('app_reservation_delete', {'idR': reservation.idR}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.idR) }}">
+                        <button class="btn btn-danger">
+                            <i class="fas fa-times"></i> Annuler la réservation
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

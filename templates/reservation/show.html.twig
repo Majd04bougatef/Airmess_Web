@@ -1,30 +1,264 @@
-{% extends 'base.html.twig' %}
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
 
-{% block title %}Reservation{% endblock %}
+{% block title %}Détails de la Réservation{% endblock %}
 
 {% block body %}
-    <h1>Reservation</h1>
+<style>
+    .reservation-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .reservation-header {
+        padding: 1.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+        color: #67748e;
+        font-size: 1rem;
+    }
+    
+    .reservation-card {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .reservation-image {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+    }
+    
+    .reservation-details {
+        padding: 2rem;
+    }
+    
+    .reservation-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #344767;
+        margin-bottom: 1rem;
+    }
+    
+    .info-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eaecf0;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .info-item {
+        margin-bottom: 1rem;
+    }
+    
+    .info-label {
+        font-size: 0.875rem;
+        color: #67748e;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+    
+    .info-value {
+        font-size: 1rem;
+        color: #344767;
+        font-weight: 600;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.65rem 1.5rem;
+        border-radius: 7px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    
+    .btn i {
+        margin-right: 0.5rem;
+    }
+    
+    .btn-primary {
+        background-color: #5e72e4;
+        border-color: #5e72e4;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: #324cdd;
+        border-color: #324cdd;
+    }
+    
+    .btn-success {
+        background-color: #2dce89;
+        border-color: #2dce89;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background-color: #24a46d;
+        border-color: #24a46d;
+    }
+    
+    .btn-danger {
+        background-color: #fb6340;
+        border-color: #fb6340;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background-color: #ea4c2d;
+        border-color: #ea4c2d;
+    }
+    
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>IdR</th>
-                <td>{{ reservation.idR }}</td>
-            </tr>
-            <tr>
-                <th>DateRes</th>
-                <td>{{ reservation.dateRes ? reservation.dateRes|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>ModePaiement</th>
-                <td>{{ reservation.modePaiement }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_reservation_index') }}">back to list</a>
-
-    <a href="{{ path('app_reservation_edit', {'idR': reservation.idR}) }}">edit</a>
-
-    {{ include('reservation/_delete_form.html.twig') }}
+<div class="container-fluid py-4">
+    <div class="reservation-container">
+        <div class="reservation-header">
+            <h2 class="page-title">Détails de la Réservation</h2>
+            <p class="page-subtitle">Informations complètes sur votre réservation</p>
+        </div>
+        
+        <div class="reservation-card">
+            <img src="{{ 'http://localhost/imageOffre/' ~ (reservation.offre.imagePath ?: 'default-offer.jpg') }}" alt="Image de l'offre" class="reservation-image">
+            
+            <div class="reservation-details">
+                <h3 class="reservation-title">{{ reservation.offre.description }}</h3>
+                
+                <div class="info-section">
+                    <h4 class="section-title">Informations sur l'offre</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Lieu</div>
+                            <div class="info-value">{{ reservation.offre.place }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Entreprise</div>
+                            <div class="info-value">{% if reservation.offre.user is not null %}{{ reservation.offre.user.username }}{% else %}Entreprise non spécifiée{% endif %}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Date de début</div>
+                            <div class="info-value">{{ reservation.offre.startDate|date('d/m/Y') }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Date de fin</div>
+                            <div class="info-value">{{ reservation.offre.endDate|date('d/m/Y') }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Prix</div>
+                            <div class="info-value">{{ reservation.offre.priceAfter }} €</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Limite de participants</div>
+                            <div class="info-value">{{ reservation.offre.numberLimit }} personnes</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Statut</div>
+                            <div class="info-value">
+                                <span class="badge {% if reservation.offre.statusoff.value == 'Confirmé' %}bg-success{% elseif reservation.offre.statusoff.value == 'Rejeté' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ reservation.offre.statusoff.value }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h4 class="section-title">Détails de la réservation</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Référence</div>
+                            <div class="info-value">{{ reservation.idR }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Date de réservation</div>
+                            <div class="info-value">{{ reservation.dateRes ? reservation.dateRes|date('d/m/Y à H:i') : 'Non définie' }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Mode de paiement</div>
+                            <div class="info-value">Non défini</div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if reservation.offre.description %}
+                <div class="info-section">
+                    <h4 class="section-title">Description de l'offre</h4>
+                    <p>{{ reservation.offre.description|nl2br }}</p>
+                </div>
+                {% endif %}
+                
+                <div class="action-buttons">
+                    <a href="{{ path('app_reservation_index') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                    
+                    <a href="{{ path('app_reservation_edit', {'idR': reservation.idR}) }}" class="btn btn-success">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    
+                    <form method="post" action="{{ path('app_reservation_delete', {'idR': reservation.idR}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation?');" style="display: inline-block;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.idR) }}">
+                        <button class="btn btn-danger">
+                            <i class="fas fa-times"></i> Annuler la réservation
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -27,20 +27,43 @@ class ReservationController extends AbstractController
     #[Route('/new/{idO}', name: 'app_reservation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, Offre $offre): Response
     {
+        // Vérifier s'il reste des places disponibles
+        if ($offre->getNumberLimit() <= 0) {
+            $this->addFlash('error', 'Cette offre ne dispose plus de places disponibles.');
+            return $this->redirectToRoute('offreVoyageurs_page');
+        }
+
         $reservation = new Reservation();
         $reservation->setOffre($offre);
-        $reservation->setUser($this->getUser()); // Utilisateur connecté
+        
+        // Si l'utilisateur est connecté, l'associer à la réservation, sinon continuer sans utilisateur
+        if ($this->getUser()) {
+            $reservation->setUser($this->getUser());
+        }
 
         $form = $this->createForm(\App\Form\ReservationType::class, $reservation);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $reservation->setDateRes(new \DateTime()); // Date actuelle si nécessaire
-            $entityManager->persist($reservation);
-            $entityManager->flush();
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $reservation->setDateRes(new \DateTime()); // Date actuelle si nécessaire
+                
+                // Décrémenter le nombre de places disponibles
+                $offre->setNumberLimit($offre->getNumberLimit() - 1);
+                
+                $entityManager->persist($reservation);
+                $entityManager->persist($offre);
+                $entityManager->flush();
 
-            // Rediriger vers la phase suivante (par exemple, récapitulatif)
-            return $this->redirectToRoute('app_reservation_recap', ['idR' => $reservation->getIdR()]);
+                $this->addFlash('success', 'Votre réservation a été créée avec succès !');
+                // Rediriger vers la phase suivante (par exemple, récapitulatif)
+                return $this->redirectToRoute('app_reservation_recap', ['idR' => $reservation->getIdR()]);
+            } else {
+                // Ajouter des messages flash pour les erreurs de validation
+                foreach ($form->getErrors(true) as $error) {
+                    $this->addFlash('error', $error->getMessage());
+                }
+            }
         }
 
         return $this->render('reservation/new.html.twig', [
@@ -79,8 +102,21 @@ class ReservationController extends AbstractController
     public function delete(Request $request, Reservation $reservation, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$reservation->getIdR(), $request->getPayload()->getString('_token'))) {
+            // Récupérer l'offre associée avant de supprimer la réservation
+            $offre = $reservation->getOffre();
+            
+            // Supprimer la réservation
             $entityManager->remove($reservation);
+            
+            // Incrémenter le nombre de places disponibles
+            if ($offre) {
+                $offre->setNumberLimit($offre->getNumberLimit() + 1);
+                $entityManager->persist($offre);
+            }
+            
             $entityManager->flush();
+            
+            $this->addFlash('success', 'Votre réservation a été annulée avec succès.');
         }
 
         return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);

@@ -1,0 +1,205 @@
+<style>
+    /* Styles de base pour les erreurs */
+    .form-error {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        background-color: rgba(220, 53, 69, 0.1);
+        display: block;
+        font-weight: 500;
+        border-left: 3px solid #dc3545;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    /* Animation d'apparition des erreurs */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Styles pour les champs invalides */
+    .form-control.is-invalid,
+    .form-check-input.is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15) !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    /* Focus sur champs invalides */
+    .form-control.is-invalid:focus {
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+    }
+    
+    /* Marquage des libellés obligatoires */
+    .form-label.required:after,
+    .form-check-label.required:after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    /* Icône pour les erreurs */
+    .field-error-icon {
+        color: #dc3545;
+        margin-right: 0.5rem;
+    }
+    
+    /* Animation de secousse pour les erreurs */
+    .error-shake {
+        animation: errorShake 0.5s;
+    }
+    
+    @keyframes errorShake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    /* Styles pour les messages d'aide */
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+        font-style: italic;
+    }
+    
+    /* Améliorations pour les form-groups */
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    /* Style de focus amélioré */
+    .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    /* Style pour les champs obligatoires */
+    .form-control[required] {
+        background-color: #fff8f8;
+    }
+    
+    /* Style pour groupes de formulaires */
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .form-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #495057;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajouter la classe "required" aux labels des champs obligatoires
+        const requiredInputs = document.querySelectorAll('input[required], textarea[required], select[required]');
+        requiredInputs.forEach(function(input) {
+            const formGroup = input.closest('.form-group');
+            if (formGroup) {
+                const label = formGroup.querySelector('.form-label');
+                if (label) {
+                    label.classList.add('required');
+                }
+            }
+        });
+        
+        // Améliorer l'affichage des textes d'aide
+        const helpTexts = document.querySelectorAll('.form-text, [class*="help-text"], small');
+        helpTexts.forEach(function(helpText) {
+            if (!helpText.classList.contains('text-danger') && !helpText.classList.contains('form-error')) {
+                helpText.classList.add('form-text');
+                // Ajouter une icône d'information
+                helpText.innerHTML = '<i class="bi bi-info-circle me-1"></i>' + helpText.innerHTML;
+            }
+        });
+        
+        // Valider les formulaires à la soumission
+        const forms = document.querySelectorAll('form');
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                let isValid = true;
+                let firstInvalidField = null;
+                
+                // Vérifier tous les champs obligatoires
+                const requiredFields = form.querySelectorAll('[required]');
+                requiredFields.forEach(function(field) {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('is-invalid');
+                        field.classList.add('error-shake');
+                        
+                        if (!firstInvalidField) {
+                            firstInvalidField = field;
+                        }
+                        
+                        // Créer un message d'erreur s'il n'existe pas déjà
+                        let errorMessage = field.nextElementSibling;
+                        if (!errorMessage || !errorMessage.classList.contains('form-error')) {
+                            errorMessage = document.createElement('div');
+                            errorMessage.classList.add('form-error');
+                            errorMessage.innerHTML = '<i class="bi bi-exclamation-circle field-error-icon"></i>' + 
+                                (field.dataset.errorMessage || 'Ce champ est obligatoire.');
+                            field.parentNode.insertBefore(errorMessage, field.nextSibling);
+                        }
+                    }
+                });
+                
+                // Faire défiler jusqu'au premier champ en erreur
+                if (!isValid && firstInvalidField) {
+                    event.preventDefault();
+                    setTimeout(function() {
+                        firstInvalidField.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center'
+                        });
+                        firstInvalidField.focus();
+                    }, 100);
+                }
+            });
+            
+            // Réinitialiser les erreurs quand l'utilisateur corrige les champs
+            form.querySelectorAll('input, textarea, select').forEach(function(field) {
+                field.addEventListener('input', function() {
+                    if (field.value.trim()) {
+                        field.classList.remove('is-invalid');
+                        field.classList.remove('error-shake');
+                        
+                        // Supprimer le message d'erreur s'il existe
+                        const errorMessage = field.nextElementSibling;
+                        if (errorMessage && errorMessage.classList.contains('form-error')) {
+                            errorMessage.remove();
+                        }
+                    }
+                });
+                
+                // Effet de focus amélioré
+                field.addEventListener('focus', function() {
+                    const formGroup = field.closest('.form-group');
+                    if (formGroup) {
+                        formGroup.classList.add('focused');
+                    }
+                });
+                
+                field.addEventListener('blur', function() {
+                    const formGroup = field.closest('.form-group');
+                    if (formGroup) {
+                        formGroup.classList.remove('focused');
+                    }
+                });
+            });
+        });
+    });
+</script> 
