@@ -54,7 +54,7 @@
                   <tr>
                     <td>
                       {% if offre.imagePath %}
-                        <img src="{{ asset(offre.imagePath) }}" alt="Image de l'offre" class="img-fluid" style="max-width: 100px; max-height: 100px;">
+                        <img src="{{ 'http://localhost/imageOffre/' ~ offre.imagePath }}" alt="Image de l'offre" class="img-fluid" style="max-width: 100px; max-height: 100px;">
                       {% else %}
                         <p class="text-xs font-weight-bold mb-0">Aucune image</p>
                       {% endif %}
