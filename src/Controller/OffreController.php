@@ -31,11 +31,13 @@ final class OffreController extends AbstractController
         ]);
     }
 
-    #[Route('/offre/new', name: 'app_offre_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'app_offre_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $offre = new Offre();
-        $form = $this->createForm(OffreType::class, $offre);
+        $form = $this->createForm(OffreType::class, $offre, [
+            'is_edit' => false,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -87,80 +89,22 @@ final class OffreController extends AbstractController
         ]);
     }
 
-    #[Route('/offre/{idO}/edit', name: 'app_offre_edit', methods: ['GET', 'POST'])]
+    #[Route('/{idO}/edit', name: 'app_offre_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Offre $offre, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
-        // Afficher les valeurs initiales pour le débogage
-        $this->addFlash('info', 'Valeurs initiales: Titre=' . $offre->getDescription() . 
-                       ', Prix=' . $offre->getPriceInit() . 
-                       ', Statut=' . $offre->getStatusoff()->value);
-
-        // Création d'une version modifiée du formulaire OffreType avec l'image non requise
-        $form = $this->createFormBuilder($offre)
-            ->add('description', null, ['label' => 'Titre'])
-            ->add('place', null, ['label' => 'Lieu'])
-            ->add('priceInit', null, ['label' => 'Prix Initial'])
-            ->add('priceAfter', null, ['label' => 'Prix Après Réduction'])
-            ->add('startDate', DateTimeType::class, [
-                'label' => 'Date de Début',
-                'widget' => 'single_text',
-                'html5' => true,
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('endDate', DateTimeType::class, [
-                'label' => 'Date de Fin',
-                'widget' => 'single_text',
-                'html5' => true,
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('numberLimit', null, ['label' => 'Nombre Limite'])
-            ->add('aidesc', null, ['label' => 'Aide Description'])
-            ->add('statusoff', ChoiceType::class, [
-                'choices' => [
-                    'En attente' => OffreStatus::EN_ATTENTE,
-                    'Confirmé' => OffreStatus::CONFIRME,
-                    'Rejeté' => OffreStatus::REJETE,
-                ],
-                'label' => 'Statut de l\'offre',
-                'attr' => ['class' => 'form-control'],
-            ])
-            ->add('imageFile', FileType::class, [
-                'label' => 'Image de l\'offre',
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'accept' => 'image/jpeg, image/jpg, image/png, image/webp'
-                ],
-                'constraints' => [
-                    new File([
-                        'maxSize' => '5M',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/jpg',
-                            'image/png',
-                            'image/webp'
-                        ],
-                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPG, PNG, WEBP)',
-                    ])
-                ],
-                'help' => 'Laissez vide pour conserver l\'image actuelle'
-            ])
-            ->getForm();
-            
-        // Afficher des informations sur la méthode et la soumission du formulaire
-        $this->addFlash('info', 'Méthode HTTP: ' . $request->getMethod());
+        // Création du formulaire en utilisant OffreType pour maintenir la cohérence
+        $form = $this->createForm(OffreType::class, $offre, [
+            'validation_groups' => ['edit'],
+            'is_edit' => true,
+        ]);
         
+        // Gestion de la requête
         $form->handleRequest($request);
 
         // Vérifier si le formulaire est soumis
         if ($form->isSubmitted()) {
-            $this->addFlash('info', 'Formulaire soumis');
-            
-            // Vérifier si le formulaire est valide
+            // Afficher si le formulaire est valide
             if ($form->isValid()) {
-                $this->addFlash('info', 'Formulaire valide');
-                
                 // Gestion du téléchargement de l'image
                 $imageFile = $form->get('imageFile')->getData();
                 
@@ -194,14 +138,12 @@ final class OffreController extends AbstractController
                     }
                 }
                 
-                // Debug - Afficher les données de l'offre avant la sauvegarde
-                $this->addFlash('info', 'Données reçues: Titre=' . $offre->getDescription() . 
-                               ', Prix=' . $offre->getPriceInit() . 
-                               ', Statut=' . $offre->getStatusoff()->value);
-                
                 try {
+                    // Debug des données avant sauvegarde
+                    $this->addFlash('info', sprintf('Prix initial: %s, Prix après: %s', 
+                        $offre->getPriceInit(), $offre->getPriceAfter()));
+                    
                     // Enregistre les modifications dans la base de données
-                    $entityManager->persist($offre);
                     $entityManager->flush();
                     
                     // Ajoute un message de succès
@@ -227,7 +169,7 @@ final class OffreController extends AbstractController
         ]);
     }
 
-    #[Route('/offre/{idO}/delete', name: 'app_offre_delete', methods: ['POST'])]
+    #[Route('/{idO}/delete', name: 'app_offre_delete', methods: ['POST'])]
     public function delete(Request $request, Offre $offre, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $offre->getIdO(), $request->request->get('_token'))) {
@@ -246,7 +188,7 @@ final class OffreController extends AbstractController
         return $this->redirectToRoute('offreEntreprise_page');
     }
 
-    #[Route('/offre/{idO}/confirm', name: 'app_offre_confirm', methods: ['POST'])]
+    #[Route('/{idO}/confirm', name: 'app_offre_confirm', methods: ['POST'])]
     public function confirm(Request $request, Offre $offre, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('confirm' . $offre->getIdO(), $request->request->get('_token'))) {
@@ -256,10 +198,10 @@ final class OffreController extends AbstractController
             $this->addFlash('success', 'Offre confirmée avec succès.');
         }
 
-        return $this->redirectToRoute('app_offre_page');
+        return $this->redirectToRoute('offreEntreprise_page');
     }
 
-    #[Route('/offre/{idO}/reject', name: 'app_offre_reject', methods: ['POST'])]
+    #[Route('/{idO}/reject', name: 'app_offre_reject', methods: ['POST'])]
     public function reject(Request $request, Offre $offre, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('reject' . $offre->getIdO(), $request->request->get('_token'))) {
@@ -269,6 +211,6 @@ final class OffreController extends AbstractController
             $this->addFlash('success', 'Offre rejetée avec succès.');
         }
 
-        return $this->redirectToRoute('app_offre_page');
+        return $this->redirectToRoute('offreEntreprise_page');
     }
 }

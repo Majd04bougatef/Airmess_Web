@@ -30,7 +30,8 @@ class Offre
     )]
     #[Assert\GreaterThan(
         propertyPath: 'priceAfter',
-        message: 'Le prix initial doit être supérieur au prix après réduction.'
+        message: 'Le prix initial doit être supérieur au prix après réduction.',
+        groups: ['Default']
     )]
     #[ORM\Column(type: 'float')]
     private float $priceInit;
@@ -43,7 +44,8 @@ class Offre
     )]
     #[Assert\LessThan(
         propertyPath: 'priceInit',
-        message: 'Le prix après réduction doit être inférieur au prix initial.'
+        message: 'Le prix après réduction doit être inférieur au prix initial.',
+        groups: ['Default']
     )]
     #[ORM\Column(type: 'float')]
     private float $priceAfter;
@@ -55,7 +57,8 @@ class Offre
     )]
     #[Assert\GreaterThanOrEqual(
         value: 'today',
-        message: 'La date de début doit être au moins aujourd\'hui ou ultérieure.'
+        message: 'La date de début doit être au moins aujourd\'hui ou ultérieure.',
+        groups: ['Default']
     )]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTimeInterface $startDate;

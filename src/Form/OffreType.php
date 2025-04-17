@@ -126,17 +126,16 @@ class OffreType extends AbstractType
                     'class' => 'form-control',
                     'data-error-message' => 'La date de début est obligatoire.',
                     'required' => true,
-                    'min' => (new \DateTime())->format('Y-m-d\TH:i')
                 ],
-                'constraints' => [
+                'constraints' => array_filter([
                     new NotBlank([
                         'message' => 'La date de début est obligatoire.'
                     ]),
-                    new GreaterThanOrEqual([
+                    $options['is_edit'] ? null : new GreaterThanOrEqual([
                         'value' => new \DateTime(),
                         'message' => 'La date de début doit être ultérieure à aujourd\'hui.'
                     ])
-                ],
+                ]),
                 'error_bubbling' => false,
             ])
             ->add('endDate', DateTimeType::class, [
@@ -146,7 +145,6 @@ class OffreType extends AbstractType
                     'class' => 'form-control',
                     'data-error-message' => 'La date de fin est obligatoire.',
                     'required' => true,
-                    'min' => (new \DateTime())->format('Y-m-d\TH:i')
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -184,17 +182,30 @@ class OffreType extends AbstractType
                 'error_bubbling' => false,
             ])
             ->add('imageFile', FileType::class, [
-                'label' => 'Image de l\'offre *',
+                'label' => 'Image de l\'offre',
                 'mapped' => false,
-                'required' => true,
+                'required' => $options['is_edit'] ? false : true,
                 'attr' => [
                     'class' => 'form-control',
                     'accept' => 'image/jpeg, image/jpg, image/png, image/webp',
-                    'data-error-message' => 'L\'image est obligatoire.'
+                    'data-error-message' => $options['is_edit'] ? 'Sélectionnez une image valide.' : 'L\'image est obligatoire.'
                 ],
-                'constraints' => [
+                'constraints' => $options['is_edit'] ? [
+                    new File([
+                        'maxSize' => '5M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/jpg',
+                            'image/png',
+                            'image/webp'
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPG, PNG, WEBP)',
+                        'maxSizeMessage' => 'L\'image est trop volumineuse. La taille maximale autorisée est {{ limit }}.'
+                    ])
+                ] : [
                     new NotBlank([
-                        'message' => 'L\'image est obligatoire.'
+                        'message' => 'L\'image est obligatoire.',
+                        'groups' => ['Default']
                     ]),
                     new File([
                         'maxSize' => '5M',
@@ -208,7 +219,7 @@ class OffreType extends AbstractType
                         'maxSizeMessage' => 'L\'image est trop volumineuse. La taille maximale autorisée est {{ limit }}.'
                     ])
                 ],
-                'help' => 'Formats acceptés : JPG, PNG, WEBP. Taille maximale : 5 Mo',
+                'help' => $options['is_edit'] ? 'Laissez vide pour conserver l\'image actuelle. Formats acceptés : JPG, PNG, WEBP.' : 'Formats acceptés : JPG, PNG, WEBP. Taille maximale : 5 Mo',
                 'error_bubbling' => false,
             ])
             ->add('aidesc', TextareaType::class, [
@@ -249,10 +260,13 @@ class OffreType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Offre::class,
             'validation_groups' => ['Default'],
+            'is_edit' => false,
             'attr' => [
                 'novalidate' => 'novalidate', // Désactive la validation HTML5 pour utiliser notre propre validation
             ],
             'error_bubbling' => false,
         ]);
+
+        $resolver->setAllowedTypes('is_edit', 'bool');
     }
 }
