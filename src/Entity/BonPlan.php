@@ -54,7 +54,6 @@ class BonPlan
     private ?string $typePlace = null;
 
     #[ORM\Column(name: 'imageBP', type: 'string', length: 500, nullable: true)]
-    #[Assert\NotBlank(message: "L'image est obligatoire")]
     private ?string $imageBP = null;
 
     #[ORM\OneToMany(mappedBy: 'bonPlan', targetEntity: ReviewBonPlan::class, cascade: ['persist', 'remove'])]

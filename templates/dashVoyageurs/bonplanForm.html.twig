@@ -103,12 +103,12 @@
           <div class="form-col form-col-md-12">
             <div class="form-floating">
               <input type="file" class="form-control" id="imageBP" name="imageBP" placeholder=" " accept="image/jpeg,image/png">
-              <label for="imageBP">Image du lieu</label>
+              <label for="imageBP">Image du lieu (optionnelle)</label>
               <div class="invalid-feedback">
-                Veuillez sélectionner une image (JPG ou PNG).
+                Veuillez sélectionner une image valide (JPG ou PNG).
               </div>
             </div>
-            <small class="form-text text-muted">Choisissez une image pour le bon plan (formats acceptés: JPG, PNG)</small>
+            <small class="form-text text-muted">Choisissez une image pour le bon plan (formats acceptés: JPG, PNG) - optionnel</small>
           </div>
         </div>
       </div>
@@ -448,10 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         break;
       case 'imageBP':
-        if (!field.files || field.files.length === 0) {
-          isValid = false;
-          errorMessage = 'Veuillez sélectionner une image';
-        } else {
+        if (field.files && field.files.length > 0) {
           const file = field.files[0];
           // Vérifier le type de fichier
           if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
@@ -481,16 +478,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Fonction pour valider tous les champs obligatoires
   function validateAllRequiredFields() {
-    const requiredFields = ['nomplace', 'localisation', 'description', 'typePlace', 'imageBP'];
+    const requiredFields = ['nomplace', 'localisation', 'description', 'typePlace'];
     let allValid = true;
     
     requiredFields.forEach(fieldId => {
       const field = document.getElementById(fieldId);
-      if (!field.value.trim() && fieldId !== 'imageBP') {
-        field.classList.add('is-invalid');
-        field.classList.remove('is-valid');
-        allValid = false;
-      } else if (fieldId === 'imageBP' && (!field.files || field.files.length === 0)) {
+      if (!field.value.trim()) {
         field.classList.add('is-invalid');
         field.classList.remove('is-valid');
         allValid = false;

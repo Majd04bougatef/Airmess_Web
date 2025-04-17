@@ -504,6 +504,26 @@ class AdminController extends AbstractController
             ], 500);
         }
     }
+
+    #[Route('/admin/stations', name: 'admin_stations')]
+    public function stations(StationRepository $stationRepository): Response
+    {
+        $stations = $stationRepository->findStationsEnAttente();
+        return $this->render('admin/stations.html.twig', [
+            'stations' => $stations
+        ]);
+    }
+
+    #[Route('/admin/stations/{id}/approuver', name: 'admin_station_approuver', methods: ['POST'])]
+    public function approuverStation(int $id, StationRepository $stationRepository, Request $request): Response
+    {
+        if ($this->isCsrfTokenValid('approuver-station', $request->request->get('_token'))) {
+            $stationRepository->approuverStation($id);
+            $this->addFlash('success', 'Station approuvée avec succès');
+        }
+
+        return $this->redirectToRoute('admin_stations');
+    }
 }
 
 ?>

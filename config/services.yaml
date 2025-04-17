@@ -9,7 +9,7 @@ parameters:
     uploads_directory: 'C:/xampp/htdocs/ImageSocialMedia'
     user_images_directory: 'C:/xampp/htdocs/images_users'
     expense_images_directory: 'C:/xampp/htdocs/images_expenses'
-    bonplan_images_directory: '%kernel.project_dir%/public/uploads/bonplans'
+    bonplan_uploads_directory: 'C:/xampp/htdocs/images_bonplans'
 
 
 

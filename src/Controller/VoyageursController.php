@@ -231,37 +231,37 @@ class VoyageursController extends AuthenticatedController
             }
 
             // Validation de l'image
-            if (!$imageBP) {
-                return new JsonResponse(['error' => ['L\'image est obligatoire']], 400);
+            if ($imageBP) {
+                $allowedMimeTypes = ['image/jpeg', 'image/png'];
+                if (!in_array($imageBP->getMimeType(), $allowedMimeTypes)) {
+                    return new JsonResponse(['error' => ['Format d\'image non supporté. Utilisez JPEG ou PNG']], 400);
+                }
+
+                // Vérification de la taille de l'image (max 5MB)
+                if ($imageBP->getSize() > 5 * 1024 * 1024) {
+                    return new JsonResponse(['error' => ['L\'image ne doit pas dépasser 5MB']], 400);
+                }
+
+                // Génération d'un nom unique pour l'image
+                $newFilename = uniqid() . '.' . $imageBP->guessExtension();
+                $uploadDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/bonplans/';
+
+                // Vérification et création du répertoire si nécessaire
+                if (!file_exists($uploadDirectory)) {
+                    mkdir($uploadDirectory, 0777, true);
+                }
+
+                // Déplacement de l'image
+                try {
+                    $imageBP->move($uploadDirectory, $newFilename);
+                    $bonplan->setImageBP($newFilename);
+                } catch (FileException $e) {
+                    return new JsonResponse(['error' => ['Erreur lors de l\'upload de l\'image']], 500);
+                }
+            } else {
+                // Si aucune image n'est fournie, utiliser une image par défaut
+                $bonplan->setImageBP('default.jpg');
             }
-
-            $allowedMimeTypes = ['image/jpeg', 'image/png'];
-            if (!in_array($imageBP->getMimeType(), $allowedMimeTypes)) {
-                return new JsonResponse(['error' => ['Format d\'image non supporté. Utilisez JPEG ou PNG']], 400);
-            }
-
-            // Vérification de la taille de l'image (max 5MB)
-            if ($imageBP->getSize() > 5 * 1024 * 1024) {
-                return new JsonResponse(['error' => ['L\'image ne doit pas dépasser 5MB']], 400);
-            }
-
-            // Génération d'un nom unique pour l'image
-            $newFilename = uniqid() . '.' . $imageBP->guessExtension();
-            $uploadDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/bonplans/';
-
-            // Vérification et création du répertoire si nécessaire
-            if (!file_exists($uploadDirectory)) {
-                mkdir($uploadDirectory, 0777, true);
-            }
-
-            // Déplacement de l'image
-            try {
-                $imageBP->move($uploadDirectory, $newFilename);
-            } catch (FileException $e) {
-                return new JsonResponse(['error' => ['Erreur lors de l\'upload de l\'image']], 500);
-            }
-
-            $bonplan->setImageBP($newFilename);
 
             // Sauvegarder dans la base de données
             $entityManager->persist($bonplan);

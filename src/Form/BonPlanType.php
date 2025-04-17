@@ -27,7 +27,7 @@ class BonPlanType extends AbstractType
             ->add('imageBP', FileType::class, [
                 'label' => 'Image',
                 'mapped' => false,
-                'required' => true,
+                'required' => false,
                 'constraints' => [
                     new File([
                         'mimeTypes' => ['image/jpg', 'image/png', 'image/webp'],
