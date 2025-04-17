@@ -1,174 +1,113 @@
-{% extends 'base.html.twig' %}
+{% extends 'dashEntreprise/dashboardEntreprise.html.twig' %}
 
-{% block title %}Réservations des offres{% endblock %}
+{% block title %}Réservations - Airmess Dashboard{% endblock %}
 
 {% block body %}
-    <div class="container-fluid py-4">
-        <!-- Header Banner with Gradient -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card bg-gradient-primary shadow-primary border-0 overflow-hidden" style="border-radius: 15px;">
-                    <div class="card-body p-4">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h2 class="text-white font-weight-bold mb-0">Réservations des offres</h2>
-                                <p class="text-white opacity-8 mb-0">Consultez toutes les réservations pour vos offres</p>
-                            </div>
-                            <div class="col-auto">
-                                <i class="bi bi-calendar-check text-white opacity-8" style="font-size: 3rem;"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+          <h6>Liste des Réservations pour vos Offres</h6>
         </div>
-
-        <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
-                <div class="card shadow-sm" style="border-radius: 15px;">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-9">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Réservations</p>
-                                    <h5 class="font-weight-bolder mb-0">
-                                        {% if reservations is defined and reservations is not null %}
-                                            {{ reservations|length }}
-                                        {% else %}
-                                            0
-                                        {% endif %}
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-3 text-end">
-                                <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
-                                    <i class="bi bi-people text-white opacity-10"></i>
-                                </div>
-                            </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-4">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Client</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Email</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Offre</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lieu</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for reservation in reservations %}
+                  <tr>
+                    <td>
+                      <div class="d-flex px-2 py-1">
+                        <div>
+                          <i class="far fa-user-circle text-primary me-2" style="font-size: 20px;"></i>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Reservations Table Card -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card shadow-sm" style="border-radius: 15px;">
-                    <div class="card-header pb-0">
-                        <h6 class="mb-0">Liste des réservations</h6>
-                    </div>
-                    <div class="card-body px-0 pt-0 pb-2">
-                        <div class="table-responsive p-0" style="max-height: 700px; overflow-y: auto;">
-                            <table class="table align-items-center mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Client</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Offre</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Prix</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Quantité</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% if reservations is defined and reservations|length > 0 %}
-                                        {% for reservation in reservations %}
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex px-3 py-2">
-                                                        <div class="avatar avatar-sm me-3 rounded-circle bg-gradient-primary d-flex justify-content-center align-items-center">
-                                                            <i class="bi bi-person text-white"></i>
-                                                        </div>
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <h6 class="mb-0 text-sm">
-                                                                {% if reservation.user is not null %}
-                                                                    {{ reservation.user.prenom }} {{ reservation.user.nom }}
-                                                                {% else %}
-                                                                    <span class="text-muted">Utilisateur inconnu</span>
-                                                                {% endif %}
-                                                            </h6>
-                                                            <p class="text-xs text-secondary mb-0">
-                                                                {% if reservation.user is not null %}
-                                                                    {{ reservation.user.email }}
-                                                                {% else %}
-                                                                    <span class="text-muted">Email non disponible</span>
-                                                                {% endif %}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">
-                                                            {% if reservation.offre is not null %}
-                                                                {{ reservation.offre.place }}
-                                                            {% else %}
-                                                                <span class="text-muted">Lieu non disponible</span>
-                                                            {% endif %}
-                                                        </h6>
-                                                        <p class="text-xs text-secondary mb-0">
-                                                            {% if reservation.offre is not null and reservation.offre.description is not null %}
-                                                                {{ reservation.offre.description|slice(0, 50) }}{% if reservation.offre.description|length > 50 %}...{% endif %}
-                                                            {% else %}
-                                                                <span class="text-muted">Description non disponible</span>
-                                                            {% endif %}
-                                                        </p>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">
-                                                            {% if reservation.dateRes is not null %}
-                                                                {{ reservation.dateRes|date('d/m/Y') }}
-                                                            {% else %}
-                                                                <span class="text-muted">Date inconnue</span>
-                                                            {% endif %}
-                                                        </h6>
-                                                        <p class="text-xs text-secondary mb-0">
-                                                            {% if reservation.dateRes is not null %}
-                                                                {{ reservation.dateRes|date('H:i') }}
-                                                            {% else %}
-                                                                <span class="text-muted">Heure inconnue</span>
-                                                            {% endif %}
-                                                        </p>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">
-                                                            {% if reservation.offre is not null and reservation.offre.priceAfter is not null %}
-                                                                {{ reservation.offre.priceAfter }} DT
-                                                            {% else %}
-                                                                <span class="text-muted">Prix non disponible</span>
-                                                            {% endif %}
-                                                        </h6>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">{{ reservation.nombre }}</h6>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    {% else %}
-                                        <tr>
-                                            <td colspan="5" class="text-center py-4">
-                                                <div class="d-flex flex-column align-items-center">
-                                                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
-                                                    <h6 class="text-muted mt-3">Aucune réservation trouvée</h6>
-                                                    <p class="text-xs text-secondary">Les réservations apparaîtront ici lorsque des clients réserveront vos offres.</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
+                        <div class="d-flex flex-column justify-content-center">
+                          {% if reservation.user %}
+                            <h6 class="mb-0 text-sm">{{ reservation.user.prenom }}</h6>
+                          {% else %}
+                            <h6 class="mb-0 text-sm text-muted">Utilisateur non enregistré</h6>
+                          {% endif %}
                         </div>
-                    </div>
-                </div>
-            </div>
+                      </div>
+                    </td>
+                    <td>
+                      {% if reservation.user %}
+                        <p class="text-xs font-weight-bold mb-0">{{ reservation.user.email }}</p>
+                      {% else %}
+                        <p class="text-xs text-muted mb-0">Email non disponible</p>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if reservation.offre %}
+                        <p class="text-xs font-weight-bold mb-0">{{ reservation.offre.description }}</p>
+                      {% else %}
+                        <p class="text-xs text-muted mb-0">Offre non disponible</p>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if reservation.offre %}
+                        <p class="text-xs font-weight-bold mb-0">{{ reservation.offre.place }}</p>
+                      {% else %}
+                        <p class="text-xs text-muted mb-0">Lieu non disponible</p>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if reservation.dateRes %}
+                        <p class="text-xs font-weight-bold mb-0">{{ reservation.dateRes|date('d/m/Y H:i') }}</p>
+                      {% else %}
+                        <p class="text-xs text-muted mb-0">Date non disponible</p>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="5" class="text-center">Aucune réservation trouvée.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="row mt-4">
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total des Réservations</p>
+                <h5 class="font-weight-bolder mb-0">
+                  {% if reservations is defined and reservations is not null %}
+                    {{ reservations|length }}
+                  {% else %}
+                    0
+                  {% endif %}
+                </h5>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                <i class="fas fa-calendar text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %} 

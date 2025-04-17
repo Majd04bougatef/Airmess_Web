@@ -251,7 +251,7 @@
                 <h3>Liste de vos réservations</h3>
             </div>
             
-            {% for reservation in reservations %}
+        {% for reservation in reservations %}
                 <div class="reservation-item">
                     <img src="{{ 'http://localhost/imageOffre/' ~ (reservation.offre.imagePath ?: 'default-offer.jpg') }}" alt="Image de l'offre" class="reservation-img">
                     
@@ -310,7 +310,7 @@
                 </div>
             {% endfor %}
         </div>
-    {% else %}
+        {% else %}
         <div class="empty-state">
             <i class="fas fa-receipt"></i>
             <h3>Aucune réservation trouvée</h3>

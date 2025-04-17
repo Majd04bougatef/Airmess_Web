@@ -90,6 +90,11 @@ final class OffreController extends AbstractController
     #[Route('/offre/{idO}/edit', name: 'app_offre_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Offre $offre, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
+        // Afficher les valeurs initiales pour le débogage
+        $this->addFlash('info', 'Valeurs initiales: Titre=' . $offre->getDescription() . 
+                       ', Prix=' . $offre->getPriceInit() . 
+                       ', Statut=' . $offre->getStatusoff()->value);
+
         // Création d'une version modifiée du formulaire OffreType avec l'image non requise
         $form = $this->createFormBuilder($offre)
             ->add('description', null, ['label' => 'Titre'])
@@ -143,50 +148,77 @@ final class OffreController extends AbstractController
             ])
             ->getForm();
             
+        // Afficher des informations sur la méthode et la soumission du formulaire
+        $this->addFlash('info', 'Méthode HTTP: ' . $request->getMethod());
+        
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Gestion du téléchargement de l'image
-            $imageFile = $form->get('imageFile')->getData();
+        // Vérifier si le formulaire est soumis
+        if ($form->isSubmitted()) {
+            $this->addFlash('info', 'Formulaire soumis');
             
-            if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+            // Vérifier si le formulaire est valide
+            if ($form->isValid()) {
+                $this->addFlash('info', 'Formulaire valide');
                 
-                // Vérifier si le répertoire existe, sinon le créer
-                if (!file_exists($this->imageOffreDirectory)) {
-                    mkdir($this->imageOffreDirectory, 0777, true);
-                }
+                // Gestion du téléchargement de l'image
+                $imageFile = $form->get('imageFile')->getData();
                 
-                // Déplacer le fichier vers le répertoire de destination
-                try {
-                    $imageFile->move(
-                        $this->imageOffreDirectory,
-                        $newFilename
-                    );
+                if ($imageFile) {
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
                     
-                    // Supprimer l'ancienne image si elle existe
-                    $oldImage = $offre->getImagePath();
-                    if ($oldImage && file_exists($this->imageOffreDirectory . '/' . $oldImage)) {
-                        unlink($this->imageOffreDirectory . '/' . $oldImage);
+                    // Vérifier si le répertoire existe, sinon le créer
+                    if (!file_exists($this->imageOffreDirectory)) {
+                        mkdir($this->imageOffreDirectory, 0777, true);
                     }
                     
-                    // Enregistrer le nouveau nom du fichier dans l'entité
-                    $offre->setImagePath($newFilename);
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image: ' . $e->getMessage());
+                    // Déplacer le fichier vers le répertoire de destination
+                    try {
+                        $imageFile->move(
+                            $this->imageOffreDirectory,
+                            $newFilename
+                        );
+                        
+                        // Supprimer l'ancienne image si elle existe
+                        $oldImage = $offre->getImagePath();
+                        if ($oldImage && file_exists($this->imageOffreDirectory . '/' . $oldImage)) {
+                            unlink($this->imageOffreDirectory . '/' . $oldImage);
+                        }
+                        
+                        // Enregistrer le nouveau nom du fichier dans l'entité
+                        $offre->setImagePath($newFilename);
+                    } catch (FileException $e) {
+                        $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image: ' . $e->getMessage());
+                    }
+                }
+                
+                // Debug - Afficher les données de l'offre avant la sauvegarde
+                $this->addFlash('info', 'Données reçues: Titre=' . $offre->getDescription() . 
+                               ', Prix=' . $offre->getPriceInit() . 
+                               ', Statut=' . $offre->getStatusoff()->value);
+                
+                try {
+                    // Enregistre les modifications dans la base de données
+                    $entityManager->persist($offre);
+                    $entityManager->flush();
+                    
+                    // Ajoute un message de succès
+                    $this->addFlash('success', 'Les modifications ont été enregistrées avec succès.');
+                    
+                    // Redirige vers la page offrePageEntreprise
+                    return $this->redirectToRoute('offreEntreprise_page');
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Erreur lors de l\'enregistrement: ' . $e->getMessage());
+                }
+            } else {
+                // Affiche les erreurs de validation du formulaire
+                $errors = $form->getErrors(true);
+                foreach ($errors as $error) {
+                    $this->addFlash('error', 'Erreur de validation: ' . $error->getMessage());
                 }
             }
-            
-            // Enregistre les modifications dans la base de données
-            $entityManager->flush();
-
-            // Ajoute un message de succès
-            $this->addFlash('success', 'Les modifications ont été enregistrées avec succès.');
-
-            // Redirige vers la page offrePageEntreprise
-            return $this->redirectToRoute('offreEntreprise_page');
         }
 
         return $this->render('offre/edit.html.twig', [

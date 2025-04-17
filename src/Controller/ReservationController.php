@@ -35,7 +35,11 @@ class ReservationController extends AbstractController
 
         $reservation = new Reservation();
         $reservation->setOffre($offre);
-        $reservation->setUser($this->getUser()); // Utilisateur connecté
+        
+        // Si l'utilisateur est connecté, l'associer à la réservation, sinon continuer sans utilisateur
+        if ($this->getUser()) {
+            $reservation->setUser($this->getUser());
+        }
 
         $form = $this->createForm(\App\Form\ReservationType::class, $reservation);
         $form->handleRequest($request);

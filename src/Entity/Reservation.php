@@ -31,13 +31,9 @@ class Reservation
     #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]
     private ?string $modePaiement = 'carte';
 
-    #[Assert\NotNull(message: 'L\'utilisateur est obligatoire.')]
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'id_U', referencedColumnName: 'id_U')]
+    #[ORM\JoinColumn(name: 'id_U', referencedColumnName: 'id_U', nullable: true)]
     private ?User $user = null;
-
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private ?int $nombre = 1;
 
     public function getIdR(): ?int
     {
@@ -88,18 +84,6 @@ class Reservation
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getNombre(): ?int
-    {
-        return $this->nombre;
-    }
-
-    public function setNombre(?int $nombre): static
-    {
-        $this->nombre = $nombre;
 
         return $this;
     }
