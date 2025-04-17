@@ -51,4 +51,83 @@ class BonPlanRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Recherche des bon plans en fonction d'un terme de recherche
+     * 
+     * @param string $searchTerm Le terme de recherche
+     * @return BonPlan[] Les bon plans correspondant au terme de recherche
+     */
+    public function searchBonPlans(string $searchTerm): array
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.nomplace LIKE :search OR b.description LIKE :search OR b.localisation LIKE :search OR b.typePlace LIKE :search')
+            ->setParameter('search', '%' . $searchTerm . '%')
+            ->orderBy('b.idP', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * Obtenir le nombre de bon plans par type
+     * 
+     * @return array Les statistiques par type de bon plan
+     */
+    public function getStatsByType(): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('b.typePlace, COUNT(b.idP) as count')
+            ->groupBy('b.typePlace')
+            ->orderBy('count', 'DESC');
+            
+        $results = $qb->getQuery()->getResult();
+        
+        // Formater les résultats
+        $stats = [];
+        foreach ($results as $result) {
+            $type = $result['typePlace'] ?: 'Non défini';
+            $stats[$type] = $result['count'];
+        }
+        
+        return $stats;
+    }
+    
+    /**
+     * Obtenir des statistiques générales sur les bon plans
+     * 
+     * @return array Les statistiques générales
+     */
+    public function getGeneralStats(): array
+    {
+        // Nombre total de bon plans
+        $totalCount = $this->createQueryBuilder('b')
+            ->select('COUNT(b.idP)')
+            ->getQuery()
+            ->getSingleScalarResult();
+            
+        // Bon plans sans image
+        $noImageCount = $this->createQueryBuilder('b')
+            ->select('COUNT(b.idP)')
+            ->where('b.imageBP IS NULL OR b.imageBP = :empty')
+            ->setParameter('empty', '')
+            ->getQuery()
+            ->getSingleScalarResult();
+            
+        // Bon plans sans description
+        $noDescriptionCount = $this->createQueryBuilder('b')
+            ->select('COUNT(b.idP)')
+            ->where('b.description IS NULL OR b.description = :empty')
+            ->setParameter('empty', '')
+            ->getQuery()
+            ->getSingleScalarResult();
+            
+        return [
+            'total' => $totalCount,
+            'withoutImage' => $noImageCount,
+            'withoutDescription' => $noDescriptionCount,
+            'completePercentage' => $totalCount > 0 
+                ? round(($totalCount - max($noImageCount, $noDescriptionCount)) / $totalCount * 100) 
+                : 0
+        ];
+    }
 }

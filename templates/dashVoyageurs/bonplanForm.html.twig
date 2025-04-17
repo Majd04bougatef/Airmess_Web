@@ -1,10 +1,13 @@
+{% block title %}Ajouter un bon plan - Airmess Dashboard{% endblock %}
+
+{% block body %}
 <div class="content-card content-section active" id="bonplan-section">
   <div class="form-header">
     <h2 class="form-title">Ajouter un nouveau bon plan</h2>
     <p class="form-subtitle">Complétez les informations ci-dessous pour créer un nouveau bon plan pour les voyageurs.</p>
   </div>
 
-  <form action="{{ path('bonplan_add') }}" method="post" id="bonplan-form" enctype="multipart/form-data">
+  <form action="{{ path('bonplan_add') }}" method="post" id="bonplan-form" enctype="multipart/form-data" class="needs-validation" novalidate>
     <!-- Basic Info Card -->
     <div class="form-card card-info">
       <div class="form-card-header">
@@ -15,8 +18,11 @@
         <div class="form-row">
           <div class="form-col form-col-md-12">
             <div class="form-floating">
-              <input type="text" class="form-control" id="nomplace" name="nomplace" placeholder=" " required>
+              <input type="text" class="form-control" id="nomplace" name="nomplace" placeholder=" ">
               <label for="nomplace">Nom du lieu</label>
+              <div class="invalid-feedback">
+                Le nom du lieu est requis et doit contenir entre 3 et 100 caractères.
+              </div>
             </div>
           </div>
         </div>
@@ -38,6 +44,9 @@
               <div class="form-floating">
                 <input type="text" class="form-control" id="localisation" name="localisation" placeholder=" " readonly>
                 <label for="localisation">Coordonnées</label>
+                <div class="invalid-feedback">
+                  Veuillez sélectionner une localisation sur la carte.
+                </div>
               </div>
               <small class="form-text text-muted">Format: latitude, longitude</small>
             </div>
@@ -49,6 +58,9 @@
         <div class="form-floating">
           <textarea class="form-control" id="description" name="description" style="height: 120px" placeholder=" "></textarea>
           <label for="description">Description</label>
+          <div class="invalid-feedback">
+            La description est requise et doit contenir entre 10 et 500 caractères.
+          </div>
         </div>
       </div>
     </div>
@@ -63,7 +75,7 @@
         <div class="form-row">
           <div class="form-col form-col-md-12">
             <div class="form-floating">
-              <select class="form-select" id="typePlace" name="typePlace" required>
+              <select class="form-select" id="typePlace" name="typePlace">
                 <option selected disabled value="">Sélectionnez un type</option>
                 <option value="resto">Restaurant</option>
                 <option value="coworkingspace">Espace de coworking</option>
@@ -71,6 +83,9 @@
                 <option value="musée">Musée</option>
               </select>
               <label for="typePlace">Type de lieu</label>
+              <div class="invalid-feedback">
+                Veuillez sélectionner un type de lieu.
+              </div>
             </div>
           </div>
         </div>
@@ -87,8 +102,11 @@
         <div class="form-row">
           <div class="form-col form-col-md-12">
             <div class="form-floating">
-              <input type="file" class="form-control" id="imageBP" name="imageBP" placeholder=" ">
+              <input type="file" class="form-control" id="imageBP" name="imageBP" placeholder=" " accept="image/jpeg,image/png">
               <label for="imageBP">Image du lieu</label>
+              <div class="invalid-feedback">
+                Veuillez sélectionner une image (JPG ou PNG).
+              </div>
             </div>
             <small class="form-text text-muted">Choisissez une image pour le bon plan (formats acceptés: JPG, PNG)</small>
           </div>
@@ -246,117 +264,50 @@
     width: 100%;
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
+    font-weight: 400;
     line-height: 1.5;
-    color: #495057;
+    color: #344767;
     background-color: #fff;
-    border: 1px solid #e9ecef;
-    border-radius: 10px;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    background-clip: padding-box;
+    border: 1px solid #d2d6da;
+    border-radius: 0.5rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
   }
   
   .form-control:focus, .form-select:focus {
+    color: #344767;
+    background-color: #fff;
     border-color: #5e72e4;
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
+    box-shadow: 0 3px 9px rgba(50, 50, 9, 0), 3px 4px 8px rgba(94, 114, 228, 0.1);
   }
   
-  .form-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  .form-control.is-invalid, .form-select.is-invalid {
+    border-color: #f5365c;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23f5365c'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23f5365c' stroke='none'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 16px 12px;
-    appearance: none;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  }
+  
+  .invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #f5365c;
+  }
+  
+  .form-control.is-invalid ~ .invalid-feedback,
+  .form-select.is-invalid ~ .invalid-feedback {
+    display: block;
   }
   
   .form-text {
-    display: block;
     margin-top: 0.25rem;
-    font-size: 0.75rem;
-  }
-  
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 2rem;
-  }
-  
-  .form-btn-outline {
-    background-color: transparent;
-    color: #5e72e4;
-    border: 1px solid #5e72e4;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-right: 1rem;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .form-btn-outline:hover {
-    background-color: #f0f7ff;
-    color: #324cdd;
-    border-color: #324cdd;
-  }
-  
-  .form-btn {
-    background-color: #5e72e4;
-    color: white;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  
-  .form-btn:hover {
-    background-color: #324cdd;
-    transform: translateY(-2px);
-    box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
-  }
-
-  /* Styles pour la map */
-  .map-container {
-    position: relative;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .leaflet-container {
-    border-radius: 10px;
-  }
-  
-  .marker-pin {
-    background-color: #5e72e4;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 4px solid white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-  
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    margin-right: -0.75rem;
-    margin-left: -0.75rem;
-  }
-  
-  .col-md-6 {
-    position: relative;
-    width: 100%;
-    padding-right: 0.75rem;
-    padding-left: 0.75rem;
-  }
-  
-  @media (min-width: 768px) {
-    .col-md-6 {
-      flex: 0 0 50%;
-      max-width: 50%;
-    }
+    font-size: 0.875em;
+    color: #6c757d;
   }
 </style>
 
@@ -403,6 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Mettre à jour le champ de texte avec les coordonnées
   function updateCoordinates(latlng) {
     document.getElementById('localisation').value = latlng.lat.toFixed(6) + ', ' + latlng.lng.toFixed(6);
+    validateField('localisation');
   }
   
   // Ajouter un marqueur lorsqu'on clique sur la carte
@@ -438,36 +390,191 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
-  
-  // Setup form submission
-  const bonplanForm = document.getElementById('bonplan-form');
-  if (bonplanForm) {
-    bonplanForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Create FormData object to handle file uploads
-      const formData = new FormData(bonplanForm);
-      
-      // Submit form using fetch API
-      fetch('{{ path('bonplan_add') }}', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Bon plan ajouté avec succès!');
-          // Redirect to the bons plans list page
-          window.location.href = '{{ path('bonplanVoyageurs_page') }}';
-        } else {
-          alert('Erreur: ' + data.message);
+
+  // Fonction de validation personnalisée
+  function validateField(fieldId) {
+    const field = document.getElementById(fieldId);
+    let isValid = true;
+    let errorMessage = '';
+
+    switch(fieldId) {
+      case 'nomplace':
+        if (!field.value.trim()) {
+          isValid = false;
+          errorMessage = 'Le nom du lieu est requis';
+        } else if (field.value.length < 3 || field.value.length > 100) {
+          isValid = false;
+          errorMessage = 'Le nom du lieu doit contenir entre 3 et 100 caractères';
         }
-      })
-      .catch(error => {
-        console.error('Erreur:', error);
-        alert('Une erreur est survenue lors de l\'ajout du bon plan.');
+        break;
+      case 'searchLocation':
+        if (field.value.trim() && field.value.length < 3) {
+          isValid = false;
+          errorMessage = 'La recherche doit contenir au moins 3 caractères';
+        }
+        break;
+      case 'localisation':
+        if (!field.value.trim()) {
+          isValid = false;
+          errorMessage = 'Veuillez sélectionner une localisation sur la carte';
+        } else {
+          // Vérifier le format des coordonnées
+          const coords = field.value.split(',');
+          if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) {
+            isValid = false;
+            errorMessage = 'Format de coordonnées invalide';
+          }
+        }
+        break;
+      case 'description':
+        if (!field.value.trim()) {
+          isValid = false;
+          errorMessage = 'La description est requise';
+        } else if (field.value.length < 10 || field.value.length > 500) {
+          isValid = false;
+          errorMessage = 'La description doit contenir entre 10 et 500 caractères';
+        }
+        break;
+      case 'typePlace':
+        if (!field.value) {
+          isValid = false;
+          errorMessage = 'Veuillez sélectionner un type de lieu';
+        } else {
+          const allowedTypes = ['resto', 'coworkingspace', 'cafe', 'musée'];
+          if (!allowedTypes.includes(field.value)) {
+            isValid = false;
+            errorMessage = 'Type de lieu invalide';
+          }
+        }
+        break;
+      case 'imageBP':
+        if (!field.files || field.files.length === 0) {
+          isValid = false;
+          errorMessage = 'Veuillez sélectionner une image';
+        } else {
+          const file = field.files[0];
+          // Vérifier le type de fichier
+          if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+            isValid = false;
+            errorMessage = 'Format d\'image non supporté. Utilisez JPG ou PNG';
+          }
+          // Vérifier la taille du fichier (max 5MB)
+          else if (file.size > 5 * 1024 * 1024) {
+            isValid = false;
+            errorMessage = 'L\'image ne doit pas dépasser 5MB';
+          }
+        }
+        break;
+    }
+
+    if (isValid) {
+      field.classList.remove('is-invalid');
+      field.classList.add('is-valid');
+    } else {
+      field.classList.remove('is-valid');
+      field.classList.add('is-invalid');
+      field.nextElementSibling.textContent = errorMessage;
+    }
+
+    return isValid;
+  }
+
+  // Fonction pour valider tous les champs obligatoires
+  function validateAllRequiredFields() {
+    const requiredFields = ['nomplace', 'localisation', 'description', 'typePlace', 'imageBP'];
+    let allValid = true;
+    
+    requiredFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (!field.value.trim() && fieldId !== 'imageBP') {
+        field.classList.add('is-invalid');
+        field.classList.remove('is-valid');
+        allValid = false;
+      } else if (fieldId === 'imageBP' && (!field.files || field.files.length === 0)) {
+        field.classList.add('is-invalid');
+        field.classList.remove('is-valid');
+        allValid = false;
+      }
+    });
+    
+    return allValid;
+  }
+
+  // Form validation
+  const form = document.getElementById('bonplan-form');
+  
+  if (form) {
+    // Validation en temps réel
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+      // Validation lors de la saisie
+      input.addEventListener('input', function() {
+        validateField(this.id);
       });
+      
+      // Validation lors de la perte de focus
+      input.addEventListener('blur', function() {
+        validateField(this.id);
+      });
+      
+      // Validation lors du changement de valeur (pour les select)
+      input.addEventListener('change', function() {
+        validateField(this.id);
+      });
+    });
+
+    // Validation à la soumission
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      // Valider d'abord tous les champs obligatoires
+      const requiredFieldsValid = validateAllRequiredFields();
+      
+      // Ensuite valider les autres contraintes
+      let allValid = requiredFieldsValid;
+      let firstInvalidField = null;
+      
+      inputs.forEach(input => {
+        if (!validateField(input.id)) {
+          allValid = false;
+          if (!firstInvalidField) {
+            firstInvalidField = input;
+          }
+        }
+      });
+
+      if (allValid) {
+        // Create FormData object to handle file uploads
+        const formData = new FormData(form);
+        
+        // Submit form using fetch API
+        fetch('{{ path('bonplan_add') }}', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Bon plan ajouté avec succès!');
+            // Redirect to the bons plans list page
+            window.location.href = '{{ path('bonplanVoyageurs_page') }}';
+          } else {
+            alert('Erreur: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+          alert('Une erreur est survenue lors de l\'ajout du bon plan.');
+        });
+      } else {
+        // Faire défiler jusqu'au premier champ invalide
+        if (firstInvalidField) {
+          firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          firstInvalidField.focus();
+        }
+      }
     });
   }
 });
-</script> 
+</script>
+{% endblock %} 

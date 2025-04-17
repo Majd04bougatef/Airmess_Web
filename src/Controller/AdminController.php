@@ -4,18 +4,21 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Form\AdminUserType;
+use App\Entity\BonPlan;
 use App\Repository\UserRepository;
 use App\Repository\StationRepository;
+use App\Repository\BonPlanRepository;
 use App\Repository\ReservationTransportRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\OffreRepository;
-use Symfony\Component\HttpFoundation\Response;
 use App\Repository\ExpenseRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -399,28 +402,42 @@ class AdminController extends AbstractController
     }
 
     #[Route('/BonplanPage', name: 'bonplan_page')]
-    public function bonplanPage(SessionInterface $session, UserRepository $userRepository): Response
+
+    public function bonplanPage(Request $request, BonPlanRepository $bonPlanRepository): Response
     {
-        // Check if user is logged in
-        if (!$session->has('user_id')) {
-            return $this->redirectToRoute('login');
+        $searchTerm = $request->query->get('search', '');
+        
+        // Si un terme de recherche est fourni, filtrer les résultats
+        if (!empty($searchTerm)) {
+            // Essayer de récupérer une méthode de recherche du repository
+            if (method_exists($bonPlanRepository, 'searchBonPlans')) {
+                $bonPlans = $bonPlanRepository->searchBonPlans($searchTerm);
+            } else {
+                // Fallback: recherche basique si la méthode n'existe pas
+                $bonPlans = $bonPlanRepository->findBy([
+                    'nomplace' => '%' . $searchTerm . '%'
+                ]);
+                
+                // Si aucun résultat, récupérer tous
+                if (empty($bonPlans)) {
+                    $bonPlans = $bonPlanRepository->findAll();
+                }
+            }
+        } else {
+            // Sinon, récupérer tous les bon plans
+            $bonPlans = $bonPlanRepository->findAll();
         }
         
-        // Get user profile data
-        $userId = $session->get('user_id');
-        $user = $userRepository->find($userId);
+        // Récupérer les statistiques
+        $statsByType = $bonPlanRepository->getStatsByType();
+        $generalStats = $bonPlanRepository->getGeneralStats();
         
-        if (!$user) {
-            $this->addFlash('error', 'User not found. Please log in again.');
-            return $this->redirectToRoute('login');
-        }
-        
-        // Get all users for the list display
-        $allUsers = $userRepository->findBy(['deleteFlag' => 0]);
-        
+        // Passer les bon plans et le terme de recherche à la vue
         return $this->render('dashAdmin/bonplanPage.html.twig', [
-            'user' => $user,
-            'allUsers' => $allUsers
+            'bonPlans' => $bonPlans,
+            'searchTerm' => $searchTerm,
+            'statsByType' => $statsByType,
+            'generalStats' => $generalStats
         ]);
     }
 
@@ -467,27 +484,24 @@ class AdminController extends AbstractController
         return $roleCount;
     }
 
-    #[Route('/admin/station/{id}/approve', name: 'admin_station_approve', methods: ['POST'])]
-    public function approveStation(
-        int $id,
-        StationRepository $stationRepository,
+
+    #[Route('/admin/bonplan/delete/{id}', name: 'admin_bonplan_delete', methods: ['POST'])]
+    public function deleteBonPlan(
+        BonPlan $bonPlan, 
         EntityManagerInterface $entityManager
-    ): JsonResponse
+    ): Response
     {
         try {
-            $station = $stationRepository->find($id);
-            
-            if (!$station) {
-                return new JsonResponse(['success' => false, 'message' => 'Station non trouvée'], 404);
-            }
-            
-            // Update station status to active
-            $station->setStatut('active');
+            // Supprimer le bon plan
+            $entityManager->remove($bonPlan);
             $entityManager->flush();
             
             return new JsonResponse(['success' => true]);
         } catch (\Exception $e) {
-            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 500);
+            return new JsonResponse([
+                'success' => false, 
+                'message' => 'Erreur lors de la suppression: '.$e->getMessage()
+            ], 500);
         }
     }
 }
