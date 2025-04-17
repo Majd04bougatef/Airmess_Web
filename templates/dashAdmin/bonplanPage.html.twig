@@ -1,6 +1,6 @@
 {% extends 'dashAdmin/dashboard.html.twig' %}
 
-{% block title %}Bon Plans Management{% endblock %}
+{% block title %}User Profiles - Admin Dashboard{% endblock %}
 
 {% block content %}
 <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
@@ -8,15 +8,15 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
         <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
-        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Bon Plans</li>
+        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Profile</li>
       </ol>
-      <h6 class="font-weight-bolder text-white mb-0">Gestion des Bon Plans</h6>
+      <h6 class="font-weight-bolder text-white mb-0">User Profiles</h6>
     </nav>
     <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
       <div class="ms-md-auto pe-md-3 d-flex align-items-center">
         <div class="input-group">
           <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-          <input type="text" class="form-control" placeholder="Type here...">
+          <input type="text" class="form-control" id="profile-search" placeholder="Search users...">
         </div>
       </div>
     </div>
@@ -24,49 +24,129 @@
 </nav>
 <!-- End Navbar -->
 <div class="container-fluid py-4">
+  <!-- Admin's profile card -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header pb-0 d-flex justify-content-between">
+          <h6>My Profile</h6>
+          <a href="{{ path('app_profile') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-edit me-1"></i> Edit Profile
+          </a>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Profile image column -->
+            <div class="col-md-4 text-center border-end">
+              <div class="p-3">
+                <div class="position-relative mb-3">
+                  <img src="{{ path('app_profile_image', {'filename': app.session.get('user_image') }) }}" 
+                       class="rounded-circle img-fluid mx-auto d-block" 
+                       style="width: 150px; height: 150px; object-fit: cover;"
+                       alt="{{ app.session.get('user_name') }}"
+                       onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                </div>
+                
+                <h5 class="font-weight-bold mt-3">{{ app.session.get('user_name') }}</h5>
+                <p class="text-muted">{{ app.session.get('user_role') }}</p>
+              </div>
+            </div>
+            
+            <!-- Profile info column -->
+            <div class="col-md-8">
+              <div class="p-3">
+                <h6 class="text-uppercase text-muted mb-3">Account Information</h6>
+                
+                <div class="table-responsive">
+                  <table class="table">
+                    <tbody>
+                      <tr>
+                        <th style="width: 30%;">Name</th>
+                        <td>{{ app.session.get('user_name') }}</td>
+                      </tr>
+                      <tr>
+                        <th>Email</th>
+                        <td>{{ app.session.get('user_email') }}</td>
+                      </tr>
+                      <tr>
+                        <th>Role</th>
+                        <td>
+                          <span class="badge bg-primary">{{ app.session.get('user_role') }}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Status</th>
+                        <td>
+                          <span class="badge bg-success">Active</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All users card -->
   <div class="row">
     <div class="col-12">
       <div class="card mb-4">
         <div class="card-header pb-0">
-          <h6>Bon Plans Table</h6>
+          <h6>All User Profiles</h6>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-0">
-            <table class="table align-items-center mb-0">
+            <table class="table align-items-center mb-0" id="users-table">
               <thead>
                 <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Titre</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Description</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">User</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role</th>
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Phone</th>
                   <th class="text-secondary opacity-7"></th>
                 </tr>
               </thead>
               <tbody>
-                <!-- Example row, to be replaced with actual data -->
-                <tr>
+                {% for user in allUsers %}
+                <tr class="user-row">
                   <td>
                     <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="{{ path('app_profile_image', {'filename': user.imagesU }) }}" 
+                             class="avatar avatar-sm me-3" 
+                             alt="{{ user.name }}"
+                             onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                      </div>
                       <div class="d-flex flex-column justify-content-center">
-                        <h6 class="mb-0 text-sm">Bon Plan Example</h6>
+                        <h6 class="mb-0 text-sm">{{ user.name }} {{ user.prenom }}</h6>
+                        <p class="text-xs text-secondary mb-0">{{ user.email }}</p>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <p class="text-xs font-weight-bold mb-0">Description example</p>
+                    <p class="text-xs font-weight-bold mb-0">{{ user.roleUser }}</p>
                   </td>
                   <td class="align-middle text-center text-sm">
-                    <span class="badge badge-sm bg-gradient-success">Active</span>
+                    {% if user.statut == 'actif' %}
+                      <span class="badge badge-sm bg-gradient-success">Active</span>
+                    {% else %}
+                      <span class="badge badge-sm bg-gradient-secondary">Inactive</span>
+                    {% endif %}
                   </td>
                   <td class="align-middle text-center">
-                    <span class="text-secondary text-xs font-weight-bold">23/04/2022</span>
+                    <span class="text-secondary text-xs font-weight-bold">{{ user.phoneNumber }}</span>
                   </td>
                   <td class="align-middle">
-                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                      Edit
+                    <a href="{{ path('user_page') }}?id={{ user.idU }}" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                      View Details
                     </a>
                   </td>
                 </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
@@ -75,4 +155,29 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Simple search functionality for the users table
+    const searchInput = document.getElementById('profile-search');
+    if (searchInput) {
+      searchInput.addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const userRows = document.querySelectorAll('.user-row');
+        
+        userRows.forEach(row => {
+          const userName = row.querySelector('h6').textContent.toLowerCase();
+          const userEmail = row.querySelector('p').textContent.toLowerCase();
+          const userRole = row.querySelector('.text-xs.font-weight-bold').textContent.toLowerCase();
+          
+          if (userName.includes(searchValue) || userEmail.includes(searchValue) || userRole.includes(searchValue)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    }
+  });
+</script>
 {% endblock %}

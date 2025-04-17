@@ -399,10 +399,29 @@ class AdminController extends AbstractController
     }
 
     #[Route('/BonplanPage', name: 'bonplan_page')]
-    public function bonplanPage(): Response
+    public function bonplanPage(SessionInterface $session, UserRepository $userRepository): Response
     {
-        // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashAdmin/bonplanPage.html.twig');
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('login');
+        }
+        
+        // Get user profile data
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        if (!$user) {
+            $this->addFlash('error', 'User not found. Please log in again.');
+            return $this->redirectToRoute('login');
+        }
+        
+        // Get all users for the list display
+        $allUsers = $userRepository->findBy(['deleteFlag' => 0]);
+        
+        return $this->render('dashAdmin/bonplanPage.html.twig', [
+            'user' => $user,
+            'allUsers' => $allUsers
+        ]);
     }
 
 
