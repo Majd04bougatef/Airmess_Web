@@ -34,7 +34,7 @@ final class StationController extends AbstractController
             ? $stationRepository->findAll()
             : $stationRepository->findBy(['user' => $user]);
 
-        return $this->render('dashEntreprise/dashboardEntreprisePage.html.twig', [
+        return $this->render('dashEntreprise/dashboardEntreprise.html.twig', [
             'stations' => $stations,
             'user' => $user,
         ]);

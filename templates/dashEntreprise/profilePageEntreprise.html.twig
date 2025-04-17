@@ -9,7 +9,7 @@
       <div class="card mb-4">
         <div class="card-header pb-0 d-flex justify-content-between align-items-center">
           <h6>Profil Entreprise</h6>
-          <a href="{{ path('profileVoyageurs_edit') }}" class="btn btn-sm btn-primary">
+          <a href="{{ path('profileEntreprise_edit') }}" class="btn btn-sm btn-primary">
             <i class="fas fa-edit me-1"></i> Modifier le profil
           </a>
         </div>
@@ -19,7 +19,7 @@
             <div class="col-md-4 text-center border-end">
               <div class="p-3">
                 <div class="position-relative mb-3">
-                  <img src="{{ path('app_profile_image', {'filename': app.session.get('user_image') }) }}" 
+                  <img src="{{ asset('uploads/users_images/' ~ app.session.get('user_image')) }}" 
                        class="rounded-circle img-fluid mx-auto d-block" 
                        style="width: 150px; height: 150px; object-fit: cover;"
                        alt="{{ user.name }}"
@@ -27,7 +27,7 @@
                   
                   <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle p-2" 
                        style="transform: translate(20%, 20%);">
-                    <a href="{{ path('profileVoyageurs_edit') }}" class="text-white">
+                    <a href="{{ path('profileEntreprise_edit') }}" class="text-white">
                       <i class="fas fa-camera"></i>
                     </a>
                   </div>
@@ -87,11 +87,11 @@
                 <div class="mt-4">
                   <h6 class="text-uppercase text-muted mb-3">Actions</h6>
                   <div class="d-flex gap-2">
-                    <a href="{{ path('profileVoyageurs_edit') }}" class="btn btn-sm btn-info">
+                    <a href="{{ path('profileEntreprise_edit') }}" class="btn btn-sm btn-info">
                       <i class="fas fa-edit me-1"></i> Modifier le profil
                     </a>
                     <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteProfileModal">
-                      <i class="fas fa-trash-alt me-1"></i> Désactiver le compte
+                      <i class="fas fa-trash-alt me-1"></i> Supprimer le compte
                     </button>
                   </div>
                 </div>
@@ -109,13 +109,13 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title" id="deleteProfileModalLabel">Confirmer la désactivation</h5>
+        <h5 class="modal-title" id="deleteProfileModalLabel">Confirmer la suppression</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Êtes-vous sûr de vouloir désactiver votre compte? Cette action aura les conséquences suivantes:</p>
+        <p>Êtes-vous sûr de vouloir supprimer votre compte? Cette action aura les conséquences suivantes:</p>
         <ul>
-          <li>Votre profil sera désactivé</li>
+          <li>Votre profil sera supprimé</li>
           <li>Vous serez déconnecté immédiatement</li>
           <li>Vous devrez contacter le support pour réactiver votre compte</li>
         </ul>
@@ -128,7 +128,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>Désactiver le compte</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>Supprimer le compte</button>
       </div>
     </div>
   </div>
@@ -167,8 +167,8 @@ document.addEventListener('DOMContentLoaded', function() {
         alertDiv.className = 'alert alert-info alert-dismissible fade show';
         alertDiv.setAttribute('role', 'alert');
         alertDiv.innerHTML = 
-          '<strong>Compte désactivé!</strong> ' + 
-          'Votre compte a été désactivé avec succès. Vous serez redirigé vers la page de connexion.' +
+          '<strong>Compte supprimé!</strong> ' + 
+          'Votre compte a été supprimé avec succès. Vous serez redirigé vers la page de connexion.' +
           '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
         
         document.querySelector('.container-fluid').prepend(alertDiv);
@@ -178,13 +178,13 @@ document.addEventListener('DOMContentLoaded', function() {
           window.location.href = "{{ path('app_logout') }}";
         }, 3000);
       } else {
-        throw new Error(data.message || 'Une erreur est survenue lors de la désactivation de votre compte.');
+        throw new Error(data.message || 'Une erreur est survenue lors de la suppression de votre compte.');
       }
     })
     .catch(error => {
       // Reset button
       this.disabled = false;
-      this.innerHTML = 'Désactiver le compte';
+      this.innerHTML = 'Supprimer le compte';
       
       // Show error message
       const alertDiv = document.createElement('div');
@@ -199,5 +199,4 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-{% endblock %}
-
+{% endblock %} 

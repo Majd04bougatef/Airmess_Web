@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="200px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>User Avatar</title>
+  <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <circle fill="#E9EEFF" cx="100" cy="100" r="100"></circle>
+    <g transform="translate(50, 40)">
+      <!-- Head -->
+      <circle fill="#B6C5E5" cx="50" cy="40" r="35"></circle>
+      <!-- Body -->
+      <path d="M95,140 C95,110 75,100 50,100 C25,100 5,110 5,140" stroke="#B6C5E5" stroke-width="30" fill="none"></path>
+    </g>
+  </g>
+</svg> 
