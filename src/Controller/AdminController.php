@@ -2,13 +2,16 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\BonPlan;
 use App\Repository\UserRepository;
 use App\Repository\StationRepository;
+use App\Repository\BonPlanRepository;
 use App\Repository\ReservationTransportRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\OffreRepository;
 
@@ -343,10 +346,42 @@ class AdminController extends AbstractController
     }
 
     #[Route('/BonplanPage', name: 'bonplan_page')]
-    public function bonplanPage(): Response
+    public function bonplanPage(Request $request, BonPlanRepository $bonPlanRepository): Response
     {
-        // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashAdmin/bonplanPage.html.twig');
+        $searchTerm = $request->query->get('search', '');
+        
+        // Si un terme de recherche est fourni, filtrer les résultats
+        if (!empty($searchTerm)) {
+            // Essayer de récupérer une méthode de recherche du repository
+            if (method_exists($bonPlanRepository, 'searchBonPlans')) {
+                $bonPlans = $bonPlanRepository->searchBonPlans($searchTerm);
+            } else {
+                // Fallback: recherche basique si la méthode n'existe pas
+                $bonPlans = $bonPlanRepository->findBy([
+                    'nomplace' => '%' . $searchTerm . '%'
+                ]);
+                
+                // Si aucun résultat, récupérer tous
+                if (empty($bonPlans)) {
+                    $bonPlans = $bonPlanRepository->findAll();
+                }
+            }
+        } else {
+            // Sinon, récupérer tous les bon plans
+            $bonPlans = $bonPlanRepository->findAll();
+        }
+        
+        // Récupérer les statistiques
+        $statsByType = $bonPlanRepository->getStatsByType();
+        $generalStats = $bonPlanRepository->getGeneralStats();
+        
+        // Passer les bon plans et le terme de recherche à la vue
+        return $this->render('dashAdmin/bonplanPage.html.twig', [
+            'bonPlans' => $bonPlans,
+            'searchTerm' => $searchTerm,
+            'statsByType' => $statsByType,
+            'generalStats' => $generalStats
+        ]);
     }
 
 
@@ -390,6 +425,26 @@ class AdminController extends AbstractController
         }
         
         return $roleCount;
+    }
+
+    #[Route('/admin/bonplan/delete/{id}', name: 'admin_bonplan_delete', methods: ['POST'])]
+    public function deleteBonPlan(
+        BonPlan $bonPlan, 
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        try {
+            // Supprimer le bon plan
+            $entityManager->remove($bonPlan);
+            $entityManager->flush();
+            
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false, 
+                'message' => 'Erreur lors de la suppression: '.$e->getMessage()
+            ], 500);
+        }
     }
 }
 

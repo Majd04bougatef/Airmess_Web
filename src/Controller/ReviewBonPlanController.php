@@ -159,14 +159,18 @@ final class ReviewBonPlanController extends AbstractController
                 return $this->json(['success' => false, 'message' => 'Bon plan non trouvé'], 404);
             }
             
+            // Get current user ID
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['success' => false, 'message' => 'Utilisateur non connecté'], 401);
+            }
+            
             // Create and save review
             $review = new ReviewBonPlan();
             $review->setBonPlan($bonPlan);
             $review->setRating((int)$rating);
             $review->setCommente($comment);
-            
-            // TODO: Get real user ID from session
-            $review->setIdU(1);
+            $review->setIdU($user->getId());
             
             $entityManager->persist($review);
             $entityManager->flush();
@@ -185,6 +189,17 @@ final class ReviewBonPlanController extends AbstractController
     public function apiEdit(ReviewBonPlan $reviewBonPlan, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
+            // Get current user
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['success' => false, 'message' => 'Utilisateur non connecté'], 401);
+            }
+            
+            // Check if user owns the review
+            if ($reviewBonPlan->getIdU() !== $user->getId()) {
+                return $this->json(['success' => false, 'message' => 'Vous n\'êtes pas autorisé à modifier cet avis'], 403);
+            }
+            
             // Get data from request
             $rating = $request->request->get('rating');
             $comment = $request->request->get('comment');
@@ -213,6 +228,17 @@ final class ReviewBonPlanController extends AbstractController
     public function apiDelete(ReviewBonPlan $reviewBonPlan, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
+            // Get current user
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['success' => false, 'message' => 'Utilisateur non connecté'], 401);
+            }
+            
+            // Check if user owns the review
+            if ($reviewBonPlan->getIdU() !== $user->getId()) {
+                return $this->json(['success' => false, 'message' => 'Vous n\'êtes pas autorisé à supprimer cet avis'], 403);
+            }
+            
             $entityManager->remove($reviewBonPlan);
             $entityManager->flush();
             

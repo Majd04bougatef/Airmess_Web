@@ -18,21 +18,43 @@ class BonPlan
     private ?int $idP = null;
 
     #[ORM\Column(name: 'id_u', type: 'integer')]
+    #[Assert\NotBlank(message: "L'ID utilisateur est obligatoire")]
     private ?int $id_u = null;
 
     #[ORM\Column(name: 'nomplace', type: 'string', length: 255)]
+    #[Assert\NotBlank(message: "Le nom du lieu est obligatoire")]
+    #[Assert\Length(
+        min: 3,
+        max: 100,
+        minMessage: "Le nom du lieu doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le nom du lieu ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $nomplace = null;
 
     #[ORM\Column(name: 'localisation', type: 'string', length: 255, nullable: true)]
+    #[Assert\NotBlank(message: "La localisation est obligatoire")]
     private ?string $localisation = null;
 
     #[ORM\Column(name: 'description', type: 'text', nullable: true)]
+    #[Assert\NotBlank(message: "La description est obligatoire")]
+    #[Assert\Length(
+        min: 10,
+        max: 500,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères",
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $description = null;
 
     #[ORM\Column(name: 'typePlace', type: 'string', length: 255, nullable: true)]
+    #[Assert\NotBlank(message: "Le type de lieu est obligatoire")]
+    #[Assert\Choice(
+        choices: ['resto', 'coworkingspace', 'cafe', 'musée'],
+        message: "Le type de lieu doit être l'un des suivants: resto, coworkingspace, cafe, musée"
+    )]
     private ?string $typePlace = null;
 
     #[ORM\Column(name: 'imageBP', type: 'string', length: 500, nullable: true)]
+    #[Assert\NotBlank(message: "L'image est obligatoire")]
     private ?string $imageBP = null;
 
     #[ORM\OneToMany(mappedBy: 'bonPlan', targetEntity: ReviewBonPlan::class, cascade: ['persist', 'remove'])]

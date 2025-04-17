@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\RangeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Length;
 
 class ReviewBonPlanType extends AbstractType
 {
@@ -29,18 +30,6 @@ class ReviewBonPlanType extends AbstractType
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez entrer l\'ID de l\'utilisateur'
-                    ])
-                ]
-            ])
-            ->add('commente', TextareaType::class, [
-                'label' => 'Commentaire',
-                'attr' => [
-                    'placeholder' => 'Entrez votre commentaire ici',
-                    'rows' => 4
-                ],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer un commentaire'
                     ])
                 ]
             ])
@@ -61,6 +50,24 @@ class ReviewBonPlanType extends AbstractType
                         'max' => 5,
                         'minMessage' => 'La note minimale est 1',
                         'maxMessage' => 'La note maximale est 5'
+                    ])
+                ]
+            ])
+            ->add('commente', TextareaType::class, [
+                'label' => 'Commentaire',
+                'attr' => [
+                    'placeholder' => 'Entrez votre commentaire ici',
+                    'rows' => 4
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Veuillez entrer un commentaire'
+                    ]),
+                    new Length([
+                        'min' => 3,
+                        'max' => 500,
+                        'minMessage' => 'Le commentaire doit contenir au moins {{ limit }} caractères',
+                        'maxMessage' => 'Le commentaire ne peut pas dépasser {{ limit }} caractères'
                     ])
                 ]
             ])

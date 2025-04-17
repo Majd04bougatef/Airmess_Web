@@ -1,3 +1,5 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
 {% block title %}Modifier un bon plan - Airmess Dashboard{% endblock %}
 
 {% block body %}
@@ -7,7 +9,7 @@
     <p class="form-subtitle">Complétez les informations ci-dessous pour modifier le bon plan "{{ bonplan.nomplace }}".</p>
   </div>
 
-  <form action="{{ path('bonplan_update', {'idP': bonplan.idP}) }}" method="post" id="bonplan-edit-form" enctype="multipart/form-data">
+  <form action="{{ path('bonplan_update', {'idP': bonplan.idP}) }}" method="post" id="bonplan-edit-form" enctype="multipart/form-data" class="needs-validation" novalidate>
     <!-- Basic Info Card -->
     <div class="form-card card-info">
       <div class="form-card-header">
@@ -18,8 +20,11 @@
         <div class="form-row">
           <div class="form-col form-col-md-12">
             <div class="form-floating">
-              <input type="text" class="form-control" id="nomplace" name="nomplace" placeholder=" " value="{{ bonplan.nomplace }}" required>
+              <input type="text" class="form-control" id="nomplace" name="nomplace" placeholder=" " value="{{ bonplan.nomplace }}" required minlength="3" maxlength="100">
               <label for="nomplace">Nom du lieu</label>
+              <div class="invalid-feedback">
+                Le nom du lieu est requis et doit contenir entre 3 et 100 caractères.
+              </div>
             </div>
           </div>
         </div>
@@ -39,8 +44,11 @@
             </div>
             <div class="col-md-6">
               <div class="form-floating">
-                <input type="text" class="form-control" id="localisation" name="localisation" placeholder=" " value="{{ bonplan.localisation }}" readonly>
+                <input type="text" class="form-control" id="localisation" name="localisation" placeholder=" " value="{{ bonplan.localisation }}" readonly required>
                 <label for="localisation">Coordonnées</label>
+                <div class="invalid-feedback">
+                  Veuillez sélectionner une localisation sur la carte.
+                </div>
               </div>
               <small class="form-text text-muted">Format: latitude, longitude</small>
             </div>
@@ -50,8 +58,11 @@
         <div class="form-spacer"></div>
         
         <div class="form-floating">
-          <textarea class="form-control" id="description" name="description" style="height: 120px" placeholder=" ">{{ bonplan.description }}</textarea>
+          <textarea class="form-control" id="description" name="description" style="height: 120px" placeholder=" " required minlength="10" maxlength="500">{{ bonplan.description }}</textarea>
           <label for="description">Description</label>
+          <div class="invalid-feedback">
+            La description est requise et doit contenir entre 10 et 500 caractères.
+          </div>
         </div>
       </div>
     </div>
@@ -74,6 +85,9 @@
                 <option value="musée" {% if bonplan.typePlace == 'musée' %}selected{% endif %}>Musée</option>
               </select>
               <label for="typePlace">Type de lieu</label>
+              <div class="invalid-feedback">
+                Veuillez sélectionner un type de lieu.
+              </div>
             </div>
           </div>
         </div>
@@ -89,11 +103,14 @@
       <div class="form-card-body">
         <div class="current-image mb-3">
           <p>Image actuelle :</p>
-          <img src="{{ asset('uploads/' ~ bonplan.imageBP) }}" alt="Image actuelle" class="img-thumbnail" style="max-height: 150px;" onerror="this.src='{{ asset('uploads/espagne-67f714bee028d.jpg') }}';">
+          <img src="{{ asset('uploads/bonplans/' ~ bonplan.imageBP) }}" alt="Image actuelle" class="img-thumbnail" style="max-height: 150px;" onerror="this.src='{{ asset('uploads/espagne-67f714bee028d.jpg') }}';">
         </div>
         <div class="form-floating">
-          <input type="file" class="form-control" id="imageBP" name="imageBP" placeholder=" ">
+          <input type="file" class="form-control" id="imageBP" name="imageBP" placeholder=" " accept="image/jpeg,image/png">
           <label for="imageBP">Nouvelle image (laisser vide pour conserver l'actuelle)</label>
+          <div class="invalid-feedback">
+                Veuillez sélectionner une image valide (JPG ou PNG).
+              </div>
         </div>
         <small class="form-text text-muted">Choisissez une nouvelle image pour le bon plan (formats acceptés: JPG, PNG)</small>
       </div>
@@ -517,6 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Mettre à jour le champ de texte avec les coordonnées
   function updateCoordinates(latlng) {
     document.getElementById('localisation').value = latlng.lat.toFixed(6) + ', ' + latlng.lng.toFixed(6);
+    validateField('localisation');
   }
   
   // Ajouter un marqueur lorsqu'on clique sur la carte
@@ -573,32 +591,136 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Setup form submission
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
+  // Fonction de validation des champs
+  function validateField(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+
+    // Validation spécifique pour chaque champ
+    switch(fieldId) {
+      case 'nomplace':
+        if (field.value.length < 3 || field.value.length > 100) {
+          field.classList.add('is-invalid');
+          field.classList.remove('is-valid');
+        } else {
+          field.classList.remove('is-invalid');
+          field.classList.add('is-valid');
+        }
+        break;
+        
+      case 'localisation':
+        if (!field.value.trim()) {
+          field.classList.add('is-invalid');
+          field.classList.remove('is-valid');
+        } else {
+          field.classList.remove('is-invalid');
+          field.classList.add('is-valid');
+        }
+        break;
+        
+      case 'description':
+        if (field.value.length < 10 || field.value.length > 500) {
+          field.classList.add('is-invalid');
+          field.classList.remove('is-valid');
+        } else {
+          field.classList.remove('is-invalid');
+          field.classList.add('is-valid');
+        }
+        break;
+        
+      case 'typePlace':
+        if (!field.value) {
+          field.classList.add('is-invalid');
+          field.classList.remove('is-valid');
+        } else {
+          field.classList.remove('is-invalid');
+          field.classList.add('is-valid');
+        }
+        break;
+        
+      case 'imageBP':
+        if (field.files.length > 0) {
+          const file = field.files[0];
+          const validTypes = ['image/jpeg', 'image/png'];
+          if (!validTypes.includes(file.type)) {
+            field.classList.add('is-invalid');
+            field.classList.remove('is-valid');
+          } else {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+          }
+        }
+        break;
+    }
+  }
+
+  // Validation en temps réel
+  const inputs = document.querySelectorAll('input, select, textarea');
+  inputs.forEach(input => {
+    input.addEventListener('input', function() {
+      validateField(this.id);
+    });
     
-    // Create FormData object for form submission with file upload
-    const formData = new FormData(form);
+    input.addEventListener('blur', function() {
+      validateField(this.id);
+    });
     
-    // Submit form using fetch API
-    fetch(form.getAttribute('action'), {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Bon plan modifié avec succès!');
-        window.location.href = '{{ path('bonplanVoyageurs_page') }}';
-      } else {
-        alert('Erreur: ' + data.message);
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Une erreur est survenue lors de la modification du bon plan.');
+    input.addEventListener('change', function() {
+      validateField(this.id);
     });
   });
+
+  // Validation du formulaire à la soumission
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Valider tous les champs
+      const requiredFields = ['nomplace', 'localisation', 'description', 'typePlace'];
+      let isValid = true;
+      
+      requiredFields.forEach(fieldId => {
+        validateField(fieldId);
+        const field = document.getElementById(fieldId);
+        if (field.classList.contains('is-invalid')) {
+          isValid = false;
+        }
+      });
+      
+      // Vérifier l'image si une nouvelle est sélectionnée
+      const imageField = document.getElementById('imageBP');
+      if (imageField.files.length > 0) {
+        validateField('imageBP');
+        if (imageField.classList.contains('is-invalid')) {
+          isValid = false;
+        }
+      }
+      
+      if (isValid) {
+        // Créer FormData pour l'envoi
+        const formData = new FormData(form);
+        
+        // Envoyer les données
+        fetch(form.action, {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Bon plan modifié avec succès!');
+            window.location.href = '{{ path('bonplanVoyageurs_page') }}';
+          } else {
+            alert('Erreur: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+          alert('Une erreur est survenue lors de la modification du bon plan.');
+        });
+      }
+    });
+  }
 });
 </script>
 {% endblock %} 
