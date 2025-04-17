@@ -68,7 +68,6 @@ final class ReservationTransportController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Store reservation data in session instead of database
             $tempData = [
                 'user_id' => $user->getIdU(),
                 'station_id' => $station->getIdS(),
