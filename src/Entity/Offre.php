@@ -7,6 +7,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Enum\OffreStatus;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: OffreRepository::class)]
 class Offre
@@ -116,6 +118,16 @@ class Offre
 
     #[ORM\Column(type: 'string', enumType: OffreStatus::class, options: ['default' => OffreStatus::EN_ATTENTE])]
     private OffreStatus $statusoff = OffreStatus::EN_ATTENTE;
+
+    #[ORM\OneToMany(mappedBy: 'offre', targetEntity: Reservation::class, orphanRemoval: true, cascade: ['remove'])]
+    private Collection $reservations;
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+        $this->aidesc = '';
+        $this->statusoff = OffreStatus::EN_ATTENTE;
+    }
 
     public function getIdO(): ?int
     {
@@ -250,6 +262,36 @@ class Offre
     public function setStatusoff(OffreStatus $statusoff): static
     {
         $this->statusoff = $statusoff;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): self
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setOffre($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): self
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getOffre() === $this) {
+                $reservation->setOffre(null);
+            }
+        }
 
         return $this;
     }

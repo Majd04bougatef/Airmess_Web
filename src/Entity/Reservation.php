@@ -15,9 +15,9 @@ class Reservation
     #[ORM\Column(name: 'idR', type: 'integer')]
     private ?int $idR = null;
 
-    #[Assert\NotNull(message: 'L\'offre associée est obligatoire.')]
-    #[ORM\ManyToOne(targetEntity: Offre::class)]
-    #[ORM\JoinColumn(name: 'idO', referencedColumnName: 'idO')]
+    #[ORM\ManyToOne(inversedBy: 'reservations')]
+    #[ORM\JoinColumn(name: 'idO', referencedColumnName: 'idO', nullable: false)]
+    #[Assert\NotNull(message: 'L\'offre est obligatoire.')]
     private ?Offre $offre = null;
 
     #[Assert\NotBlank(message: 'La date de réservation est obligatoire.')]
