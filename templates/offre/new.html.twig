@@ -373,145 +373,155 @@
 {% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="content-card content-section active" id="offre-section">
-                <div class="form-header">
-                    <h2 class="form-title">Créer une Nouvelle Offre</h2>
-                    <p class="form-subtitle">Complétez les informations ci-dessous pour créer une nouvelle offre touristique.</p>
+    {# Inclure les styles et scripts pour la validation des formulaires #}
+    {% include 'form_error_styling.html.twig' %}
+
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="content-card content-section active" id="offre-section">
+                    <div class="form-header">
+                        <h2 class="form-title">Créer une Nouvelle Offre</h2>
+                        <p class="form-subtitle">Complétez les informations ci-dessous pour créer une nouvelle offre touristique.</p>
+                    </div>
+
+                    {{ form_start(form, {'method': 'POST', 'attr': {'class': 'offre-form', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+                        
+                        <!-- Basic Info Card -->
+                        <div class="form-card card-info">
+                            <div class="form-card-header">
+                                <i class="fas fa-info-circle form-card-icon"></i>
+                                <h3 class="form-card-title">Informations de l'offre</h3>
+                            </div>
+                            <div class="form-card-body">
+                                <div class="form-row">
+                                    <div class="form-col form-col-md-6">
+                                        <div class="form-floating">
+                                            {{ form_widget(form.place, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                                            {{ form_label(form.place) }}
+                                            {{ form_errors(form.place) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-col form-col-md-6">
+                                        <div class="form-floating">
+                                            {{ form_widget(form.numberLimit, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                                            {{ form_label(form.numberLimit) }}
+                                            {{ form_errors(form.numberLimit) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-spacer"></div>
+                                
+                                <div class="form-row">
+                                    <div class="form-col form-col-md-6">
+                                        <div class="form-floating">
+                                            {{ form_widget(form.priceInit, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                                            {{ form_label(form.priceInit) }}
+                                            {{ form_errors(form.priceInit) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-col form-col-md-6">
+                                        <div class="form-floating">
+                                            {{ form_widget(form.priceAfter, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                                            {{ form_label(form.priceAfter) }}
+                                            {{ form_errors(form.priceAfter) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-spacer"></div>
+                                
+                                <div class="form-row">
+                                    <div class="form-col form-col-md-6">
+                                        <div class="form-floating">
+                                            {{ form_widget(form.startDate, {'attr': {'class': 'form-control date-control', 'placeholder': ' '}}) }}
+                                            {{ form_label(form.startDate) }}
+                                            {{ form_errors(form.startDate) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-col form-col-md-6">
+                                        <div class="form-floating">
+                                            {{ form_widget(form.endDate, {'attr': {'class': 'form-control date-control', 'placeholder': ' '}}) }}
+                                            {{ form_label(form.endDate) }}
+                                            {{ form_errors(form.endDate) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-spacer"></div>
+                                
+                                <div class="form-floating">
+                                    {{ form_widget(form.description, {'attr': {'class': 'form-control', 'style': 'height: 120px', 'placeholder': ' '}}) }}
+                                    {{ form_label(form.description) }}
+                                    {{ form_errors(form.description) }}
+                                </div>
+                                
+                                <div class="col-md-12 mb-3 form-group">
+                                    {{ form_label(form.aidesc, null, {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.aidesc, {'attr': {'class': 'form-control' ~ (form.aidesc.vars.valid ? '' : ' is-invalid'), 'rows': '4'}}) }}
+                                    <small class="form-text text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        {{ form_help(form.aidesc) }}
+                                    </small>
+                                    {% if not form.aidesc.vars.valid %}
+                                        <div class="form-error">
+                                            <i class="bi bi-exclamation-circle field-error-icon"></i>
+                                            {{ form_errors(form.aidesc) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Media Card -->
+                        <div class="form-card card-media">
+                            <div class="form-card-header">
+                                <i class="fas fa-photo-video form-card-icon"></i>
+                                <h3 class="form-card-title">Image de l'offre</h3>
+                            </div>
+                            <div class="form-card-body">
+                                <div class="form-image-upload">
+                                    <h4>Télécharger une image pour votre offre</h4>
+                                    {{ form_label(form.imageFile) }}
+                                    {{ form_widget(form.imageFile, {
+                                        'attr': {
+                                            'class': 'form-control-file',
+                                            'accept': 'image/jpeg, image/jpg, image/png, image/webp'
+                                        }
+                                    }) }}
+                                    <small class="form-image-hint">{{ form_help(form.imageFile) }}</small>
+                                    {{ form_errors(form.imageFile) }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if form.statusoff is defined and is_granted('ROLE_ADMIN') %}
+                        <div class="form-card card-status">
+                            <div class="form-card-header">
+                                <i class="fas fa-flag form-card-icon"></i>
+                                <h3 class="form-card-title">Statut de l'offre</h3>
+                            </div>
+                            <div class="form-card-body">
+                                <div class="form-floating">
+                                    {{ form_widget(form.statusoff, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                                    {{ form_label(form.statusoff) }}
+                                    {{ form_errors(form.statusoff) }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="form-actions">
+                            <a href="{{ path('offreEntreprise_page') }}" class="form-btn-outline">Annuler</a>
+                            <button type="submit" class="form-btn">Créer l'offre</button>
+                        </div>
+                    {{ form_end(form) }}
                 </div>
-
-                {{ form_start(form, {'method': 'POST', 'attr': {'class': 'offre-form', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
-                    
-                    <!-- Basic Info Card -->
-                    <div class="form-card card-info">
-                        <div class="form-card-header">
-                            <i class="fas fa-info-circle form-card-icon"></i>
-                            <h3 class="form-card-title">Informations de l'offre</h3>
-                        </div>
-                        <div class="form-card-body">
-                            <div class="form-row">
-                                <div class="form-col form-col-md-6">
-                                    <div class="form-floating">
-                                        {{ form_widget(form.place, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
-                                        {{ form_label(form.place) }}
-                                        {{ form_errors(form.place) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="form-col form-col-md-6">
-                                    <div class="form-floating">
-                                        {{ form_widget(form.numberLimit, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
-                                        {{ form_label(form.numberLimit) }}
-                                        {{ form_errors(form.numberLimit) }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-spacer"></div>
-                            
-                            <div class="form-row">
-                                <div class="form-col form-col-md-6">
-                                    <div class="form-floating">
-                                        {{ form_widget(form.priceInit, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
-                                        {{ form_label(form.priceInit) }}
-                                        {{ form_errors(form.priceInit) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="form-col form-col-md-6">
-                                    <div class="form-floating">
-                                        {{ form_widget(form.priceAfter, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
-                                        {{ form_label(form.priceAfter) }}
-                                        {{ form_errors(form.priceAfter) }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-spacer"></div>
-                            
-                            <div class="form-row">
-                                <div class="form-col form-col-md-6">
-                                    <div class="form-floating">
-                                        {{ form_widget(form.startDate, {'attr': {'class': 'form-control date-control', 'placeholder': ' '}}) }}
-                                        {{ form_label(form.startDate) }}
-                                        {{ form_errors(form.startDate) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="form-col form-col-md-6">
-                                    <div class="form-floating">
-                                        {{ form_widget(form.endDate, {'attr': {'class': 'form-control date-control', 'placeholder': ' '}}) }}
-                                        {{ form_label(form.endDate) }}
-                                        {{ form_errors(form.endDate) }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-spacer"></div>
-                            
-                            <div class="form-floating">
-                                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'style': 'height: 120px', 'placeholder': ' '}}) }}
-                                {{ form_label(form.description) }}
-                                {{ form_errors(form.description) }}
-                            </div>
-                            
-                            <div class="form-spacer"></div>
-                            
-                            <div class="form-floating">
-                                {{ form_widget(form.aidesc, {'attr': {'class': 'form-control', 'style': 'height: 120px', 'placeholder': ' '}}) }}
-                                {{ form_label(form.aidesc) }}
-                                {{ form_errors(form.aidesc) }}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Media Card -->
-                    <div class="form-card card-media">
-                        <div class="form-card-header">
-                            <i class="fas fa-photo-video form-card-icon"></i>
-                            <h3 class="form-card-title">Image de l'offre</h3>
-                        </div>
-                        <div class="form-card-body">
-                            <div class="form-image-upload">
-                                <h4>Télécharger une image pour votre offre</h4>
-                                {{ form_label(form.imageFile) }}
-                                {{ form_widget(form.imageFile, {
-                                    'attr': {
-                                        'class': 'form-control-file',
-                                        'accept': 'image/jpeg, image/jpg, image/png, image/webp'
-                                    }
-                                }) }}
-                                <small class="form-image-hint">{{ form_help(form.imageFile) }}</small>
-                                {{ form_errors(form.imageFile) }}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {% if form.statusoff is defined and is_granted('ROLE_ADMIN') %}
-                    <div class="form-card card-status">
-                        <div class="form-card-header">
-                            <i class="fas fa-flag form-card-icon"></i>
-                            <h3 class="form-card-title">Statut de l'offre</h3>
-                        </div>
-                        <div class="form-card-body">
-                            <div class="form-floating">
-                                {{ form_widget(form.statusoff, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
-                                {{ form_label(form.statusoff) }}
-                                {{ form_errors(form.statusoff) }}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <div class="form-actions">
-                        <a href="{{ path('offreEntreprise_page') }}" class="form-btn-outline">Annuler</a>
-                        <button type="submit" class="form-btn">Créer l'offre</button>
-                    </div>
-                {{ form_end(form) }}
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

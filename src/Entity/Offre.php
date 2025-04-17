@@ -20,40 +20,94 @@ class Offre
     #[ORM\JoinColumn(name: 'id_U', referencedColumnName: 'id_U')]
     private ?User $user = null;
 
-#[Assert\GreaterThan(
+    #[Assert\NotBlank(message: 'Le prix initial est obligatoire.')]
+    #[Assert\Positive(message: 'Le prix initial doit être positif.')]
+    #[Assert\GreaterThan(
+        value: 0,
+        message: 'Le prix initial doit être supérieur à 0.'
+    )]
+    #[Assert\GreaterThan(
         propertyPath: 'priceAfter',
         message: 'Le prix initial doit être supérieur au prix après réduction.'
     )]
     #[ORM\Column(type: 'float')]
     private float $priceInit;
 
-#[Assert\LessThan(
+    #[Assert\NotBlank(message: 'Le prix après réduction est obligatoire.')]
+    #[Assert\Positive(message: 'Le prix après réduction doit être positif.')]
+    #[Assert\GreaterThan(
+        value: 0,
+        message: 'Le prix après réduction doit être supérieur à 0.'
+    )]
+    #[Assert\LessThan(
         propertyPath: 'priceInit',
         message: 'Le prix après réduction doit être inférieur au prix initial.'
     )]
     #[ORM\Column(type: 'float')]
     private float $priceAfter;
 
-#[Assert\NotBlank(message: 'La date de début est obligatoire.')]
+    #[Assert\NotBlank(message: 'La date de début est obligatoire.')]
+    #[Assert\Type(
+        type: \DateTimeInterface::class,
+        message: 'La date de début doit être une date valide.'
+    )]
+    #[Assert\GreaterThanOrEqual(
+        value: 'today',
+        message: 'La date de début doit être au moins aujourd\'hui ou ultérieure.'
+    )]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTimeInterface $startDate;
 
-#[Assert\GreaterThan(
+    #[Assert\NotBlank(message: 'La date de fin est obligatoire.')]
+    #[Assert\Type(
+        type: \DateTimeInterface::class,
+        message: 'La date de fin doit être une date valide.'
+    )]
+    #[Assert\GreaterThan(
         propertyPath: 'startDate',
         message: 'La date de fin doit être après la date de début.'
     )]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTimeInterface $endDate;
 
+    #[Assert\NotBlank(message: 'Le nombre de places est obligatoire.')]
+    #[Assert\Type(
+        type: 'integer',
+        message: 'Le nombre de places doit être un nombre entier.'
+    )]
+    #[Assert\GreaterThan(
+        value: 0,
+        message: 'Le nombre de places doit être supérieur à 0.'
+    )]
     #[ORM\Column(type: 'integer')]
     private int $numberLimit;
 
+    #[Assert\NotBlank(message: 'La description est obligatoire.')]
+    #[Assert\Length(
+        min: 10,
+        max: 1000,
+        minMessage: 'La description doit contenir au moins {{ limit }} caractères.',
+        maxMessage: 'La description ne peut pas dépasser {{ limit }} caractères.'
+    )]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[Assert\NotBlank(message: 'Le lieu est obligatoire.')]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: 'Le lieu doit contenir au moins {{ limit }} caractères.',
+        maxMessage: 'Le lieu ne peut pas dépasser {{ limit }} caractères.'
+    )]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $place = null;
 
+    #[Assert\Image(
+        maxSize: '5M',
+        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        mimeTypesMessage: 'Veuillez télécharger une image valide (JPEG, PNG, WebP).',
+        maxSizeMessage: 'L\'image ne peut pas dépasser {{ limit }}.'
+    )]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $imagePath = null;
 

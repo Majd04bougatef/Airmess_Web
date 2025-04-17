@@ -1,29 +1,100 @@
-{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Nouvelle Réservation{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Réserver une offre</h3>
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">Offre sélectionnée : {{ offre.place }}</h5>
-            <p class="card-text">
-                <strong>Prix :</strong> {{ offre.priceAfter ? offre.priceAfter ~ ' €' : 'Non défini' }}<br>
-            </p>
-            <hr>
-            <h5 class="mb-3">Informations de réservation</h5>
-            {{ form_start(form) }}
-                <div class="form-group mb-3">
-                    {{ form_label(form.dateRes, 'Date de réservation', {'label_attr': {'class': 'form-label'}}) }}
-                    {{ form_widget(form.dateRes, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.dateRes) }}
+    {# Inclure les styles et scripts pour la validation des formulaires #}
+    {% include 'form_error_styling.html.twig' %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-gradient-primary text-white p-4">
+                        <h3 class="mb-0">Réserver cette offre</h3>
+                        <p class="mb-0 opacity-8">Remplissez le formulaire ci-dessous pour finaliser votre réservation</p>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        {# Affichage des messages flash #}
+                        {% for label, messages in app.flashes %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        
+                        {# Informations sur l'offre #}
+                        <div class="offer-summary mb-4">
+                            <h4 class="mb-3">Détails de l'offre</h4>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <img src="{{ 'http://localhost/imageOffre/' ~ (offre.imagePath ?: 'default-offer.jpg') }}" 
+                                                 alt="Image de l'offre" class="img-fluid rounded" style="max-height: 150px; width: 100%; object-fit: cover;">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <h5 class="fw-bold mb-2">{{ offre.description }}</h5>
+                                            <p class="mb-1"><i class="bi bi-geo-alt text-primary me-2"></i>{{ offre.place }}</p>
+                                            <p class="mb-1"><i class="bi bi-calendar-event text-primary me-2"></i>Disponible du {{ offre.startDate|date('d/m/Y') }} au {{ offre.endDate|date('d/m/Y') }}</p>
+                                            <div class="d-flex align-items-center mt-2">
+                                                <span class="text-decoration-line-through text-muted me-2">{{ offre.priceInit }} €</span>
+                                                <span class="fs-5 fw-bold text-primary">{{ offre.priceAfter }} €</span>
+                                                <span class="badge bg-danger ms-2">-{{ ((offre.priceInit - offre.priceAfter) / offre.priceInit * 100)|round }}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {# Formulaire de réservation #}
+                        <h4 class="mb-3">Informations de réservation</h4>
+                        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                            <div class="mb-3 form-group">
+                                {{ form_label(form.dateRes, 'Date de réservation *', {'label_attr': {'class': 'form-label required'}}) }}
+                                {{ form_widget(form.dateRes, {'attr': {'class': 'form-control' ~ (form.dateRes.vars.valid ? '' : ' is-invalid'), 'data-error-message': 'La date de réservation est obligatoire.'}}) }}
+                                {% if not form.dateRes.vars.valid %}
+                                    <div class="form-error">
+                                        <i class="bi bi-exclamation-circle field-error-icon"></i>
+                                        {{ form_errors(form.dateRes) }}
+                                    </div>
+                                {% endif %}
+                                <small class="text-muted">Choisissez la date à laquelle vous souhaitez profiter de cette offre</small>
+                            </div>
+                            
+                            <div class="mb-3 form-group">
+                                <div class="form-check">
+                                    {{ form_widget(form.termsAccepted, {'attr': {'class': 'form-check-input' ~ (form.termsAccepted.vars.valid ? '' : ' is-invalid'), 'data-error-message': 'Vous devez accepter les conditions générales.'}}) }}
+                                    {{ form_label(form.termsAccepted, 'J\'accepte les conditions générales *', {'label_attr': {'class': 'form-check-label required'}}) }}
+                                    {% if not form.termsAccepted.vars.valid %}
+                                        <div class="form-error">
+                                            <i class="bi bi-exclamation-circle field-error-icon"></i>
+                                            {{ form_errors(form.termsAccepted) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info" role="alert">
+                                <i class="bi bi-info-circle me-2"></i>Le paiement s'effectuera par carte bancaire lors de votre arrivée sur place
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-check-circle me-2"></i>Confirmer la réservation
+                                </button>
+                                <a href="{{ path('offreVoyageurs_page') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>Retour aux offres
+                                </a>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-success">Confirmer la réservation</button>
-            {{ form_end(form) }}
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

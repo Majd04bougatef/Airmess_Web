@@ -40,18 +40,26 @@ class ReservationController extends AbstractController
         $form = $this->createForm(\App\Form\ReservationType::class, $reservation);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $reservation->setDateRes(new \DateTime()); // Date actuelle si nécessaire
-            
-            // Décrémenter le nombre de places disponibles
-            $offre->setNumberLimit($offre->getNumberLimit() - 1);
-            
-            $entityManager->persist($reservation);
-            $entityManager->persist($offre);
-            $entityManager->flush();
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $reservation->setDateRes(new \DateTime()); // Date actuelle si nécessaire
+                
+                // Décrémenter le nombre de places disponibles
+                $offre->setNumberLimit($offre->getNumberLimit() - 1);
+                
+                $entityManager->persist($reservation);
+                $entityManager->persist($offre);
+                $entityManager->flush();
 
-            // Rediriger vers la phase suivante (par exemple, récapitulatif)
-            return $this->redirectToRoute('app_reservation_recap', ['idR' => $reservation->getIdR()]);
+                $this->addFlash('success', 'Votre réservation a été créée avec succès !');
+                // Rediriger vers la phase suivante (par exemple, récapitulatif)
+                return $this->redirectToRoute('app_reservation_recap', ['idR' => $reservation->getIdR()]);
+            } else {
+                // Ajouter des messages flash pour les erreurs de validation
+                foreach ($form->getErrors(true) as $error) {
+                    $this->addFlash('error', $error->getMessage());
+                }
+            }
         }
 
         return $this->render('reservation/new.html.twig', [
