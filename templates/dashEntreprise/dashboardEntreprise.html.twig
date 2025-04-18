@@ -44,31 +44,13 @@
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" href="{{ path('dashboardEntreprise_page') }}" id="dashboard-button">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-tv-2 text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Dashboard</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ path('userEntreprise_page') }}" id="user-button">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <img src="{{ asset('images/user-icon.png') }}" alt="Icon" class="img" style="width: 25px; height: 25px;" />
-            </div>
-            <span class="nav-link-text ms-1">Utilisateurs</span>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="{{ path('app_station_new') }}" id="station-button-ajouter">
+          <a class="nav-link active" href="{{ path('app_station_new') }}" id="station-button-ajouter">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <img src="{{ asset('images/ajouter-un-bouton.png') }}" alt="Icon" class="img" style="width: 25px; height: 25px;" />
             </div>
             <span class="nav-link-text ms-1">Ajouter Stations</span>
           </a>
         </li>
-
         <li class="nav-item">
           <a class="nav-link" href="{{ path('app_station_index') }}" id="station-button">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -78,10 +60,11 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ path('bonplanEntreprise_page') }}" id="bonplan-button">
+          <a class="nav-link" href="{{ path('profileEntreprise_page') }}" id="profile-button">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <img src="{{ asset('images/bonplan-icon.png') }}" alt="Icon" class="img" style="width: 25px; height: 25px;" />            </div>
-            <span class="nav-link-text ms-1">Bon Plan</span>
+              <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Mon Profil</span>
           </a>
         </li>
         <li class="nav-item">
@@ -109,19 +92,6 @@
             <span class="nav-link-text ms-1">Analytics</span>
           </a>
         </li>
-        <li class="nav-item mt-3">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
-        </li>
-        <li class="nav-item">
-          <button onclick="goToProfile()" class="nav-link w-100 text-start" style="background-color: rgba(23, 152, 255, 0.05); border: none; border-radius: 8px; cursor:pointer;">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Profile</span>
-            <i class="fas fa-external-link-alt ms-2" style="font-size: 0.8em;"></i>
-          </button>
-        </li>
-      
       </ul>
     </div>
     <div class="sidenav-footer mx-3 ">
@@ -141,11 +111,6 @@
     </div>
   </aside>
   <main class="main-content position-relative border-radius-lg ">
-    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
-      <a href="{{ path('goto_profile') }}" class="btn btn-primary btn-sm" target="_self">
-        <i class="ni ni-single-02 me-1"></i> Go to Profile
-      </a>
-    </div>
    
 <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
       <div class="container-fluid py-1 px-3">
@@ -202,12 +167,182 @@
             <div class="card-header pb-0">
               <h6>Bienvenue sur le tableau de bord d'Airmess</h6>
             </div>
-            <div class="card-body px-0 pt-0 pb-2">
-              <div class="p-4">
-                <p>Chargement du contenu en cours...</p>
-                <div class="text-center">
-                  <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+            <div class="card-body px-4 pt-0 pb-2">
+              <div class="row mt-4">
+                <div class="col-md-4 mb-4">
+                  <!-- Profile Card -->
+                  <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                      <div class="text-center">
+                        <div class="position-relative mb-3">
+                          <img src="{{ asset('uploads/users_images/' ~ app.session.get('user_image')) }}" 
+                               class="rounded-circle img-fluid mx-auto d-block" 
+                               style="width: 120px; height: 120px; object-fit: cover;"
+                               alt="{{ app.session.get('user_name') }}"
+                               onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                        </div>
+                        
+                        <h5 class="font-weight-bold">{{ app.session.get('user_name') }}</h5>
+                        <p class="text-muted">{{ app.session.get('user_role')|default('Entreprise') }}</p>
+                        
+                        <div class="d-grid gap-2 mt-3">
+                          <a href="{{ path('profileEntreprise_page') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-user me-1"></i> Mon profil
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-8 mb-4">
+                  <!-- Dashboard Summary -->
+                  <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-transparent">
+                      <h6 class="mb-0">Vue d'ensemble</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="row g-3">
+                        <!-- Stations Card -->
+                        <div class="col-md-6">
+                          <div class="card bg-gradient-primary border-0">
+                            <div class="card-body py-3">
+                              <div class="row">
+                                <div class="col-8">
+                                  <div class="numbers">
+                                    <p class="text-white text-sm mb-0 opacity-7">Stations</p>
+                                    <h5 class="text-white font-weight-bolder mb-0">
+                                      5
+                                    </h5>
+                                  </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                  <div class="icon icon-shape bg-white shadow text-center rounded-circle">
+                                    <i class="fas fa-map-marker-alt text-primary opacity-10"></i>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Offres Card -->
+                        <div class="col-md-6">
+                          <div class="card bg-gradient-success border-0">
+                            <div class="card-body py-3">
+                              <div class="row">
+                                <div class="col-8">
+                                  <div class="numbers">
+                                    <p class="text-white text-sm mb-0 opacity-7">Offres</p>
+                                    <h5 class="text-white font-weight-bolder mb-0">
+                                      3
+                                    </h5>
+                                  </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                  <div class="icon icon-shape bg-white shadow text-center rounded-circle">
+                                    <i class="fas fa-tags text-success opacity-10"></i>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Quick Actions -->
+                      <div class="mt-4">
+                        <h6 class="text-muted text-uppercase font-weight-bolder">Actions rapides</h6>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                          <a href="{{ path('app_station_new') }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus me-1"></i> Ajouter une station
+                          </a>
+                          <a href="{{ path('app_station_index') }}" class="btn btn-sm btn-info">
+                            <i class="fas fa-map me-1"></i> Gérer les stations
+                          </a>
+                          <a href="{{ path('offreEntreprise_page') }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-tag me-1"></i> Gérer les offres
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Recent Stations Section -->
+              <div class="row">
+                <div class="col-12">
+                  <div class="card shadow-sm border-0">
+                    <div class="card-header bg-transparent">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Stations récentes</h6>
+                        <a href="{{ path('app_station_index') }}" class="btn btn-link text-primary m-0 p-0">
+                          Voir tout <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-0">
+                      <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                          <thead>
+                            <tr>
+                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-3">Station</th>
+                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Localisation</th>
+                              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">État</th>
+                              <th class="text-end text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 pe-3">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div class="d-flex px-3 py-2">
+                                  <div class="icon icon-shape icon-sm me-3 bg-gradient-primary shadow text-center">
+                                    <i class="fas fa-gas-pump text-white opacity-10"></i>
+                                  </div>
+                                  <div class="d-flex flex-column justify-content-center">
+                                    <h6 class="mb-0 text-sm">Station Centre-Ville</h6>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p class="text-xs font-weight-bold mb-0">Tunis</p>
+                              </td>
+                              <td class="align-middle text-center text-sm">
+                                <span class="badge badge-sm bg-gradient-success">Active</span>
+                              </td>
+                              <td class="text-end pe-3">
+                                <a href="{{ path('app_station_index') }}" class="btn btn-link text-dark px-3 mb-0">
+                                  <i class="fas fa-pencil-alt text-dark me-2"></i>Gérer
+                                </a>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="d-flex px-3 py-2">
+                                  <div class="icon icon-shape icon-sm me-3 bg-gradient-primary shadow text-center">
+                                    <i class="fas fa-gas-pump text-white opacity-10"></i>
+                                  </div>
+                                  <div class="d-flex flex-column justify-content-center">
+                                    <h6 class="mb-0 text-sm">Station Lac 2</h6>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p class="text-xs font-weight-bold mb-0">Tunis</p>
+                              </td>
+                              <td class="align-middle text-center text-sm">
+                                <span class="badge badge-sm bg-gradient-success">Active</span>
+                              </td>
+                              <td class="text-end pe-3">
+                                <a href="{{ path('app_station_index') }}" class="btn btn-link text-dark px-3 mb-0">
+                                  <i class="fas fa-pencil-alt text-dark me-2"></i>Gérer
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -356,11 +491,6 @@
         damping: '0.5'
       }
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-    
-    function goToProfile() {
-      // Navigate directly to profile URL
-      window.location.href = "{{ path('goto_profile') }}";
     }
   </script>
   

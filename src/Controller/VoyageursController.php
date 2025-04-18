@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class VoyageursController extends AuthenticatedController
 {
@@ -50,7 +51,7 @@ class VoyageursController extends AuthenticatedController
             }
         }
         
-        return $this->render('dashVoyageurs/dashboardVoyageursPage.html.twig');
+        return $this->render('dashVoyageurs/dashboardVoyageurs.html.twig');
     }
 
     #[Route('/UserVoyageursPage', name: 'userVoyageurs_page')]
@@ -93,9 +94,59 @@ class VoyageursController extends AuthenticatedController
     }
 
     #[Route('/BonplanVoyageursPage', name: 'bonplanVoyageurs_page')]
-    public function bonplanVoyageursPage(): Response
+
+    public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager)
     {
-        return $this->render('dashVoyageurs/bonplanVoyageursPage.html.twig');
+        // Récupérer tous les bons plans
+        $bonplans = $bonPlanRepository->findAll();
+        
+        // Récupérer les notes moyennes pour chaque bon plan
+        $ratings = [];
+        $reviewsCount = [];
+        $reviewsByBonPlan = [];
+        
+        foreach ($bonplans as $bonplan) {
+            // Requête pour calculer la note moyenne
+            $averageRating = $entityManager->createQuery(
+                'SELECT AVG(r.rating) as average
+                FROM App\Entity\ReviewBonPlan r
+                WHERE r.bonPlan = :bonplanId'
+            )
+            ->setParameter('bonplanId', $bonplan->getIdP())
+            ->getSingleScalarResult();
+            
+            // Requête pour compter le nombre d'avis
+            $count = $entityManager->createQuery(
+                'SELECT COUNT(r.idR) as count
+                FROM App\Entity\ReviewBonPlan r
+                WHERE r.bonPlan = :bonplanId'
+            )
+            ->setParameter('bonplanId', $bonplan->getIdP())
+            ->getSingleScalarResult();
+            
+            // Récupérer tous les avis pour ce bon plan
+            $reviews = $entityManager->createQuery(
+                'SELECT r
+                FROM App\Entity\ReviewBonPlan r
+                WHERE r.bonPlan = :bonplanId
+                ORDER BY r.idR DESC'
+            )
+            ->setParameter('bonplanId', $bonplan->getIdP())
+            ->getResult();
+            
+            // Stocker les résultats
+            $ratings[$bonplan->getIdP()] = $averageRating ? round($averageRating, 1) : 0;
+            $reviewsCount[$bonplan->getIdP()] = $count;
+            $reviewsByBonPlan[$bonplan->getIdP()] = $reviews;
+        }
+        
+        // Passer les bons plans et les notes moyennes à la vue
+        return $this->render('dashVoyageurs/bonplanPageVoyageurs.html.twig', [
+            'bonplans' => $bonplans,
+            'ratings' => $ratings,
+            'reviewsCount' => $reviewsCount,
+            'reviewsByBonPlan' => $reviewsByBonPlan
+        ]);
     }
 
     #[Route('/OffreVoyageursPage', name: 'offreVoyageurs_page')]
@@ -150,72 +201,75 @@ class VoyageursController extends AuthenticatedController
         return $this->render('dashVoyageurs/bonplanForm.html.twig');
     }
 
-    #[Route('/BonplanAdd', name: 'bonplan_add', methods: ['POST'])]
-    public function bonplanAdd(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    #[Route('/bonplan/add', name: 'bonplan_add', methods: ['POST'])]
+    public function bonplanAdd(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         try {
-            // Create a new BonPlan entity
-            $bonPlan = new BonPlan();
-            
-            // Set data from form
-            $bonPlan->setNomplace($request->request->get('nomplace'));
-            $bonPlan->setLocalisation($request->request->get('localisation'));
-            $bonPlan->setDescription($request->request->get('description'));
-            $bonPlan->setTypePlace($request->request->get('typePlace'));
-            
-            // Set default user ID (you might want to get this from the session in a real app)
-            $bonPlan->setIdU(1);
-            
-            // Debug uploads directory
-            $uploadsDir = $this->getParameter('uploads_directory');
-            if (!file_exists($uploadsDir)) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Erreur: Le répertoire d\'uploads n\'existe pas: ' . $uploadsDir
-                ], 500);
-            }
-            
-            // Handle image upload
-            $imageFile = $request->files->get('imageBP');
-            if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-                
-                // Move the file to the uploads directory
-                try {
-                    $imageFile->move(
-                        $this->getParameter('uploads_directory'), 
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    return $this->json([
-                        'success' => false,
-                        'message' => 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage()
-                    ], 500);
+            // Récupérer les données du formulaire
+            $nomplace = $request->request->get('nomplace');
+            $localisation = $request->request->get('localisation');
+            $description = $request->request->get('description');
+            $typePlace = $request->request->get('typePlace');
+            $imageBP = $request->files->get('imageBP');
+
+            // Créer un nouveau BonPlan
+            $bonplan = new BonPlan();
+            $bonplan->setNomplace($nomplace);
+            $bonplan->setLocalisation($localisation);
+            $bonplan->setDescription($description);
+            $bonplan->setTypePlace($typePlace);
+            $bonplan->setIdU(1); // TODO: Récupérer l'ID de l'utilisateur connecté
+
+            // Valider l'entité
+            $errors = $validator->validate($bonplan);
+            if (count($errors) > 0) {
+                $errorMessages = [];
+                foreach ($errors as $error) {
+                    $errorMessages[] = $error->getMessage();
                 }
-                
-                $bonPlan->setImageBP($newFilename);
-            } else {
-                // If no image provided, use an existing image or set a placeholder
-                $bonPlan->setImageBP('espagne-67f714bee028d.jpg');
+                return new JsonResponse(['error' => $errorMessages], 400);
             }
-            
-            // Save to database
-            $entityManager->persist($bonPlan);
+
+            // Validation de l'image
+            if ($imageBP) {
+                $allowedMimeTypes = ['image/jpeg', 'image/png'];
+                if (!in_array($imageBP->getMimeType(), $allowedMimeTypes)) {
+                    return new JsonResponse(['error' => ['Format d\'image non supporté. Utilisez JPEG ou PNG']], 400);
+                }
+
+                // Vérification de la taille de l'image (max 5MB)
+                if ($imageBP->getSize() > 5 * 1024 * 1024) {
+                    return new JsonResponse(['error' => ['L\'image ne doit pas dépasser 5MB']], 400);
+                }
+
+                // Génération d'un nom unique pour l'image
+                $newFilename = uniqid() . '.' . $imageBP->guessExtension();
+                $uploadDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/bonplans/';
+
+                // Vérification et création du répertoire si nécessaire
+                if (!file_exists($uploadDirectory)) {
+                    mkdir($uploadDirectory, 0777, true);
+                }
+
+                // Déplacement de l'image
+                try {
+                    $imageBP->move($uploadDirectory, $newFilename);
+                    $bonplan->setImageBP($newFilename);
+                } catch (FileException $e) {
+                    return new JsonResponse(['error' => ['Erreur lors de l\'upload de l\'image']], 500);
+                }
+            } else {
+                // Si aucune image n'est fournie, utiliser une image par défaut
+                $bonplan->setImageBP('default.jpg');
+            }
+
+            // Sauvegarder dans la base de données
+            $entityManager->persist($bonplan);
             $entityManager->flush();
-            
-            // Return JSON response for AJAX handling
-            return $this->json([
-                'success' => true,
-                'message' => 'Bon plan ajouté avec succès',
-                'id' => $bonPlan->getId()
-            ]);
+
+            return new JsonResponse(['success' => true, 'message' => 'Bon plan ajouté avec succès']);
         } catch (\Exception $e) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Une erreur est survenue: ' . $e->getMessage()
-            ], 500);
+            return new JsonResponse(['error' => ['Une erreur est survenue lors de l\'ajout du bon plan']], 500);
         }
     }
 
@@ -320,16 +374,24 @@ class VoyageursController extends AuthenticatedController
     public function bonplanDelete(BonPlan $bonPlan, EntityManagerInterface $entityManager): Response
     {
         try {
-            // Delete image if it's not the default
+            // Vérifier si le bon plan existe
+            if (!$bonPlan) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Bon plan non trouvé'
+                ], 404);
+            }
+
+            // Supprimer l'image associée si elle existe
             $image = $bonPlan->getImageBP();
             if ($image && $image != 'default.jpg') {
-                $imagePath = $this->getParameter('uploads_directory') . $image;
+                $imagePath = $this->getParameter('uploads_directory') . '/' . $image;
                 if (file_exists($imagePath)) {
                     unlink($imagePath);
                 }
             }
             
-            // Delete from database
+            // Supprimer le bon plan de la base de données
             $entityManager->remove($bonPlan);
             $entityManager->flush();
             
@@ -340,7 +402,7 @@ class VoyageursController extends AuthenticatedController
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
-                'message' => 'Une erreur est survenue: ' . $e->getMessage()
+                'message' => 'Une erreur est survenue lors de la suppression: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -549,7 +611,12 @@ class VoyageursController extends AuthenticatedController
             }
         }
         
-        return new BinaryFileResponse($filePath);
+        // Create a response with appropriate headers
+        $response = new BinaryFileResponse($filePath);
+        $response->headers->set('Content-Type', mime_content_type($filePath));
+        $response->headers->set('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+        
+        return $response;
     }
 }
 

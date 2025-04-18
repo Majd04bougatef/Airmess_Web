@@ -190,15 +190,11 @@ final class ExpenseController extends AbstractController
         $originalImage = $expense->getImagedepense();
         $hasExistingImage = $originalImage && $originalImage !== 'default-receipt.jpg';
         
-        // Create the form with custom validation for edit
+        // Create the form with custom validation for edit - always make image optional when editing
         $options = [
-            'is_admin' => $isAdmin
+            'is_admin' => $isAdmin,
+            'image_required' => false // Always make image optional when editing
         ];
-        
-        // If there's already an image, make the field optional in edit mode
-        if ($hasExistingImage) {
-            $options['image_required'] = false;
-        }
         
         $form = $this->createForm(ExpenseType::class, $expense, $options);
         $form->handleRequest($request);
@@ -239,14 +235,11 @@ final class ExpenseController extends AbstractController
                     ]);
                 }
             } else if (!$hasExistingImage) {
-                // No image uploaded and no existing image
-                $this->addFlash('error', 'A receipt image is required.');
-                return $this->renderForm('expense/edit.html.twig', [
-                    'expense' => $expense,
-                    'form' => $form,
-                    'in_voyageurs_dashboard' => $request->query->has('dashboard') && $request->query->get('dashboard') === 'voyageurs',
-                ]);
+                // If no new image was uploaded and there's no existing image, use default
+                $expense->setImagedepense('default-receipt.jpg');
             }
+            // If no image was uploaded but there's an existing image, keep using the existing image
+            // (No action needed as the entity already has the image filename)
             
             try {
                 $entityManager->flush();

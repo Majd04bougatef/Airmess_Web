@@ -23,13 +23,13 @@ class loginController extends AbstractController
     #[Route('/dashEntreprise', name: 'app_dashEntreprise')]
     public function dashEntreprise(): Response
     {
-        return $this->render('dashEntreprise/dashboardEntreprisePage.html.twig');
+        return $this->render('dashEntreprise/dashboardEntreprise.html.twig');
     }
 
     #[Route('/dashVoyageurs', name: 'app_dashVoyageurs')]
     public function dashVoyageurs(): Response
     {
-        return $this->render('dashVoyageurs/dashboardVoyageursPage.html.twig');
+        return $this->render('dashVoyageurs/dashboardVoyageurs.html.twig');
     }
 }
 ?>

@@ -133,7 +133,7 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('login');
         }
         
-        return $this->render('dashEntreprise/dashboardEntreprisePage.html.twig');
+        return $this->render('dashEntreprise/dashboardEntreprise.html.twig');
     }
     
     #[Route('/dashVoyageurs', name: 'app_dashVoyageurs')]
@@ -150,7 +150,7 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('login');
         }
         
-        return $this->render('dashVoyageurs/dashboardVoyageursPage.html.twig');
+        return $this->render('dashVoyageurs/dashboardVoyageurs.html.twig');
     }
     
     #[Route('/logout', name: 'app_logout')]
@@ -457,7 +457,7 @@ class SecurityController extends AbstractController
         return $this->render('profile/redirect_to_profile.html.twig');
     }
     
-    #[Route('/update-password-ajax', name: 'update_password_ajax', methods: ['POST'])]
+    #[Route('/update-password-ajax', name: 'app_update_password_ajax', methods: ['POST'])]
     public function updatePasswordAjax(Request $request, UserRepository $userRepository, SessionInterface $session, EntityManagerInterface $entityManager): Response
     {
         // Check if user is logged in
@@ -489,13 +489,13 @@ class SecurityController extends AbstractController
                 error_log('Using form data: ' . $request->getContentType());
                 // For form data requests
                 $data = [
-                    'current_password' => $request->request->get('current_password'),
-                    'password' => $request->request->get('password'),
-                    'confirm_password' => $request->request->get('confirm_password')
+                    'current_password' => $request->request->get('currentPassword'),
+                    'password' => $request->request->get('newPassword'),
+                    'confirm_password' => $request->request->get('confirmPassword')
                 ];
             }
             
-            // Log decoded data
+            // Log decoded data for debugging
             error_log('Request data: ' . print_r($data, true));
             
             // Validate input data
@@ -530,6 +530,14 @@ class SecurityController extends AbstractController
                 return $this->json([
                     'success' => false,
                     'message' => 'New password must be at least 6 characters long.'
+                ]);
+            }
+            
+            // Check for complexity - requires at least one number and one letter
+            if (!preg_match('/[A-Za-z]/', $data['password']) || !preg_match('/\d/', $data['password'])) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Password must contain at least one letter and one number.'
                 ]);
             }
             
@@ -594,27 +602,5 @@ class SecurityController extends AbstractController
                 'message' => 'Error deactivating profile: ' . $e->getMessage()
             ]);
         }
-    }
-    
-    #[Route('/change-password', name: 'change_password_page')]
-    public function changePasswordPage(SessionInterface $session, UserRepository $userRepository): Response
-    {
-        // Check if user is logged in
-        if (!$session->has('user_id')) {
-            return $this->redirectToRoute('login');
-        }
-        
-        // Get current user
-        $userId = $session->get('user_id');
-        $user = $userRepository->find($userId);
-        
-        if (!$user) {
-            $this->addFlash('error', 'User not found. Please log in again.');
-            return $this->redirectToRoute('login');
-        }
-        
-        return $this->render('security/change_password.html.twig', [
-            'user' => $user
-        ]);
     }
 } 

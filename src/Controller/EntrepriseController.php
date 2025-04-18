@@ -10,20 +10,33 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Offre;
 use App\Form\OffreType;
 use App\Repository\OffreRepository;
+use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
+use App\Repository\ReservationRepository;
 
 class EntrepriseController extends AbstractController{
 
     #[Route('/dashboardEntreprisePage', name: 'dashboardEntreprise_page')]
-    public function dashboardEntreprisePage()
+    public function dashboardEntreprisePage(UserRepository $userRepository = null, SessionInterface $session = null): Response
     {
-        return $this->render('dashEntreprise/dashboardEntreprisePage.html.twig');
+        // Get user profile data if repository and session are available
+        $user = null;
+        if ($session && $userRepository && $session->has('user_id')) {
+            $userId = $session->get('user_id');
+            $user = $userRepository->find($userId);
+        }
+        
+        return $this->render('dashEntreprise/dashboardEntreprise.html.twig', [
+            'user' => $user
+        ]);
     }
 
     #[Route('/UserEntreprisePage', name: 'userEntreprise_page')]
     public function UserEntreprisePage()
     {
         // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashEntreprise/userPageEntreprise.html.twig');
+        return $this->render('dashEntreprise/dashboardEntreprise.html.twig');
     }
 
     #[Route('/StationEntreprisePage', name: 'stationEntreprise_page')]
@@ -33,11 +46,42 @@ class EntrepriseController extends AbstractController{
         return $this->render('dashEntreprise/stationPageEntreprise.html.twig');
     }
 
-    #[Route('/BonplanEntreprisePage', name: 'bonplanEntreprise_page')]
-    public function bonplanEntreprisePage()
+    #[Route('/ProfileEntreprisePage', name: 'profileEntreprise_page')]
+    public function profileEntreprisePage(UserRepository $userRepository = null, SessionInterface $session = null): Response
     {
-        // Vous pouvez ajouter ici des données à passer à la vue
-        return $this->render('dashEntreprise/bonplanPageEntreprise.html.twig');
+        // Get user profile data if repository and session are available
+        $user = null;
+        if ($session && $userRepository && $session->has('user_id')) {
+            $userId = $session->get('user_id');
+            $user = $userRepository->find($userId);
+        }
+        
+        return $this->render('dashEntreprise/profilePageEntreprise.html.twig', [
+            'user' => $user,
+            'showProfile' => true
+        ]);
+    }
+
+    #[Route('/ProfileEntrepriseEdit', name: 'profileEntreprise_edit')]
+    public function profileEntrepriseEdit(UserRepository $userRepository, SessionInterface $session): Response
+    {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('login');
+        }
+        
+        // Get current user
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        if (!$user) {
+            $this->addFlash('error', 'User not found. Please log in again.');
+            return $this->redirectToRoute('login');
+        }
+        
+        return $this->render('dashEntreprise/profileEntrepriseEdit.html.twig', [
+            'user' => $user
+        ]);
     }
 
     #[Route('/OffreEntreprisePage', name: 'offreEntreprise_page')]
@@ -69,6 +113,17 @@ class EntrepriseController extends AbstractController{
     {
         // Vous pouvez ajouter ici des données à passer à la vue
         return $this->render('dashEntreprise/socialPageEntreprise.html.twig');
+    }
+
+    #[Route('/reservations-offres', name: 'reservations_offres_page')]
+    public function reservationsOffresPage(ReservationRepository $reservationRepository): Response
+    {
+        // Récupérer toutes les réservations
+        $reservations = $reservationRepository->findAll();
+        
+        return $this->render('dashEntreprise/reservationsOffresPage.html.twig', [
+            'reservations' => $reservations
+        ]);
     }
 }
 

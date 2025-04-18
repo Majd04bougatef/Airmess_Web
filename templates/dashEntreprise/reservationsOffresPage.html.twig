@@ -1,0 +1,405 @@
+{% extends 'dashEntreprise/dashboardEntreprise.html.twig' %}
+
+{% block title %}Réservations - Airmess Dashboard{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+  .reservation-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+  
+  .reservation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  
+  .card-header-gradient {
+    background: linear-gradient(to right, #4481eb, #04befe);
+    color: white;
+    border-bottom: none;
+  }
+  
+  .stats-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 20px;
+    color: white;
+  }
+  
+  .bg-gradient-success {
+    background: linear-gradient(310deg, #2dce89, #26adab);
+  }
+  
+  .bg-gradient-warning {
+    background: linear-gradient(310deg, #fb6340, #fbb140);
+  }
+  
+  .bg-gradient-info {
+    background: linear-gradient(310deg, #1171ef, #11cdef);
+  }
+  
+  .avatar-sm {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+  }
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+  
+  .empty-state i {
+    font-size: 4rem;
+    color: #ccc;
+    margin-bottom: 1.5rem;
+  }
+  
+  .empty-state h4 {
+    color: #666;
+    margin-bottom: 0.75rem;
+  }
+  
+  .empty-state p {
+    color: #999;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .date-badge {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 6px;
+    padding: 0.35rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .date-badge i {
+    margin-right: 0.35rem;
+    opacity: 0.5;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card card-header-gradient reservation-card shadow-lg">
+        <div class="card-body py-4">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <h2 class="text-white font-weight-bolder mb-0">Gestion des Réservations</h2>
+              <p class="text-white opacity-8 mb-0">Suivez et gérez toutes les réservations de vos offres</p>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+              <a href="{{ path('offreEntreprise_page') }}" class="btn btn-sm bg-white text-primary px-3 mb-0">
+                <i class="fas fa-arrow-left me-2"></i> Retour aux offres
+              </a>
+              <a href="#" class="btn btn-sm bg-white text-primary px-3 mb-0 ms-2" onclick="window.print()">
+                <i class="fas fa-print me-2"></i> Imprimer
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Statistiques -->
+  <div class="row mb-4">
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card reservation-card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold text-muted">Total Réservations</p>
+                <h5 class="font-weight-bolder mt-2">
+                  {% if reservations is defined and reservations is not null %}
+                    {{ reservations|length }}
+                  {% else %}
+                    0
+                  {% endif %}
+                </h5>
+                <p class="mb-0 text-xs text-success">
+                  <span>Réservations actives</span>
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="stats-icon bg-gradient-primary shadow">
+                <i class="fas fa-calendar text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card reservation-card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold text-muted">Revenus Estimés</p>
+                <h5 class="font-weight-bolder mt-2">
+                  {% set totalRevenue = 0 %}
+                  {% for reservation in reservations %}
+                    {% if reservation.offre %}
+                      {% set totalRevenue = totalRevenue + reservation.offre.priceAfter %}
+                    {% endif %}
+                  {% endfor %}
+                  {{ totalRevenue|number_format(2, ',', ' ') }} €
+                </h5>
+                <p class="mb-0 text-xs text-success">
+                  <span>Après réductions</span>
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="stats-icon bg-gradient-success shadow">
+                <i class="fas fa-euro-sign text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card reservation-card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold text-muted">Taux d'occupation</p>
+                <h5 class="font-weight-bolder mt-2">
+                  {% set totalPlaces = 0 %}
+                  {% set occupiedPlaces = reservations|length %}
+                  {% for reservation in reservations %}
+                    {% if reservation.offre %}
+                      {% set totalPlaces = totalPlaces + reservation.offre.numberLimit %}
+                    {% endif %}
+                  {% endfor %}
+                  {% if totalPlaces > 0 %}
+                    {{ ((occupiedPlaces / (totalPlaces + occupiedPlaces)) * 100)|round }}%
+                  {% else %}
+                    0%
+                  {% endif %}
+                </h5>
+                <p class="mb-0 text-xs text-info">
+                  <span>Places réservées</span>
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="stats-icon bg-gradient-info shadow">
+                <i class="fas fa-percentage text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xl-3 col-sm-6">
+      <div class="card reservation-card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold text-muted">Offres Populaires</p>
+                <h5 class="font-weight-bolder mt-2">
+                  {% set offreCount = {} %}
+                  {% for reservation in reservations %}
+                    {% if reservation.offre %}
+                      {% set offreId = reservation.offre.idO %}
+                      {% if offreCount[offreId] is defined %}
+                        {% set offreCount = offreCount|merge({(offreId): offreCount[offreId] + 1}) %}
+                      {% else %}
+                        {% set offreCount = offreCount|merge({(offreId): 1}) %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  {{ offreCount|length }}
+                </h5>
+                <p class="mb-0 text-xs text-warning">
+                  <span>Offres avec réservations</span>
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="stats-icon bg-gradient-warning shadow">
+                <i class="fas fa-star text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des réservations -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card reservation-card mb-4">
+        <div class="card-header pb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Liste des Réservations</h6>
+            <div class="d-flex">
+              <div class="form-group mb-0 me-2">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-search"></i></span>
+                  <input class="form-control" id="searchReservation" type="text" placeholder="Rechercher...">
+                </div>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-filter me-2"></i>Filtrer
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Toutes les réservations</a></li>
+                  <li><a class="dropdown-item" href="#">Cette semaine</a></li>
+                  <li><a class="dropdown-item" href="#">Ce mois-ci</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#">Par offre</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          {% if reservations is defined and reservations|length > 0 %}
+            <div class="table-responsive p-4">
+              <table class="table align-items-center mb-0 table-hover">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Client</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Offre</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for reservation in reservations %}
+                    <tr>
+                      <td>
+                        <div class="d-flex px-3 py-2">
+                          <div class="avatar-sm bg-gradient-primary me-3">
+                            <i class="fas fa-user text-white"></i>
+                          </div>
+                          <div class="d-flex flex-column justify-content-center">
+                            {% if reservation.user %}
+                              <h6 class="mb-0 text-sm">{{ reservation.user.prenom }}</h6>
+                              <p class="text-xs text-secondary mb-0">{{ reservation.user.email }}</p>
+                            {% else %}
+                              <h6 class="mb-0 text-sm">Utilisateur non enregistré</h6>
+                              <p class="text-xs text-secondary mb-0">Email non disponible</p>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex flex-column px-3 py-2">
+                          {% if reservation.offre %}
+                            <h6 class="mb-0 text-sm">{{ reservation.offre.description|length > 30 ? reservation.offre.description|slice(0, 30) ~ '...' : reservation.offre.description }}</h6>
+                          {% else %}
+                            <h6 class="mb-0 text-sm">Offre non disponible</h6>
+                          {% endif %}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex flex-column px-3 py-2">
+                          {% if reservation.dateRes %}
+                            <div class="date-badge mt-2">
+                              <i class="fas fa-calendar-day"></i>
+                              <span class="text-xs">{{ reservation.dateRes|date('d/m/Y') }}</span>
+                            </div>
+                            <div class="date-badge mt-1">
+                              <i class="fas fa-clock"></i>
+                              <span class="text-xs">{{ reservation.dateRes|date('H:i') }}</span>
+                            </div>
+                          {% else %}
+                            <p class="text-xs text-secondary mb-0">Date non disponible</p>
+                          {% endif %}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="px-3 py-2">
+                          {% if reservation.offre %}
+                            <div class="d-flex align-items-center">
+                              <h6 class="mb-0 text-sm">{{ reservation.offre.priceAfter }} €</h6>
+                            </div>
+                          {% else %}
+                            <p class="text-xs text-secondary mb-0">Prix non disponible</p>
+                          {% endif %}
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <i class="fas fa-calendar-times"></i>
+              <h4>Aucune réservation trouvée</h4>
+              <p>Les réservations de vos clients apparaîtront ici une fois qu'ils auront réservé vos offres.</p>
+              <a href="{{ path('offreEntreprise_page') }}" class="btn btn-primary mt-3">
+                <i class="fas fa-plus me-2"></i>Gérer vos offres
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Recherche dynamique dans le tableau
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchReservation');
+    if (searchInput) {
+      searchInput.addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const table = document.querySelector('.table-responsive table');
+        const rows = table.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(searchValue) ? '' : 'none';
+        });
+      });
+    }
+  });
+</script>
+{% endblock %} 

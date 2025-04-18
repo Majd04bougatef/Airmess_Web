@@ -69,9 +69,40 @@
 
             <div class="form-group mb-3">
                 {{ form_label(form.imageFile, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                <span class="text-danger">*</span>
+                {% if app.request.get('_route') == 'app_expense_edit' %}
+                    <span class="text-muted">(Optional)</span>
+                    {% if expense.imagedepense and expense.imagedepense != 'default-receipt.jpg' %}
+                        <div class="mb-2">
+                            <div class="card border-light mb-2">
+                                <div class="card-header bg-light py-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-image me-2"></i>Current Receipt Image</span>
+                                    </div>
+                                </div>
+                                <div class="card-body text-center p-2">
+                                    <img src="{{ path('app_expense_image', {'filename': expense.imagedepense}) }}" 
+                                         alt="Current Receipt" 
+                                         class="img-fluid" 
+                                         style="max-height: 250px; width: auto;">
+                                </div>
+                            </div>
+                            <small class="text-muted">Upload a new image only if you want to replace the current one.</small>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <span class="text-danger">*</span>
+                {% endif %}
                 <div class="input-group mb-1">
-                    {{ form_widget(form.imageFile, {'attr': {'class': 'form-control expense-input', 'data-validate': 'true', 'data-type': 'file', 'data-optional': 'false', 'accept': 'image/jpeg,image/png,image/gif,image/webp', 'required': 'required'}}) }}
+                    {{ form_widget(form.imageFile, {
+                        'attr': {
+                            'class': 'form-control expense-input', 
+                            'data-validate': 'true', 
+                            'data-type': 'file', 
+                            'data-optional': app.request.get('_route') == 'app_expense_edit' ? 'true' : 'false', 
+                            'accept': 'image/jpeg,image/png,image/gif,image/webp',
+                            'required': app.request.get('_route') == 'app_expense_edit' ? false : 'required'
+                        }
+                    }) }}
                     <button class="btn btn-outline-secondary" type="button" id="clear-image-btn" style="display: none;">
                         <i class="fas fa-times"></i> Clear
                     </button>
@@ -290,18 +321,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Validate a single input based on its data attributes
+    // Helper function to validate a specific input
     function validateInput(input) {
-        // Skip validation for optional fields if empty
-        if (input.dataset.optional === 'true' && (input.value === '' || input.files.length === 0)) {
-            input.classList.remove('is-invalid');
-            input.classList.add('is-valid');
-            document.getElementById('feedback-' + input.id.split('_').pop()).textContent = '';
-            return true;
+        let isValid = true;
+        const feedbackElement = document.getElementById(`feedback-${input.id}`);
+        
+        if (!feedbackElement) return isValid; // Skip if feedback element not found
+        
+        // Reset validation state
+        input.classList.remove('is-invalid');
+        input.classList.remove('is-valid');
+        feedbackElement.textContent = '';
+        
+        // Skip validation if the field is optional and empty
+        const isOptional = input.dataset.optional === 'true';
+        const isFileInput = input.type === 'file';
+        
+        // Special case for file inputs - if it's optional and editing an expense with existing image
+        if (isFileInput && isOptional && !input.files.length) {
+            // Check if we're in edit mode and have an existing image
+            const currentRoute = '{{ app.request.get('_route') }}';
+            if (currentRoute === 'app_expense_edit') {
+                // Skip validation for file input in edit mode when no new file is selected
+                return true;
+            }
+        }
+        
+        // Proceed with standard validation rules if not empty or not optional
+        if (!input.value.trim() && !isOptional) {
+            isValid = false;
+            input.classList.add('is-invalid');
+            feedbackElement.textContent = 'This field is required';
+            return isValid;
+        } else if (!input.value.trim() && isOptional) {
+            // Optional field is empty, skip further validation
+            return isValid;
         }
         
         const type = input.dataset.type || 'text';
-        let isValid = true;
         let errorMessage = '';
         
         // Get the field name for error messages
@@ -309,86 +366,79 @@ document.addEventListener('DOMContentLoaded', function() {
             input.previousElementSibling.previousElementSibling.textContent.trim() : 
             'This field';
         
-        // Basic required validation
-        if (input.value === '' || (type === 'select' && input.value === '') || (type === 'file' && input.files.length === 0 && !input.dataset.optional)) {
-            isValid = false;
-            errorMessage = fieldName + ' is required';
-        } 
         // Type-specific validations
-        else {
-            switch(type) {
-                case 'text':
-                    if (input.dataset.minLength && input.value.length < parseInt(input.dataset.minLength)) {
-                        isValid = false;
-                        errorMessage = fieldName + ' must be at least ' + input.dataset.minLength + ' characters';
-                    } else if (input.dataset.maxLength && input.value.length > parseInt(input.dataset.maxLength)) {
-                        isValid = false;
-                        errorMessage = fieldName + ' cannot exceed ' + input.dataset.maxLength + ' characters';
-                    }
-                    break;
+        switch(type) {
+            case 'text':
+                if (input.dataset.minLength && input.value.length < parseInt(input.dataset.minLength)) {
+                    isValid = false;
+                    errorMessage = fieldName + ' must be at least ' + input.dataset.minLength + ' characters';
+                } else if (input.dataset.maxLength && input.value.length > parseInt(input.dataset.maxLength)) {
+                    isValid = false;
+                    errorMessage = fieldName + ' cannot exceed ' + input.dataset.maxLength + ' characters';
+                }
+                break;
+                
+            case 'number':
+                const value = parseFloat(input.value);
+                if (isNaN(value)) {
+                    isValid = false;
+                    errorMessage = fieldName + ' must be a valid number';
+                } else if (input.dataset.min && value < parseFloat(input.dataset.min)) {
+                    isValid = false;
+                    errorMessage = fieldName + ' must be at least ' + input.dataset.min;
+                } else if (input.dataset.max && value > parseFloat(input.dataset.max)) {
+                    isValid = false;
+                    errorMessage = fieldName + ' cannot exceed ' + input.dataset.max;
+                }
+                break;
+                
+            case 'date':
+                const date = new Date(input.value);
+                if (isNaN(date.getTime())) {
+                    isValid = false;
+                    errorMessage = fieldName + ' must be a valid date';
+                } else if (input.dataset.max === 'today' && date > new Date()) {
+                    isValid = false;
+                    errorMessage = fieldName + ' cannot be in the future';
+                }
+                break;
+                
+            case 'file':
+                if (input.files.length > 0) {
+                    const file = input.files[0];
                     
-                case 'number':
-                    const value = parseFloat(input.value);
-                    if (isNaN(value)) {
+                    // Check file size
+                    if (file.size > 5 * 1024 * 1024) {
                         isValid = false;
-                        errorMessage = fieldName + ' must be a valid number';
-                    } else if (input.dataset.min && value < parseFloat(input.dataset.min)) {
-                        isValid = false;
-                        errorMessage = fieldName + ' must be at least ' + input.dataset.min;
-                    } else if (input.dataset.max && value > parseFloat(input.dataset.max)) {
-                        isValid = false;
-                        errorMessage = fieldName + ' cannot exceed ' + input.dataset.max;
+                        errorMessage = 'File is too large. Maximum size is 5MB.';
                     }
-                    break;
                     
-                case 'date':
-                    const date = new Date(input.value);
-                    if (isNaN(date.getTime())) {
+                    // Check file type
+                    const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!acceptedTypes.includes(file.type)) {
                         isValid = false;
-                        errorMessage = fieldName + ' must be a valid date';
-                    } else if (input.dataset.max === 'today' && date > new Date()) {
-                        isValid = false;
-                        errorMessage = fieldName + ' cannot be in the future';
+                        errorMessage = 'Invalid file type. Accepted formats: JPEG, PNG, GIF, WEBP.';
                     }
-                    break;
-                    
-                case 'file':
-                    if (input.files.length > 0) {
-                        const file = input.files[0];
-                        
-                        // Check file size
-                        if (file.size > 5 * 1024 * 1024) {
-                            isValid = false;
-                            errorMessage = 'File is too large. Maximum size is 5MB.';
-                        }
-                        
-                        // Check file type
-                        const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                        if (!acceptedTypes.includes(file.type)) {
-                            isValid = false;
-                            errorMessage = 'Invalid file type. Accepted formats: JPEG, PNG, GIF, WEBP.';
-                        }
-                    }
-                    break;
-                    
-                case 'select':
-                    if (input.value === '') {
-                        isValid = false;
-                        errorMessage = 'Please select a ' + fieldName.toLowerCase();
-                    }
-                    break;
-            }
+                }
+                break;
+                
+            case 'select':
+                if (input.value === '') {
+                    isValid = false;
+                    errorMessage = 'Please select a ' + fieldName.toLowerCase();
+                }
+                break;
         }
         
         // Set validation state
         if (isValid) {
             input.classList.remove('is-invalid');
             input.classList.add('is-valid');
-            document.getElementById('feedback-' + input.id.split('_').pop()).textContent = '';
+            feedbackElement.textContent = '';
         } else {
             input.classList.remove('is-valid');
             input.classList.add('is-invalid');
-            document.getElementById('feedback-' + input.id.split('_').pop()).textContent = errorMessage;
+            feedbackElement.textContent = errorMessage;
         }
         
         return isValid;

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ReviewBonPlanRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReviewBonPlanRepository::class)]
 #[ORM\Table(name: 'reviewbonplan')] 
@@ -14,17 +15,32 @@ class ReviewBonPlan
     #[ORM\Column(name: "idR", type: "integer")]
     private ?int $idR = null;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(name: "id_U", type: "integer")]
+    #[Assert\NotBlank(message: "L'ID utilisateur est obligatoire")]
     private ?int $id_U = null;
 
-    #[ORM\ManyToOne(targetEntity: BonPlan::class)]
-    #[ORM\JoinColumn(name: 'idP', referencedColumnName: 'idP', onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(targetEntity: BonPlan::class, inversedBy: "reviews")]
+    #[ORM\JoinColumn(name: "idP", referencedColumnName: "idP", onDelete: "CASCADE")]
+    #[Assert\NotBlank(message: "Le bon plan est obligatoire")]
     private ?BonPlan $bonPlan = null;
 
-    #[ORM\Column(type: 'text')]
+    #[ORM\Column(type: "text")]
+    #[Assert\NotBlank(message: "Le commentaire est obligatoire")]
+    #[Assert\Length(
+        min: 3,
+        max: 500,
+        minMessage: "Le commentaire doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le commentaire ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $commente = null;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "integer")]
+    #[Assert\NotBlank(message: "La note est obligatoire")]
+    #[Assert\Range(
+        min: 1,
+        max: 5,
+        notInRangeMessage: "La note doit être comprise entre {{ min }} et {{ max }}"
+    )]
     private ?int $rating = null;
 
     // Getters et Setters

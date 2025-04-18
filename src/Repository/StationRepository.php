@@ -89,4 +89,34 @@ class StationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findStationsActives(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.statut = :statut')
+            ->setParameter('statut', 'active')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findStationsEnAttente(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.statut = :statut')
+            ->setParameter('statut', 'inactive')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function approuverStation(int $stationId): void
+    {
+        $this->createQueryBuilder('s')
+            ->update()
+            ->set('s.statut', ':statut')
+            ->where('s.id = :id')
+            ->setParameter('statut', 'active')
+            ->setParameter('id', $stationId)
+            ->getQuery()
+            ->execute();
+    }
 }

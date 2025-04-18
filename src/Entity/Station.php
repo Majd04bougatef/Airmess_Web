@@ -86,13 +86,8 @@ class Station
     #[Assert\NotBlank(message: "Le pays est obligatoire")]
     private string $pays;
 
-    #[ORM\Column(name: "statut", type: "string", length: 50)]
-    #[Assert\NotBlank(message: "Le statut est obligatoire")]
-    #[Assert\Choice(
-        choices: ["active", "inactive"],
-        message: "Le statut doit être 'active' ou 'inactive'"
-    )]
-    private string $statut = "inactive";
+    #[ORM\Column(type: "string", length: 20, options: ["default" => "inactive"])]
+    private string $statut = 'inactive';
 
     // Getters et Setters
 

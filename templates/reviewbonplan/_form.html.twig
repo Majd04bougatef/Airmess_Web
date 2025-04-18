@@ -1,4 +1,85 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form_label(form.id_U) }}
+                {{ form_widget(form.id_U, {'attr': {'class': 'form-control'}}) }}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.id_U) }}
+                </div>
+                <small class="form-text text-muted">{{ form_help(form.id_U) }}</small>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                {{ form_label(form.bonPlan) }}
+                {{ form_widget(form.bonPlan, {'attr': {'class': 'form-select'}}) }}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.bonPlan) }}
+                </div>
+                <small class="form-text text-muted">{{ form_help(form.bonPlan) }}</small>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            {{ form_label(form.rating) }}
+            <div class="d-flex align-items-center">
+                {{ form_widget(form.rating, {'attr': {'class': 'form-range me-3'}}) }}
+                <span class="rating-value badge bg-primary">3</span>
+            </div>
+            <div class="invalid-feedback">
+                {{ form_errors(form.rating) }}
+            </div>
+            <small class="form-text text-muted">{{ form_help(form.rating) }}</small>
+        </div>
+        
+        <div class="mb-3">
+            {{ form_label(form.commente) }}
+            {{ form_widget(form.commente, {'attr': {'class': 'form-control'}}) }}
+            <div class="invalid-feedback">
+                {{ form_errors(form.commente) }}
+            </div>
+            <small class="form-text text-muted">{{ form_help(form.commente) }}</small>
+        </div>
+    </div>
+    
+    <div class="card-footer d-flex justify-content-between">
+        <a href="{{ path('app_reviewbonplan_admin') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> {{ button_label|default('Enregistrer') }}
+        </button>
+    </div>
 {{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mise à jour de l'affichage de la note
+    const ratingInput = document.querySelector('input[type="range"]');
+    const ratingValue = document.querySelector('.rating-value');
+    
+    if (ratingInput && ratingValue) {
+        // Initialisation
+        ratingValue.textContent = ratingInput.value;
+        
+        // Mise à jour lors du changement
+        ratingInput.addEventListener('input', function() {
+            ratingValue.textContent = this.value;
+        });
+    }
+    
+    // Validation du formulaire
+    const form = document.querySelector('form.needs-validation');
+    
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    }
+});
+</script>
