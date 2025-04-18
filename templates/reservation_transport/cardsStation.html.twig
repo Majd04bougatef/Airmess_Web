@@ -331,7 +331,15 @@
 <div class="station-container">
     {% for station in stations %}
         <div class="station-card">
-            <img src="{{ asset('images/logo-airmess.png') }}" alt="Image de la station" class="station-image">
+            <img src="{% if station.typeVelo == 'velo electrique' %}
+                        {{ asset('images/vel electrique.jpeg') }}
+                    {% elseif station.typeVelo == 'velo urbain' %}
+                        {{ asset('images/vel urbain.jpeg') }}
+                    {% elseif station.typeVelo == 'velo de route' %}
+                        {{ asset('images/vel de route.jpeg') }}
+                    {% else %}
+                        {{ asset('images/vel de route.jpeg') }}
+                    {% endif %}" alt="Image de la station" class="station-image">
             <div class="station-content">
                 <h3 class="station-title">{{ station.nom }}</h3>
                 <div class="station-detail">
