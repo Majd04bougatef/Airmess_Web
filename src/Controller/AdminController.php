@@ -524,6 +524,7 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_stations');
+    }
 
     /**
      * @Route("/admin/users/search", name="admin_users_search", methods={"POST"})
@@ -560,7 +561,6 @@ class AdminController extends AbstractController
             'pagination' => $pagination,
             'totalItems' => $users['totalItems']
         ]);
-
     }
 }
 
