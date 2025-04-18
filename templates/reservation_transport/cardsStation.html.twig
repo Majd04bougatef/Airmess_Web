@@ -280,6 +280,33 @@
         background-color: #324cdd;
         box-shadow: 0 4px 10px rgba(94, 114, 228, 0.25);
     }
+
+    .discount-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #ff4757;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        z-index: 1;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
 </style>
 
 <div class="page-header">
@@ -331,6 +358,9 @@
 <div class="station-container">
     {% for station in stations %}
         <div class="station-card">
+            {% if station.nombreVelo > 50 %}
+                <div class="discount-badge">-20%</div>
+            {% endif %}
             <img src="{% if station.typeVelo == 'velo electrique' %}
                         {{ asset('images/vel electrique.jpeg') }}
                     {% elseif station.typeVelo == 'velo urbain' %}
@@ -348,7 +378,19 @@
                 </div>
                 <div class="station-detail">
                     <i class="fas fa-money-bill-wave"></i>
-                    <span>{{ station.prixHeure ?? 5 }}€/heure par vélo</span>
+                    <span>
+                        {% if station.nombreVelo > 50 %}
+                            <span style="text-decoration: line-through; color: #67748e; margin-right: 5px;">
+                                {{ station.prixHeure ?? 5 }}€/heure
+                            </span>
+                            <span style="color: #ff4757; font-weight: 600;">
+                                {{ ((station.prixHeure ?? 5) * 0.8)|number_format(2) }}€/heure
+                            </span>
+                        {% else %}
+                            {{ station.prixHeure ?? 5 }}€/heure
+                        {% endif %}
+                        par vélo
+                    </span>
                 </div>
                 <div class="station-rating">
                     <div class="rating-stars" data-station-id="{{ station.idS }}">

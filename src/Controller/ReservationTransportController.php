@@ -68,13 +68,25 @@ final class ReservationTransportController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Calculate the price with potential discount
+            $interval = $reservationTransport->getDateRes()->diff($reservationTransport->getDateFin());
+            $heures = $interval->h + ($interval->days * 24);
+            $prixTotal = $station->getPrixHeure() * $heures * $reservationTransport->getNombreVelo();
+            
+            // Apply 20% discount if station has more than 50 bikes
+            if ($station->getNombreVelo() > 50) {
+                $prixTotal = $prixTotal * 0.8;
+            }
+            
+            $reservationTransport->setPrix($prixTotal);
+            
             $tempData = [
                 'user_id' => $user->getIdU(),
                 'station_id' => $station->getIdS(),
                 'date_res' => $reservationTransport->getDateRes()->format('Y-m-d H:i:s'),
                 'date_fin' => $reservationTransport->getDateFin()->format('Y-m-d H:i:s'),
                 'nombre_velo' => $reservationTransport->getNombreVelo(),
-                'prix' => $reservationTransport->getPrix(),
+                'prix' => $prixTotal,
                 'reference' => $reference
             ];
             
@@ -429,6 +441,11 @@ final class ReservationTransportController extends AbstractController
     
         // Calcul du prix total
         $prixTotal = $station->getPrixHeure() * $heures * $nombreVelo;
+        
+        // Appliquer une remise de 20% si la station a plus de 50 vélos disponibles
+        if ($station->getNombreVelo() > 50) {
+            $prixTotal = $prixTotal * 0.8; // 20% de remise
+        }
     
         // Récupérer l'utilisateur
         $user = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);

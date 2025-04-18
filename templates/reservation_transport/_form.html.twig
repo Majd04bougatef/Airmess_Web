@@ -306,7 +306,15 @@ input:-moz-ui-invalid {
                 </div>
                 <div class="col-md-6">
                     <label>Prix par heure: </label>
-                    <strong>{{ prix }}€</strong>
+                    {% if nombreVelo > 50 %}
+                        <strong>
+                            <span style="text-decoration: line-through; color: #67748e;">{{ prix }}€</span>
+                            <span style="color: #ff4757; margin-left: 5px;">{{ prix * 0.8 }}€</span>
+                            <span style="font-size: 0.9em; color: #2dce89; margin-left: 5px;">(-20%)</span>
+                        </strong>
+                    {% else %}
+                        <strong>{{ prix }}€</strong>
+                    {% endif %}
                 </div>
             </div>
             <div class="row mt-2">
