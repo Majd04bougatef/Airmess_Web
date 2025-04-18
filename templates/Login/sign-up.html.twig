@@ -289,7 +289,7 @@
                     
                     <!-- Voyageur Tab -->
                     <div class="tab-pane fade show active" id="voyageur" role="tabpanel" aria-labelledby="voyageur-tab">
-                        <form action="{{ path('app_register') }}" method="post" enctype="multipart/form-data" novalidate>
+                        <form id="form-voyageur" action="{{ path('app_register') }}" method="post" enctype="multipart/form-data" novalidate>
                             <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -326,18 +326,27 @@
                                     <div class="photo-upload-container text-center">
                                         <div id="voyageurPhotoPreview" class="photo-preview"></div>
                                         <div class="custom-file">
-                                            <input type="file" class="custom-file-input" name="photo" accept="image/*">
+                                            <input class="custom-file-input" type="file" id="photo-voyageur" name="photo" accept="image/*">
                                             <button type="button" class="photo-btn">Ajouter une photo</button>
                                         </div>
                                         <div id="photo-error" class="field-error"></div>
                                     </div>
                                 </div>
+                                
+                                <!-- reCAPTCHA for Voyageur form - initially hidden -->
+                                <div class="form-group captcha-container" id="voyageur-captcha" style="display: none;">
+                                    {{ recaptcha_widget('onRecaptchaVoyageurCompleted') }}
+                                    <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response-v">
+                                    <div id="captcha-v-error" class="field-error"></div>
+                                </div>
+                                
                                 <div class="col-12">
                                     <input type="hidden" name="roleUser" value="Voyageurs">
                                     <input type="hidden" name="statut" value="active">
                                     <input type="hidden" name="diamond" value="0">
                                     <input type="hidden" name="deleteFlag" value="0">
-                                    <button type="submit" class="btn-register">S'enregistrer</button>
+                                    <button type="button" class="btn-register show-captcha-btn" id="voyageur-show-captcha">S'enregistrer</button>
+                                    <button type="submit" class="btn-register submit-btn" id="voyageur-submit" style="display: none;">Confirmer</button>
                                 </div>
                             </div>
                         </form>
@@ -345,7 +354,7 @@
                     
                     <!-- Entreprise Tab -->
                     <div class="tab-pane fade" id="entreprise" role="tabpanel" aria-labelledby="entreprise-tab">
-                        <form action="{{ path('app_register') }}" method="post" enctype="multipart/form-data" novalidate>
+                        <form id="form-entreprise" action="{{ path('app_register') }}" method="post" enctype="multipart/form-data" novalidate>
                             <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -376,18 +385,27 @@
                                     <div class="photo-upload-container text-center">
                                         <div id="entreprisePhotoPreview" class="photo-preview"></div>
                                         <div class="custom-file">
-                                            <input type="file" class="custom-file-input" name="photo" accept="image/*">
+                                            <input class="custom-file-input" type="file" id="photo-entreprise" name="photo" accept="image/*">
                                             <button type="button" class="photo-btn">Ajouter une photo</button>
                                         </div>
                                         <div id="photo-error" class="field-error"></div>
                                     </div>
                                 </div>
+                                
+                                <!-- reCAPTCHA for Entreprise form - initially hidden -->
+                                <div class="form-group captcha-container" id="entreprise-captcha" style="display: none;">
+                                    {{ recaptcha_widget('onRecaptchaEntrepriseCompleted') }}
+                                    <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response-e">
+                                    <div id="captcha-e-error" class="field-error"></div>
+                                </div>
+                                
                                 <div class="col-12">
                                     <input type="hidden" name="roleUser" value="Entreprise">
                                     <input type="hidden" name="statut" value="active">
                                     <input type="hidden" name="diamond" value="0">
                                     <input type="hidden" name="deleteFlag" value="0">
-                                    <button type="submit" class="btn-register">S'enregistrer</button>
+                                    <button type="button" class="btn-register show-captcha-btn" id="entreprise-show-captcha">S'enregistrer</button>
+                                    <button type="submit" class="btn-register submit-btn" id="entreprise-submit" style="display: none;">Confirmer</button>
                                 </div>
                             </div>
                         </form>
@@ -398,6 +416,19 @@
                 </div>
 
             <script type="text/javascript">
+        // Functions to update the hidden fields with the reCAPTCHA responses
+        function onRecaptchaVoyageurCompleted(response) {
+            document.getElementById('g-recaptcha-response-v').value = response;
+            // Enable submit button
+            $('#voyageur-submit').prop('disabled', false);
+        }
+        
+        function onRecaptchaEntrepriseCompleted(response) {
+            document.getElementById('g-recaptcha-response-e').value = response;
+            // Enable submit button
+            $('#entreprise-submit').prop('disabled', false);
+        }
+        
         // Handle file selection and preview
         $('.custom-file-input').on('change', function() {
             // Only show image preview
@@ -676,52 +707,113 @@
                 validateDate($(this));
             });
             
-            // Validate forms on submit
-            $('#voyageur form, #entreprise form').on('submit', function(e) {
-                const form = $(this);
+            // Validate form submission
+            $('#form-voyageur').on('submit', function(e) {
+                // Validate captcha
+                const captchaResponse = grecaptcha.getResponse();
+                if (!captchaResponse) {
+                    showFieldError('captcha-v', 'Please check the reCAPTCHA box');
+                    e.preventDefault();
+                }
+            });
+            
+            $('#form-entreprise').on('submit', function(e) {
+                // Validate captcha
+                const captchaResponse = grecaptcha.getResponse(1); // second widget
+                if (!captchaResponse) {
+                    showFieldError('captcha-e', 'Please check the reCAPTCHA box');
+                    e.preventDefault();
+                }
+            });
+            
+            // Show captcha buttons click handlers
+            $('#voyageur-show-captcha').click(function() {
                 let isValid = true;
                 
-                // Validate all fields
-                const nameField = form.find('input[name="name"]');
+                // Run all validations
+                const nameField = $('#form-voyageur').find('input[name="name"]');
                 if (nameField.length) {
                     isValid = validateName(nameField) && isValid;
                 }
                 
-                const prenomField = form.find('input[name="prenom"]');
-                if (prenomField.length && form.closest('#voyageur').length > 0) {
+                const prenomField = $('#form-voyageur').find('input[name="prenom"]');
+                if (prenomField.length) {
                     isValid = validatePrenom(prenomField) && isValid;
                 }
                 
-                const emailField = form.find('input[name="email"]');
+                const emailField = $('#form-voyageur').find('input[name="email"]');
                 if (emailField.length) {
                     isValid = validateEmail(emailField) && isValid;
                 }
                 
-                const phoneField = form.find('input[name="phoneNumber"]');
+                const phoneField = $('#form-voyageur').find('input[name="phoneNumber"]');
                 if (phoneField.length) {
                     isValid = validatePhone(phoneField) && isValid;
                 }
                 
-                const passwordField = form.find('input[name="password"]');
+                const passwordField = $('#form-voyageur').find('input[name="password"]');
                 if (passwordField.length) {
                     isValid = validatePassword(passwordField) && isValid;
                 }
                 
-                const confirmField = form.find('input[name="password_confirm"]');
+                const confirmField = $('#form-voyageur').find('input[name="password_confirm"]');
                 if (confirmField.length) {
                     isValid = validatePasswordConfirm(confirmField, passwordField) && isValid;
                 }
                 
-                const dateField = form.find('input[name="dateNaiss"]');
-                if (dateField.length && form.closest('#voyageur').length > 0) {
+                const dateField = $('#form-voyageur').find('input[name="dateNaiss"]');
+                if (dateField.length) {
                     isValid = validateDate(dateField) && isValid;
                 }
                 
-                const photoInput = form.find('input[type="file"]');
+                const photoInput = $('#form-voyageur').find('input[type="file"]');
                 isValid = validatePhoto(photoInput) && isValid;
                 
-                if (!isValid) {
-                    e.preventDefault();
+                if (isValid) {
+                    // Show captcha and submit button
+                    $('#voyageur-captcha').show();
+                    $('#voyageur-show-captcha').hide();
+                    $('#voyageur-submit').show().prop('disabled', true);
+                }
+            });
+            
+            $('#entreprise-show-captcha').click(function() {
+                let isValid = true;
+                
+                // Run all validations
+                const nameField = $('#form-entreprise').find('input[name="name"]');
+                if (nameField.length) {
+                    isValid = validateName(nameField) && isValid;
+                }
+                
+                const emailField = $('#form-entreprise').find('input[name="email"]');
+                if (emailField.length) {
+                    isValid = validateEmail(emailField) && isValid;
+                }
+                
+                const phoneField = $('#form-entreprise').find('input[name="phoneNumber"]');
+                if (phoneField.length) {
+                    isValid = validatePhone(phoneField) && isValid;
+                }
+                
+                const passwordField = $('#form-entreprise').find('input[name="password"]');
+                if (passwordField.length) {
+                    isValid = validatePassword(passwordField) && isValid;
+                }
+                
+                const confirmField = $('#form-entreprise').find('input[name="password_confirm"]');
+                if (confirmField.length) {
+                    isValid = validatePasswordConfirm(confirmField, passwordField) && isValid;
+                }
+                
+                const photoInput = $('#form-entreprise').find('input[type="file"]');
+                isValid = validatePhoto(photoInput) && isValid;
+                
+                if (isValid) {
+                    // Show captcha and submit button
+                    $('#entreprise-captcha').show();
+                    $('#entreprise-show-captcha').hide();
+                    $('#entreprise-submit').show().prop('disabled', true);
                 }
             });
         });

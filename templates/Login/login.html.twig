@@ -309,19 +309,19 @@
                 
                 // Validate email
                 if (!email) {
-                    showFieldError('email', 'Veuillez entrer votre adresse email.');
+                    showFieldError('email', 'Please enter your email address.');
                     isValid = false;
                 } else {
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!emailRegex.test(email)) {
-                        showFieldError('email', 'Veuillez entrer une adresse email valide.');
+                        showFieldError('email', 'Please enter a valid email address.');
                         isValid = false;
                     }
                 }
                 
                 // Validate password
                 if (!password) {
-                    showFieldError('password', 'Veuillez entrer votre mot de passe.');
+                    showFieldError('password', 'Please enter your password.');
                     isValid = false;
                 }
                 

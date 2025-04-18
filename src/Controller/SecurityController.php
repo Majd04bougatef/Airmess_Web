@@ -96,6 +96,33 @@ class SecurityController extends AbstractController
         return $this->render('login/login.html.twig');
     }
     
+    /**
+     * Helper method to verify reCAPTCHA
+     */
+    private function verifyRecaptcha(string $recaptchaResponse): bool
+    {
+        // Verify with Google reCAPTCHA API
+        $url = 'https://www.google.com/recaptcha/api/siteverify';
+        $data = [
+            'secret' => $this->getParameter('recaptcha_secret_key'),
+            'response' => $recaptchaResponse
+        ];
+        
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query($data)
+            ]
+        ];
+        
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        $resultJson = json_decode($result);
+        
+        return $resultJson->success ?? false;
+    }
+    
     #[Route('/sign-up', name: 'app_signup')]
     public function signup(): Response
     {

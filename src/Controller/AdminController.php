@@ -505,6 +505,7 @@ class AdminController extends AbstractController
         }
     }
 
+
     #[Route('/admin/stations', name: 'admin_stations')]
     public function stations(StationRepository $stationRepository): Response
     {
@@ -523,6 +524,43 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_stations');
+
+    /**
+     * @Route("/admin/users/search", name="admin_users_search", methods={"POST"})
+     */
+    public function searchUsers(Request $request, UserRepository $userRepository): JsonResponse
+    {
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => false, 'message' => 'Invalid request'], 400);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $search = $data['search'] ?? '';
+        $role = $data['role'] ?? '';
+        $status = $data['status'] ?? '';
+        $page = $data['page'] ?? 1;
+
+        // Get paginated users with search filters
+        $users = $userRepository->findPaginatedUsers($page, 10, $search, $role, $status);
+        
+        // Render the table rows
+        $html = $this->renderView('dashAdmin/_user_table_rows.html.twig', [
+            'users' => $users['items']
+        ]);
+
+        // Render the pagination
+        $pagination = $this->renderView('dashAdmin/_pagination.html.twig', [
+            'currentPage' => $page,
+            'totalPages' => $users['totalPages']
+        ]);
+
+        return new JsonResponse([
+            'success' => true,
+            'html' => $html,
+            'pagination' => $pagination,
+            'totalItems' => $users['totalItems']
+        ]);
+
     }
 }
 

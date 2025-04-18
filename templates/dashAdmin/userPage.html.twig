@@ -405,24 +405,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Fonction de recherche utilisateur
-  document.getElementById('searchInput').addEventListener('keyup', function() {
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById('searchInput');
-    filter = input.value.toUpperCase();
-    table = document.getElementById('usersTable');
-    tr = table.getElementsByTagName('tr');
+  // AJAX Search functionality
+  const searchInput = document.getElementById('searchInput');
+  let searchTimeout;
+
+  searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    const searchValue = this.value.trim();
     
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName('td')[0];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = '';
-        } else {
-          tr[i].style.display = 'none';
-        }
-      }
+    // Only search if there are at least 2 characters or the input is empty
+    if (searchValue.length >= 2 || searchValue.length === 0) {
+      searchTimeout = setTimeout(() => {
+        fetch('{{ path('user_page', {'page': 1}) }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            search: searchValue,
+            role: document.getElementById('roleFilter').value,
+            status: document.getElementById('statusFilter').value
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update the table with new data
+            const tableBody = document.querySelector('#usersTable tbody');
+            tableBody.innerHTML = data.html;
+            
+            // Update pagination
+            const paginationContainer = document.querySelector('.pagination');
+            if (paginationContainer) {
+              paginationContainer.innerHTML = data.pagination;
+            }
+            
+            // Update user count
+            const userCountElement = document.querySelector('.user-count');
+            if (userCountElement) {
+              userCountElement.textContent = data.totalItems;
+            }
+          } else {
+            console.error('Search error:', data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+        });
+      }, 300); // Debounce for 300ms
     }
   });
   
