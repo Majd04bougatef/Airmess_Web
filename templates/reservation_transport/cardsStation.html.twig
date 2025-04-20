@@ -3,6 +3,7 @@
 {% block title %}Réserver un vélo{% endblock %}
 
 {% block body %}
+<meta name="csrf-token" content="{{ csrf_token('rate-station') }}">
 <style>
     .station-container {
         display: grid;
@@ -21,6 +22,30 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+    }
+
+    .current-rating {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .current-rating i {
+        color: #ffca28;
+    }
+
+    .current-rating small {
+        opacity: 0.8;
+        font-size: 0.8rem;
     }
 
     .station-card:hover {
@@ -358,6 +383,11 @@
 <div class="station-container">
     {% for station in stations %}
         <div class="station-card">
+            <div class="current-rating">
+                <i class="fas fa-star"></i>
+                <span>{{ station.rating|number_format(1) }}/5</span>
+                <small>({{ station.numberRaters }} avis)</small>
+            </div>
             {% if station.nombreVelo > 50 %}
                 <div class="discount-badge">-20%</div>
             {% endif %}
@@ -418,29 +448,49 @@
 
 <script>
     function rateStation(star, rating) {
-        // Get all stars in this rating container
-        const stars = star.parentElement.querySelectorAll('i');
-        
-        // Remove filled class from all stars
-        stars.forEach(s => s.classList.remove('filled'));
-        
-        // Fill stars up to the clicked one
-        for (let i = 0; i < rating; i++) {
-            stars[i].classList.add('filled');
-        }
-        
         // Get station ID from parent container
         const stationId = star.parentElement.dataset.stationId;
         
-        // Here you would typically save the rating to the server
-        console.log(`Station ${stationId} rated ${rating} stars`);
-        
-        // You can add AJAX call to save rating
-        // fetch('/rate-station', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ stationId, rating })
-        // });
+        // Show confirmation dialog
+        if (confirm(`Êtes-vous sûr de vouloir donner une note de ${rating} étoiles à cette station ?`)) {
+            // Send rating to backend
+            fetch(`/station/rate/${stationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ rating: rating })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the display
+                    const stars = star.parentElement.querySelectorAll('i');
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('filled');
+                        } else {
+                            s.classList.remove('filled');
+                        }
+                    });
+
+                    // Update the current rating display
+                    const cardElement = star.closest('.station-card');
+                    const ratingDisplay = cardElement.querySelector('.current-rating span');
+                    const ratersDisplay = cardElement.querySelector('.current-rating small');
+                    
+                    ratingDisplay.textContent = `${data.newRating.toFixed(1)}/5`;
+                    ratersDisplay.textContent = `(${data.numberRaters} avis)`;
+                } else {
+                    alert('Une erreur est survenue lors de la notation. Veuillez réessayer.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors de la notation. Veuillez réessayer.');
+            });
+        }
     }
     
     // Filter functionality

@@ -186,4 +186,50 @@ final class StationController extends AbstractController
 
         return $this->redirectToRoute('app_dashboard');
     }
+
+    #[Route('/rate/{idS}', name: 'app_station_rate', methods: ['POST'])]
+    public function rate(Request $request, Station $station, EntityManagerInterface $entityManager, SessionInterface $session): Response
+    {
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->json(['success' => false, 'message' => 'Vous devez être connecté pour noter une station.'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        // Validate CSRF token
+        if (!$this->isCsrfTokenValid('rate-station', $request->headers->get('X-CSRF-TOKEN'))) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $data = json_decode($request->getContent(), true);
+            $rating = $data['rating'] ?? null;
+
+            if (!$rating || $rating < 1 || $rating > 5) {
+                return $this->json(['success' => false, 'message' => 'Note invalide.'], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Calculate new rating
+            $currentRating = $station->getRating();
+            $numberRaters = $station->getNumberRaters();
+            
+            // Calculate new average rating
+            $newRating = (($currentRating * $numberRaters) + $rating) / ($numberRaters + 1);
+            
+            // Update station
+            $station->setRating($newRating);
+            $station->setNumberRaters($numberRaters + 1);
+            
+            $entityManager->persist($station);
+            $entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'newRating' => $newRating,
+                'numberRaters' => $numberRaters + 1
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'message' => 'Une erreur est survenue.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

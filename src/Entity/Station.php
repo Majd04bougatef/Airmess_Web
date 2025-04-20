@@ -89,6 +89,23 @@ class Station
     #[ORM\Column(type: "string", length: 20, options: ["default" => "inactive"])]
     private string $statut = 'inactive';
 
+    #[ORM\Column(name: "numberRaters", type: "integer")]
+    #[Assert\NotNull]
+    #[Assert\GreaterThanOrEqual(
+        value: 0,
+        message: "Le nombre d'évaluateurs ne peut pas être négatif"
+    )]
+    private int $numberRaters = 0;
+
+    #[ORM\Column(name: "rating", type: "float")]
+    #[Assert\NotNull]
+    #[Assert\Range(
+        min: 0,
+        max: 5,
+        notInRangeMessage: "La note doit être comprise entre {{ min }} et {{ max }}"
+    )]
+    private float $rating = 0.0;
+
     // Getters et Setters
 
     public function getIdS(): int
@@ -204,6 +221,28 @@ class Station
     public function setStatut(string $statut): self
     {
         $this->statut = $statut;
+        return $this;
+    }
+
+    public function getNumberRaters(): int
+    {
+        return $this->numberRaters;
+    }
+
+    public function setNumberRaters(int $numberRaters): self
+    {
+        $this->numberRaters = $numberRaters;
+        return $this;
+    }
+
+    public function getRating(): float
+    {
+        return $this->rating;
+    }
+
+    public function setRating(float $rating): self
+    {
+        $this->rating = $rating;
         return $this;
     }
 
