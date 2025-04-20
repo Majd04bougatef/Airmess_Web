@@ -273,9 +273,23 @@
             <div class="recap-value">{{ station.prixHeure }}€/heure</div>
         </div>
         
+        {% set interval = reservation.dateRes.diff(reservation.dateFin) %}
+        {% set hours = interval.h + (interval.days * 24) %}
+        {% set originalPrice = station.prixHeure * hours * reservation.nombreVelo %}
+        
         <div class="total-price">
             <div class="recap-label">Total</div>
-            <div class="recap-value">{{ reservation.prix }}€</div>
+            <div class="recap-value">
+                {% if station.nombreVelo > 50 %}
+                    <span style="text-decoration: line-through; color: #67748e; margin-right: 10px;">{{ originalPrice }}€</span>
+                    <span style="color: #ff4757; font-weight: 600;">
+                        {{ reservation.prix }}€
+                    </span>
+                    <span style="font-size: 0.9em; color: #2dce89; margin-left: 10px;">(-20%)</span>
+                {% else %}
+                    {{ reservation.prix }}€
+                {% endif %}
+            </div>
         </div>
         
         <div class="button-group">

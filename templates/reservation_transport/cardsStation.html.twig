@@ -3,6 +3,7 @@
 {% block title %}Réserver un vélo{% endblock %}
 
 {% block body %}
+<meta name="csrf-token" content="{{ csrf_token('rate-station') }}">
 <style>
     .station-container {
         display: grid;
@@ -21,6 +22,30 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+    }
+
+    .current-rating {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .current-rating i {
+        color: #ffca28;
+    }
+
+    .current-rating small {
+        opacity: 0.8;
+        font-size: 0.8rem;
     }
 
     .station-card:hover {
@@ -129,38 +154,33 @@
 
     .page-header {
         margin-bottom: 2rem;
-        border-bottom: 1px solid #e9ecef;
         padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
     }
-    
+
+    .header-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+    }
+
     .page-title {
         font-size: 1.75rem;
         font-weight: 700;
         color: #344767;
-        margin-bottom: 0.5rem;
-    }
-    
-    .page-subtitle {
-        font-size: 1rem;
-        color: #67748e;
+        margin: 0;
+        margin-bottom: 1rem;
     }
 
     .filter-section {
         background-color: white;
         border-radius: 12px;
         box-shadow: 0 3px 8px rgba(149, 157, 165, 0.12);
-        padding: 0.75rem;
-        margin-bottom: 1.25rem;
+        padding: 1rem;
+        width: 100%;
     }
-    
-    .filter-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-        cursor: pointer;
-    }
-    
+
     .filter-title {
         font-size: 1rem;
         font-weight: 600;
@@ -168,32 +188,25 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        margin-bottom: 1rem;
     }
-    
+
     .filter-title i {
         color: #5e72e4;
     }
-    
+
     .filter-body {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 0.75rem;
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+        align-items: flex-end;
     }
-    
-    @media (max-width: 768px) {
-        .filter-section {
-            padding: 0.5rem;
-        }
-        
-        .filter-body {
-            gap: 0.5rem;
-        }
-    }
-    
+
     .filter-group {
-        margin-bottom: 0.5rem;
+        flex: 1;
+        min-width: 200px;
     }
-    
+
     .filter-label {
         display: block;
         margin-bottom: 0.25rem;
@@ -201,7 +214,7 @@
         font-size: 0.875rem;
         color: #344767;
     }
-    
+
     .filter-input {
         width: 100%;
         padding: 0.375rem 0.5rem;
@@ -211,28 +224,13 @@
         transition: all 0.2s ease;
         font-size: 0.875rem;
     }
-    
-    .filter-input:focus {
-        outline: none;
-        border-color: #5e72e4;
-        background-color: #fff;
-        box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.15);
-    }
-    
+
     .range-container {
         display: flex;
         align-items: center;
         gap: 0.75rem;
     }
-    
-    .range-slider {
-        flex: 1;
-        height: 4px;
-        background-color: #d9e2ef;
-        border-radius: 4px;
-        position: relative;
-    }
-    
+
     .range-value {
         min-width: 40px;
         text-align: center;
@@ -243,87 +241,77 @@
         font-weight: 500;
         font-size: 0.75rem;
     }
-    
-    .filter-buttons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        margin-top: 0.75rem;
+
+    @media (max-width: 992px) {
+        .filter-body {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .filter-group {
+            width: 100%;
+        }
     }
-    
-    .btn-filter {
-        padding: 0.375rem 0.75rem;
-        border-radius: 5px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    
-    .btn-reset {
-        background-color: #fff;
-        color: #67748e;
-        border: 1px solid #d9e2ef;
-    }
-    
-    .btn-reset:hover {
-        background-color: #f8f9fa;
-    }
-    
-    .btn-apply {
-        background-color: #5e72e4;
+
+    .discount-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #ff4757;
         color: white;
-        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        z-index: 1;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        animation: pulse 2s infinite;
     }
-    
-    .btn-apply:hover {
-        background-color: #324cdd;
-        box-shadow: 0 4px 10px rgba(94, 114, 228, 0.25);
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
     }
 </style>
 
 <div class="page-header">
-    <h2 class="page-title">Stations disponibles</h2>
-    <p class="page-subtitle">Sélectionnez une station pour réserver des vélos</p>
-</div>
-
-<!-- Filter Section -->
-<div class="filter-section">
-    <div class="filter-header" onclick="toggleFilterSection()">
-        <div class="filter-title">
-            <i class="fas fa-filter"></i>
-            <span>Filtrer les stations</span>
-        </div>
-        <button class="btn-filter btn-reset" id="toggle-filter" style="border:none; padding: 0.25rem 0.5rem;">
-            <i class="fas fa-chevron-down" id="toggle-icon"></i>
-        </button>
-    </div>
-    
-    <div class="filter-body" id="filter-body" style="display: none;">
-        <div class="filter-group">
-            <label for="filter-name" class="filter-label">Nom de la station</label>
-            <input type="text" id="filter-name" class="filter-input" placeholder="Rechercher par nom...">
-        </div>
-        
-        <div class="filter-group">
-            <label for="filter-price" class="filter-label">Prix maximum (€/heure)</label>
-            <div class="range-container">
-                <input type="range" id="filter-price" class="filter-input" min="0" max="20" step="1" value="20" oninput="updatePriceValue(this.value)">
-                <div class="range-value" id="price-value">20€</div>
+    <div class="header-content">
+        <h2 class="page-title">Stations disponibles</h2>
+        <div class="filter-section">
+            <div class="filter-title">
+                <i class="fas fa-filter"></i>
+                <span>Filtrer les stations</span>
             </div>
-        </div>
-        
-        <div class="filter-group">
-            <label for="filter-bikes" class="filter-label">Nombre minimum de vélos</label>
-            <div class="range-container">
-                <input type="range" id="filter-bikes" class="filter-input" min="0" max="20" step="1" value="0" oninput="updateBikesValue(this.value)">
-                <div class="range-value" id="bikes-value">0</div>
+            
+            <div class="filter-body">
+                <div class="filter-group">
+                    <label for="filter-name" class="filter-label">Nom de la station</label>
+                    <input type="text" id="filter-name" class="filter-input" placeholder="Rechercher par nom..." oninput="applyFilters()">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-price" class="filter-label">Prix maximum (€/heure)</label>
+                    <div class="range-container">
+                        <input type="range" id="filter-price" class="filter-input" min="0" max="20" step="1" value="20" oninput="updatePriceValue(this.value); applyFilters()">
+                        <div class="range-value" id="price-value">20€</div>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-bikes" class="filter-label">Nombre minimum de vélos</label>
+                    <div class="range-container">
+                        <input type="range" id="filter-bikes" class="filter-input" min="0" max="20" step="1" value="0" oninput="updateBikesValue(this.value); applyFilters()">
+                        <div class="range-value" id="bikes-value">0</div>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div class="filter-buttons">
-            <button class="btn-filter btn-reset" onclick="resetFilters()">Réinitialiser</button>
-            <button class="btn-filter btn-apply" onclick="applyFilters()">Appliquer</button>
         </div>
     </div>
 </div>
@@ -331,7 +319,23 @@
 <div class="station-container">
     {% for station in stations %}
         <div class="station-card">
-            <img src="{{ asset('images/logo-airmess.png') }}" alt="Image de la station" class="station-image">
+            <div class="current-rating">
+                <i class="fas fa-star"></i>
+                <span>{{ station.rating|number_format(1) }}/5</span>
+                <small>({{ station.numberRaters }} avis)</small>
+            </div>
+            {% if station.nombreVelo > 50 %}
+                <div class="discount-badge">-20%</div>
+            {% endif %}
+            <img src="{% if station.typeVelo == 'velo electrique' %}
+                        {{ asset('images/vel electrique.jpeg') }}
+                    {% elseif station.typeVelo == 'velo urbain' %}
+                        {{ asset('images/vel urbain.jpeg') }}
+                    {% elseif station.typeVelo == 'velo de route' %}
+                        {{ asset('images/vel de route.jpeg') }}
+                    {% else %}
+                        {{ asset('images/vel de route.jpeg') }}
+                    {% endif %}" alt="Image de la station" class="station-image">
             <div class="station-content">
                 <h3 class="station-title">{{ station.nom }}</h3>
                 <div class="station-detail">
@@ -340,7 +344,19 @@
                 </div>
                 <div class="station-detail">
                     <i class="fas fa-money-bill-wave"></i>
-                    <span>{{ station.prixHeure ?? 5 }}€/heure par vélo</span>
+                    <span>
+                        {% if station.nombreVelo > 50 %}
+                            <span style="text-decoration: line-through; color: #67748e; margin-right: 5px;">
+                                {{ station.prixHeure ?? 5 }}€/heure
+                            </span>
+                            <span style="color: #ff4757; font-weight: 600;">
+                                {{ ((station.prixHeure ?? 5) * 0.8)|number_format(2) }}€/heure
+                            </span>
+                        {% else %}
+                            {{ station.prixHeure ?? 5 }}€/heure
+                        {% endif %}
+                        par vélo
+                    </span>
                 </div>
                 <div class="station-rating">
                     <div class="rating-stars" data-station-id="{{ station.idS }}">
@@ -368,68 +384,57 @@
 
 <script>
     function rateStation(star, rating) {
-        // Get all stars in this rating container
-        const stars = star.parentElement.querySelectorAll('i');
-        
-        // Remove filled class from all stars
-        stars.forEach(s => s.classList.remove('filled'));
-        
-        // Fill stars up to the clicked one
-        for (let i = 0; i < rating; i++) {
-            stars[i].classList.add('filled');
-        }
-        
         // Get station ID from parent container
         const stationId = star.parentElement.dataset.stationId;
         
-        // Here you would typically save the rating to the server
-        console.log(`Station ${stationId} rated ${rating} stars`);
-        
-        // You can add AJAX call to save rating
-        // fetch('/rate-station', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ stationId, rating })
-        // });
+        // Show confirmation dialog
+        if (confirm(`Êtes-vous sûr de vouloir donner une note de ${rating} étoiles à cette station ?`)) {
+            // Send rating to backend
+            fetch(`/station/rate/${stationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ rating: rating })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the display
+                    const stars = star.parentElement.querySelectorAll('i');
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('filled');
+                        } else {
+                            s.classList.remove('filled');
+                        }
+                    });
+
+                    // Update the current rating display
+                    const cardElement = star.closest('.station-card');
+                    const ratingDisplay = cardElement.querySelector('.current-rating span');
+                    const ratersDisplay = cardElement.querySelector('.current-rating small');
+                    
+                    ratingDisplay.textContent = `${data.newRating.toFixed(1)}/5`;
+                    ratersDisplay.textContent = `(${data.numberRaters} avis)`;
+                } else {
+                    alert('Une erreur est survenue lors de la notation. Veuillez réessayer.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors de la notation. Veuillez réessayer.');
+            });
+        }
     }
     
-    // Filter functionality
     function updatePriceValue(value) {
         document.getElementById('price-value').textContent = value + '€';
     }
     
     function updateBikesValue(value) {
         document.getElementById('bikes-value').textContent = value;
-    }
-    
-    function toggleFilterSection() {
-        const filterBody = document.getElementById('filter-body');
-        const toggleIcon = document.getElementById('toggle-icon');
-        
-        if (filterBody.style.display === 'none') {
-            filterBody.style.display = 'grid';
-            toggleIcon.classList.remove('fa-chevron-down');
-            toggleIcon.classList.add('fa-chevron-up');
-        } else {
-            filterBody.style.display = 'none';
-            toggleIcon.classList.remove('fa-chevron-up');
-            toggleIcon.classList.add('fa-chevron-down');
-        }
-    }
-    
-    function resetFilters() {
-        document.getElementById('filter-name').value = '';
-        
-        const priceInput = document.getElementById('filter-price');
-        priceInput.value = priceInput.max;
-        updatePriceValue(priceInput.max);
-        
-        const bikesInput = document.getElementById('filter-bikes');
-        bikesInput.value = 0;
-        updateBikesValue(0);
-        
-        // Show all stations
-        applyFilters();
     }
     
     function applyFilters() {

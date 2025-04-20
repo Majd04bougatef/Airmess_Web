@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Stripe\Stripe;
+use Stripe\Charge;
 
 #[Route('/reservation/transport')]
 final class ReservationTransportController extends AbstractController
@@ -68,14 +70,25 @@ final class ReservationTransportController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Store reservation data in session instead of database
+            // Calculate the price with potential discount
+            $interval = $reservationTransport->getDateRes()->diff($reservationTransport->getDateFin());
+            $heures = $interval->h + ($interval->days * 24);
+            $prixTotal = $station->getPrixHeure() * $heures * $reservationTransport->getNombreVelo();
+            
+            // Apply 20% discount if station has more than 50 bikes
+            if ($station->getNombreVelo() > 50) {
+                $prixTotal = $prixTotal * 0.8;
+            }
+            
+            $reservationTransport->setPrix($prixTotal);
+            
             $tempData = [
                 'user_id' => $user->getIdU(),
                 'station_id' => $station->getIdS(),
                 'date_res' => $reservationTransport->getDateRes()->format('Y-m-d H:i:s'),
                 'date_fin' => $reservationTransport->getDateFin()->format('Y-m-d H:i:s'),
                 'nombre_velo' => $reservationTransport->getNombreVelo(),
-                'prix' => $reservationTransport->getPrix(),
+                'prix' => $prixTotal,
                 'reference' => $reference
             ];
             
@@ -249,11 +262,10 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/process-payment', name: 'app_reservation_transport_process_payment', methods: ['POST'])]
-    public function processPayment(Request $request, EntityManagerInterface $entityManager, 
-                                StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
+    public function processPayment(Request $request, EntityManagerInterface $entityManager, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
-        // Check if user is logged in
         if (!$session->has('user_id')) {
+            $this->addFlash('error', 'Vous devez être connecté pour effectuer un paiement.');
             return $this->redirectToRoute('app_login');
         }
         
@@ -264,50 +276,105 @@ final class ReservationTransportController extends AbstractController
         // Get temporary reservation data from session
         $tempData = $session->get('temp_reservation');
         if (!$tempData) {
+            $this->addFlash('error', 'Données de réservation non trouvées. Veuillez recommencer.');
             return $this->redirectToRoute('app_reservation_transport_station');
         }
         
-        // Récupérer la station
+        // Get the station
         $station = $stationRepository->find($tempData['station_id']);
         
         if (!$station) {
-            throw $this->createNotFoundException('Station non trouvée');
+            $this->addFlash('error', 'Station non trouvée.');
+            return $this->redirectToRoute('app_reservation_transport_station');
         }
-        
-        // Création de la réservation dans la base de données après paiement réussi
-        $reservation = new ReservationTransport();
-        
-        // Configuration de la réservation
-        $reservation->setUser($user);
-        $reservation->setStation($station);
-        $reservation->setDateRes(new \DateTime($tempData['date_res']));
-        $reservation->setDateFin(new \DateTime($tempData['date_fin']));
-        $reservation->setNombreVelo($tempData['nombre_velo']);
-        $reservation->setPrix($tempData['prix']);
-        $reservation->setReference($tempData['reference']);
-        $reservation->setStatut('confirmé');
-        
-        // Enregistrer dans la base de données
-        $entityManager->persist($reservation);
-        $entityManager->flush();
-        
-        // Mettre à jour le nombre de vélos disponibles à la station
-        $stationRepository->decrementNbVelosDispo($station->getIdS(), $tempData['nombre_velo']);
-        
-        // Stocker les données de réservation pour la page de confirmation
-        $session->set('confirmed_reservation', [
-            'reference' => $reservation->getReference(),
-            'station' => $station->getNom(),
-            'date' => $tempData['date_res'],
-            'nombreVelo' => $tempData['nombre_velo'],
-            'prix' => $tempData['prix']
-        ]);
-        
-        // Clear the temporary reservation data
-        $session->remove('temp_reservation');
-        
-        // Rediriger vers la page de confirmation
-        return $this->redirectToRoute('app_reservation_transport_confirmation');
+
+        // Get the Stripe token from the form
+        $stripeToken = $request->request->get('stripeToken');
+        if (!$stripeToken) {
+            $this->addFlash('error', 'Erreur de paiement: Token Stripe manquant.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        }
+
+        try {
+            // Set your secret key
+            \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+
+            // Create a charge
+            $charge = \Stripe\Charge::create([
+                'amount' => $tempData['prix'] * 100, // Amount in cents
+                'currency' => 'eur',
+                'source' => $stripeToken,
+                'description' => 'Réservation de transport - Référence: ' . $tempData['reference']
+            ]);
+
+            // Verify the charge was successful
+            if ($charge->status !== 'succeeded') {
+                throw new \Exception('Le paiement n\'a pas été validé par Stripe.');
+            }
+
+            // Create the reservation in the database after successful payment
+            $reservation = new ReservationTransport();
+            
+            // Configure the reservation
+            $reservation->setUser($user);
+            $reservation->setStation($station);
+            $reservation->setDateRes(new \DateTime($tempData['date_res']));
+            $reservation->setDateFin(new \DateTime($tempData['date_fin']));
+            $reservation->setNombreVelo($tempData['nombre_velo']);
+            $reservation->setPrix($tempData['prix']);
+            $reservation->setReference($tempData['reference']);
+            $reservation->setStatut('confirmé');
+            
+            // Save to database
+            $entityManager->persist($reservation);
+            $entityManager->flush();
+            
+            // Update the number of available bikes at the station
+            $stationRepository->decrementNbVelosDispo($station->getIdS(), $tempData['nombre_velo']);
+            
+            // Store reservation data for the confirmation page
+            $session->set('confirmed_reservation', [
+                'reference' => $reservation->getReference(),
+                'station' => $station->getNom(),
+                'date' => $tempData['date_res'],
+                'nombreVelo' => $tempData['nombre_velo'],
+                'prix' => $tempData['prix']
+            ]);
+            
+            // Clear the temporary reservation data
+            $session->remove('temp_reservation');
+            
+            // Redirect to confirmation page
+            return $this->redirectToRoute('app_reservation_transport_confirmation');
+        } catch (\Stripe\Exception\CardException $e) {
+            // Handle card errors
+            $this->addFlash('error', 'Erreur de carte: ' . $e->getMessage());
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\RateLimitException $e) {
+            // Too many requests made to the API too quickly
+            $this->addFlash('error', 'Trop de tentatives. Veuillez réessayer plus tard.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+            // Invalid parameters were supplied to Stripe's API
+            $this->addFlash('error', 'Erreur de paramètres: ' . $e->getMessage());
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\AuthenticationException $e) {
+            // Authentication with Stripe's API failed
+            $this->addFlash('error', 'Erreur d\'authentification avec Stripe.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\ApiConnectionException $e) {
+            // Network communication with Stripe failed
+            $this->addFlash('error', 'Erreur de connexion avec Stripe. Veuillez vérifier votre connexion internet.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            // Display a very generic error to the user
+            $this->addFlash('error', 'Une erreur est survenue lors du paiement. Veuillez réessayer.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Exception $e) {
+            // Something else happened, completely unrelated to Stripe
+            $this->addFlash('error', 'Une erreur inattendue est survenue: ' . $e->getMessage());
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        }
     }
 
     #[Route('/confirmation', name: 'app_reservation_transport_confirmation', methods: ['GET'])]
@@ -355,7 +422,8 @@ final class ReservationTransportController extends AbstractController
         $reservation->setReference($tempData['reference']); // Use the stored reference
         
         return $this->render('reservation_transport/payment.html.twig', [
-            'reservation' => $reservation
+            'reservation' => $reservation,
+            'stripe_public_key' => $_ENV['STRIPE_PUBLIC_KEY']
         ]);
     }
 
@@ -430,6 +498,11 @@ final class ReservationTransportController extends AbstractController
     
         // Calcul du prix total
         $prixTotal = $station->getPrixHeure() * $heures * $nombreVelo;
+        
+        // Appliquer une remise de 20% si la station a plus de 50 vélos disponibles
+        if ($station->getNombreVelo() > 50) {
+            $prixTotal = $prixTotal * 0.8; // 20% de remise
+        }
     
         // Récupérer l'utilisateur
         $user = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
@@ -497,18 +570,35 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/{id}/chat', name: 'app_reservation_transport_chat', methods: ['GET'])]
-    public function chat(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager): Response
+    public function chat(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository): Response
     {
-        // Check if the user is the owner of the reservation
-        $currentUser = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
         
+        // Get current user from session
+        $userId = $session->get('user_id');
+        $currentUser = $userRepository->find($userId);
+        
+        if (!$currentUser) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Check if the user is the owner of the reservation
         if ($reservation->getUser()->getIdU() !== $currentUser->getIdU()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à cette conversation.');
         }
         
-        // Get existing messages for this reservation
+        // Get the station owner
+        $stationOwner = $reservation->getStation()->getUser();
+        
+        // Get messages between the current user and the station owner
         $messages = $entityManager->getRepository('App\Entity\Message')->findBy(
-            ['reservation' => $reservation],
+            [
+                'sender' => [$currentUser->getIdU(), $stationOwner->getIdU()],
+                'receiver' => [$currentUser->getIdU(), $stationOwner->getIdU()]
+            ],
             ['dateM' => 'ASC']
         );
         
@@ -519,11 +609,22 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/{id}/message/new', name: 'app_reservation_message_new', methods: ['POST'])]
-    public function newMessage(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function newMessage(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager, UserRepository $userRepository, SessionInterface $session): Response
     {
-        // Check if the user is the owner of the reservation
-        $currentUser = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
         
+        // Get current user from session
+        $userId = $session->get('user_id');
+        $currentUser = $userRepository->find($userId);
+        
+        if (!$currentUser) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Check if the user is the owner of the reservation
         if ($reservation->getUser()->getIdU() !== $currentUser->getIdU()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à envoyer un message pour cette réservation.');
         }
@@ -536,25 +637,22 @@ final class ReservationTransportController extends AbstractController
             return $this->redirectToRoute('app_reservation_transport_chat', ['id' => $reservation->getId()]);
         }
         
-        // Get the station founder as the receiver
-        // We use the station's ID to find its founder
+        // Get the station from the reservation
         $station = $reservation->getStation();
         
-        // Find the founder/owner of the station (assuming user with ID 1 is the founder)
-        // In a real system, you would have a proper relationship between stations and their founders
-        $receiverUser = $userRepository->find(1);
+        // Get the owner of the station
+        $stationOwner = $station->getUser();
         
-        if (!$receiverUser) {
-            throw new \Exception('Le fondateur de la station n\'a pas été trouvé.');
+        if (!$stationOwner) {
+            throw new \Exception('Le propriétaire de la station n\'a pas été trouvé.');
         }
         
         // Create new message
         $message = new \App\Entity\Message();
         $message->setContent($content);
         $message->setSender($currentUser);
-        $message->setReceiver($receiverUser); // Set the station founder as receiver
+        $message->setReceiver($stationOwner);
         $message->setDateM(new \DateTime());
-        $message->setReservation($reservation);
         
         // Save to database
         $entityManager->persist($message);

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Payment Cancelled{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="alert alert-warning">
+            <h1>Payment Cancelled</h1>
+            <p>Your payment was cancelled. You can try again or contact support if you need assistance.</p>
+            <a href="{{ path('app_home') }}" class="btn btn-primary">Return to Home</a>
+        </div>
+    </div>
+{% endblock %} 
