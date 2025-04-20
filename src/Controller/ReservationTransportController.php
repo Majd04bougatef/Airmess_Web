@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Stripe\Stripe;
+use Stripe\Charge;
 
 #[Route('/reservation/transport')]
 final class ReservationTransportController extends AbstractController
@@ -260,11 +262,10 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/process-payment', name: 'app_reservation_transport_process_payment', methods: ['POST'])]
-    public function processPayment(Request $request, EntityManagerInterface $entityManager, 
-                                StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
+    public function processPayment(Request $request, EntityManagerInterface $entityManager, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
-        // Check if user is logged in
         if (!$session->has('user_id')) {
+            $this->addFlash('error', 'Vous devez être connecté pour effectuer un paiement.');
             return $this->redirectToRoute('app_login');
         }
         
@@ -275,50 +276,105 @@ final class ReservationTransportController extends AbstractController
         // Get temporary reservation data from session
         $tempData = $session->get('temp_reservation');
         if (!$tempData) {
+            $this->addFlash('error', 'Données de réservation non trouvées. Veuillez recommencer.');
             return $this->redirectToRoute('app_reservation_transport_station');
         }
         
-        // Récupérer la station
+        // Get the station
         $station = $stationRepository->find($tempData['station_id']);
         
         if (!$station) {
-            throw $this->createNotFoundException('Station non trouvée');
+            $this->addFlash('error', 'Station non trouvée.');
+            return $this->redirectToRoute('app_reservation_transport_station');
         }
-        
-        // Création de la réservation dans la base de données après paiement réussi
-        $reservation = new ReservationTransport();
-        
-        // Configuration de la réservation
-        $reservation->setUser($user);
-        $reservation->setStation($station);
-        $reservation->setDateRes(new \DateTime($tempData['date_res']));
-        $reservation->setDateFin(new \DateTime($tempData['date_fin']));
-        $reservation->setNombreVelo($tempData['nombre_velo']);
-        $reservation->setPrix($tempData['prix']);
-        $reservation->setReference($tempData['reference']);
-        $reservation->setStatut('confirmé');
-        
-        // Enregistrer dans la base de données
-        $entityManager->persist($reservation);
-        $entityManager->flush();
-        
-        // Mettre à jour le nombre de vélos disponibles à la station
-        $stationRepository->decrementNbVelosDispo($station->getIdS(), $tempData['nombre_velo']);
-        
-        // Stocker les données de réservation pour la page de confirmation
-        $session->set('confirmed_reservation', [
-            'reference' => $reservation->getReference(),
-            'station' => $station->getNom(),
-            'date' => $tempData['date_res'],
-            'nombreVelo' => $tempData['nombre_velo'],
-            'prix' => $tempData['prix']
-        ]);
-        
-        // Clear the temporary reservation data
-        $session->remove('temp_reservation');
-        
-        // Rediriger vers la page de confirmation
-        return $this->redirectToRoute('app_reservation_transport_confirmation');
+
+        // Get the Stripe token from the form
+        $stripeToken = $request->request->get('stripeToken');
+        if (!$stripeToken) {
+            $this->addFlash('error', 'Erreur de paiement: Token Stripe manquant.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        }
+
+        try {
+            // Set your secret key
+            \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+
+            // Create a charge
+            $charge = \Stripe\Charge::create([
+                'amount' => $tempData['prix'] * 100, // Amount in cents
+                'currency' => 'eur',
+                'source' => $stripeToken,
+                'description' => 'Réservation de transport - Référence: ' . $tempData['reference']
+            ]);
+
+            // Verify the charge was successful
+            if ($charge->status !== 'succeeded') {
+                throw new \Exception('Le paiement n\'a pas été validé par Stripe.');
+            }
+
+            // Create the reservation in the database after successful payment
+            $reservation = new ReservationTransport();
+            
+            // Configure the reservation
+            $reservation->setUser($user);
+            $reservation->setStation($station);
+            $reservation->setDateRes(new \DateTime($tempData['date_res']));
+            $reservation->setDateFin(new \DateTime($tempData['date_fin']));
+            $reservation->setNombreVelo($tempData['nombre_velo']);
+            $reservation->setPrix($tempData['prix']);
+            $reservation->setReference($tempData['reference']);
+            $reservation->setStatut('confirmé');
+            
+            // Save to database
+            $entityManager->persist($reservation);
+            $entityManager->flush();
+            
+            // Update the number of available bikes at the station
+            $stationRepository->decrementNbVelosDispo($station->getIdS(), $tempData['nombre_velo']);
+            
+            // Store reservation data for the confirmation page
+            $session->set('confirmed_reservation', [
+                'reference' => $reservation->getReference(),
+                'station' => $station->getNom(),
+                'date' => $tempData['date_res'],
+                'nombreVelo' => $tempData['nombre_velo'],
+                'prix' => $tempData['prix']
+            ]);
+            
+            // Clear the temporary reservation data
+            $session->remove('temp_reservation');
+            
+            // Redirect to confirmation page
+            return $this->redirectToRoute('app_reservation_transport_confirmation');
+        } catch (\Stripe\Exception\CardException $e) {
+            // Handle card errors
+            $this->addFlash('error', 'Erreur de carte: ' . $e->getMessage());
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\RateLimitException $e) {
+            // Too many requests made to the API too quickly
+            $this->addFlash('error', 'Trop de tentatives. Veuillez réessayer plus tard.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+            // Invalid parameters were supplied to Stripe's API
+            $this->addFlash('error', 'Erreur de paramètres: ' . $e->getMessage());
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\AuthenticationException $e) {
+            // Authentication with Stripe's API failed
+            $this->addFlash('error', 'Erreur d\'authentification avec Stripe.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\ApiConnectionException $e) {
+            // Network communication with Stripe failed
+            $this->addFlash('error', 'Erreur de connexion avec Stripe. Veuillez vérifier votre connexion internet.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            // Display a very generic error to the user
+            $this->addFlash('error', 'Une erreur est survenue lors du paiement. Veuillez réessayer.');
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        } catch (\Exception $e) {
+            // Something else happened, completely unrelated to Stripe
+            $this->addFlash('error', 'Une erreur inattendue est survenue: ' . $e->getMessage());
+            return $this->redirectToRoute('app_reservation_transport_payment', ['id' => $tempData['station_id']]);
+        }
     }
 
     #[Route('/confirmation', name: 'app_reservation_transport_confirmation', methods: ['GET'])]
@@ -366,7 +422,8 @@ final class ReservationTransportController extends AbstractController
         $reservation->setReference($tempData['reference']); // Use the stored reference
         
         return $this->render('reservation_transport/payment.html.twig', [
-            'reservation' => $reservation
+            'reservation' => $reservation,
+            'stripe_public_key' => $_ENV['STRIPE_PUBLIC_KEY']
         ]);
     }
 
