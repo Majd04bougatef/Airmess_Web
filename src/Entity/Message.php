@@ -23,10 +23,6 @@ class Message
     #[ORM\JoinColumn(name: "receiver_id", referencedColumnName: "id_U", nullable: false)]
     private ?User $receiver = null;
 
-    #[ORM\ManyToOne(targetEntity: ReservationTransport::class)]
-    #[ORM\JoinColumn(name: "id", referencedColumnName: "id", nullable: true)]
-    private ?ReservationTransport $reservation = null;
-
     #[ORM\Column(name: "content", type: "text", options: ["collation" => "utf8mb4_general_ci"])]
     private string $content;
 
@@ -62,17 +58,6 @@ class Message
     public function setReceiver(?User $receiver): self
     {
         $this->receiver = $receiver;
-        return $this;
-    }
-
-    public function getReservation(): ?ReservationTransport
-    {
-        return $this->reservation;
-    }
-
-    public function setReservation(?ReservationTransport $reservation): self
-    {
-        $this->reservation = $reservation;
         return $this;
     }
 

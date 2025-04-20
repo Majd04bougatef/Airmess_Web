@@ -570,18 +570,35 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/{id}/chat', name: 'app_reservation_transport_chat', methods: ['GET'])]
-    public function chat(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager): Response
+    public function chat(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository): Response
     {
-        // Check if the user is the owner of the reservation
-        $currentUser = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
         
+        // Get current user from session
+        $userId = $session->get('user_id');
+        $currentUser = $userRepository->find($userId);
+        
+        if (!$currentUser) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Check if the user is the owner of the reservation
         if ($reservation->getUser()->getIdU() !== $currentUser->getIdU()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à cette conversation.');
         }
         
-        // Get existing messages for this reservation
+        // Get the station owner
+        $stationOwner = $reservation->getStation()->getUser();
+        
+        // Get messages between the current user and the station owner
         $messages = $entityManager->getRepository('App\Entity\Message')->findBy(
-            ['reservation' => $reservation],
+            [
+                'sender' => [$currentUser->getIdU(), $stationOwner->getIdU()],
+                'receiver' => [$currentUser->getIdU(), $stationOwner->getIdU()]
+            ],
             ['dateM' => 'ASC']
         );
         
@@ -592,11 +609,22 @@ final class ReservationTransportController extends AbstractController
     }
 
     #[Route('/{id}/message/new', name: 'app_reservation_message_new', methods: ['POST'])]
-    public function newMessage(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function newMessage(Request $request, ReservationTransport $reservation, EntityManagerInterface $entityManager, UserRepository $userRepository, SessionInterface $session): Response
     {
-        // Check if the user is the owner of the reservation
-        $currentUser = $this->getUser() ?? $entityManager->getRepository(User::class)->find(40);
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
         
+        // Get current user from session
+        $userId = $session->get('user_id');
+        $currentUser = $userRepository->find($userId);
+        
+        if (!$currentUser) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Check if the user is the owner of the reservation
         if ($reservation->getUser()->getIdU() !== $currentUser->getIdU()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à envoyer un message pour cette réservation.');
         }
@@ -609,25 +637,22 @@ final class ReservationTransportController extends AbstractController
             return $this->redirectToRoute('app_reservation_transport_chat', ['id' => $reservation->getId()]);
         }
         
-        // Get the station founder as the receiver
-        // We use the station's ID to find its founder
+        // Get the station from the reservation
         $station = $reservation->getStation();
         
-        // Find the founder/owner of the station (assuming user with ID 1 is the founder)
-        // In a real system, you would have a proper relationship between stations and their founders
-        $receiverUser = $userRepository->find(1);
+        // Get the owner of the station
+        $stationOwner = $station->getUser();
         
-        if (!$receiverUser) {
-            throw new \Exception('Le fondateur de la station n\'a pas été trouvé.');
+        if (!$stationOwner) {
+            throw new \Exception('Le propriétaire de la station n\'a pas été trouvé.');
         }
         
         // Create new message
         $message = new \App\Entity\Message();
         $message->setContent($content);
         $message->setSender($currentUser);
-        $message->setReceiver($receiverUser); // Set the station founder as receiver
+        $message->setReceiver($stationOwner);
         $message->setDateM(new \DateTime());
-        $message->setReservation($reservation);
         
         // Save to database
         $entityManager->persist($message);
