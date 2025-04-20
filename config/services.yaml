@@ -11,6 +11,9 @@ parameters:
     expense_images_directory: 'C:/xampp/htdocs/images_expenses'
     bonplan_uploads_directory: 'C:/xampp/htdocs/images_bonplans'
 
+    # Replace these with your actual reCAPTCHA keys from https://www.google.com/recaptcha/admin
+    recaptcha_site_key: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'  # Test key
+    recaptcha_secret_key: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'  # Test key
 
 
 services:
