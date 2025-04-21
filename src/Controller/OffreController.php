@@ -198,6 +198,12 @@ final class OffreController extends AbstractController
             $this->addFlash('success', 'Offre confirmée avec succès.');
         }
 
+        // Rediriger en fonction de la page d'origine
+        $from = $request->request->get('from', 'entreprise');
+        if ($from === 'admin') {
+            return $this->redirectToRoute('app_offre_page');
+        }
+
         return $this->redirectToRoute('offreEntreprise_page');
     }
 
@@ -209,6 +215,12 @@ final class OffreController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Offre rejetée avec succès.');
+        }
+        
+        // Rediriger en fonction de la page d'origine
+        $from = $request->request->get('from', 'entreprise');
+        if ($from === 'admin') {
+            return $this->redirectToRoute('app_offre_page');
         }
 
         return $this->redirectToRoute('offreEntreprise_page');
