@@ -685,4 +685,50 @@ final class ReservationTransportController extends AbstractController
 
         return $response;
     }
+
+    #[Route('/stations/map', name: 'app_stations_map')]
+    public function stationsMap(StationRepository $stationRepository): Response
+    {
+        try {
+            $stations = $stationRepository->findAll();
+            
+            // Transform stations to include only necessary data and validate coordinates
+            $stationsData = array_map(function($station) {
+                return [
+                    'idS' => $station->getIdS(),
+                    'nom' => $station->getNom(),
+                    'latitude' => (float)$station->getLatitude(),
+                    'longitude' => (float)$station->getLongitude(),
+                    'nombreVelo' => $station->getNombreVelo(),
+                    'capacite' => $station->getCapacite(),
+                    'prixHeure' => $station->getPrixHeure(),
+                    'typeVelo' => $station->getTypeVelo(),
+                    'rating' => $station->getRating() ?? 0,
+                    'numberRaters' => $station->getNumberRaters() ?? 0
+                ];
+            }, $stations);
+
+            // Filter out stations with invalid coordinates
+            $stationsData = array_filter($stationsData, function($station) {
+                return $station['latitude'] != 0 && $station['longitude'] != 0 
+                    && $station['latitude'] !== null && $station['longitude'] !== null;
+            });
+
+            // Debug log
+            error_log('Number of stations after filtering: ' . count($stationsData));
+            error_log('Stations data: ' . json_encode(array_values($stationsData)));
+
+            return $this->render('reservation_transport/stations_map.html.twig', [
+                'stations' => array_values($stationsData) // Reset array keys after filtering
+            ]);
+        } catch (\Exception $e) {
+            // Log the error
+            error_log('Error in stationsMap: ' . $e->getMessage());
+            
+            // Return empty stations array if there's an error
+            return $this->render('reservation_transport/stations_map.html.twig', [
+                'stations' => []
+            ]);
+        }
+    }
 }
