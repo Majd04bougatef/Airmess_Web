@@ -1,0 +1,331 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Carte des Stations{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        .content-card {
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+        #map {
+            height: 600px !important;
+            width: 90% !important;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 0 auto; /* Center the map */
+            position: relative !important;
+            z-index: 1;
+        }
+        .map-container {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin: 20px;
+            position: relative;
+            min-height: 700px;
+        }
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+        .back-button {
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+            color: white;
+            text-decoration: none;
+        }
+        .station-popup {
+            padding: 10px;
+            min-width: 250px;
+        }
+        .station-popup h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .station-popup p {
+            margin: 5px 0;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .station-popup .reserve-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+            width: 100%;
+            text-align: center;
+        }
+        .station-popup .reserve-btn:hover {
+            background-color: #0056b3;
+        }
+        .leaflet-popup-content {
+            margin: 0;
+            padding: 5px;
+        }
+        /* Override any conflicting styles */
+        .leaflet-container {
+            z-index: 1;
+        }
+        .leaflet-control-container {
+            z-index: 2;
+        }
+        .location-button {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            background: white;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .location-button:hover {
+            background: #f4f4f4;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="map-container">
+        <div class="map-header">
+            <h2>Carte des Stations de Vélos</h2>
+            <a href="{{ path('app_reservation_transport_station') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Retour à la liste
+            </a>
+        </div>
+        <div id="map"></div>
+        <button class="location-button" onclick="locateUser()">
+            <i class="fas fa-location-arrow"></i>
+            Ma position
+        </button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        let map, userMarker, userCircle;
+        let isFirstLocation = true;
+
+        // Initialize map
+        function initializeMap() {
+            // Debug: Log the stations data
+            console.log('Stations data:', {{ stations|json_encode|raw }});
+
+            // Initialize map
+            map = L.map('map', {
+                zoomControl: true,
+                scrollWheelZoom: true,
+                dragging: true
+            }).setView([36.8065, 10.1815], 6);
+            
+            // Add the OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors',
+                tileSize: 256,
+                zoomOffset: 0,
+                detectRetina: true
+            }).addTo(map);
+
+            // Custom icons for different bike types
+            var bikeIcons = {
+                'velo électrique': L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                }),
+                'velo urbain': L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                }),
+                'velo de route': L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                })
+            };
+
+            // Add markers for each station
+            {% if stations is defined and stations is not empty %}
+                console.log('Number of stations:', {{ stations|length }});
+                {% for station in stations %}
+                    console.log('Processing station:', {
+                        name: '{{ station.nom }}',
+                        lat: {{ station.latitude }},
+                        lng: {{ station.longitude }},
+                        type: '{{ station.typeVelo }}'
+                    });
+
+                    var icon = bikeIcons['{{ station.typeVelo }}'] || bikeIcons['velo urbain'];
+                    var marker = L.marker([{{ station.latitude }}, {{ station.longitude }}], {
+                        icon: icon
+                    });
+
+                    var popupContent = `
+                        <div class="station-popup">
+                            <h3>{{ station.nom }}</h3>
+                            <p>
+                                <span>Vélos disponibles:</span>
+                                <span>{{ station.nombreVelo }} / {{ station.capacite }}</span>
+                            </p>
+                            <p>
+                                <span>Type de vélo:</span>
+                                <span>{{ station.typeVelo }}</span>
+                            </p>
+                            <p>
+                                <span>Prix:</span>
+                                <span>{{ station.prixHeure }} DT/heure</span>
+                            </p>
+                            <a href="{{ path('app_reservation_transport_new', {'idS': station.idS}) }}" class="reserve-btn">
+                                Réserver maintenant
+                            </a>
+                        </div>
+                    `;
+
+                    marker.bindPopup(popupContent);
+                    marker.addTo(map);
+                    console.log('Added marker for station:', '{{ station.nom }}');
+                {% endfor %}
+            {% else %}
+                console.log('No stations data available');
+                // Add a default marker to show the map is working
+                var defaultMarker = L.marker([36.8065, 10.1815]).addTo(map);
+                defaultMarker.bindPopup("<b>Aucune station disponible</b>").openPopup();
+            {% endif %}
+
+            // Force a resize event after a short delay
+            setTimeout(function() {
+                map.invalidateSize(true);
+                console.log('Map resized');
+            }, 100);
+        }
+
+        // Function to locate user
+        function locateUser() {
+            if (!navigator.geolocation) {
+                alert('La géolocalisation n\'est pas supportée par votre navigateur');
+                return;
+            }
+
+            // Show loading state
+            document.querySelector('.location-button').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Localisation...';
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    // Remove existing user location markers
+                    if (userMarker) map.removeLayer(userMarker);
+                    if (userCircle) map.removeLayer(userCircle);
+
+                    // Add user marker
+                    userMarker = L.marker([latitude, longitude], {
+                        icon: L.divIcon({
+                            html: '<i class="fas fa-user-circle fa-2x" style="color: #2196F3;"></i>',
+                            iconSize: [25, 25],
+                            className: 'user-location-marker'
+                        })
+                    }).addTo(map);
+
+                    // Add accuracy circle
+                    userCircle = L.circle([latitude, longitude], {
+                        radius: accuracy,
+                        color: '#2196F3',
+                        fillColor: '#2196F3',
+                        fillOpacity: 0.15
+                    }).addTo(map);
+
+                    // Center map on user's location if it's the first time
+                    if (isFirstLocation) {
+                        map.setView([latitude, longitude], 15);
+                        isFirstLocation = false;
+                    }
+
+                    // Update button state
+                    document.querySelector('.location-button').innerHTML = '<i class="fas fa-location-arrow"></i> Ma position';
+
+                    // Bind popup to user marker
+                    userMarker.bindPopup('Vous êtes ici! (précision: ' + Math.round(accuracy) + ' mètres)').openPopup();
+                },
+                function(error) {
+                    let errorMessage;
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = "Vous avez refusé la demande de géolocalisation.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = "L'information de localisation n'est pas disponible.";
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = "La demande de localisation a expiré.";
+                            break;
+                        default:
+                            errorMessage = "Une erreur inconnue s'est produite.";
+                            break;
+                    }
+                    alert(errorMessage);
+                    document.querySelector('.location-button').innerHTML = '<i class="fas fa-location-arrow"></i> Ma position';
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        // Initialize map when page loads
+        initializeMap();
+
+        // Add resize handler for when the window is resized
+        window.addEventListener('resize', function() {
+            map.invalidateSize(true);
+        });
+    </script>
+{% endblock %}
+
+{% block js %}
+    {{ parent() }}
+{% endblock %}
+

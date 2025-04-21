@@ -660,4 +660,75 @@ final class ReservationTransportController extends AbstractController
         
         return $this->redirectToRoute('app_reservation_transport_chat', ['id' => $reservation->getId()]);
     }
+
+    #[Route('/ticket/{reference}', name: 'app_reservation_transport_ticket', methods: ['GET'])]
+    public function generateTicket(string $reference, ReservationTransportRepository $reservationTransportRepository): Response
+    {
+        $reservation = $reservationTransportRepository->findOneBy(['reference' => $reference]);
+        
+        if (!$reservation) {
+            throw $this->createNotFoundException('Réservation non trouvée');
+        }
+
+        $html = $this->renderView('reservation_transport/ticket.html.twig', [
+            'reservation' => $reservation,
+        ]);
+
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A5', 'portrait');
+        $dompdf->render();
+
+        $response = new Response($dompdf->output());
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="ticket-' . $reservation->getReference() . '.pdf"');
+
+        return $response;
+    }
+
+    #[Route('/stations/map', name: 'app_stations_map')]
+    public function stationsMap(StationRepository $stationRepository): Response
+    {
+        try {
+            $stations = $stationRepository->findAll();
+            
+            // Transform stations to include only necessary data and validate coordinates
+            $stationsData = array_map(function($station) {
+                return [
+                    'idS' => $station->getIdS(),
+                    'nom' => $station->getNom(),
+                    'latitude' => (float)$station->getLatitude(),
+                    'longitude' => (float)$station->getLongitude(),
+                    'nombreVelo' => $station->getNombreVelo(),
+                    'capacite' => $station->getCapacite(),
+                    'prixHeure' => $station->getPrixHeure(),
+                    'typeVelo' => $station->getTypeVelo(),
+                    'rating' => $station->getRating() ?? 0,
+                    'numberRaters' => $station->getNumberRaters() ?? 0
+                ];
+            }, $stations);
+
+            // Filter out stations with invalid coordinates
+            $stationsData = array_filter($stationsData, function($station) {
+                return $station['latitude'] != 0 && $station['longitude'] != 0 
+                    && $station['latitude'] !== null && $station['longitude'] !== null;
+            });
+
+            // Debug log
+            error_log('Number of stations after filtering: ' . count($stationsData));
+            error_log('Stations data: ' . json_encode(array_values($stationsData)));
+
+            return $this->render('reservation_transport/stations_map.html.twig', [
+                'stations' => array_values($stationsData) // Reset array keys after filtering
+            ]);
+        } catch (\Exception $e) {
+            // Log the error
+            error_log('Error in stationsMap: ' . $e->getMessage());
+            
+            // Return empty stations array if there's an error
+            return $this->render('reservation_transport/stations_map.html.twig', [
+                'stations' => []
+            ]);
+        }
+    }
 }
