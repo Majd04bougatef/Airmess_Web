@@ -3,27 +3,258 @@
 {% block title %}Confirmation de Réservation{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h2>Confirmation de Réservation</h2>
-    <div class="alert alert-success mt-3">
-        <strong>Succès !</strong> Votre réservation a été confirmée avec succès.
-    </div>
-    <ul class="list-group mt-4">
-        <li class="list-group-item">
-            <strong>Référence :</strong> {{ reservation.idR }}
-        </li>
-        <li class="list-group-item">
-            <strong>Offre :</strong> {{ reservation.offre.place }}
-        </li>
-        <li class="list-group-item">
-            <strong>Date de réservation :</strong> {{ reservation.dateRes|date('d/m/Y à H:i') }}
-        </li>
-        <li class="list-group-item">
-            <strong>Montant payé :</strong> {{ reservation.offre.priceAfter }} €
-        </li>
-    </ul>
-    <div class="mt-4">
-        <a href="{{ path('app_offre_voyageurs') }}" class="btn btn-primary">Retour aux offres</a>
+<style>
+    .confirmation-container {
+        background: #fff;
+        margin: 0 auto;
+        width: 100%;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        padding: 30px;
+    }
+    
+    .confirmation-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .confirmation-header h2 {
+        color: #344767;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .confirmation-icon {
+        width: 80px;
+        height: 80px;
+        background-color: #4CAF50;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .confirmation-icon i {
+        color: white;
+        font-size: 40px;
+    }
+    
+    .confirmation-message {
+        text-align: center;
+        color: #67748e;
+        font-size: 18px;
+        margin-bottom: 30px;
+    }
+    
+    .confirmation-details {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .detail-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #344767;
+    }
+    
+    .detail-value {
+        font-weight: 500;
+        color: #67748e;
+    }
+    
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .btn-action {
+        padding: 12px 25px;
+        border-radius: 7px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background-color: #5e72e4;
+        color: white;
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        background-color: #324cdd;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(94, 114, 228, 0.4);
+    }
+    
+    .btn-secondary {
+        background-color: #67748e;
+        color: white;
+        border: none;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #596579;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(103, 116, 142, 0.4);
+    }
+    
+    /* Stepper Component */
+    .stepper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 0;
+        position: relative;
+    }
+    
+    /* Line that connects steps */
+    .stepper::before {
+        content: '';
+        position: absolute;
+        width: 80%;
+        height: 4px;
+        background-color: #e9ecef;
+        top: 18px;
+        left: 10%;
+        z-index: 0;
+    }
+    
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        flex: 1;
+        z-index: 1;
+    }
+    
+    .step-number {
+        width: 36px;
+        height: 36px;
+        background-color: #e9ecef;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        color: white;
+        position: relative;
+        z-index: 1;
+        border: 3px solid white;
+        transition: all 0.3s ease;
+    }
+    
+    /* Active and completed step styling */
+    .step.active .step-number {
+        background-color: #5e72e4;
+        transform: scale(1.1);
+        box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
+    }
+    
+    .step.completed .step-number {
+        background-color: #5e72e4;
+    }
+    
+    .step-text {
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #67748e;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .step.active .step-text {
+        color: #344767;
+    }
+    
+    .step.completed .step-text {
+        color: #344767;
+    }
+</style>
+
+<div class="container">
+    <div class="confirmation-container">
+        <div class="stepper">
+            <div class="step completed">
+                <div class="step-number">1</div>
+                <div class="step-text">Réservation</div>
+            </div>
+            <div class="step completed">
+                <div class="step-number">2</div>
+                <div class="step-text">Récap</div>
+            </div>
+            <div class="step completed">
+                <div class="step-number">3</div>
+                <div class="step-text">Paiement</div>
+            </div>
+            <div class="step active">
+                <div class="step-number">4</div>
+                <div class="step-text">Confirmation</div>
+            </div>
+        </div>
+        
+        <div class="confirmation-header">
+            <div class="confirmation-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2>Réservation Confirmée</h2>
+        </div>
+        
+        <div class="confirmation-message">
+            Votre réservation a été traitée avec succès. Un email de confirmation vous a été envoyé.
+        </div>
+        
+        <div class="confirmation-details">
+            <div class="detail-item">
+                <div class="detail-label">Référence</div>
+                <div class="detail-value">{{ reservation.idR }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Offre</div>
+                <div class="detail-value">{{ reservation.offre.description }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Lieu</div>
+                <div class="detail-value">{{ reservation.offre.place }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Date de réservation</div>
+                <div class="detail-value">{{ reservation.dateRes|date('d/m/Y à H:i') }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Montant payé</div>
+                <div class="detail-value">{{ reservation.offre.priceAfter }} €</div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <a href="{{ path('app_offre_voyageurs') }}" class="btn-action btn-primary">Retour aux offres</a>
+            <a href="{{ path('app_reservation_index') }}" class="btn-action btn-secondary">Mes réservations</a>
+        </div>
     </div>
 </div>
 {% endblock %}
