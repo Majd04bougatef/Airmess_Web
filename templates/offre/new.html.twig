@@ -702,11 +702,60 @@ function initMap() {
             updateFields(e.latlng.lat, e.latlng.lng);
         });
         
-        // Mettre à jour les champs cachés
+        // Mettre à jour les champs cachés et le champ place
         function updateFields(lat, lng) {
             if (latField) latField.value = lat.toFixed(6);
             if (lngField) lngField.value = lng.toFixed(6);
             console.log("Coordonnées mises à jour:", lat.toFixed(6), lng.toFixed(6));
+            
+            // Récupérer le champ place
+            const placeField = document.querySelector('input[name$="[place]"]');
+            
+            // Géocodage inverse pour obtenir le nom du lieu
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Données de géocodage reçues:", data);
+                    
+                    if (data && data.display_name && placeField) {
+                        // Extraire le nom du lieu
+                        let placeName = '';
+                        
+                        // Construire une adresse plus lisible
+                        if (data.address) {
+                            const address = data.address;
+                            const parts = [];
+                            
+                            // Construire l'adresse avec les composants pertinents
+                            if (address.road) parts.push(address.road);
+                            if (address.house_number) parts.unshift(address.house_number);
+                            
+                            if (address.city || address.town || address.village) {
+                                parts.push(address.city || address.town || address.village);
+                            }
+                            
+                            if (address.postcode) parts.push(address.postcode);
+                            if (address.country) parts.push(address.country);
+                            
+                            placeName = parts.join(', ');
+                        } else {
+                            // Utiliser le nom complet si les détails d'adresse ne sont pas disponibles
+                            placeName = data.display_name;
+                        }
+                        
+                        // Mettre à jour le champ place
+                        placeField.value = placeName;
+                        
+                        // Déclencher l'événement input pour activer toute validation ou écouteurs d'événements
+                        const event = new Event('input', { bubbles: true });
+                        placeField.dispatchEvent(event);
+                        
+                        console.log("Champ place mis à jour avec:", placeName);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur lors du géocodage inverse:", error);
+                });
         }
         
         // Forcer un redimensionnement pour éviter les problèmes d'affichage
