@@ -125,6 +125,12 @@ class Offre
     #[ORM\OneToMany(mappedBy: 'offre', targetEntity: Reservation::class, orphanRemoval: true, cascade: ['remove'])]
     private Collection $reservations;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $longitude = null;
+
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
@@ -295,6 +301,30 @@ class Offre
                 $reservation->setOffre(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): static
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): static
+    {
+        $this->longitude = $longitude;
 
         return $this;
     }
