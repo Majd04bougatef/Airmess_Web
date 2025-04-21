@@ -26,8 +26,14 @@
             "./migrations/.gitignore"
         ]
     },
+    "endroid/qr-code-bundle": {
+        "version": "6.0.0"
+    },
     "knplabs/knp-paginator-bundle": {
         "version": "v6.7.0"
+    },
+    "knplabs/knp-snappy-bundle": {
+        "version": "v1.10.4"
     },
     "knpuniversity/oauth2-client-bundle": {
         "version": "2.18",

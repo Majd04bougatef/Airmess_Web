@@ -660,4 +660,29 @@ final class ReservationTransportController extends AbstractController
         
         return $this->redirectToRoute('app_reservation_transport_chat', ['id' => $reservation->getId()]);
     }
+
+    #[Route('/ticket/{reference}', name: 'app_reservation_transport_ticket', methods: ['GET'])]
+    public function generateTicket(string $reference, ReservationTransportRepository $reservationTransportRepository): Response
+    {
+        $reservation = $reservationTransportRepository->findOneBy(['reference' => $reference]);
+        
+        if (!$reservation) {
+            throw $this->createNotFoundException('Réservation non trouvée');
+        }
+
+        $html = $this->renderView('reservation_transport/ticket.html.twig', [
+            'reservation' => $reservation,
+        ]);
+
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A5', 'portrait');
+        $dompdf->render();
+
+        $response = new Response($dompdf->output());
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="ticket-' . $reservation->getReference() . '.pdf"');
+
+        return $response;
+    }
 }
