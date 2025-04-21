@@ -8,7 +8,30 @@
 
     <div class="container py-5">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
+                <!-- Titre principal -->
+                <h2 class="text-center mb-4">Paiement de votre réservation</h2>
+                
+                <!-- Indicateur d'étapes -->
+                <div class="stepper">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Réservation</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Récap</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Paiement</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Confirmation</div>
+                    </div>
+                </div>
+                
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-gradient-primary text-white p-4">
                         <h3 class="mb-0">Réserver cette offre</h3>
@@ -97,4 +120,83 @@
             </div>
         </div>
     </div>
+
+    <style>
+        /* Stepper Component */
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 0;
+            position: relative;
+        }
+        
+        /* Line that connects steps */
+        .stepper::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 4px;
+            background-color: #e9ecef;
+            top: 18px;
+            left: 10%;
+            z-index: 0;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+            z-index: 1;
+        }
+        
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background-color: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            z-index: 1;
+            border: 3px solid white;
+            transition: all 0.3s ease;
+        }
+        
+        /* Active and completed step styling */
+        .step.active .step-number {
+            background-color: #5e72e4;
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
+        }
+        
+        .step.completed .step-number {
+            background-color: #5e72e4;
+        }
+        
+        .step-text {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #67748e;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-text {
+            color: #344767;
+        }
+        
+        .step.completed .step-text {
+            color: #344767;
+        }
+    </style>
 {% endblock %}
