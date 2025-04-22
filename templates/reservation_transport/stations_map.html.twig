@@ -5,6 +5,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
     <style>
         .content-card {
             padding: 0 !important;
@@ -111,6 +112,42 @@
         .location-button:hover {
             background: #f4f4f4;
         }
+        .route-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .route-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        .route-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .route-info .distance {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        .route-info .duration {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .route-info .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
     </style>
 {% endblock %}
 
@@ -131,21 +168,26 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script>
-        let map, userMarker, userCircle;
+        let map, userMarker, userCircle, routingControl;
         let isFirstLocation = true;
+        let stations = [];
 
         // Initialize map
         function initializeMap() {
             // Debug: Log the stations data
             console.log('Stations data:', {{ stations|json_encode|raw }});
 
+            // Store stations data
+            stations = {{ stations|json_encode|raw }};
+
             // Initialize map
             map = L.map('map', {
                 zoomControl: true,
                 scrollWheelZoom: true,
                 dragging: true
-            }).setView([36.8065, 10.1815], 6);
+            }).setView([36.8065, 10.1815], 13);
             
             // Add the OpenStreetMap tiles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -239,6 +281,99 @@
             }, 100);
         }
 
+        // Function to find nearest station
+        function findNearestStation(userLat, userLng) {
+            let nearestStation = null;
+            let minDistance = Infinity;
+
+            stations.forEach(station => {
+                const distance = calculateDistance(userLat, userLng, station.latitude, station.longitude);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestStation = station;
+                }
+            });
+
+            return nearestStation;
+        }
+
+        // Function to calculate distance between two points
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2); 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            const distance = R * c; // Distance in km
+            return distance;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+
+        // Function to show route to nearest station
+        function showRouteToNearestStation(userLat, userLng, nearestStation) {
+            // Remove existing route if any
+            if (routingControl) {
+                map.removeControl(routingControl);
+            }
+
+            // Create route control
+            routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(userLat, userLng),
+                    L.latLng(nearestStation.latitude, nearestStation.longitude)
+                ],
+                routeWhileDragging: true,
+                show: true,
+                addWaypoints: false,
+                draggableWaypoints: false,
+                fitSelectedRoutes: true,
+                showAlternatives: false,
+                createMarker: function(i, waypoint, n) {
+                    if (i === 0) {
+                        return L.marker(waypoint.latLng, {
+                            icon: L.divIcon({
+                                html: '<i class="fas fa-user-circle fa-2x" style="color: #2196F3;"></i>',
+                                iconSize: [25, 25],
+                                className: 'user-location-marker'
+                            })
+                        });
+                    } else {
+                        return L.marker(waypoint.latLng, {
+                            icon: bikeIcons[nearestStation.typeVelo] || bikeIcons['velo urbain']
+                        });
+                    }
+                }
+            }).addTo(map);
+
+            // Add route info panel
+            const routeInfo = document.createElement('div');
+            routeInfo.className = 'route-info';
+            routeInfo.innerHTML = `
+                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+                <h3>Itinéraire vers ${nearestStation.nom}</h3>
+                <p>Distance: <span class="distance">Calcul en cours...</span></p>
+                <p>Durée: <span class="duration">Calcul en cours...</span></p>
+            `;
+            document.querySelector('.map-container').appendChild(routeInfo);
+
+            // Update route info when route is found
+            routingControl.on('routesfound', function(e) {
+                const routes = e.routes;
+                const summary = routes[0].summary;
+                const distance = (summary.totalDistance / 1000).toFixed(1);
+                const duration = Math.round(summary.totalTime / 60);
+
+                routeInfo.querySelector('.distance').textContent = `${distance} km`;
+                routeInfo.querySelector('.duration').textContent = `${duration} min`;
+            });
+        }
+
         // Function to locate user
         function locateUser() {
             if (!navigator.geolocation) {
@@ -275,6 +410,12 @@
                         fillColor: '#2196F3',
                         fillOpacity: 0.15
                     }).addTo(map);
+
+                    // Find nearest station and show route
+                    const nearestStation = findNearestStation(latitude, longitude);
+                    if (nearestStation) {
+                        showRouteToNearestStation(latitude, longitude, nearestStation);
+                    }
 
                     // Center map on user's location if it's the first time
                     if (isFirstLocation) {
