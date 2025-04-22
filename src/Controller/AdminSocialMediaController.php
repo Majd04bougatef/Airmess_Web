@@ -97,7 +97,7 @@ class AdminSocialMediaController extends AbstractController
                     'form' => $form->createView(),
                     'forbidden_words' => [
                         'title' => $forbiddenInTitle,
-                        'content' => $forbiddenInContent
+                        'content' => $forbiddenInContent 
                     ]
                 ]);
             }

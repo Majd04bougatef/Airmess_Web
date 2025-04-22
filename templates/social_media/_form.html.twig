@@ -7,41 +7,103 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Get forbidden words from template if they exist
-    const forbiddenWords = {
+    // Get all forbidden words from template if they exist
+    const allForbiddenWords = {{ app.container.get('App\\Service\\ForbiddenWordsChecker').getForbiddenWords()|json_encode|raw }};
+    
+    // Already detected forbidden words from server validation
+    const detectedForbiddenWords = {
         title: {{ forbidden_words.title is defined ? forbidden_words.title|json_encode|raw : '[]' }},
         content: {{ forbidden_words.content is defined ? forbidden_words.content|json_encode|raw : '[]' }}
     };
 
-    // Highlight forbidden words in fields
-    function highlightForbiddenWords(fieldId, words) {
-        const field = $(`#${fieldId}`);
-        const text = field.val();
+    // Real-time forbidden word detection
+    function checkForbiddenWords(text) {
+        const found = [];
+        if (!text) return found;
         
-        words.forEach(word => {
-            const regex = new RegExp(word, 'gi');
-            const highlighted = text.replace(regex, 
-                `<span class="forbidden-word-highlight">${word}</span>`);
-            field.next('.forbidden-words-preview').html(highlighted);
+        allForbiddenWords.forEach(word => {
+            // Use word boundary to match whole words only
+            const regex = new RegExp('\\b' + word + '\\b', 'i');
+            if (regex.test(text)) {
+                found.push(word);
+            }
         });
+        
+        return found;
     }
 
-    // Add preview divs after fields
-    $('#social_media_titre').after('<div class="forbidden-words-preview"></div>');
-    $('#social_media_contenu').after('<div class="forbidden-words-preview"></div>');
+    // Highlight forbidden words in fields and show real-time feedback
+    function updateFieldWithForbiddenCheck(fieldId, fieldType) {
+        const field = $(`#${fieldId}`);
+        const text = field.val();
+        const foundWords = checkForbiddenWords(text);
+        
+        // Clear any previous warning
+        field.removeClass('has-forbidden-words');
+        field.closest('.form-floating').find('.forbidden-word-warning').remove();
+        
+        if (foundWords.length > 0) {
+            // Add warning class and message
+            field.addClass('has-forbidden-words');
+            field.closest('.form-floating').append(
+                `<div class="forbidden-word-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Mots interdits détectés: ${foundWords.join(', ')}
+                </div>`
+            );
+        }
+    }
 
-    // Check on input
+    // Setup real-time checks on input fields
     $('#social_media_titre').on('input', function() {
-        highlightForbiddenWords('social_media_titre', forbiddenWords.title);
+        updateFieldWithForbiddenCheck('social_media_titre', 'title');
     });
 
     $('#social_media_contenu').on('input', function() {
-        highlightForbiddenWords('social_media_contenu', forbiddenWords.content);
+        updateFieldWithForbiddenCheck('social_media_contenu', 'content');
     });
 
-    // Initial check
-    highlightForbiddenWords('social_media_titre', forbiddenWords.title);
-    highlightForbiddenWords('social_media_contenu', forbiddenWords.content);
+    // Check form before submit
+    $('form.social-media-form').on('submit', function(e) {
+        const titleForbidden = checkForbiddenWords($('#social_media_titre').val());
+        const contentForbidden = checkForbiddenWords($('#social_media_contenu').val());
+        
+        if (titleForbidden.length > 0 || contentForbidden.length > 0) {
+            e.preventDefault();
+            
+            // Create alert if not exists
+            if ($('.realtime-forbidden-alert').length === 0) {
+                const alertHtml = `
+                    <div class="alert alert-danger realtime-forbidden-alert">
+                        <h5>Impossible de soumettre - Mots interdits détectés:</h5>
+                        ${titleForbidden.length > 0 ? `<p><strong>Titre:</strong> ${titleForbidden.join(', ')}</p>` : ''}
+                        ${contentForbidden.length > 0 ? `<p><strong>Contenu:</strong> ${contentForbidden.join(', ')}</p>` : ''}
+                        <p>Veuillez retirer ces mots avant de soumettre à nouveau.</p>
+                    </div>
+                `;
+                
+                $(this).prepend(alertHtml);
+                
+                // Scroll to alert
+                $('html, body').animate({
+                    scrollTop: $('.realtime-forbidden-alert').offset().top - 100
+                }, 500);
+            }
+        }
+    });
+
+    // Initial check when page loads
+    updateFieldWithForbiddenCheck('social_media_titre', 'title');
+    updateFieldWithForbiddenCheck('social_media_contenu', 'content');
+    
+    // Highlight already detected words
+    if (detectedForbiddenWords.title.length > 0) {
+        $('#social_media_titre').addClass('has-forbidden-words');
+    }
+    
+    if (detectedForbiddenWords.content.length > 0) {
+        $('#social_media_contenu').addClass('has-forbidden-words');
+    }
 });
 </script>
 {% endblock %}
@@ -76,6 +138,7 @@ $(document).ready(function() {
                             {% if forbidden_words.content is defined and forbidden_words.content is not empty %}
                                 <p><strong>Contenu:</strong> {{ forbidden_words.content|join(', ') }}</p>
                             {% endif %}
+                            <p>Veuillez retirer ces mots avant de soumettre à nouveau.</p>
                         </div>
                     {% endif %}
                     
@@ -199,13 +262,33 @@ $(document).ready(function() {
   .forbidden-words-alert p {
     color: #dc3545 !important;
   }
-
-  .forbidden-words-alert h5 {
-    font-weight: bold;
+  
+  /* Real-time forbidden word highlighting */
+  .has-forbidden-words {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
   }
-
-  .forbidden-words-alert p:last-child {
-    margin-bottom: 0;
+  
+  .forbidden-word-warning {
+    color: #dc3545;
+    font-size: 0.85em;
+    margin-top: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .forbidden-word-warning i {
+    margin-right: 5px;
+  }
+  
+  .realtime-forbidden-alert {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
   }
 
   /* Form card styles */
@@ -561,20 +644,6 @@ $(document).ready(function() {
 
   .content-section.active {
     display: block;
-  }
-
-  /* Forbidden words highlighting */
-  .forbidden-word-highlight {
-    background-color: #ffcccc;
-    color: #d9534f;
-    padding: 2px;
-    border-radius: 3px;
-  }
-
-  .forbidden-words-preview {
-    margin-top: 5px;
-    font-size: 0.8rem;
-    color: #d9534f;
   }
 </style>
 {% endblock %}

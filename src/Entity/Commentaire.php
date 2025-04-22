@@ -24,7 +24,7 @@ class Commentaire
     private ?User $user = null;
 
     #[ORM\Column(type: "text")]
-    #[Assert\NotBlank(message: "Le commentaire ne peut pas être vide")]
+    #[Assert\NotBlank(message: "")]
     #[Assert\Length(
         min: 5,
         max: 1000,

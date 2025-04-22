@@ -635,6 +635,127 @@
             color: #dc3545 !important;
             background-color: rgba(220, 53, 69, 0.15) !important;
         }
+        
+        /* Forbidden words styling */
+        .forbidden-words-warning {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid #dc3545;
+            color: #dc3545;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        
+        .shake-animation {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        
+        textarea.is-invalid {
+            border-color: #dc3545 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .post-content {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+
+        /* Styles pour les alertes */
+        .alert {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .alert-danger {
+            background-color: #fff5f5;
+            color: #dc3545;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-danger strong {
+            color: #dc3545;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-dismissible {
+            padding-right: 3rem;
+        }
+
+        .alert-dismissible .btn-close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 1rem;
+            color: #dc3545;
+        }
+
+        /* Animation pour les alertes */
+        .alert {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Style pour les erreurs de formulaire */
+        .form-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        /* Style pour le formulaire de commentaire */
+        .comment-input {
+            border: 1px solid #e0e4e8;
+            transition: all 0.3s ease;
+        }
+
+        .comment-input:focus {
+            border-color: #4a6bda;
+            box-shadow: 0 0 0 0.2rem rgba(74, 107, 218, 0.25);
+        }
+
+        .comment-input.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
     </style>
 {% endblock %}
 
@@ -784,27 +905,17 @@
                 <div id="comments-area" class="comments-section p-3">
                     <h3 class="section-title fs-5">Commentaires</h3>
 
-                    {# Affichage des erreurs basé sur les paramètres d'URL #}
-                    {% if app.request.query.get('error') %}
-                        {% set error_type = app.request.query.get('error') %}
-                        <div class="alert alert-danger mb-3">
-                            {% if error_type == 'empty_comment' %}
-                                <strong>Erreur :</strong> Le commentaire ne peut pas être vide.
-                            {% elseif error_type == 'validation_failed' %}
-                                <strong>Erreur :</strong> {{ app.request.query.get('message', 'Erreur de validation du formulaire.') }}
-                            {% elseif error_type == 'forbidden_words' %}
-                                <strong>Erreur :</strong> Votre commentaire contient des mots interdits: {{ app.request.query.get('words') }}
-                            {% elseif error_type == 'database_error' %}
-                                <strong>Erreur :</strong> Une erreur s'est produite lors de l'enregistrement du commentaire.
-                            {% elseif error_type == 'form_not_submitted' %}
-                                <strong>Erreur :</strong> Le formulaire n'a pas été soumis correctement.
-                            {% else %}
-                                <strong>Erreur :</strong> Une erreur est survenue.
-                            {% endif %}
-                        </div>
-                    {% endif %}
+                    {# Affichage des messages flash #}
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                                {{ message|raw }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
 
-                {# Formulaire Ajout Commentaire #}
+                    {# Formulaire Ajout Commentaire #}
                     <div class="add-comment-form-container d-flex align-items-start">
                         {% set current_user = app.user %}
                         <div class="flex-shrink-0 me-2">
@@ -813,23 +924,31 @@
                                 class="comment-author-img rounded-circle" width="32" height="32">
                      </div>
                      <div class="flex-grow-1">
-                        {# Noter que la route 'ajouter_commentaire' est dépréciée. Utiliser 'app_social_media_ajouter_commentaire' à la place #}
-                        <form name="{{ comment_form.vars.name }}" method="{{ comment_form.vars.method }}" action="{{ comment_form.vars.action }}" class="add-comment-form" id="comment-form" novalidate>
+                        {{ form_start(comment_form, {
+                            'action': path('app_social_media_ajouter_commentaire', {'idEB': social_media.idEB}),
+                            'method': 'POST',
+                            'attr': {
+                                'class': 'add-comment-form',
+                                'id': 'comment-form',
+                                'novalidate': 'novalidate'
+                            }
+                        }) }}
                             <div class="position-relative">
-                                {{ form_widget(comment_form.description, {'attr': {'rows': 2, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control comment-input py-2 px-3', 'id': 'comment-input', 'required': 'required', 'minlength': '5'}}) }}
+                                {{ form_widget(comment_form.description, {
+                                    'attr': {
+                                        'class': 'form-control comment-input py-2 px-3',
+                                        'rows': '2',
+                                        'placeholder': 'Écrivez un commentaire...',
+                                        'id': 'comment-input'
+                                    }
+                                }) }}
                                 {{ form_errors(comment_form.description) }}
-                                <div id="empty-comment-error" class="alert alert-danger mt-2" style="display: none;">Le commentaire ne peut pas être vide.</div>
                                 <button type="submit" class="btn btn-primary btn-send-comment" id="submit-comment" aria-label="Publier le commentaire">
                                     <i class="fas fa-paper-plane"></i>
                                 </button>
                             </div>
                             {{ form_rest(comment_form) }}
-                            <input type="hidden" name="_token" value="{{ csrf_token('comment_token') }}">
-                            <div class="d-none">
-                                <p>DEBUG - Nom du formulaire: {{ comment_form.vars.name }}</p>
-                                <p>DEBUG - Nom du champ description: {{ comment_form.description.vars.full_name }}</p>
-                            </div>
-                        </form>
+                        {{ form_end(comment_form) }}
                      </div>
                 </div>
 
@@ -930,6 +1049,91 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Get forbidden words list from backend
+            const forbiddenWords = {{ app.container.get('App\\Service\\ForbiddenWordsChecker').getForbiddenWords()|json_encode|raw }};
+            
+            // Function to check for forbidden words
+            function checkForbiddenWords(text) {
+                if (!text) return [];
+                const foundWords = [];
+                
+                forbiddenWords.forEach(word => {
+                    // Use word boundary to match whole words only
+                    const regex = new RegExp('\\b' + word + '\\b', 'i');
+                    if (regex.test(text)) {
+                        foundWords.push(word);
+                    }
+                });
+                
+                return foundWords;
+            }
+            
+            // Set up comment form validation with forbidden words check
+            const commentForm = document.getElementById('comment-form');
+            const commentInput = document.getElementById('comment-input');
+            
+            if (commentForm && commentInput) {
+                // Create forbidden words warning element
+                const forbiddenWordsWarning = document.createElement('div');
+                forbiddenWordsWarning.className = 'alert alert-danger mt-2 forbidden-words-warning';
+                forbiddenWordsWarning.style.display = 'none';
+                commentInput.parentNode.insertBefore(forbiddenWordsWarning, 
+                    document.getElementById('empty-comment-error'));
+                
+                // Check comment text on input
+                commentInput.addEventListener('input', function() {
+                    const text = this.value.trim();
+                    const foundWords = checkForbiddenWords(text);
+                    
+                    // Hide any previous warnings
+                    forbiddenWordsWarning.style.display = 'none';
+                    document.getElementById('empty-comment-error').style.display = 'none';
+                    
+                    // Remove any highlighting
+                    commentInput.classList.remove('is-invalid');
+                    
+                    if (foundWords.length > 0) {
+                        // Show warning with forbidden words
+                        forbiddenWordsWarning.innerHTML = '<strong>Mots interdits détectés:</strong> ' + 
+                            foundWords.join(', ') + '. Votre commentaire ne peut pas être publié avec ces mots.';
+                        forbiddenWordsWarning.style.display = 'block';
+                        
+                        // Add highlighting
+                        commentInput.classList.add('is-invalid');
+                    }
+                });
+                
+                // Prevent form submission if it contains forbidden words
+                commentForm.addEventListener('submit', function(e) {
+                    const text = commentInput.value.trim();
+                    
+                    // Check for empty comment
+                    if (text === '') {
+                        e.preventDefault();
+                        document.getElementById('empty-comment-error').style.display = 'block';
+                        return;
+                    }
+                    
+                    // Check for forbidden words
+                    const foundWords = checkForbiddenWords(text);
+                    if (foundWords.length > 0) {
+                        e.preventDefault();
+                        forbiddenWordsWarning.innerHTML = '<strong>Mots interdits détectés:</strong> ' + 
+                            foundWords.join(', ') + '. Votre commentaire ne peut pas être publié avec ces mots.';
+                        forbiddenWordsWarning.style.display = 'block';
+                        
+                        // Add animation to draw attention
+                        forbiddenWordsWarning.classList.add('shake-animation');
+                        setTimeout(() => {
+                            forbiddenWordsWarning.classList.remove('shake-animation');
+                        }, 500);
+                        
+                        // Scroll to warning
+                        forbiddenWordsWarning.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
+            
             // Force style des boutons actifs (like/dislike)
             function applyActiveStyles() {
                 // Gestion du bouton like
@@ -1008,46 +1212,6 @@
                         this.style.color = '';
                         this.style.backgroundColor = '';
                     }
-                });
-            }
-            
-            // -------------------- VALIDATION DES COMMENTAIRES --------------------
-            const commentForm = document.getElementById('comment-form');
-            const commentInput = document.getElementById('comment-input');
-            const errorMessage = document.getElementById('empty-comment-error');
-            
-            if (commentForm && commentInput && errorMessage) {
-                // Fonction de validation
-                function validateComment() {
-                    const content = commentInput.value.trim();
-                    
-                    if (!content) {
-                        commentInput.classList.add('is-invalid');
-                        errorMessage.textContent = 'Le commentaire ne peut pas être vide.';
-                        errorMessage.style.display = 'block';
-                        return false;
-                    } else if (content.length < 5) {
-                        commentInput.classList.add('is-invalid');
-                        errorMessage.textContent = 'Le commentaire doit contenir au moins 5 caractères.';
-                        errorMessage.style.display = 'block';
-                        return false;
-                    } else {
-                        commentInput.classList.remove('is-invalid');
-                        errorMessage.style.display = 'none';
-                        return true;
-                    }
-                }
-                
-                // Validation en temps réel
-                commentInput.addEventListener('input', validateComment);
-                
-                // Validation à la soumission
-                commentForm.addEventListener('submit', function(e) {
-                    if (!validateComment()) {
-                        e.preventDefault();
-                        return false;
-                    }
-                    return true;
                 });
             }
             

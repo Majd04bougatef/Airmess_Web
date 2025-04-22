@@ -107,28 +107,18 @@ class SocialMediaController extends AbstractController
         $form = $this->createForm(SocialMediaType::class, $socialMedia);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-             if (!$form->isValid()) {
-                 dump('Form is submitted but NOT valid.');
-                 dump((string) $form->getErrors(true, false));
-                 dump($form->getData());
-                 dump($request->request->all());
-             } else {
-                 dump('Form submitted AND valid.');
-             }
-        }
-
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier les mots interdits dans le titre et le contenu
             $forbiddenInTitle = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getTitre());
             $forbiddenInContent = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getContenu());
 
             if (!empty($forbiddenInTitle) || !empty($forbiddenInContent)) {
-                $message = 'Contient des mots interdits: ';
+                $message = 'Votre publication contient des mots interdits et ne peut pas être publiée: ';
                 if (!empty($forbiddenInTitle)) {
-                    $message .= 'Titre: ' . implode(', ', $forbiddenInTitle) . ' ';
+                    $message .= 'Dans le titre: ' . implode(', ', $forbiddenInTitle) . ' ';
                 }
                 if (!empty($forbiddenInContent)) {
-                    $message .= 'Contenu: ' . implode(', ', $forbiddenInContent);
+                    $message .= 'Dans le contenu: ' . implode(', ', $forbiddenInContent);
                 }
                 $this->addFlash('error', trim($message));
                 return $this->renderCustomForm($request, 'social_media/new.html.twig', $socialMedia, $form, 'Ajouter', [
@@ -139,19 +129,14 @@ class SocialMediaController extends AbstractController
                 ]);
             }
 
-                try {
-                    $this->handleImageUpload($form, $socialMedia, $request);
-                    $this->entityManager->persist($socialMedia);
-                    dump('Entity persisted, attempting flush:', $socialMedia);
-                    $this->entityManager->flush();
-                    dump('Flush successful!');
-
+            try {
+                $this->handleImageUpload($form, $socialMedia, $request);
+                $this->entityManager->persist($socialMedia);
+                $this->entityManager->flush();
+                
                 return $this->handleSaveRedirect($request, 'Publication ajoutée !');
-
-                } catch (\Exception $e) {
-                    dump('EXCEPTION during flush: ' . $e->getMessage());
-                    dump($e);
-                     dd('Stopped after catching flush exception');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la création de la publication: ' . $e->getMessage());
             }
         }
 
@@ -219,12 +204,12 @@ class SocialMediaController extends AbstractController
             $forbiddenInContent = $this->forbiddenWordsChecker->containsForbiddenWords($socialMedia->getContenu());
 
             if (!empty($forbiddenInTitle) || !empty($forbiddenInContent)) {
-                $message = 'Contient des mots interdits: ';
+                $message = 'Votre publication contient des mots interdits et ne peut pas être mise à jour: ';
                 if (!empty($forbiddenInTitle)) {
-                    $message .= 'Titre: ' . implode(', ', $forbiddenInTitle) . ' ';
+                    $message .= 'Dans le titre: ' . implode(', ', $forbiddenInTitle) . ' ';
                 }
                 if (!empty($forbiddenInContent)) {
-                    $message .= 'Contenu: ' . implode(', ', $forbiddenInContent);
+                    $message .= 'Dans le contenu: ' . implode(', ', $forbiddenInContent);
                 }
                 $this->addFlash('error', trim($message));
                 return $this->renderCustomForm($request, 'social_media/edit.html.twig', $socialMedia, $form, 'Mettre à jour', [
@@ -396,7 +381,7 @@ class SocialMediaController extends AbstractController
         $session = $request->getSession();
         
         if (!$session->has('user_id')) {
-            $this->addFlash('error', 'Vous devez être connecté pour ajouter un commentaire.');
+            $this->addFlash('danger', 'Vous devez être connecté pour ajouter un commentaire.');
             return $this->redirectToRoute('login');
         }
         
@@ -404,71 +389,46 @@ class SocialMediaController extends AbstractController
         $user = $this->userRepository->find($userId);
         
         if (!$user) {
-            $this->addFlash('error', 'Utilisateur introuvable. Veuillez vous reconnecter.');
+            $this->addFlash('danger', 'Utilisateur introuvable. Veuillez vous reconnecter.');
             return $this->redirectToRoute('login');
         }
         
-        // Get the description from the request
-        $description = null;
-        
-        // Create and handle the form directly
         $commentaire = new Commentaire();
+        $commentaire->setSocialMedia($socialMedia);
+        $commentaire->setUser($user);
+        $commentaire->setNumberlike(0);
+        $commentaire->setNumberdislike(0);
+        
         $form = $this->createForm(CommentaireType::class, $commentaire);
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            // Get description from the form's entity
-            $description = $commentaire->getDescription();
-        } else if ($request->request->has('description')) {
-            // Fallback for direct submission
-            $description = $request->request->get('description');
-        } else if ($request->request->has('commentaire')) {
-            // Try to get from 'commentaire' parameter
-            $commentaireData = $request->request->get('commentaire');
-            
-            if (is_scalar($commentaireData)) {
-                $description = $commentaireData;
-            } else if (is_array($commentaireData) && isset($commentaireData['description'])) {
-                $description = $commentaireData['description'];
+            try {
+                // Vérifier les mots interdits
+                $forbiddenWords = $this->forbiddenWordsChecker->containsForbiddenWords($commentaire->getDescription());
+                if (!empty($forbiddenWords)) {
+                    $this->addFlash('danger', '<strong>Mots interdits détectés :</strong><br>' . implode(', ', $forbiddenWords) . '<br>Votre commentaire ne peut pas être publié avec ces mots.');
+                    return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+                }
+                
+                $this->entityManager->persist($commentaire);
+                $this->entityManager->flush();
+                
+                // Redirection silencieuse sans message de succès
+                return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'Erreur lors de l\'ajout du commentaire : ' . $e->getMessage());
             }
-        }
-        
-        if (empty(trim($description ?? ''))) {
-            $this->addFlash('error', 'Le commentaire ne peut pas être vide.');
-            return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
-        }
-        
-        // Vérifier les mots interdits
-        $forbiddenWords = $this->forbiddenWordsChecker->containsForbiddenWords($description);
-        if (!empty($forbiddenWords)) {
-            $this->addFlash('error', 'Votre commentaire contient des mots interdits: ' . implode(', ', $forbiddenWords));
-            return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
-        }
-        
-        try {
-            // If we got the data from the form object, use that object directly
-            if ($form->isSubmitted() && $form->isValid()) {
-                $commentaire->setSocialMedia($socialMedia);
-                $commentaire->setUser($user);
-                $commentaire->setNumberlike(0);
-                $commentaire->setNumberdislike(0);
-            } else {
-                // Otherwise create a new object
-                $commentaire = new Commentaire();
-                $commentaire->setSocialMedia($socialMedia);
-                $commentaire->setUser($user);
-                $commentaire->setDescription($description);
-                $commentaire->setNumberlike(0);
-                $commentaire->setNumberdislike(0);
-                $commentaire->setDateC(new \DateTimeImmutable());
+        } else {
+            // Collecter toutes les erreurs de validation
+            $errors = [];
+            foreach ($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
             }
             
-            $this->entityManager->persist($commentaire);
-            $this->entityManager->flush();
-            
-            $this->addFlash('success', 'Commentaire ajouté avec succès!');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Erreur lors de l\'ajout du commentaire: ' . $e->getMessage());
+            if (!empty($errors)) {
+                $this->addFlash('danger', '<strong>Erreur de validation :</strong><br>' . implode('<br>', $errors));
+            }
         }
         
         return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
