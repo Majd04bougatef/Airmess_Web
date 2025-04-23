@@ -414,6 +414,127 @@
     z-index: 2;
     pointer-events: auto !important;
   }
+
+  /* Styles pour la modale */
+  .modal {
+    z-index: 1060 !important;
+  }
+
+  .modal-backdrop {
+    z-index: 1050 !important;
+  }
+
+  .modal-dialog {
+    z-index: 1070 !important;
+  }
+
+  .modal-content {
+    background-color: #fff !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Styles pour les étoiles dans la modale */
+  .modal .rating-star {
+    color: #ccc;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    font-size: 1.5rem;
+    margin-right: 5px;
+    transition: color 0.2s ease;
+  }
+
+  .modal .rating-star:hover,
+  .modal .rating-star.fas {
+    color: #f8ce0b;
+  }
+
+  /* Styles pour les boutons de la modale */
+  .modal .btn {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+  }
+
+  .modal .btn-primary {
+    background-color: #5e72e4 !important;
+    border-color: #5e72e4 !important;
+    color: white !important;
+  }
+
+  .modal .btn-secondary {
+    background-color: #8392ab !important;
+    border-color: #8392ab !important;
+    color: white !important;
+  }
+
+  .modal textarea {
+    pointer-events: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+  }
+
+  /* Assurer que la modale est au-dessus de tout */
+  #addReviewModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1060 !important;
+  }
+
+  #addReviewModal.show {
+    display: block;
+  }
+
+  /* Rendre tous les éléments de la modale cliquables */
+  #addReviewModal * {
+    pointer-events: auto !important;
+  }
+
+  .modal {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .star-rating-control {
+    cursor: pointer;
+  }
+  
+  .star-rating {
+    color: #ccc;
+    transition: color 0.2s;
+  }
+  
+  .star-rating.active {
+    color: #ffc107;
+  }
+  
+  .star-rating:hover {
+    color: #ffc107;
+  }
+  
+  .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal.show {
+    display: block;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-dialog {
+    margin: 1.75rem auto;
+    max-width: 500px;
+  }
 </style>
 {% endblock %}
 
@@ -573,15 +694,9 @@ document.addEventListener('DOMContentLoaded', function() {
                       
                       <!-- Section des avis avec le bouton et l'accordion -->
                       <div class="card-footer p-0">
-                        <!-- Bouton Ajouter un avis -->
+                        <!-- Bouton pour ajouter un avis -->
                         <div class="text-center py-2" style="position: relative; z-index: 1000;">
-                          <button type="button" 
-                                  class="btn btn-sm btn-primary add-card-review-btn" 
-                                  data-bonplan-id="{{ bonplan.idP }}"
-                                  data-bs-toggle="collapse"
-                                  data-bs-target="#reviewCollapse{{ bonplan.idP }}"
-                                  aria-expanded="false"
-                                  aria-controls="reviewCollapse{{ bonplan.idP }}">
+                          <button type="button" class="btn btn-primary btn-sm" onclick="openReviewModal({{ bonplan.idP }})">
                             <i class="fas fa-plus me-1"></i> Ajouter un avis
                           </button>
                         </div>
@@ -890,187 +1005,146 @@ document.addEventListener('DOMContentLoaded', function() {
   {% endfor %}
 {% endif %}
 
-<!-- Script global pour les fonctions d'interaction -->
+<!-- Modale pour ajouter un avis -->
+<div class="modal fade" id="addReviewModal" tabindex="-1" role="dialog" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addReviewModalLabel">Ajouter un avis</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="reviewForm" class="review-form">
+          <input type="hidden" id="bonplanId" name="bonplanId">
+          
+          <div class="form-group mb-3">
+            <label class="form-label d-block">Note</label>
+            <div class="rating-container d-flex align-items-center">
+              <div class="stars d-flex">
+                {% for i in 1..5 %}
+                  <span class="star-rating-control">
+                    <i class="far fa-star star-rating" data-rating="{{ i }}" style="font-size: 24px; margin-right: 5px; cursor: pointer;"></i>
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+            <input type="hidden" name="rating" id="ratingInput" value="0">
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="comment" class="form-label">Commentaire</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" id="submitReview">Soumettre</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-function toggleReviewForm(button) {
-  console.log("toggleReviewForm appelé");
-  var form = button.nextElementSibling;
-  if (form.style.display === 'none' || !form.style.display) {
-    form.style.display = 'block';
-    button.innerHTML = '<i class="fas fa-times me-1"></i> Annuler';
-  } else {
-    form.style.display = 'none';
-    button.innerHTML = '<i class="fas fa-plus me-1"></i> Ajouter un avis';
-    form.reset();
-    var reviewIdInput = form.querySelector('.review-id-input');
-    if (reviewIdInput) {
-      reviewIdInput.value = '';
-    }
-  }
-}
-
-function cancelReviewForm(button) {
-  var form = button.closest('form');
-  var toggleBtn = form.previousElementSibling;
-  
-  form.style.display = 'none';
-  toggleBtn.innerHTML = '<i class="fas fa-plus me-1"></i> Ajouter un avis';
-  form.reset();
-  var reviewIdInput = form.querySelector('.review-id-input');
-  if (reviewIdInput) {
-    reviewIdInput.value = '';
-  }
-}
-
-function editReview(button) {
-  console.log("editReview appelé");
-  var reviewId = button.getAttribute('data-id');
-  var rating = button.getAttribute('data-rating');
-  var comment = button.getAttribute('data-comment');
-  
-  var modal = button.closest('.modal');
-  var form = modal.querySelector('.review-form');
-  var toggleBtn = form.previousElementSibling;
-  
-  form.querySelector('.review-id-input').value = reviewId;
-  form.querySelector('.rating-input').value = rating;
-  form.querySelector('.comment-input').value = comment;
-  
-  form.style.display = 'block';
-  toggleBtn.innerHTML = '<i class="fas fa-times me-1"></i> Annuler';
-}
-
-function deleteReview(button) {
-  console.log("deleteReview appelé");
-  if (confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
-    var reviewId = button.getAttribute('data-id');
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation de la modale
+    var reviewModal = new bootstrap.Modal(document.getElementById('addReviewModal'), {
+        keyboard: false,
+        backdrop: 'static'
+    });
     
-    fetch('{{ path('api_reviewbonplan_delete', {'idR': 'PLACEHOLDER'}) }}'.replace('PLACEHOLDER', reviewId), {
-      method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Avis supprimé avec succès');
-        window.location.reload();
-      } else {
-        alert('Erreur: ' + data.message);
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Une erreur est survenue lors de la suppression');
-    });
-  }
-}
-
-// S'assurer que tous les boutons toggle-review-form sont cliquables
-document.addEventListener('DOMContentLoaded', function() {
-  // Ajouter des onclick directement aux boutons
-  document.querySelectorAll('.toggle-review-form').forEach(function(btn) {
-    btn.onclick = function(e) {
-      e.preventDefault();
-      toggleReviewForm(this);
+    // Fonction pour ouvrir la modale
+    window.openReviewModal = function(bonplanId) {
+        document.getElementById('bonplanId').value = bonplanId;
+        document.getElementById('ratingInput').value = 0;
+        document.getElementById('comment').value = '';
+        
+        // Réinitialiser les étoiles
+        document.querySelectorAll('.star-rating').forEach(star => {
+            star.classList.remove('active');
+            star.classList.remove('fas');
+            star.classList.add('far');
+        });
+        
+        reviewModal.show();
     };
-  });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Gestion de la suppression des bons plans
-  const deleteButtons = document.querySelectorAll('.delete-bonplan');
-  deleteButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      if (confirm('Êtes-vous sûr de vouloir supprimer ce bon plan ?')) {
-        const id = this.getAttribute('data-id');
-        
-        fetch(`/BonplanDelete/${id}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // Supprimer la carte du DOM
-            this.closest('.col-12').remove();
-            // Afficher un message de succès
-            alert('Bon plan supprimé avec succès');
-          } else {
-            alert('Erreur: ' + data.message);
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Une erreur est survenue lors de la suppression');
-        });
-      }
-    });
-  });
-});
-
-// Gestion des étoiles de notation
-document.querySelectorAll('.card-rating-star').forEach(star => {
-    star.addEventListener('click', function() {
-        const rating = parseInt(this.getAttribute('data-rating'));
-        const bonplanId = this.getAttribute('data-bonplan-id');
-        const form = document.querySelector(`.quick-review-form[data-bonplan-id="${bonplanId}"]`);
-        
-        // Mettre à jour les étoiles
-        form.querySelectorAll('.card-rating-star').forEach((s, index) => {
-            if (index < rating) {
-                s.classList.remove('far');
-                s.classList.add('fas', 'active');
-            } else {
-                s.classList.remove('fas', 'active');
-                s.classList.add('far');
-            }
+    
+    // Gestion des étoiles
+    document.querySelectorAll('.star-rating').forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.getAttribute('data-rating');
+            document.getElementById('ratingInput').value = rating;
+            
+            // Mettre à jour l'affichage des étoiles
+            document.querySelectorAll('.star-rating').forEach((s, index) => {
+                if (index < rating) {
+                    s.classList.remove('far');
+                    s.classList.add('fas', 'active');
+                } else {
+                    s.classList.remove('fas', 'active');
+                    s.classList.add('far');
+                }
+            });
         });
         
-        // Mettre à jour la valeur cachée
-        form.querySelector('.card-rating-input').value = rating;
+        // Effet hover
+        star.addEventListener('mouseover', function() {
+            const rating = this.getAttribute('data-rating');
+            document.querySelectorAll('.star-rating').forEach((s, index) => {
+                if (index < rating) {
+                    s.classList.add('fas');
+                }
+            });
+        });
+        
+        star.addEventListener('mouseout', function() {
+            const currentRating = document.getElementById('ratingInput').value;
+            document.querySelectorAll('.star-rating').forEach((s, index) => {
+                if (index >= currentRating) {
+                    s.classList.remove('fas');
+                    s.classList.add('far');
+                }
+            });
+        });
     });
-});
-
-// Gestion de la soumission du formulaire
-document.querySelectorAll('.card-review-form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const bonplanId = this.getAttribute('data-bonplan-id');
-        const rating = this.querySelector('.card-rating-input').value;
-        const comment = this.querySelector('.card-comment-input').value;
+    
+    // Gestion de la soumission
+    document.getElementById('submitReview').addEventListener('click', function() {
+        const bonplanId = document.getElementById('bonplanId').value;
+        const rating = document.getElementById('ratingInput').value;
+        const comment = document.getElementById('comment').value;
         
         if (!rating || !comment) {
             alert('Veuillez remplir tous les champs');
             return;
         }
         
-        // Envoyer les données au serveur
+        // Envoyer les données
         fetch('{{ path('api_reviewbonplan_add') }}', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: JSON.stringify({
-                bonPlanId: bonplanId,
-                rating: rating,
-                comment: comment
+            body: new URLSearchParams({
+                'bonplanId': bonplanId,
+                'rating': rating,
+                'comment': comment
             })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Votre avis a été publié avec succès!');
-                location.reload();
+                reviewModal.hide();
+                window.location.reload();
             } else {
                 alert('Erreur: ' + data.message);
             }
         })
         .catch(error => {
-            console.error('Erreur:', error);
-            alert('Une erreur est survenue lors de la publication de votre avis');
+            console.error('Error:', error);
+            alert('Une erreur est survenue lors de l\'envoi de l\'avis');
+        });
     });
-  });
 });
 </script>
 {% endblock %}
