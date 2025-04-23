@@ -756,6 +756,23 @@
             border-color: #dc3545;
             box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
         }
+
+        .preview-comment {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .preview-comment-text {
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
     </style>
 {% endblock %}
 
@@ -943,14 +960,103 @@
                                     }
                                 }) }}
                                 {{ form_errors(comment_form.description) }}
-                                <button type="submit" class="btn btn-primary btn-send-comment" id="submit-comment" aria-label="Publier le commentaire">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
+                                <div class="comment-actions mt-2">
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-paper-plane me-1"></i> Publier
+                                    </button>
+                                </div>
                             </div>
                             {{ form_rest(comment_form) }}
                         {{ form_end(comment_form) }}
                      </div>
                 </div>
+
+                {# Modal de prévisualisation des commentaires #}
+                <div class="modal fade" id="previewCommentModal" tabindex="-1" aria-labelledby="previewCommentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="previewCommentModalLabel">Prévisualisation du commentaire</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="preview-comment-content"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Modifier</button>
+                                <button type="button" class="btn btn-primary" id="confirmCommentPublish">Publier</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const previewCommentModal = new bootstrap.Modal(document.getElementById('previewCommentModal'));
+                    const commentForm = document.getElementById('comment-form');
+                    const previewButton = document.getElementById('previewCommentButton');
+                    const submitButton = document.getElementById('submit-comment');
+                    const confirmButton = document.getElementById('confirmCommentPublish');
+
+                    previewButton.addEventListener('click', function() {
+                        const content = document.getElementById('comment-input').value.trim();
+
+                        if (!content) {
+                            alert('Veuillez écrire un commentaire');
+                            return;
+                        }
+
+                        // Afficher l'état de chargement
+                        this.disabled = true;
+                        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Chargement...';
+
+                        // Envoyer la requête de prévisualisation
+                        fetch('{{ path('app_social_media_preview_comment') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                'content': content
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                // Afficher les mots interdits
+                                let errorMessage = '<div class="alert alert-danger">';
+                                errorMessage += `<p><strong>Mots interdits détectés:</strong> ${data.forbiddenWords.join(', ')}</p>`;
+                                errorMessage += '</div>';
+                                document.querySelector('.preview-comment-content').innerHTML = errorMessage;
+                                confirmButton.disabled = true;
+                            } else {
+                                // Afficher la prévisualisation
+                                document.querySelector('.preview-comment-content').innerHTML = `
+                                    <div class="preview-comment">
+                                        <div class="preview-comment-text">${data.preview}</div>
+                                    </div>
+                                `;
+                                confirmButton.disabled = false;
+                            }
+                            previewCommentModal.show();
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            alert('Une erreur est survenue lors de la prévisualisation');
+                        })
+                        .finally(() => {
+                            // Réinitialiser le bouton
+                            this.disabled = false;
+                            this.innerHTML = '<i class="fas fa-eye me-1"></i> Prévisualiser';
+                        });
+                    });
+
+                    // Gérer la confirmation de publication du commentaire
+                    confirmButton.addEventListener('click', function() {
+                        commentForm.submit();
+                    });
+                });
+                </script>
 
                     {# Séparateur visuel #}
                     <hr class="my-2 text-muted">
@@ -1047,18 +1153,86 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Get forbidden words list from backend
             const forbiddenWords = {{ app.container.get('App\\Service\\ForbiddenWordsChecker').getForbiddenWords()|json_encode|raw }};
             
-            // Function to check for forbidden words
+            // Initialize modal
+            const previewCommentModal = new bootstrap.Modal(document.getElementById('previewCommentModal'));
+            const commentForm = document.getElementById('comment-form');
+            const previewButton = document.getElementById('previewCommentButton');
+            const submitButton = document.getElementById('submit-comment');
+            const confirmButton = document.getElementById('confirmCommentPublish');
+            const commentInput = document.getElementById('comment-input');
+
+            // Preview button click handler
+            previewButton.addEventListener('click', function() {
+                const content = commentInput.value.trim();
+
+                if (!content) {
+                    alert('Veuillez écrire un commentaire');
+                    return;
+                }
+
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Chargement...';
+
+                // Send preview request
+                fetch('{{ path('app_social_media_preview_comment') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'content': content
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        // Show forbidden words warning
+                        document.querySelector('.preview-comment-content').innerHTML = `
+                            <div class="alert alert-danger">
+                                <p><strong>Mots interdits détectés:</strong> ${data.forbiddenWords.join(', ')}</p>
+                            </div>
+                        `;
+                        confirmButton.disabled = true;
+                    } else {
+                        // Show preview
+                        document.querySelector('.preview-comment-content').innerHTML = `
+                            <div class="preview-comment">
+                                <div class="preview-comment-text">${data.preview}</div>
+                            </div>
+                        `;
+                        confirmButton.disabled = false;
+                    }
+                    previewCommentModal.show();
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de la prévisualisation');
+                })
+                .finally(() => {
+                    // Reset button state
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-eye me-1"></i> Prévisualiser';
+                });
+            });
+
+            // Confirm publish button click handler
+            confirmButton.addEventListener('click', function() {
+                commentForm.submit();
+            });
+
+            // Real-time forbidden words check
             function checkForbiddenWords(text) {
                 if (!text) return [];
                 const foundWords = [];
                 
                 forbiddenWords.forEach(word => {
-                    // Use word boundary to match whole words only
                     const regex = new RegExp('\\b' + word + '\\b', 'i');
                     if (regex.test(text)) {
                         foundWords.push(word);
@@ -1067,195 +1241,31 @@
                 
                 return foundWords;
             }
-            
-            // Set up comment form validation with forbidden words check
-            const commentForm = document.getElementById('comment-form');
-            const commentInput = document.getElementById('comment-input');
-            
-            if (commentForm && commentInput) {
-                // Create forbidden words warning element
-                const forbiddenWordsWarning = document.createElement('div');
-                forbiddenWordsWarning.className = 'alert alert-danger mt-2 forbidden-words-warning';
+
+            // Create forbidden words warning element
+            const forbiddenWordsWarning = document.createElement('div');
+            forbiddenWordsWarning.className = 'alert alert-danger mt-2 forbidden-words-warning';
+            forbiddenWordsWarning.style.display = 'none';
+            commentInput.parentNode.insertBefore(forbiddenWordsWarning, commentInput.nextSibling);
+
+            // Check comment text on input
+            commentInput.addEventListener('input', function() {
+                const text = this.value.trim();
+                const foundWords = checkForbiddenWords(text);
+                
+                // Hide any previous warnings
                 forbiddenWordsWarning.style.display = 'none';
-                commentInput.parentNode.insertBefore(forbiddenWordsWarning, 
-                    document.getElementById('empty-comment-error'));
+                commentInput.classList.remove('is-invalid');
                 
-                // Check comment text on input
-                commentInput.addEventListener('input', function() {
-                    const text = this.value.trim();
-                    const foundWords = checkForbiddenWords(text);
+                if (foundWords.length > 0) {
+                    // Show warning with forbidden words
+                    forbiddenWordsWarning.innerHTML = '<strong>Mots interdits détectés:</strong> ' + 
+                        foundWords.join(', ') + '. Votre commentaire ne peut pas être publié avec ces mots.';
+                    forbiddenWordsWarning.style.display = 'block';
                     
-                    // Hide any previous warnings
-                    forbiddenWordsWarning.style.display = 'none';
-                    document.getElementById('empty-comment-error').style.display = 'none';
-                    
-                    // Remove any highlighting
-                    commentInput.classList.remove('is-invalid');
-                    
-                    if (foundWords.length > 0) {
-                        // Show warning with forbidden words
-                        forbiddenWordsWarning.innerHTML = '<strong>Mots interdits détectés:</strong> ' + 
-                            foundWords.join(', ') + '. Votre commentaire ne peut pas être publié avec ces mots.';
-                        forbiddenWordsWarning.style.display = 'block';
-                        
-                        // Add highlighting
-                        commentInput.classList.add('is-invalid');
-                    }
-                });
-                
-                // Prevent form submission if it contains forbidden words
-                commentForm.addEventListener('submit', function(e) {
-                    const text = commentInput.value.trim();
-                    
-                    // Check for empty comment
-                    if (text === '') {
-                        e.preventDefault();
-                        document.getElementById('empty-comment-error').style.display = 'block';
-                        return;
-                    }
-                    
-                    // Check for forbidden words
-                    const foundWords = checkForbiddenWords(text);
-                    if (foundWords.length > 0) {
-                        e.preventDefault();
-                        forbiddenWordsWarning.innerHTML = '<strong>Mots interdits détectés:</strong> ' + 
-                            foundWords.join(', ') + '. Votre commentaire ne peut pas être publié avec ces mots.';
-                        forbiddenWordsWarning.style.display = 'block';
-                        
-                        // Add animation to draw attention
-                        forbiddenWordsWarning.classList.add('shake-animation');
-                        setTimeout(() => {
-                            forbiddenWordsWarning.classList.remove('shake-animation');
-                        }, 500);
-                        
-                        // Scroll to warning
-                        forbiddenWordsWarning.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                });
-            }
-            
-            // Force style des boutons actifs (like/dislike)
-            function applyActiveStyles() {
-                // Gestion du bouton like
-                const likeButton = document.querySelector('.like-button');
-                if (likeButton && likeButton.classList.contains('active')) {
-                    likeButton.style.color = '#4a6bda';
-                    likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
-                    likeButton.style.fontWeight = '500';
-                    const icon = likeButton.querySelector('i');
-                    if (icon) icon.style.transform = 'scale(1.15)';
+                    // Add highlighting
+                    commentInput.classList.add('is-invalid');
                 }
-                
-                // Gestion du bouton dislike
-                const dislikeButton = document.querySelector('.dislike-button');
-                if (dislikeButton && dislikeButton.classList.contains('active')) {
-                    dislikeButton.style.color = '#dc3545';
-                    dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
-                    dislikeButton.style.fontWeight = '500';
-                    const icon = dislikeButton.querySelector('i');
-                    if (icon) icon.style.transform = 'scale(1.15)';
-                }
-            }
-            
-            // Appliquer les styles immédiatement
-            applyActiveStyles();
-            
-            // Appliquer les styles à nouveau après un court délai (pour être sûr que le DOM est entièrement chargé)
-            setTimeout(applyActiveStyles, 100);
-            
-            // -------------------- GESTION DES LIKES/DISLIKES --------------------
-            const likeButton = document.querySelector('.like-button');
-            const dislikeButton = document.querySelector('.dislike-button');
-            
-            // Mettre en évidence les boutons actifs
-            if (likeButton && likeButton.classList.contains('active')) {
-                likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
-                likeButton.style.color = '#4a6bda';
-                const icon = likeButton.querySelector('i');
-                if (icon) icon.style.transform = 'scale(1.15)';
-            }
-            
-            if (dislikeButton && dislikeButton.classList.contains('active')) {
-                dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
-                dislikeButton.style.color = '#dc3545';
-                const icon = dislikeButton.querySelector('i');
-                if (icon) icon.style.transform = 'scale(1.15)';
-            }
-            
-            // Effets au survol
-            if (likeButton) {
-                likeButton.addEventListener('mouseenter', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.color = '#4a6bda';
-                        this.style.backgroundColor = 'rgba(74, 107, 218, 0.05)';
-                    }
-                });
-                
-                likeButton.addEventListener('mouseleave', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.color = '';
-                        this.style.backgroundColor = '';
-                    }
-                });
-            }
-            
-            if (dislikeButton) {
-                dislikeButton.addEventListener('mouseenter', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.color = '#dc3545';
-                        this.style.backgroundColor = 'rgba(220, 53, 69, 0.05)';
-                    }
-                });
-                
-                dislikeButton.addEventListener('mouseleave', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.color = '';
-                        this.style.backgroundColor = '';
-                    }
-                });
-            }
-            
-            // -------------------- ANIMATIONS --------------------
-            // Animation image de publication
-            const postImage = document.querySelector('.post-image-container img');
-            if (postImage) {
-                postImage.style.opacity = '0';
-                setTimeout(() => {
-                    postImage.style.opacity = '1';
-                }, 300);
-            }
-            
-            // Animation bouton retour
-            const backButton = document.querySelector('.btn-back');
-            if (backButton) {
-                backButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const href = this.getAttribute('href');
-                    
-                    document.querySelector('.post-card').style.opacity = '0';
-                    
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 300);
-                });
-            }
-            
-            // Animation des boutons like des commentaires
-            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
-            commentLikeButtons.forEach(button => {
-                if (button.classList.contains('active')) {
-                    button.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
-                }
-                
-                button.addEventListener('mouseenter', function() {
-                    this.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
-                });
-                
-                button.addEventListener('mouseleave', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.backgroundColor = '';
-                    }
-                });
             });
         });
     </script>

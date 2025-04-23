@@ -253,6 +253,64 @@ class AdminSocialMediaController extends AbstractController
         ]);
     }
 
+    #[Route('/statistics', name: 'admin_social_media_statistics', methods: ['GET'])]
+    public function statistics(SocialMediaRepository $socialMediaRepository, CommentaireRepository $commentaireRepository): Response
+    {
+        // Statistiques générales
+        $totalPosts = $socialMediaRepository->count([]);
+        $totalComments = $commentaireRepository->count([]);
+        $totalLikes = $socialMediaRepository->createQueryBuilder('s')
+            ->select('SUM(s.likee) as totalLikes')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0;
+        $totalDislikes = $socialMediaRepository->createQueryBuilder('s')
+            ->select('SUM(s.dislike) as totalDislikes')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0;
+
+        // Posts les plus populaires
+        $mostLikedPosts = $socialMediaRepository->findMostLiked(5);
+        
+        // Posts les plus commentés
+        $mostCommentedPosts = $socialMediaRepository->createQueryBuilder('s')
+            ->select('s.idEB', 's.titre', 's.contenu', 's.publicationDate', 's.lieu', 's.likee', 's.dislike', 'COUNT(c.idC) as commentCount')
+            ->leftJoin('s.commentaires', 'c')
+            ->groupBy('s.idEB', 's.titre', 's.contenu', 's.publicationDate', 's.lieu', 's.likee', 's.dislike')
+            ->orderBy('commentCount', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+
+        // Statistiques par lieu
+        $postsByLocation = $socialMediaRepository->createQueryBuilder('s')
+            ->select('s.lieu', 'COUNT(s.idEB) as postCount')
+            ->groupBy('s.lieu')
+            ->orderBy('postCount', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        // Statistiques temporelles (derniers 7 jours)
+        $lastWeekPosts = $socialMediaRepository->createQueryBuilder('s')
+            ->select('SUBSTRING(s.publicationDate, 1, 10) as date', 'COUNT(s.idEB) as postCount')
+            ->where('s.publicationDate >= :lastWeek')
+            ->setParameter('lastWeek', new \DateTime('-7 days'))
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('dashAdmin/social_media_statistics.html.twig', [
+            'totalPosts' => $totalPosts,
+            'totalComments' => $totalComments,
+            'totalLikes' => $totalLikes,
+            'totalDislikes' => $totalDislikes,
+            'mostLikedPosts' => $mostLikedPosts,
+            'mostCommentedPosts' => $mostCommentedPosts,
+            'postsByLocation' => $postsByLocation,
+            'lastWeekPosts' => $lastWeekPosts
+        ]);
+    }
+
     private function getDefaultUser(): User
     {
         $defaultUser = $this->userRepository->find(self::DEFAULT_USER_ID);

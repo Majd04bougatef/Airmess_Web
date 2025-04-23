@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\SocialMediaRepository;
 use App\Service\ForbiddenWordsChecker;
+use App\Service\GeminiService;
 
 /**
  * Contrôleur pour la gestion des commentaires
@@ -25,7 +26,8 @@ use App\Service\ForbiddenWordsChecker;
 final class CommentaireController extends AbstractController
 {
     public function __construct(
-        private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker
+        private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker,
+        private GeminiService $geminiService
     ) {
     }
     
@@ -71,7 +73,6 @@ final class CommentaireController extends AbstractController
         // Check if the user is allowed to edit this comment
         $session = $request->getSession();
         if (!$session->has('user_id') || $commentaire->getUser()->getIdU() != $session->get('user_id')) {
-            $this->addFlash('error', 'Vous n\'êtes pas autorisé à modifier ce commentaire.');
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $commentaire->getSocialMedia()->getIdEB()]);
         }
         
@@ -79,10 +80,24 @@ final class CommentaireController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            try {
+                // Vérifier les mots interdits
+                $forbiddenWords = $this->forbiddenWordsChecker->containsForbiddenWords($commentaire->getDescription());
+                if (!empty($forbiddenWords)) {
+                    return $this->redirectToRoute('app_social_media_show', ['idEB' => $commentaire->getSocialMedia()->getIdEB()]);
+                }
 
-            $this->addFlash('success', 'Commentaire modifié avec succès !');
-            return $this->redirectToRoute('app_social_media_show', ['idEB' => $commentaire->getSocialMedia()->getIdEB()]);
+                // Améliorer le texte avec Gemini
+                $improvedDescription = $this->geminiService->improveText($commentaire->getDescription());
+                $commentaire->setDescription($improvedDescription);
+
+                $entityManager->flush();
+
+                // Redirection silencieuse
+                return $this->redirectToRoute('app_social_media_show', ['idEB' => $commentaire->getSocialMedia()->getIdEB()]);
+            } catch (\Exception $e) {
+                return $this->redirectToRoute('app_social_media_show', ['idEB' => $commentaire->getSocialMedia()->getIdEB()]);
+            }
         }
 
         return $this->render('commentaire/edit.html.twig', [
@@ -99,14 +114,12 @@ final class CommentaireController extends AbstractController
         // Check if the user is allowed to delete this comment
         $session = $request->getSession();
         if (!$session->has('user_id') || $commentaire->getUser()->getIdU() != $session->get('user_id')) {
-            $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer ce commentaire.');
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMediaId]);
         }
         
         if ($this->isCsrfTokenValid('delete'.$commentaire->getIdC(), $request->request->get('_token'))) {
             $entityManager->remove($commentaire);
             $entityManager->flush();
-            $this->addFlash('success', 'Commentaire supprimé avec succès !');
         }
 
         return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMediaId]);
@@ -117,12 +130,9 @@ final class CommentaireController extends AbstractController
     {
         $submittedToken = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('like_commentaire' . $commentaire->getIdC(), $submittedToken)) {
-            $this->addFlash('error', 'Token CSRF invalide.');
-            
             if ($request->isXmlHttpRequest()) {
                 return $this->json(['success' => false, 'error' => 'Invalid CSRF token'], 403);
             }
-            
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $commentaire->getSocialMedia()->getIdEB()]);
         }
         
@@ -136,14 +146,12 @@ final class CommentaireController extends AbstractController
             if (isset($userCommentActions[$commentId]) && $userCommentActions[$commentId] === 'like') {
                 $commentaire->setNumberlike($commentaire->getNumberlike() - 1);
                 unset($userCommentActions[$commentId]);
-                $message = 'J\'aime retiré du commentaire!';
                 $isLiked = false;
             } 
             // Sinon, ajouter un like
             else {
                 $commentaire->setNumberlike($commentaire->getNumberlike() + 1);
                 $userCommentActions[$commentId] = 'like';
-                $message = 'Commentaire aimé!';
                 $isLiked = true;
             }
             
@@ -155,12 +163,10 @@ final class CommentaireController extends AbstractController
                 return $this->json([
                     'success' => true,
                     'likeCount' => $commentaire->getNumberlike(),
-                    'message' => $message,
                     'isLiked' => $isLiked
                 ]);
             }
             
-            $this->addFlash('success', $message);
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $commentaire->getSocialMedia()->getIdEB()]);
             
         } catch (\Exception $e) {
@@ -170,8 +176,6 @@ final class CommentaireController extends AbstractController
                     'error' => 'Erreur de base de données: ' . $e->getMessage()
                 ], 500);
             }
-            
-            $this->addFlash('error', 'Erreur lors de l\'ajout du j\'aime au commentaire.');
             return $this->redirectToRoute('app_social_media_show', ['idEB' => $commentaire->getSocialMedia()->getIdEB()]);
         }
     }

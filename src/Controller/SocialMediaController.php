@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use LogicException;
 use App\Service\ForbiddenWordsChecker;
+use App\Service\GeminiService;
 
 
 #[Route('/social/media')]
@@ -39,7 +40,8 @@ class SocialMediaController extends AbstractController
         private SluggerInterface $slugger,
         private PaginatorInterface $paginator,
         private string $uploadsDirectory = 'C:/xampp/htdocs/ImageSocialMedia',
-        private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker
+        private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker,
+        private \App\Service\GeminiService $geminiService
     ) {
         // Vérifier que le répertoire d'upload existe et est accessible
         if (!file_exists($this->uploadsDirectory)) {
@@ -87,7 +89,7 @@ class SocialMediaController extends AbstractController
         // Get the current user from session
         $session = $request->getSession();
         if (!$session->has('user_id')) {
-            $this->addFlash('error', 'Vous devez être connecté pour créer une publication.');
+            $this->addFlash('danger', 'Vous devez être connecté pour créer une publication.');
             return $this->redirectToRoute('login');
         }
         
@@ -95,7 +97,7 @@ class SocialMediaController extends AbstractController
         $currentUser = $this->userRepository->find($userId);
         
         if (!$currentUser) {
-            $this->addFlash('error', 'Utilisateur introuvable. Veuillez vous reconnecter.');
+            $this->addFlash('danger', 'Utilisateur introuvable. Veuillez vous reconnecter.');
             return $this->redirectToRoute('login');
         }
         
@@ -120,7 +122,7 @@ class SocialMediaController extends AbstractController
                 if (!empty($forbiddenInContent)) {
                     $message .= 'Dans le contenu: ' . implode(', ', $forbiddenInContent);
                 }
-                $this->addFlash('error', trim($message));
+                $this->addFlash('danger', trim($message));
                 return $this->renderCustomForm($request, 'social_media/new.html.twig', $socialMedia, $form, 'Ajouter', [
                     'forbidden_words' => [
                         'title' => $forbiddenInTitle,
@@ -130,13 +132,20 @@ class SocialMediaController extends AbstractController
             }
 
             try {
+                // Améliorer le texte avec Gemini
+                $improvedTitle = $this->geminiService->improveText($socialMedia->getTitre());
+                $improvedContent = $this->geminiService->improveText($socialMedia->getContenu());
+                
+                $socialMedia->setTitre($improvedTitle);
+                $socialMedia->setContenu($improvedContent);
+
                 $this->handleImageUpload($form, $socialMedia, $request);
                 $this->entityManager->persist($socialMedia);
                 $this->entityManager->flush();
                 
                 return $this->handleSaveRedirect($request, 'Publication ajoutée !');
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de la création de la publication: ' . $e->getMessage());
+                $this->addFlash('danger', 'Erreur lors de la création de la publication: ' . $e->getMessage());
             }
         }
 
@@ -220,10 +229,21 @@ class SocialMediaController extends AbstractController
                 ]);
             }
 
-            $this->handleImageUpload($form, $socialMedia, $request, $originalImage);
-            $this->entityManager->flush();
+            try {
+                // Améliorer le texte avec Gemini
+                $improvedTitle = $this->geminiService->improveText($socialMedia->getTitre());
+                $improvedContent = $this->geminiService->improveText($socialMedia->getContenu());
+                
+                $socialMedia->setTitre($improvedTitle);
+                $socialMedia->setContenu($improvedContent);
 
-            return $this->handleSaveRedirect($request, 'Publication mise à jour !');
+                $this->handleImageUpload($form, $socialMedia, $request, $originalImage);
+                $this->entityManager->flush();
+
+                return $this->handleSaveRedirect($request, 'Publication mise à jour !');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la mise à jour: ' . $e->getMessage());
+            }
         }
 
         return $this->renderCustomForm($request, 'social_media/edit.html.twig', $socialMedia, $form, 'Mettre à jour');
@@ -411,6 +431,10 @@ class SocialMediaController extends AbstractController
                     return $this->redirectToRoute('app_social_media_show', ['idEB' => $socialMedia->getIdEB()]);
                 }
                 
+                // Améliorer le texte avec Gemini
+                $improvedDescription = $this->geminiService->improveText($commentaire->getDescription());
+                $commentaire->setDescription($improvedDescription);
+                
                 $this->entityManager->persist($commentaire);
                 $this->entityManager->flush();
                 
@@ -459,9 +483,7 @@ class SocialMediaController extends AbstractController
                 $this->entityManager->remove($socialMedia);
                 $this->entityManager->flush();
                 
-                $this->addFlash('success', 'Publication supprimée avec succès !');
-                
-                // Redirect to socialVoyageurs_page instead of app_social_media_index
+                // Redirection silencieuse sans message de succès
                 return $this->redirectToRoute('socialVoyageurs_page');
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Erreur lors de la suppression: ' . $e->getMessage());
@@ -654,6 +676,73 @@ class SocialMediaController extends AbstractController
         
         return $this->render('social_media/_random_publications.html.twig', [
             'publications' => $publications,
+        ]);
+    }
+
+    #[Route('/preview/post', name: 'app_social_media_preview_post', methods: ['POST'])]
+    public function previewPost(Request $request): Response
+    {
+        $content = $request->request->get('content');
+        $title = $request->request->get('title');
+        
+        if (!$content || !$title) {
+            return $this->json(['error' => 'Contenu manquant'], 400);
+        }
+
+        // Vérifier les mots interdits
+        $forbiddenInTitle = $this->forbiddenWordsChecker->containsForbiddenWords($title);
+        $forbiddenInContent = $this->forbiddenWordsChecker->containsForbiddenWords($content);
+
+        if (!empty($forbiddenInTitle) || !empty($forbiddenInContent)) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Contenu inapproprié détecté',
+                'forbiddenWords' => [
+                    'title' => $forbiddenInTitle,
+                    'content' => $forbiddenInContent
+                ]
+            ], 400);
+        }
+
+        // Améliorer le texte avec Gemini
+        $improvedTitle = $this->geminiService->improveText($title);
+        $improvedContent = $this->geminiService->improveText($content);
+
+        return $this->json([
+            'success' => true,
+            'preview' => [
+                'title' => $improvedTitle,
+                'content' => $improvedContent
+            ]
+        ]);
+    }
+
+    #[Route('/preview/comment', name: 'app_social_media_preview_comment', methods: ['POST'])]
+    public function previewComment(Request $request): Response
+    {
+        $content = $request->request->get('content');
+        
+        if (!$content) {
+            return $this->json(['error' => 'Contenu manquant'], 400);
+        }
+
+        // Vérifier les mots interdits
+        $forbiddenWords = $this->forbiddenWordsChecker->containsForbiddenWords($content);
+
+        if (!empty($forbiddenWords)) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Contenu inapproprié détecté',
+                'forbiddenWords' => $forbiddenWords
+            ], 400);
+        }
+
+        // Améliorer le texte avec Gemini
+        $improvedContent = $this->geminiService->improveText($content);
+
+        return $this->json([
+            'success' => true,
+            'preview' => $improvedContent
         ]);
     }
 }
