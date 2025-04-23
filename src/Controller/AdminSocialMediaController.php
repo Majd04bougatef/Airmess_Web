@@ -311,6 +311,69 @@ class AdminSocialMediaController extends AbstractController
         ]);
     }
 
+    #[Route('/trends', name: 'admin_social_media_trends', methods: ['GET'])]
+    public function trends(SocialMediaRepository $socialMediaRepository): Response
+    {
+        // Analyse des hashtags populaires
+        $hashtags = $socialMediaRepository->createQueryBuilder('s')
+            ->select('s.contenu')
+            ->where('s.contenu LIKE :hashtag')
+            ->setParameter('hashtag', '%#%')
+            ->getQuery()
+            ->getResult();
+
+        $hashtagCounts = [];
+        foreach ($hashtags as $post) {
+            preg_match_all('/#(\w+)/', $post['contenu'], $matches);
+            foreach ($matches[1] as $hashtag) {
+                $hashtagCounts[$hashtag] = ($hashtagCounts[$hashtag] ?? 0) + 1;
+            }
+        }
+        arsort($hashtagCounts);
+        $topHashtags = array_slice($hashtagCounts, 0, 10, true);
+
+        // Analyse des sujets tendances (mots-clés fréquents)
+        $posts = $socialMediaRepository->createQueryBuilder('s')
+            ->select('s.contenu', 's.titre')
+            ->orderBy('s.publicationDate', 'DESC')
+            ->setMaxResults(100)
+            ->getQuery()
+            ->getResult();
+
+        $wordCounts = [];
+        $stopWords = ['le', 'la', 'les', 'un', 'une', 'des', 'et', 'ou', 'mais', 'donc', 'car', 'ni', 'pour', 'par', 'avec', 'sans', 'sur', 'sous', 'dans', 'de', 'du', 'ce', 'cet', 'cette', 'ces', 'mon', 'ton', 'son', 'notre', 'votre', 'leur', 'leurs', 'qui', 'que', 'quoi', 'dont', 'où', 'quand', 'comment', 'pourquoi'];
+        
+        foreach ($posts as $post) {
+            $text = strtolower($post['contenu'] . ' ' . $post['titre']);
+            $words = str_word_count($text, 1, 'àáâãäçèéêëìíîïñòóôõöùúûüýÿ');
+            foreach ($words as $word) {
+                if (strlen($word) > 3 && !in_array($word, $stopWords)) {
+                    $wordCounts[$word] = ($wordCounts[$word] ?? 0) + 1;
+                }
+            }
+        }
+        arsort($wordCounts);
+        $topKeywords = array_slice($wordCounts, 0, 20, true);
+
+        // Posts les plus engageants
+        $engagingPosts = $socialMediaRepository->createQueryBuilder('s')
+            ->select('s.idEB', 's.titre', 's.contenu', 's.publicationDate', 's.lieu', 's.likee', 's.dislike', 'COUNT(c.idC) as commentCount')
+            ->leftJoin('s.commentaires', 'c')
+            ->groupBy('s.idEB', 's.titre', 's.contenu', 's.publicationDate', 's.lieu', 's.likee', 's.dislike')
+            ->orderBy('s.likee', 'DESC')
+            ->addOrderBy('s.dislike', 'DESC')
+            ->addOrderBy('commentCount', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('dashAdmin/social_media_trends.html.twig', [
+            'topHashtags' => $topHashtags,
+            'topKeywords' => $topKeywords,
+            'engagingPosts' => $engagingPosts
+        ]);
+    }
+
     private function getDefaultUser(): User
     {
         $defaultUser = $this->userRepository->find(self::DEFAULT_USER_ID);
