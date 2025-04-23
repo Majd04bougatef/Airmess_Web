@@ -505,7 +505,12 @@
                                 
                                 <div class="form-group">
                                     {{ form_label(form.aidesc, null, {'label_attr': {'class': 'form-label'}}) }}
-                                    {{ form_widget(form.aidesc, {'attr': {'class': 'form-control' ~ (form.aidesc.vars.valid ? '' : ' is-invalid'), 'rows': '4', 'style': 'resize: vertical;'}}) }}
+                                    <div class="input-group">
+                                        {{ form_widget(form.aidesc, {'attr': {'class': 'form-control' ~ (form.aidesc.vars.valid ? '' : ' is-invalid'), 'rows': '4', 'style': 'resize: vertical;', 'id': 'offre_aidesc'}}) }}
+                                        <button type="button" id="generate-description-btn" class="btn btn-primary">
+                                            <i class="bi bi-magic"></i> Générer
+                                        </button>
+                                    </div>
                                     <small class="form-text text-muted">
                                         <i class="bi bi-info-circle me-1"></i>
                                         {{ form_help(form.aidesc) }}
@@ -786,5 +791,67 @@ function initMap() {
         console.error("Erreur détaillée:", error);
     }
 }
+
+// Code pour générer automatiquement la description avec Gemini AI
+document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = document.getElementById('generate-description-btn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', function() {
+            // Afficher un loader dans le bouton
+            const originalBtnText = generateBtn.innerHTML;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération...';
+            generateBtn.disabled = true;
+            
+            // Récupérer les données du formulaire nécessaires pour l'IA
+            const place = document.querySelector('input[name$="[place]"]')?.value || '';
+            const startDate = document.querySelector('input[name$="[startDate]"]')?.value || '';
+            const endDate = document.querySelector('input[name$="[endDate]"]')?.value || '';
+            const priceInit = document.querySelector('input[name$="[priceInit]"]')?.value || '';
+            const priceAfter = document.querySelector('input[name$="[priceAfter]"]')?.value || '';
+            const description = document.querySelector('textarea[name$="[description]"]')?.value || '';
+            const aideDescField = document.getElementById('offre_aidesc');
+            
+            // Appeler l'API d'IA pour générer la description
+            fetch('/api/generate-description', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    place: place,
+                    startDate: startDate,
+                    endDate: endDate,
+                    priceInit: priceInit,
+                    priceAfter: priceAfter,
+                    description: description
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.description) {
+                    // Mettre à jour le champ avec la description générée
+                    if (aideDescField) {
+                        aideDescField.value = data.description;
+                        
+                        // Déclencher l'événement pour activer les validations
+                        const event = new Event('input', { bubbles: true });
+                        aideDescField.dispatchEvent(event);
+                    }
+                } else {
+                    alert('Erreur lors de la génération de la description: ' + (data.message || 'Erreur inconnue'));
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'appel à l\'API: ' + error.message);
+            })
+            .finally(() => {
+                // Restaurer le bouton
+                generateBtn.innerHTML = originalBtnText;
+                generateBtn.disabled = false;
+            });
+        });
+    }
+});
 </script>
 {% endblock %}
