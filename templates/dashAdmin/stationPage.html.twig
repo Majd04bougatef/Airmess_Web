@@ -53,7 +53,7 @@
                   </tr>
                 {% else %}
                   {% for station in stations %}
-                    <tr>
+                    <tr data-station-id="{{ station.idS }}">
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-center">
@@ -126,35 +126,35 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function approveStation(stationId) {
-  if (confirm('Êtes-vous sûr de vouloir approuver cette station ?')) {
-    // Send approval request to backend
-    fetch(`/admin/station/${stationId}/approve`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Remove the row from the table
-        const row = document.querySelector(`tr[data-station-id="${stationId}"]`);
-        if (row) {
-          row.remove();
-        }
-        // Show success message
-        alert('Station approuvée avec succès !');
-        // Reload the page to update the table
-        location.reload();
-      } else {
-        alert('Erreur lors de l\'approbation de la station');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Une erreur est survenue');
-    });
-  }
+    if (confirm('Êtes-vous sûr de vouloir approuver cette station ?')) {
+        fetch(`/admin/station/${stationId}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                alert(data.message);
+                // Remove the row from the table
+                const row = document.querySelector(`tr[data-station-id="${stationId}"]`);
+                if (row) {
+                    row.remove();
+                }
+                // Reload the page to update the table
+                location.reload();
+            } else {
+                alert(data.message || 'Une erreur est survenue lors de l\'approbation');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur est survenue lors de l\'approbation');
+        });
+    }
 }
 
 function showStationDetails(stationId) {

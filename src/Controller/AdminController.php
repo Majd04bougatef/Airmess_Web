@@ -562,6 +562,39 @@ class AdminController extends AbstractController
             'totalItems' => $users['totalItems']
         ]);
     }
+
+    #[Route('/admin/station/{id}/approve', name: 'admin_station_approve', methods: ['POST'])]
+    public function approveStation(
+        int $id, 
+        StationRepository $stationRepository, 
+        EntityManagerInterface $entityManager
+    ): Response {
+        try {
+            $station = $stationRepository->find($id);
+            
+            if (!$station) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Station non trouvée'
+                ], 404);
+            }
+            
+            // Update station status
+            $station->setStatut('active');
+            $entityManager->flush();
+            
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Station approuvée avec succès'
+            ]);
+            
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'approbation: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
 
 ?>

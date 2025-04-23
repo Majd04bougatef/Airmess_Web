@@ -54,12 +54,14 @@
         color: #8392ab;
         padding: 1rem 1.5rem;
         border-bottom: 1px solid #f0f2f5;
+        white-space: nowrap;
     }
     
     .table td {
         padding: 1rem 1.5rem;
         vertical-align: middle;
         border-color: #f0f2f5;
+        white-space: nowrap;
     }
     
     .font-weight-bold {
@@ -90,12 +92,14 @@
     }
     
     .action-btn {
-        padding: 0.5rem 0.75rem;
+        padding: 0.5rem;
         border-radius: 7px;
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
         transition: all 0.2s ease;
+        min-width: 32px;
+        text-align: center;
     }
     
     .btn-view {
@@ -137,6 +141,8 @@
     .actions-cell {
         display: flex;
         gap: 0.5rem;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
     }
 
     .empty-state {
@@ -182,6 +188,123 @@
         color: white;
         text-decoration: none;
     }
+    
+    .filter-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 0 1.5rem;
+    }
+    
+    .filter-btn {
+        padding: 0.5rem 1.5rem;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: 2px solid transparent;
+        background-color: #f6f9fc;
+        color: #8392ab;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .filter-btn:hover {
+        background-color: #e9ecef;
+        color: #344767;
+    }
+    
+    .filter-btn.active {
+        background-color: #5e72e4;
+        color: white;
+        border-color: #5e72e4;
+    }
+    
+    .reservation-row {
+        display: table-row;
+    }
+    
+    .reservation-row.hidden {
+        display: none;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        min-width: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        min-width: 1000px;
+    }
+    
+    .table th {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #8392ab;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f0f2f5;
+        white-space: nowrap;
+    }
+    
+    .table td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-color: #f0f2f5;
+        white-space: nowrap;
+    }
+
+    .table th.reference-col,
+    .table td.reference-col {
+        width: 25%;
+        min-width: 250px;
+    }
+
+    .table th.date-col,
+    .table td.date-col {
+        width: 12%;
+        min-width: 150px;
+    }
+
+    .table th.number-col,
+    .table td.number-col {
+        width: 5%;
+        min-width: 70px;
+    }
+
+    .table th.price-col,
+    .table td.price-col {
+        width: 7%;
+        min-width: 80px;
+    }
+
+    .table th.status-col,
+    .table td.status-col {
+        width: 10%;
+        min-width: 120px;
+    }
+
+    .table th.actions-col,
+    .table td.actions-col {
+        width: 15%;
+        min-width: 180px;
+    }
+
+    .reference-col .font-weight-bold {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .btn-edit.disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.6;
+    }
 </style>
 
 <div class="page-header">
@@ -197,71 +320,83 @@
         </a>
     </div>
     
+    <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all">Toutes</button>
+        <button class="filter-btn" data-filter="current">En cours</button>
+        <button class="filter-btn" data-filter="upcoming">À venir</button>
+        <button class="filter-btn" data-filter="past">Passées</button>
+    </div>
+    
     <div class="card-body p-0">
-        {% if reservation_transports|length > 0 %}
+        {% if reservation_transports is not empty %}
             <div class="table-responsive">
-                <table class="table align-items-center">
+                <table class="table align-items-center mb-0">
                     <thead>
                         <tr>
-                            <th>Référence</th>
-                            <th>Date de début</th>
-                            <th>Date de fin</th>
-                            <th>Durée</th>
-                            <th>Vélos</th>
-                            <th>Prix</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
+                            <th class="reference-col">Référence</th>
+                            <th class="date-col">Date de début</th>
+                            <th class="date-col">Date de fin</th>
+                            <th class="number-col">Nombre de vélos</th>
+                            <th class="price-col">Prix</th>
+                            <th class="status-col">Statut</th>
+                            <th class="actions-col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for reservation_transport in reservation_transports %}
-                            <tr>
-                                <td>
-                                    <p class="text-sm font-weight-bold mb-0">{{ reservation_transport.reference }}</p>
+                            {% set now = "now"|date("Y-m-d H:i:s") %}
+                            {% set status = "" %}
+                            
+                            {% if reservation_transport.dateFin|date("Y-m-d H:i:s") < now %}
+                                {% set status = "past" %}
+                            {% elseif reservation_transport.dateRes|date("Y-m-d H:i:s") > now %}
+                                {% set status = "upcoming" %}
+                            {% else %}
+                                {% set status = "current" %}
+                            {% endif %}
+                            
+                            <tr class="reservation-row" data-status="{{ status }}">
+                                <td class="reference-col">
+                                    <span class="font-weight-bold">{{ reservation_transport.reference }}</span>
                                 </td>
-                                <td>
-                                    <span class="text-xs font-weight-bold">{{ reservation_transport.dateRes ? reservation_transport.dateRes|date('d/m/Y à H:i') : '' }}</span>
-                                </td>
-                                <td>
-                                    <span class="text-xs font-weight-bold">{{ reservation_transport.dateFin ? reservation_transport.dateFin|date('d/m/Y à H:i') : '' }}</span>
-                                </td>
-                                <td>
-                                    <span class="text-xs font-weight-bold">
-                                        {% set interval = reservation_transport.dateRes.diff(reservation_transport.dateFin) %}
-                                        {% set hours = interval.h + (interval.days * 24) %}
-                                        {{ hours }} heure{% if hours > 1 %}s{% endif %}
+                                <td class="date-col">{{ reservation_transport.dateRes ? reservation_transport.dateRes|date('d/m/Y H:i') : '' }}</td>
+                                <td class="date-col">{{ reservation_transport.dateFin ? reservation_transport.dateFin|date('d/m/Y H:i') : '' }}</td>
+                                <td class="number-col">{{ reservation_transport.nombreVelo }}</td>
+                                <td class="price-col">{{ reservation_transport.prix }} €</td>
+                                <td class="status-col">
+                                    <span class="badge {% if status == 'past' %}badge-info{% elseif status == 'current' %}badge-warning{% else %}badge-success{% endif %}">
+                                        {% if status == 'past' %}
+                                            Terminée
+                                        {% elseif status == 'current' %}
+                                            En cours
+                                        {% else %}
+                                            À venir
+                                        {% endif %}
                                     </span>
                                 </td>
-                                <td>
-                                    <span class="text-xs font-weight-bold">{{ reservation_transport.nombreVelo }}</span>
-                                </td>
-                                <td>
-                                    <span class="text-xs font-weight-bold">{{ reservation_transport.prix }}€</span>
-                                </td>
-                                <td>
-                                    <span class="badge {% if reservation_transport.statut == 'confirmé' %}badge-success{% elseif reservation_transport.statut == 'en cours' %}badge-warning{% else %}badge-info{% endif %}">
-                                        {{ reservation_transport.statut }}
-                                    </span>
-                                </td>
-                                <td class="actions-cell">
-                                    <a href="{{ path('app_reservation_transport_show', {'id': reservation_transport.id}) }}" class="action-btn btn-view" title="Voir les détails">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    
-                                    <a href="{{ path('app_reservation_transport_chat', {'id': reservation_transport.id}) }}" class="action-btn btn-primary" style="background-color: #11cdef;" title="Discuter avec le service client">
-                                        <i class="fas fa-comments"></i>
-                                    </a>
-                                    
-                                    <a href="{{ path('app_reservation_transport_edit', {'id': reservation_transport.id}) }}" class="action-btn btn-edit" title="Modifier">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                    
-                                    <form method="post" action="{{ path('app_reservation_transport_delete', {'id': reservation_transport.id}) }}" style="display:inline;">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation_transport.id) }}">
-                                        <button type="submit" class="action-btn btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');" title="Supprimer">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                <td class="actions-col">
+                                    <div class="actions-cell">
+                                        <a href="{{ path('app_reservation_transport_chat', {'id': reservation_transport.id}) }}" class="action-btn btn-primary" style="background-color: #11cdef;" title="Discuter avec le service client">
+                                            <i class="fas fa-comments"></i>
+                                        </a>
+                                        
+                                        {% if status != 'past' %}
+                                            <a href="{{ path('app_reservation_transport_edit', {'id': reservation_transport.id}) }}" class="action-btn btn-edit" title="Modifier">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                        {% else %}
+                                            <span class="action-btn btn-edit disabled" title="Modification impossible - Réservation terminée">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </span>
+                                        {% endif %}
+                                        
+                                        <form method="post" action="{{ path('app_reservation_transport_delete', {'id': reservation_transport.id}) }}" style="display:inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation_transport.id) }}">
+                                            <button type="submit" class="action-btn btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');" title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -280,4 +415,35 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const reservationRows = document.querySelectorAll('.reservation-row');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            button.classList.add('active');
+            
+            const filter = button.getAttribute('data-filter');
+            
+            reservationRows.forEach(row => {
+                if (filter === 'all') {
+                    row.classList.remove('hidden');
+                } else {
+                    const status = row.getAttribute('data-status');
+                    if (status === filter) {
+                        row.classList.remove('hidden');
+                    } else {
+                        row.classList.add('hidden');
+                    }
+                }
+            });
+        });
+    });
+});
+</script>
 {% endblock %}
