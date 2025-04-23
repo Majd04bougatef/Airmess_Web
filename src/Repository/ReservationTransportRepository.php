@@ -55,5 +55,20 @@ class ReservationTransportRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-
+    /**
+     * Find reservations for a station within a date range
+     */
+    public function findByDateRangeAndStation(\DateTime $startDate, \DateTime $endDate, $station): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.station = :station')
+            ->andWhere('r.dateRes >= :startDate')
+            ->andWhere('r.dateRes <= :endDate')
+            ->setParameter('station', $station)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->orderBy('r.dateRes', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
