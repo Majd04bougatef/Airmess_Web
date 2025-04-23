@@ -58,26 +58,26 @@ class SocialMediaController extends AbstractController
         return $defaultUser;
     }
 
-    #[Route(name: 'app_social_media_index', methods: ['GET'])]
-    public function index(SocialMediaRepository $socialMediaRepository, Request $request): Response
+    #[Route('/', name: 'app_social_media_index', methods: ['GET'])]
+    public function index(SocialMediaRepository $socialMediaRepository, Request $request, PaginatorInterface $paginator): Response
     {
-        $lieu = $request->query->get('lieu');
-        $queryBuilder = $socialMediaRepository->createFilteredQueryBuilder($lieu)
+        $now = new \DateTime();
+        $queryBuilder = $socialMediaRepository->createQueryBuilder('s')
             ->select('s', 'u')
-            ->leftJoin('s.user', 'u');
+            ->leftJoin('s.user', 'u')
+            ->where('s.publicationDate <= :now')
+            ->andWhere('s.publicationDate IS NOT NULL')
+            ->setParameter('now', $now)
+            ->orderBy('s.publicationDate', 'DESC');
 
-        $pagination = $this->paginator->paginate(
+        $pagination = $paginator->paginate(
             $queryBuilder,
             $request->query->getInt('page', 1),
-            self::POSTS_PER_PAGE
+            9
         );
 
-        $template = $request->isXmlHttpRequest()
-            ? 'social_media/_index_content.html.twig'
-            : 'social_media/index.html.twig';
-
-        return $this->render($template, [
-            'pagination' => $pagination,
+        return $this->render('dashVoyageurs/socialPageVoyageurs.html.twig', [
+            'publications' => $pagination
         ]);
     }
 
@@ -651,12 +651,28 @@ class SocialMediaController extends AbstractController
     #[Route('/random-publications', name: 'app_social_media_random', methods: ['GET'])]
     public function randomPublications(Request $request, SocialMediaRepository $socialMediaRepository, int $limit = 4): Response
     {
+        $now = new \DateTime();
         // Try to get most liked publications first
-        $mostLiked = $socialMediaRepository->findMostLiked($limit);
+        $mostLiked = $socialMediaRepository->createQueryBuilder('s')
+            ->where('s.publicationDate <= :now')
+            ->andWhere('s.publicationDate IS NOT NULL')
+            ->setParameter('now', $now)
+            ->orderBy('s.likee', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
         
         // If we don't have enough, get some random ones
         if (count($mostLiked) < $limit) {
-            $random = $socialMediaRepository->findRandom($limit - count($mostLiked));
+            $random = $socialMediaRepository->createQueryBuilder('s')
+                ->where('s.publicationDate <= :now')
+                ->andWhere('s.publicationDate IS NOT NULL')
+                ->setParameter('now', $now)
+                ->orderBy('RAND()')
+                ->setMaxResults($limit - count($mostLiked))
+                ->getQuery()
+                ->getResult();
+            
             $publications = array_merge($mostLiked, $random);
             
             // Prevent duplicates
