@@ -593,12 +593,9 @@ final class ReservationTransportController extends AbstractController
         // Get the station owner
         $stationOwner = $reservation->getStation()->getUser();
         
-        // Get messages between the current user and the station owner
+        // Get messages for this specific reservation reference
         $messages = $entityManager->getRepository('App\Entity\Message')->findBy(
-            [
-                'sender' => [$currentUser->getIdU(), $stationOwner->getIdU()],
-                'receiver' => [$currentUser->getIdU(), $stationOwner->getIdU()]
-            ],
+            ['refRes' => $reservation->getReference()],
             ['dateM' => 'ASC']
         );
         
@@ -653,6 +650,7 @@ final class ReservationTransportController extends AbstractController
         $message->setSender($currentUser);
         $message->setReceiver($stationOwner);
         $message->setDateM(new \DateTime());
+        $message->setRefRes($reservation->getReference()); // Set the reservation reference
         
         // Save to database
         $entityManager->persist($message);
