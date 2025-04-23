@@ -3,9 +3,9 @@
 namespace App\Controller\DashEntreprise;
 
 use App\Entity\Station;
-use App\Entity\Reservation;
+use App\Entity\ReservationTransport;
 use App\Repository\StationRepository;
-use App\Repository\ReservationRepository;
+use App\Repository\ReservationTransportRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,7 +19,7 @@ class AnalyticsController extends AbstractController
     #[Route('/entreprise/analytics', name: 'app_entreprise_analytics')]
     public function index(
         StationRepository $stationRepository, 
-        ReservationRepository $reservationRepository,
+        ReservationTransportRepository $reservationRepository,
         SessionInterface $session,
         UserRepository $userRepository
     ): Response
@@ -67,7 +67,7 @@ class AnalyticsController extends AbstractController
 
     #[Route('/entreprise/analytics/usage', name: 'app_entreprise_analytics_usage')]
     public function getUsageData(
-        ReservationRepository $reservationRepository,
+        ReservationTransportRepository $reservationRepository,
         StationRepository $stationRepository,
         SessionInterface $session,
         UserRepository $userRepository
@@ -94,7 +94,7 @@ class AnalyticsController extends AbstractController
 
     #[Route('/entreprise/analytics/revenue', name: 'app_entreprise_analytics_revenue')]
     public function getRevenueData(
-        ReservationRepository $reservationRepository,
+        ReservationTransportRepository $reservationRepository,
         StationRepository $stationRepository,
         SessionInterface $session,
         UserRepository $userRepository
@@ -122,6 +122,7 @@ class AnalyticsController extends AbstractController
     private function calculateTotalRevenue(array $reservations): float
     {
         $total = 0;
+        /** @var ReservationTransport $reservation */
         foreach ($reservations as $reservation) {
             $total += $reservation->getPrix();
         }
@@ -131,6 +132,7 @@ class AnalyticsController extends AbstractController
     private function countActiveUsers(array $reservations): int
     {
         $userIds = [];
+        /** @var ReservationTransport $reservation */
         foreach ($reservations as $reservation) {
             $user = $reservation->getUser();
             if ($user && !in_array($user->getIdU(), $userIds)) {
@@ -145,10 +147,12 @@ class AnalyticsController extends AbstractController
         $totalBikes = 0;
         $usedBikes = 0;
 
+        /** @var Station $station */
         foreach ($stations as $station) {
             $totalBikes += $station->getNombreVelo();
         }
 
+        /** @var ReservationTransport $reservation */
         foreach ($reservations as $reservation) {
             if ($reservation->getStatut() === 'active') {
                 $usedBikes++;
@@ -163,6 +167,7 @@ class AnalyticsController extends AbstractController
         $totalDuration = 0;
         $count = 0;
 
+        /** @var ReservationTransport $reservation */
         foreach ($reservations as $reservation) {
             if ($reservation->getDateFin()) {
                 $duration = $reservation->getDateFin()->getTimestamp() - $reservation->getDateRes()->getTimestamp();
@@ -177,7 +182,9 @@ class AnalyticsController extends AbstractController
     private function getStationPerformance(array $stations, array $reservations): array
     {
         $performance = [];
+        /** @var Station $station */
         foreach ($stations as $station) {
+            /** @var ReservationTransport[] $stationReservations */
             $stationReservations = array_filter($reservations, function($reservation) use ($station) {
                 return $reservation->getStation() === $station;
             });
@@ -202,6 +209,7 @@ class AnalyticsController extends AbstractController
         $totalBikes = $station->getNombreVelo();
         $availableBikes = $totalBikes;
 
+        /** @var ReservationTransport $reservation */
         foreach ($reservations as $reservation) {
             if ($reservation->getStatut() === 'active') {
                 $availableBikes--;
@@ -226,6 +234,7 @@ class AnalyticsController extends AbstractController
         $today = new \DateTime();
         $today->setTime(0, 0, 0);
 
+        /** @var ReservationTransport[] $dailyReservations */
         $dailyReservations = array_filter($reservations, function($reservation) use ($today) {
             return $reservation->getDateRes()->format('Y-m-d') === $today->format('Y-m-d');
         });
@@ -238,7 +247,7 @@ class AnalyticsController extends AbstractController
         return $total;
     }
 
-    private function calculateUsageTrends(ReservationRepository $reservationRepository, array $stations): array
+    private function calculateUsageTrends(ReservationTransportRepository $reservationRepository, array $stations): array
     {
         // Get reservations for the last 6 months
         $endDate = new \DateTime();
@@ -260,6 +269,7 @@ class AnalyticsController extends AbstractController
             $currentDate->modify('+1 month');
         }
 
+        /** @var ReservationTransport $reservation */
         foreach ($reservations as $reservation) {
             $monthKey = $reservation->getDateRes()->format('M');
             $monthlyData[$monthKey]++;
@@ -271,7 +281,7 @@ class AnalyticsController extends AbstractController
         ];
     }
 
-    private function calculateRevenueData(ReservationRepository $reservationRepository, array $stations): array
+    private function calculateRevenueData(ReservationTransportRepository $reservationRepository, array $stations): array
     {
         // Get reservations for the last week
         $endDate = new \DateTime();
@@ -293,6 +303,7 @@ class AnalyticsController extends AbstractController
             $currentDate->modify('+1 day');
         }
 
+        /** @var ReservationTransport $reservation */
         foreach ($reservations as $reservation) {
             $dayKey = $reservation->getDateRes()->format('D');
             $dailyData[$dayKey] += $reservation->getPrix();
