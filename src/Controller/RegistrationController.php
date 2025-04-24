@@ -39,22 +39,6 @@ class RegistrationController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             try {
-                // Verify reCAPTCHA
-                $recaptchaResponse = $request->request->get('g-recaptcha-response');
-                
-                if (!$recaptchaResponse) {
-                    $this->addFlash('error', 'Please check the reCAPTCHA box');
-                    return $this->redirectToRoute('app_signup');
-                }
-                
-                // Verify with Google reCAPTCHA API
-                $recaptchaSuccess = $this->verifyRecaptcha($recaptchaResponse);
-                
-                if (!$recaptchaSuccess) {
-                    $this->addFlash('error', 'reCAPTCHA verification failed. Please try again.');
-                    return $this->redirectToRoute('app_signup');
-                }
-                
                 // Create a new User object and set its properties
                 $user = new User();
                 $user->setName($request->request->get('name'));
@@ -157,32 +141,5 @@ class RegistrationController extends AbstractController
         
         // If not a POST request, redirect to signup page
         return $this->redirectToRoute('app_signup');
-    }
-    
-    /**
-     * Helper method to verify reCAPTCHA
-     */
-    private function verifyRecaptcha(string $recaptchaResponse): bool
-    {
-        // Verify with Google reCAPTCHA API
-        $url = 'https://www.google.com/recaptcha/api/siteverify';
-        $data = [
-            'secret' => $this->getParameter('recaptcha_secret_key'),
-            'response' => $recaptchaResponse
-        ];
-        
-        $options = [
-            'http' => [
-                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method' => 'POST',
-                'content' => http_build_query($data)
-            ]
-        ];
-        
-        $context = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-        $resultJson = json_decode($result);
-        
-        return $resultJson->success ?? false;
     }
 } 
