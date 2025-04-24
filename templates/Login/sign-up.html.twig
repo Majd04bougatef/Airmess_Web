@@ -333,20 +333,12 @@
                                     </div>
                                 </div>
                                 
-                                <!-- reCAPTCHA for Voyageur form - initially hidden -->
-                                <div class="form-group captcha-container" id="voyageur-captcha" style="display: none;">
-                                    {{ recaptcha_widget('onRecaptchaVoyageurCompleted') }}
-                                    <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response-v">
-                                    <div id="captcha-v-error" class="field-error"></div>
-                                </div>
-                                
                                 <div class="col-12">
                                     <input type="hidden" name="roleUser" value="Voyageurs">
                                     <input type="hidden" name="statut" value="active">
                                     <input type="hidden" name="diamond" value="0">
                                     <input type="hidden" name="deleteFlag" value="0">
-                                    <button type="button" class="btn-register show-captcha-btn" id="voyageur-show-captcha">S'enregistrer</button>
-                                    <button type="submit" class="btn-register submit-btn" id="voyageur-submit" style="display: none;">Confirmer</button>
+                                    <button type="submit" class="btn-register" id="voyageur-submit">S'enregistrer</button>
                                 </div>
                             </div>
                         </form>
@@ -392,20 +384,12 @@
                                     </div>
                                 </div>
                                 
-                                <!-- reCAPTCHA for Entreprise form - initially hidden -->
-                                <div class="form-group captcha-container" id="entreprise-captcha" style="display: none;">
-                                    {{ recaptcha_widget('onRecaptchaEntrepriseCompleted') }}
-                                    <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response-e">
-                                    <div id="captcha-e-error" class="field-error"></div>
-                                </div>
-                                
                                 <div class="col-12">
                                     <input type="hidden" name="roleUser" value="Entreprise">
                                     <input type="hidden" name="statut" value="active">
                                     <input type="hidden" name="diamond" value="0">
                                     <input type="hidden" name="deleteFlag" value="0">
-                                    <button type="button" class="btn-register show-captcha-btn" id="entreprise-show-captcha">S'enregistrer</button>
-                                    <button type="submit" class="btn-register submit-btn" id="entreprise-submit" style="display: none;">Confirmer</button>
+                                    <button type="submit" class="btn-register" id="entreprise-submit">S'enregistrer</button>
                                 </div>
                             </div>
                         </form>
@@ -416,7 +400,7 @@
                 </div>
 
             <script type="text/javascript">
-        // Functions to update the hidden fields with the reCAPTCHA responses
+        /* 
         function onRecaptchaVoyageurCompleted(response) {
             document.getElementById('g-recaptcha-response-v').value = response;
             // Enable submit button
@@ -428,6 +412,34 @@
             // Enable submit button
             $('#entreprise-submit').prop('disabled', false);
         }
+        */
+        
+        /* 
+        // For reCAPTCHA v3
+        function onRecaptchaLoad() {
+            // Handle voyageur form
+            $('#voyageur-show-captcha').click(function() {
+                $('#voyageur-captcha').show();
+                grecaptcha.ready(function() {
+                    grecaptcha.execute('REMOVED-KEY', {action: 'voyageur_signup'}).then(function(token) {
+                        document.getElementById('g-recaptcha-response-v').value = token;
+                        $('#voyageur-submit').show();
+                    });
+                });
+            });
+            
+            // Handle entreprise form
+            $('#entreprise-show-captcha').click(function() {
+                $('#entreprise-captcha').show();
+                grecaptcha.ready(function() {
+                    grecaptcha.execute('REMOVED-KEY', {action: 'entreprise_signup'}).then(function(token) {
+                        document.getElementById('g-recaptcha-response-e').value = token;
+                        $('#entreprise-submit').show();
+                    });
+                });
+            });
+        }
+        */
         
         // Handle file selection and preview
         $('.custom-file-input').on('change', function() {
@@ -708,6 +720,7 @@
             });
             
             // Validate form submission
+            /*
             $('#form-voyageur').on('submit', function(e) {
                 // Validate captcha
                 const captchaResponse = grecaptcha.getResponse();
@@ -725,8 +738,10 @@
                     e.preventDefault();
                 }
             });
+            */
             
             // Show captcha buttons click handlers
+            /*
             $('#voyageur-show-captcha').click(function() {
                 let isValid = true;
                 
@@ -816,6 +831,7 @@
                     $('#entreprise-submit').show().prop('disabled', true);
                 }
             });
+            */
         });
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
