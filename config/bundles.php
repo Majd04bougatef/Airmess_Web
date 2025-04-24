@@ -18,5 +18,8 @@ return [
 <<<<<<< Updated upstream
 =======
     Endroid\QrCodeBundle\EndroidQrCodeBundle::class => ['all' => true],
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 ];
