@@ -348,31 +348,36 @@
                     <div class="tab-pane fade" id="entreprise" role="tabpanel" aria-labelledby="entreprise-tab">
                         <form id="form-entreprise" action="{{ path('app_register') }}" method="post" enctype="multipart/form-data" novalidate>
                             <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
+                                <div class="col-md-6">
+                                    <div class="form-group">
                                         <input type="text" class="form-control" name="name" placeholder="Nom de l'entreprise" value="">
-                                        </div>
-                                        <div class="form-group">
+                                    </div>
+                                    <div class="form-group">
                                         <input type="email" class="form-control" name="email" placeholder="Email professionnel" value="">
                                     </div>
-                                        </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" name="taxId" placeholder="Numéro d'identification fiscale" value="">
+                                        <small class="form-text text-muted">Entrez un numéro d'identification fiscale valide (8 à 12 chiffres)</small>
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
-                                        <div class="form-group">
+                                    <div class="form-group">
                                         <input type="text" class="form-control" name="phoneNumber" placeholder="Numéro de téléphone" value="" minlength="8" maxlength="8">
-                                        </div>
-                                        <div class="form-group">
+                                    </div>
+                                    <div class="form-group">
                                         <div class="password-field-container">
                                             <input type="password" class="form-control password-field" name="password" placeholder="Mot de passe" value="">
                                             <i class="password-toggle-icon fa fa-eye-slash" data-target="password"></i>
                                         </div>
-                                    </div>
+                                    
                                         <div class="form-group">
-                                        <div class="password-field-container">
-                                            <input type="password" class="form-control password-field" name="password_confirm" placeholder="Confirmer le mot de passe" value="">
-                                            <i class="password-toggle-icon fa fa-eye-slash" data-target="password_confirm"></i>
+                                            <div class="password-field-container">
+                                                <input type="password" class="form-control password-field" name="password_confirm" placeholder="Confirmer le mot de passe" value="">
+                                                <i class="password-toggle-icon fa fa-eye-slash" data-target="password_confirm"></i>
+                                            </div>
                                         </div>
-                                        </div>
-                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-12">
                                     <div class="photo-upload-container text-center">
                                         <div id="entreprisePhotoPreview" class="photo-preview"></div>
@@ -684,6 +689,27 @@
                 }
             }
             
+            // Add this function after the existing validation functions
+            
+            function validateTaxId(field) {
+                const taxId = field.val().trim();
+                const errorId = field.attr('name') + '-error';
+                
+                if (taxId === '') {
+                    showFieldError(errorId, 'Le numéro d\'identification fiscale est obligatoire');
+                    return false;
+                }
+                
+                // Check format (8-12 digits)
+                if (!/^\d{8,12}$/.test(taxId)) {
+                    showFieldError(errorId, 'Le numéro d\'identification fiscale doit contenir entre 8 et 12 chiffres');
+                    return false;
+                }
+                
+                hideFieldError(errorId);
+                return true;
+            }
+            
             // Attach real-time validation to form fields
             $('input[name="name"]').on('input blur', function() {
                 validateName($(this));
@@ -719,119 +745,37 @@
                 validateDate($(this));
             });
             
-            // Validate form submission
-            /*
-            $('#form-voyageur').on('submit', function(e) {
-                // Validate captcha
-                const captchaResponse = grecaptcha.getResponse();
-                if (!captchaResponse) {
-                    showFieldError('captcha-v', 'Please check the reCAPTCHA box');
+            // Add tax ID validation to form submission
+            $('#form-entreprise').submit(function(e) {
+                let isValid = true;
+                const roleUser = $(this).find('input[name="roleUser"]').val();
+                
+                // Only validate tax ID for enterprise accounts
+                if (roleUser === 'Entreprise') {
+                    const taxIdField = $(this).find('input[name="taxId"]');
+                    isValid = validateTaxId(taxIdField) && isValid;
+                }
+                
+                // Add validation calls for other fields
+                const nameField = $(this).find('input[name="name"]');
+                isValid = validateName(nameField) && isValid;
+                
+                const emailField = $(this).find('input[name="email"]');
+                isValid = validateEmail(emailField) && isValid;
+                
+                const phoneField = $(this).find('input[name="phoneNumber"]');
+                isValid = validatePhone(phoneField) && isValid;
+                
+                const passwordField = $(this).find('input[name="password"]');
+                isValid = validatePassword(passwordField) && isValid;
+                
+                const confirmField = $(this).find('input[name="password_confirm"]');
+                isValid = validatePasswordConfirm(confirmField, passwordField) && isValid;
+                
+                if (!isValid) {
                     e.preventDefault();
                 }
             });
-            
-            $('#form-entreprise').on('submit', function(e) {
-                // Validate captcha
-                const captchaResponse = grecaptcha.getResponse(1); // second widget
-                if (!captchaResponse) {
-                    showFieldError('captcha-e', 'Please check the reCAPTCHA box');
-                    e.preventDefault();
-                }
-            });
-            */
-            
-            // Show captcha buttons click handlers
-            /*
-            $('#voyageur-show-captcha').click(function() {
-                let isValid = true;
-                
-                // Run all validations
-                const nameField = $('#form-voyageur').find('input[name="name"]');
-                if (nameField.length) {
-                    isValid = validateName(nameField) && isValid;
-                }
-                
-                const prenomField = $('#form-voyageur').find('input[name="prenom"]');
-                if (prenomField.length) {
-                    isValid = validatePrenom(prenomField) && isValid;
-                }
-                
-                const emailField = $('#form-voyageur').find('input[name="email"]');
-                if (emailField.length) {
-                    isValid = validateEmail(emailField) && isValid;
-                }
-                
-                const phoneField = $('#form-voyageur').find('input[name="phoneNumber"]');
-                if (phoneField.length) {
-                    isValid = validatePhone(phoneField) && isValid;
-                }
-                
-                const passwordField = $('#form-voyageur').find('input[name="password"]');
-                if (passwordField.length) {
-                    isValid = validatePassword(passwordField) && isValid;
-                }
-                
-                const confirmField = $('#form-voyageur').find('input[name="password_confirm"]');
-                if (confirmField.length) {
-                    isValid = validatePasswordConfirm(confirmField, passwordField) && isValid;
-                }
-                
-                const dateField = $('#form-voyageur').find('input[name="dateNaiss"]');
-                if (dateField.length) {
-                    isValid = validateDate(dateField) && isValid;
-                }
-                
-                const photoInput = $('#form-voyageur').find('input[type="file"]');
-                isValid = validatePhoto(photoInput) && isValid;
-                
-                if (isValid) {
-                    // Show captcha and submit button
-                    $('#voyageur-captcha').show();
-                    $('#voyageur-show-captcha').hide();
-                    $('#voyageur-submit').show().prop('disabled', true);
-                }
-            });
-            
-            $('#entreprise-show-captcha').click(function() {
-                let isValid = true;
-                
-                // Run all validations
-                const nameField = $('#form-entreprise').find('input[name="name"]');
-                if (nameField.length) {
-                    isValid = validateName(nameField) && isValid;
-                }
-                
-                const emailField = $('#form-entreprise').find('input[name="email"]');
-                if (emailField.length) {
-                    isValid = validateEmail(emailField) && isValid;
-                }
-                
-                const phoneField = $('#form-entreprise').find('input[name="phoneNumber"]');
-                if (phoneField.length) {
-                    isValid = validatePhone(phoneField) && isValid;
-                }
-                
-                const passwordField = $('#form-entreprise').find('input[name="password"]');
-                if (passwordField.length) {
-                    isValid = validatePassword(passwordField) && isValid;
-                }
-                
-                const confirmField = $('#form-entreprise').find('input[name="password_confirm"]');
-                if (confirmField.length) {
-                    isValid = validatePasswordConfirm(confirmField, passwordField) && isValid;
-                }
-                
-                const photoInput = $('#form-entreprise').find('input[type="file"]');
-                isValid = validatePhoto(photoInput) && isValid;
-                
-                if (isValid) {
-                    // Show captcha and submit button
-                    $('#entreprise-captcha').show();
-                    $('#entreprise-show-captcha').hide();
-                    $('#entreprise-submit').show().prop('disabled', true);
-                }
-            });
-            */
         });
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">

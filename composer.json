@@ -11,6 +11,12 @@
         "doctrine/doctrine-bundle": "^2.14",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
+<<<<<<< Updated upstream
+=======
+        "dompdf/dompdf": "^3.1",
+        "endroid/qr-code": "*",
+        "endroid/qr-code-bundle": "*",
+>>>>>>> Stashed changes
         "knplabs/knp-paginator-bundle": "^6.7",
         "knpuniversity/oauth2-client-bundle": "^2.18",
         "league/oauth2-github": "^3.1",

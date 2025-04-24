@@ -92,6 +92,12 @@
                 </div>
             {% endfor %}
             
+            {% for flash_message in app.flashes('warning') %}
+                <div class="alert alert-warning">
+                    {{ flash_message|raw }}
+                </div>
+            {% endfor %}
+            
             {% if error %}
                 <div class="alert alert-danger">
                     {{ error }}
