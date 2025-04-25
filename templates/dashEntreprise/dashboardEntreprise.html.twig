@@ -77,13 +77,24 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="{{ path('socialEntreprise_page') }}" id="social-button">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <img src="{{ asset('images/social-icon.png') }}" alt="Icon" class="img" style="width: 25px; height: 25px;" />
-            </div>
-            <span class="nav-link-text ms-1">Social Media</span>
+          <a class="nav-link" href="{{ path('socialEntreprise_page') }}" id="social-button" data-section="social-section">
+            <span class="nav-link-icon">
+              <i class="fas fa-hashtag"></i>
+            </span>
+            Social Media
           </a>
         </li>
+        
+        <!-- Added Online Users Navigation Link -->
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('app_online_users') }}">
+            <span class="nav-link-icon">
+              <i class="fas fa-users"></i>
+            </span>
+            Utilisateurs en ligne
+          </a>
+        </li>
+        <!-- End Online Users Link -->
         <li class="nav-item">
           <a class="nav-link" href="{{ path('app_entreprise_analytics') }}" id="analytics-button">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">

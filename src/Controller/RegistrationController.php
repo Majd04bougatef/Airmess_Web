@@ -15,18 +15,22 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Psr\Log\LoggerInterface;
 
 class RegistrationController extends AbstractController
 {
     private $emailService;
     private $verificationService;
+    private $logger;
 
     public function __construct(
         EmailService $emailService,
-        VerificationService $verificationService
+        VerificationService $verificationService,
+        LoggerInterface $logger = null
     ) {
         $this->emailService = $emailService;
         $this->verificationService = $verificationService;
+        $this->logger = $logger;
     }
 
     #[Route('/register', name: 'app_register')]
@@ -39,19 +43,25 @@ class RegistrationController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             try {
+                $this->log('Registration process started');
+                
+                // Get the user role
+                $userRole = $request->request->get('roleUser');
+                $this->log('User role: ' . $userRole);
+                
                 // Create a new User object and set its properties
                 $user = new User();
                 $user->setName($request->request->get('name'));
                 $user->setEmail($request->request->get('email'));
                 $user->setPassword(password_hash($request->request->get('password'), PASSWORD_BCRYPT));
-                $user->setRoleUser($request->request->get('roleUser'));
+                $user->setRoleUser($userRole);
                 $user->setPhoneNumber($request->request->get('phoneNumber'));
                 $user->setStatut('actif');
                 $user->setDiamond(0);
                 $user->setDeleteFlag(0);
                 
                 // Set additional fields for Voyageurs
-                if ($request->request->get('roleUser') === 'Voyageurs') {
+                if ($userRole === 'Voyageurs') {
                     $user->setPrenom($request->request->get('prenom'));
                     $dateNaiss = $request->request->get('dateNaiss');
                     if ($dateNaiss) {
@@ -118,14 +128,24 @@ class RegistrationController extends AbstractController
                 }
                 
                 $session->set('temp_user_data', $userData);
+                $this->log('User data stored in session for email: ' . $user->getEmail());
                 
                 // Generate verification code
                 $code = $this->verificationService->generateCode($user->getEmail());
+                $this->log('Generated verification code for email: ' . $user->getEmail());
                 
                 // Send verification code
+                $this->log('Attempting to send verification code to: ' . $user->getEmail());
                 $emailSent = $this->verificationService->sendVerificationCode($user->getEmail(), $code);
+                $this->log('Email sending result: ' . ($emailSent ? 'success' : 'failure'));
                 
-                if (!$emailSent) {
+                if (!$emailSent && $_ENV['APP_ENV'] === 'dev') {
+                    // In development, provide a direct link to see the verification code
+                    $codeLink = $this->generateUrl('app_show_verification_code', [
+                        'email' => $user->getEmail()
+                    ]);
+                    $this->addFlash('warning', 'Email could not be sent. For testing purposes, you can <a href="' . $codeLink . '">click here</a> to view your verification code.');
+                } else if (!$emailSent) {
                     $this->addFlash('error', 'Nous n\'avons pas pu envoyer le code de vérification. Veuillez réessayer.');
                     return $this->redirectToRoute('app_signup');
                 }
@@ -134,6 +154,7 @@ class RegistrationController extends AbstractController
                 return $this->redirectToRoute('app_verify');
                 
             } catch (\Exception $e) {
+                $this->log('Exception during registration: ' . $e->getMessage());
                 $this->addFlash('error', 'Une erreur est survenue lors de l\'inscription: ' . $e->getMessage());
                 return $this->redirectToRoute('app_signup');
             }
@@ -142,4 +163,16 @@ class RegistrationController extends AbstractController
         // If not a POST request, redirect to signup page
         return $this->redirectToRoute('app_signup');
     }
-} 
+    
+    /**
+     * Helper method to log messages
+     */
+    private function log(string $message): void
+    {
+        if ($this->logger) {
+            $this->logger->info('[Registration] ' . $message);
+        } else {
+            error_log('[Registration] ' . $message);
+        }
+    }
+}

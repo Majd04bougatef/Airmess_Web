@@ -36,6 +36,80 @@ class UserRepository extends ServiceEntityRepository
     }
 
     /**
+     * Trouver les utilisateurs actuellement en ligne
+     */
+    public function findCurrentlyOnlineUsers(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.deleteFlag = 0')
+            ->andWhere('u.isOnline = :isOnline')
+            ->setParameter('isOnline', true)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Trouver les utilisateurs actifs dans le dernier mois
+     */
+    public function findUsersActiveInLastMonth(): array
+    {
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo->modify('-1 month');
+
+        return $this->createQueryBuilder('u')
+            ->where('u.deleteFlag = 0')
+            ->andWhere('u.lastActivity >= :timeLimit')
+            ->setParameter('timeLimit', $oneMonthAgo)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Trouver les utilisateurs actifs aujourd'hui
+     */
+    public function findUsersActiveToday(): array
+    {
+        $today = new \DateTime('today');
+        
+        return $this->createQueryBuilder('u')
+            ->where('u.deleteFlag = 0')
+            ->andWhere('u.lastActivity >= :today')
+            ->setParameter('today', $today)
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * Trouver les utilisateurs actifs ce mois-ci
+     */
+    public function findUsersActiveThisMonth(): array
+    {
+        $firstDayOfMonth = new \DateTime('first day of this month midnight');
+        
+        return $this->createQueryBuilder('u')
+            ->where('u.deleteFlag = 0')
+            ->andWhere('u.lastActivity >= :firstDay')
+            ->setParameter('firstDay', $firstDayOfMonth)
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * Trouver les utilisateurs actifs cette année
+     */
+    public function findUsersActiveThisYear(): array
+    {
+        $firstDayOfYear = new \DateTime('first day of January this year midnight');
+        
+        return $this->createQueryBuilder('u')
+            ->where('u.deleteFlag = 0')
+            ->andWhere('u.lastActivity >= :firstDay')
+            ->setParameter('firstDay', $firstDayOfYear)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Pagination des utilisateurs avec filtres optionnels
      */
     public function findPaginatedUsers(int $page = 1, int $limit = 10, array $filters = []): array

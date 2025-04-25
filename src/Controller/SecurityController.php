@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\OnlineUsersService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,12 +15,22 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class SecurityController extends AbstractController
 {
+    private $onlineUsersService;
+    
+    public function __construct(OnlineUsersService $onlineUsersService)
+    {
+        $this->onlineUsersService = $onlineUsersService;
+    }
+    
     #[Route('/login', name: 'login')]
-    public function login(Request $request, UserRepository $userRepository, SessionInterface $session): Response
+    public function login(Request $request, UserRepository $userRepository, SessionInterface $session, EntityManagerInterface $entityManager): Response
     {
         // Check if user is already logged in and 'force_login' is not set
         if ($session->has('user_id') && !$request->query->has('force_login')) {
             $userRole = $session->get('user_role');
+            
+            // Update user's online status
+            $this->onlineUsersService->updateLastActivity($session->get('user_id'));
             
             // Redirect to appropriate dashboard
             if ($userRole === 'Admin' || $userRole === 'ROLE_ADMIN') {
@@ -59,11 +70,19 @@ class SecurityController extends AbstractController
                     $session->set('user_post_actions', []);
                     $session->set('user_comment_actions', []);
                     
+                    // Update user's online status
+                    $this->onlineUsersService->updateLastActivity($user->getIdU());
+                    
                     // Force session write
                     $session->save();
                     
                     // Get role for redirect
                     $userRole = $user->getRoleUser();
+                    
+                    // Update user's online status in the database
+                    $user->setIsOnline(true);
+                    $user->setLastActivity(new \DateTime());
+                    $entityManager->flush();
                     
                     // Redirect based on user role
                     if ($userRole === 'Admin' || $userRole === 'ROLE_ADMIN') {
@@ -181,8 +200,24 @@ class SecurityController extends AbstractController
     }
     
     #[Route('/logout', name: 'app_logout')]
-    public function logout(SessionInterface $session): Response
+    public function logout(SessionInterface $session, UserRepository $userRepository, EntityManagerInterface $entityManager): Response
     {
+        // Update online status in database before invalidating the session
+        if ($session->has('user_id')) {
+            $userId = $session->get('user_id');
+            $user = $userRepository->find($userId);
+            
+            if ($user) {
+                // Set user as offline
+                $user->setIsOnline(false);
+                $entityManager->flush();
+            }
+            
+            // Clear from session
+            $session->remove('online_user_id');
+            $session->remove('last_activity_timestamp');
+        }
+        
         // Clear the session
         $session->invalidate();
         

@@ -29,24 +29,32 @@ class AdminController extends AbstractController
     public function dashboardPage(
         UserRepository $userRepository,
         StationRepository $stationRepository,
-        ReservationTransportRepository $reservationRepository
+        ReservationTransportRepository $reservationRepository,
+        OffreRepository $offreRepository,
+        EntityManagerInterface $entityManager
     ): Response
     {
         // Get counts for dashboard stats
-        $userCount = $userRepository->count([]);
+        $userCount = $userRepository->count(['deleteFlag' => 0]);
         $stationCount = $stationRepository->count([]);
         $reservationCount = $reservationRepository->count([]);
-        $offerCount = 0; // Replace with actual repository count when available
+        $offerCount = $offreRepository->count([]);
 
         // User role distribution for charts
         $usersByRole = $this->getUserCountByRole($userRepository);
+        
+        // Get user activity stats
+        $onlineUsersCount = count($userRepository->findCurrentlyOnlineUsers());
+        $activeLastMonthCount = count($userRepository->findUsersActiveInLastMonth());
         
         return $this->render('dashAdmin/dashboardPage.html.twig', [
             'userCount' => $userCount,
             'stationCount' => $stationCount,
             'reservationCount' => $reservationCount,
             'offerCount' => $offerCount,
-            'usersByRole' => $usersByRole
+            'usersByRole' => $usersByRole,
+            'onlineUsersCount' => $onlineUsersCount,
+            'activeLastMonthCount' => $activeLastMonthCount
         ]);
     }
 
@@ -524,6 +532,42 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_stations');
+    }
+
+    /**
+     * Show detailed list of online users
+     */
+    #[Route('/admin/online-users', name: 'admin_online_users_details')]
+    public function onlineUsersDetails(UserRepository $userRepository): Response
+    {
+        // Get all currently online users
+        $onlineUsers = $userRepository->findCurrentlyOnlineUsers();
+        
+        return $this->render('dashAdmin/onlineUsersDetails.html.twig', [
+            'onlineUsers' => $onlineUsers,
+            'currentTime' => new \DateTime()
+        ]);
+    }
+
+    /**
+     * Show detailed list of users active in the last month
+     */
+    #[Route('/admin/monthly-active-users', name: 'admin_monthly_users_details')]
+    public function monthlyActiveUsersDetails(UserRepository $userRepository): Response
+    {
+        // Get users active in different time periods
+        $activeUsersToday = $userRepository->findUsersActiveToday();
+        $activeUsersThisMonth = $userRepository->findUsersActiveThisMonth();
+        $activeUsersThisYear = $userRepository->findUsersActiveThisYear();
+        
+        return $this->render('dashAdmin/monthlyActiveUsersDetails.html.twig', [
+            'activeUsersToday' => $activeUsersToday,
+            'activeUsersThisMonth' => $activeUsersThisMonth,
+            'activeUsersThisYear' => $activeUsersThisYear,
+            'currentTime' => new \DateTime(),
+            'startDateMonth' => new \DateTime('first day of this month midnight'),
+            'startDateYear' => new \DateTime('first day of January this year midnight')
+        ]);
     }
 
     /**
