@@ -175,4 +175,34 @@ class UserRepository extends ServiceEntityRepository
             'currentPage' => $page
         ];
     }
+
+    /**
+     * Find users with filters applied
+     */
+    public function findFilteredUsers(array $filters = []): array
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->where('u.deleteFlag = 0');
+        
+        // Apply role filter
+        if (!empty($filters['role'])) {
+            $qb->andWhere('u.roleUser = :role')
+               ->setParameter('role', $filters['role']);
+        }
+        
+        // Apply status filter
+        if (!empty($filters['status'])) {
+            $qb->andWhere('u.statut = :status')
+               ->setParameter('status', $filters['status']);
+        }
+        
+        // Apply search filter
+        if (!empty($filters['search'])) {
+            $searchTerm = '%' . $filters['search'] . '%';
+            $qb->andWhere('u.name LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search')
+               ->setParameter('search', $searchTerm);
+        }
+        
+        return $qb->getQuery()->getResult();
+    }
 }

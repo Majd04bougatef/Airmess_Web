@@ -1,23 +1,41 @@
 {% if totalPages > 1 %}
 <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
-        <li class="page-item {{ currentPage == 1 ? 'disabled' : '' }}">
-            <a class="page-link" href="#" data-page="{{ currentPage - 1 }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
+        {% if currentPage > 1 %}
+            <li class="page-item">
+                <a class="page-link pagination-link" href="{{ path('user_page', {'page': currentPage - 1}) }}" aria-label="Précédent">
+                    <span aria-hidden="true">&laquo;</span> Précédent
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo; Précédent</a>
+            </li>
+        {% endif %}
         
-        {% for page in 1..totalPages %}
-            <li class="page-item {{ page == currentPage ? 'active' : '' }}">
-                <a class="page-link" href="#" data-page="{{ page }}">{{ page }}</a>
+        {% set startPage = max(1, currentPage - 2) %}
+        {% set endPage = min(totalPages, startPage + 4) %}
+        {% if endPage - startPage < 4 and totalPages > 5 %}
+            {% set startPage = max(1, endPage - 4) %}
+        {% endif %}
+        
+        {% for i in startPage..endPage %}
+            <li class="page-item {{ currentPage == i ? 'active' : '' }}">
+                <a class="page-link pagination-link" href="{{ path('user_page', {'page': i}) }}">{{ i }}</a>
             </li>
         {% endfor %}
         
-        <li class="page-item {{ currentPage == totalPages ? 'disabled' : '' }}">
-            <a class="page-link" href="#" data-page="{{ currentPage + 1 }}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
+        {% if currentPage < totalPages %}
+            <li class="page-item">
+                <a class="page-link pagination-link" href="{{ path('user_page', {'page': currentPage + 1}) }}" aria-label="Suivant">
+                    Suivant <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Suivant &raquo;</a>
+            </li>
+        {% endif %}
     </ul>
 </nav>
 {% endif %} 

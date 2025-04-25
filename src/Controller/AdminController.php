@@ -21,6 +21,12 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Knp\Snappy\Pdf;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 
 class AdminController extends AbstractController
@@ -68,16 +74,37 @@ class AdminController extends AbstractController
     {
         $pageSize = 10; // Number of users per page
         
-        // Collect any filter parameters
-        $filters = [];
-        if ($request->query->has('role')) {
-            $filters['role'] = $request->query->get('role');
-        }
-        if ($request->query->has('status')) {
-            $filters['status'] = $request->query->get('status');
-        }
-        if ($request->query->has('search')) {
-            $filters['search'] = $request->query->get('search');
+        // Detect AJAX requests
+        $isAjax = $request->isXmlHttpRequest();
+        
+        // Process JSON data if it's an AJAX POST request
+        if ($isAjax && $request->isMethod('POST')) {
+            $data = json_decode($request->getContent(), true);
+            $filters = [];
+            
+            if (!empty($data['role'])) {
+                $filters['role'] = $data['role'];
+            }
+            
+            if (!empty($data['status'])) {
+                $filters['status'] = $data['status'];
+            }
+            
+            if (!empty($data['search'])) {
+                $filters['search'] = $data['search'];
+            }
+        } else {
+            // Collect any filter parameters from query string for normal page loads
+            $filters = [];
+            if ($request->query->has('role')) {
+                $filters['role'] = $request->query->get('role');
+            }
+            if ($request->query->has('status')) {
+                $filters['status'] = $request->query->get('status');
+            }
+            if ($request->query->has('search')) {
+                $filters['search'] = $request->query->get('search');
+            }
         }
         
         // Get paginated results with any filters
@@ -138,6 +165,39 @@ class AdminController extends AbstractController
             ]
         ];
         
+        // If AJAX request, return only the necessary HTML and data
+        if ($isAjax) {
+            // Render only the table rows
+            $html = $this->renderView('dashAdmin/_user_table_rows.html.twig', [
+                'users' => $results['items']
+            ]);
+            
+            // Render the pagination
+            $pagination = $this->renderView('dashAdmin/_pagination.html.twig', [
+                'currentPage' => $results['currentPage'],
+                'totalPages' => $results['totalPages'],
+                'filters' => $filters
+            ]);
+            
+            // Pagination info text
+            $paginationInfo = sprintf(
+                'Affichage des utilisateurs %d à %d sur %d utilisateurs',
+                ($results['currentPage'] - 1) * $results['itemsPerPage'] + 1,
+                min($results['currentPage'] * $results['itemsPerPage'], $results['totalItems']),
+                $results['totalItems']
+            );
+            
+            return new JsonResponse([
+                'success' => true,
+                'html' => $html,
+                'pagination' => $pagination,
+                'totalItems' => $results['totalItems'],
+                'currentPage' => $results['currentPage'],
+                'paginationInfo' => $paginationInfo
+            ]);
+        }
+        
+        // Normal page rendering
         return $this->render('dashAdmin/userPage.html.twig', [
             'users' => $results['items'],
             'usersByRole' => $usersByRole,
@@ -655,6 +715,150 @@ class AdminController extends AbstractController
             'html' => $html,
             'count' => count($onlineUsers)
         ]);
+    }
+
+    /**
+     * Export users list to PDF
+     */
+    #[Route('/admin/users/export/pdf', name: 'admin_users_export_pdf', methods: ['POST'])]
+    public function exportUsersToPdf(Request $request, UserRepository $userRepository): Response
+    {
+        // Get filter parameters
+        $filters = [
+            'role' => $request->request->get('role', ''),
+            'status' => $request->request->get('status', ''),
+            'search' => $request->request->get('search', ''),
+        ];
+        
+        // Get customization options
+        $title = $request->request->get('title', 'Liste des Utilisateurs');
+        $orientation = $request->request->get('orientation', 'landscape');
+        $showTimestamp = $request->request->has('showTimestamp');
+        $showFilters = $request->request->has('showFilters');
+        
+        // Get column selections
+        $columns = [
+            'user' => $request->request->has('includeUserColumn'),
+            'role' => $request->request->has('includeRoleColumn'),
+            'status' => $request->request->has('includeStatusColumn'),
+            'date' => $request->request->has('includeDateColumn'),
+            'phone' => $request->request->has('includePhoneColumn'),
+        ];
+        
+        // Fetch all users (we'll paginate in the view if needed)
+        $users = $userRepository->findFilteredUsers($filters);
+        
+        // Render the PDF template
+        $html = $this->renderView('dashAdmin/exports/users_pdf.html.twig', [
+            'users' => $users,
+            'title' => $title,
+            'timestamp' => new \DateTime(),
+            'showTimestamp' => $showTimestamp,
+            'filters' => $filters,
+            'showFilters' => $showFilters,
+            'columns' => $columns,
+        ]);
+        
+        // Configure Dompdf
+        $options = new \Dompdf\Options();
+        $options->set('defaultFont', 'Arial');
+        $options->setIsRemoteEnabled(true);
+        
+        // Create new PDF instance
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', $orientation);
+        $dompdf->render();
+        
+        // Create response
+        $filename = 'utilisateurs_' . (new \DateTime())->format('Y-m-d') . '.pdf';
+        $response = new Response($dompdf->output());
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        
+        return $response;
+    }
+    
+    /**
+     * Export users list to Excel
+     */
+    #[Route('/admin/users/export/excel', name: 'admin_users_export_excel', methods: ['POST'])]
+    public function exportUsersToExcel(Request $request, UserRepository $userRepository): Response
+    {
+        // Get filter parameters
+        $filters = [
+            'role' => $request->request->get('role', ''),
+            'status' => $request->request->get('status', ''),
+            'search' => $request->request->get('search', ''),
+        ];
+        
+        // Fetch all users with filters
+        $users = $userRepository->findFilteredUsers($filters);
+        
+        // Determine what columns to include
+        $includeUser = $request->request->has('includeUserColumn', true);
+        $includeRole = $request->request->has('includeRoleColumn', true);
+        $includeStatus = $request->request->has('includeStatusColumn', true);
+        $includeDate = $request->request->has('includeDateColumn', true);
+        $includePhone = $request->request->has('includePhoneColumn', true);
+        
+        // Create CSV response
+        $response = new StreamedResponse(function() use ($users, $includeUser, $includeRole, $includeStatus, $includeDate, $includePhone) {
+            $handle = fopen('php://output', 'w+');
+            
+            // Add UTF-8 BOM to fix Excel encoding
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            // Write headers
+            $headers = [];
+            if ($includeUser) $headers[] = 'Utilisateur';
+            if ($includeUser) $headers[] = 'Email';
+            if ($includeRole) $headers[] = 'Rôle';
+            if ($includeStatus) $headers[] = 'Statut';
+            if ($includeDate) $headers[] = "Date de naissance";
+            if ($includePhone) $headers[] = 'Téléphone';
+            
+            fputcsv($handle, $headers, ';');
+            
+            // Write data rows
+            foreach ($users as $user) {
+                $row = [];
+                
+                if ($includeUser) {
+                    $row[] = $user->getName() . ' ' . $user->getPrenom();
+                    $row[] = $user->getEmail();
+                }
+                
+                if ($includeRole) {
+                    $row[] = $user->getRoleUser();
+                }
+                
+                if ($includeStatus) {
+                    $row[] = $user->getStatut();
+                }
+                
+                if ($includeDate) {
+                    $dateValue = $user->getDateNaiss() instanceof \DateTime 
+                        ? $user->getDateNaiss()->format('d/m/Y') 
+                        : '';
+                    $row[] = $dateValue;
+                }
+                
+                if ($includePhone) {
+                    $row[] = $user->getPhoneNumber();
+                }
+                
+                fputcsv($handle, $row, ';');
+            }
+            
+            fclose($handle);
+        });
+        
+        $filename = 'utilisateurs_' . (new \DateTime())->format('Y-m-d') . '.csv';
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        
+        return $response;
     }
 }
 

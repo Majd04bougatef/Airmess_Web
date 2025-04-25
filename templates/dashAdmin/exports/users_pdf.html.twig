@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .timestamp {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .filters {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 20px;
+            padding: 5px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th {
+            background-color: #5e72e4;
+            color: white;
+            font-weight: bold;
+            text-align: left;
+            padding: 8px;
+            font-size: 11px;
+            border: 1px solid #ddd;
+        }
+        td {
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            font-size: 10px;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            margin-top: 20px;
+        }
+        .user-name {
+            font-weight: bold;
+        }
+        .user-email {
+            color: #5e72e4;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 6px;
+            font-size: 9px;
+            font-weight: bold;
+            border-radius: 10px;
+            color: white;
+        }
+        .badge-success {
+            background-color: #2dce89;
+        }
+        .badge-danger {
+            background-color: #f5365c;
+        }
+        .badge-warning {
+            background-color: #fb6340;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">{{ title }}</div>
+        
+        {% if showTimestamp %}
+        <div class="timestamp">
+            Exporté le {{ timestamp|date('d/m/Y à H:i') }}
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if showFilters %}
+    <div class="filters">
+        <strong>Filtres appliqués:</strong> 
+        {% if filters.role %}Rôle: {{ filters.role }}{% else %}Tous les rôles{% endif %}, 
+        {% if filters.status %}Statut: {{ filters.status }}{% else %}Tous les statuts{% endif %}
+        {% if filters.search %}, Recherche: "{{ filters.search }}"{% endif %}
+    </div>
+    {% endif %}
+    
+    <table>
+        <thead>
+            <tr>
+                {% if columns.user %}<th>Utilisateur</th>{% endif %}
+                {% if columns.role %}<th>Rôle</th>{% endif %}
+                {% if columns.status %}<th>Statut</th>{% endif %}
+                {% if columns.date %}<th>Date de naissance</th>{% endif %}
+                {% if columns.phone %}<th>Téléphone</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                {% if columns.user %}
+                <td>
+                    <div class="user-name">{{ user.name }} {{ user.prenom }}</div>
+                    <div class="user-email">{{ user.email }}</div>
+                    {% if user.lastActivity %}
+                    <div style="font-size: 9px; color: #888;">
+                        Dernière activité: {{ user.lastActivity|date("d/m/Y H:i") }}
+                    </div>
+                    {% endif %}
+                </td>
+                {% endif %}
+                
+                {% if columns.role %}
+                <td>{{ user.roleUser }}</td>
+                {% endif %}
+                
+                {% if columns.status %}
+                <td>
+                    {% if user.statut == 'actif' or user.statut == 'active' %}
+                    <span class="badge badge-success">Actif</span>
+                    {% elseif user.statut == 'inactif' or user.statut == 'inactive' %}
+                    <span class="badge badge-danger">Inactif</span>
+                    {% else %}
+                    <span class="badge badge-warning">{{ user.statut }}</span>
+                    {% endif %}
+                </td>
+                {% endif %}
+                
+                {% if columns.date %}
+                <td>{{ user.dateNaiss|date("d/m/Y") }}</td>
+                {% endif %}
+                
+                {% if columns.phone %}
+                <td>{{ user.phoneNumber }}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        Airmess - {{ "now"|date("Y") }} - {{ users|length }} utilisateurs
+    </div>
+</body>
+</html> 
