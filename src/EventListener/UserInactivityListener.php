@@ -5,12 +5,13 @@ namespace App\EventListener;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UserInactivityListener implements EventSubscriberInterface
 {
-    private const INACTIVE_TIMEOUT = 900; // 15 minutes in seconds
+    private const INACTIVITY_TIMEOUT = 900; // 15 minutes in seconds
+    private const CHECK_PROBABILITY = 0.1; // 10% chance to run on each request
     
     private $userRepository;
     private $entityManager;
@@ -23,45 +24,56 @@ class UserInactivityListener implements EventSubscriberInterface
         $this->entityManager = $entityManager;
     }
     
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => [
-                ['checkInactiveUsers', 10]
+                ['onKernelRequest', 10]
             ]
         ];
     }
     
-    public function checkInactiveUsers(RequestEvent $event): void
+    /**
+     * Check for inactive users and update their status
+     */
+    public function onKernelRequest(RequestEvent $event): void
     {
+        // Only process main requests (not sub-requests)
         if (!$event->isMainRequest()) {
             return;
         }
-        
-        // Update inactive users every few requests (to avoid doing this on every request)
-        if (mt_rand(1, 10) !== 1) {
+
+        // Randomly determine if we should check inactive users
+        // This prevents checking on every request which would be inefficient
+        if (mt_rand(1, 100) / 100 > self::CHECK_PROBABILITY) {
             return;
         }
+
+        // Get all users that are currently marked as online
+        $onlineUsers = $this->userRepository->findBy(['isOnline' => true]);
         
-        // Find users who are marked as online but haven't been active recently
-        $timeoutThreshold = new \DateTime();
-        $timeoutThreshold->modify('-' . self::INACTIVE_TIMEOUT . ' seconds');
+        // Current time minus the inactivity threshold
+        $inactivityThreshold = new \DateTime();
+        $inactivityThreshold->modify('-' . self::INACTIVITY_TIMEOUT . ' seconds');
         
-        $onlineInactiveUsers = $this->userRepository->createQueryBuilder('u')
-            ->where('u.isOnline = :isOnline')
-            ->andWhere('u.lastActivity < :threshold OR u.lastActivity IS NULL')
-            ->setParameter('isOnline', true)
-            ->setParameter('threshold', $timeoutThreshold)
-            ->getQuery()
-            ->getResult();
-        
-        // Mark these users as offline
-        if (!empty($onlineInactiveUsers)) {
-            foreach ($onlineInactiveUsers as $user) {
-                $user->setIsOnline(false);
-            }
+        $updated = false;
+
+        // Check each online user for inactivity
+        foreach ($onlineUsers as $user) {
+            $lastActivity = $user->getLastActivity();
             
-            // Save changes
+            // If the user has no last activity record or their last activity is older than the threshold
+            if (!$lastActivity || $lastActivity < $inactivityThreshold) {
+                $user->setIsOnline(false);
+                $updated = true;
+            }
+        }
+
+        // Only flush if we've made changes
+        if ($updated) {
             $this->entityManager->flush();
         }
     }

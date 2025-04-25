@@ -542,9 +542,11 @@ class AdminController extends AbstractController
     {
         // Get all currently online users
         $onlineUsers = $userRepository->findCurrentlyOnlineUsers();
+        $userCount = $userRepository->count(['deleteFlag' => 0]);
         
         return $this->render('dashAdmin/onlineUsersDetails.html.twig', [
             'onlineUsers' => $onlineUsers,
+            'userCount' => $userCount,
             'currentTime' => new \DateTime()
         ]);
     }
@@ -559,11 +561,13 @@ class AdminController extends AbstractController
         $activeUsersToday = $userRepository->findUsersActiveToday();
         $activeUsersThisMonth = $userRepository->findUsersActiveThisMonth();
         $activeUsersThisYear = $userRepository->findUsersActiveThisYear();
+        $userCount = $userRepository->count(['deleteFlag' => 0]);
         
         return $this->render('dashAdmin/monthlyActiveUsersDetails.html.twig', [
             'activeUsersToday' => $activeUsersToday,
             'activeUsersThisMonth' => $activeUsersThisMonth,
             'activeUsersThisYear' => $activeUsersThisYear,
+            'userCount' => $userCount,
             'currentTime' => new \DateTime(),
             'startDateMonth' => new \DateTime('first day of this month midnight'),
             'startDateYear' => new \DateTime('first day of January this year midnight')
@@ -604,6 +608,54 @@ class AdminController extends AbstractController
             'html' => $html,
             'pagination' => $pagination,
             'totalItems' => $users['totalItems']
+        ]);
+    }
+
+    /**
+     * Search online users via AJAX
+     */
+    #[Route('/admin/online-users/search', name: 'admin_online_users_search', methods: ['POST'])]
+    public function searchOnlineUsers(Request $request, UserRepository $userRepository): JsonResponse
+    {
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => false, 'message' => 'Invalid request'], 400);
+        }
+
+        // Get search parameters
+        $search = $request->request->get('search', '');
+        $role = $request->request->get('role', '');
+        
+        // Get all online users
+        $onlineUsers = $userRepository->findCurrentlyOnlineUsers();
+        
+        // Filter by search term if provided
+        if (!empty($search)) {
+            $onlineUsers = array_filter($onlineUsers, function($user) use ($search) {
+                $searchLower = strtolower($search);
+                return (
+                    str_contains(strtolower($user->getName() ?? ''), $searchLower) ||
+                    str_contains(strtolower($user->getPrenom() ?? ''), $searchLower) ||
+                    str_contains(strtolower($user->getEmail() ?? ''), $searchLower)
+                );
+            });
+        }
+        
+        // Filter by role if provided
+        if (!empty($role)) {
+            $onlineUsers = array_filter($onlineUsers, function($user) use ($role) {
+                return $user->getRoleUser() === $role;
+            });
+        }
+        
+        // Render the table rows
+        $html = $this->renderView('dashAdmin/_online_users_table_rows.html.twig', [
+            'onlineUsers' => $onlineUsers
+        ]);
+
+        return new JsonResponse([
+            'success' => true,
+            'html' => $html,
+            'count' => count($onlineUsers)
         ]);
     }
 }
