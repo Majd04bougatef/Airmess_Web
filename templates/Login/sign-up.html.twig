@@ -355,10 +355,6 @@
                                     <div class="form-group">
                                         <input type="email" class="form-control" name="email" placeholder="Email professionnel" value="">
                                     </div>
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" name="taxId" placeholder="Numéro d'identification fiscale" value="">
-                                        <small class="form-text text-muted">Entrez un numéro d'identification fiscale valide (8 à 12 chiffres)</small>
-                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -689,27 +685,6 @@
                 }
             }
             
-            // Add this function after the existing validation functions
-            
-            function validateTaxId(field) {
-                const taxId = field.val().trim();
-                const errorId = field.attr('name') + '-error';
-                
-                if (taxId === '') {
-                    showFieldError(errorId, 'Le numéro d\'identification fiscale est obligatoire');
-                    return false;
-                }
-                
-                // Check format (8-12 digits)
-                if (!/^\d{8,12}$/.test(taxId)) {
-                    showFieldError(errorId, 'Le numéro d\'identification fiscale doit contenir entre 8 et 12 chiffres');
-                    return false;
-                }
-                
-                hideFieldError(errorId);
-                return true;
-            }
-            
             // Attach real-time validation to form fields
             $('input[name="name"]').on('input blur', function() {
                 validateName($(this));
@@ -749,12 +724,6 @@
             $('#form-entreprise').submit(function(e) {
                 let isValid = true;
                 const roleUser = $(this).find('input[name="roleUser"]').val();
-                
-                // Only validate tax ID for enterprise accounts
-                if (roleUser === 'Entreprise') {
-                    const taxIdField = $(this).find('input[name="taxId"]');
-                    isValid = validateTaxId(taxIdField) && isValid;
-                }
                 
                 // Add validation calls for other fields
                 const nameField = $(this).find('input[name="name"]');
