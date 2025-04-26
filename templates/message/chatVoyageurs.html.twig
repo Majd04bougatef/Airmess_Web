@@ -4,6 +4,14 @@
 
 {% block body %}
 <div class="container-fluid py-4">
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h5 class="chat-page-title">Mes discussions</h5>
+            <a href="{{ path('app_reservation_transport_index') }}" class="btn-reservation">
+                <i class="fas fa-calendar-check me-2"></i>Mes réservations
+            </a>
+        </div>
+    </div>
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -81,10 +89,37 @@
                                     {% endif %}
                                 </div>
                                 
+                                <div class="quick-messages">
+                                    <div class="quick-messages-container">
+                                        <button class="quick-message-btn" data-message="Bonjour, j'ai une question concernant ma réservation.">
+                                            Question réservation
+                                        </button>
+                                        <button class="quick-message-btn" data-message="Quels sont les horaires d'ouverture ?">
+                                            Horaires
+                                        </button>
+                                        <button class="quick-message-btn" data-message="Je souhaite signaler un problème avec les vélos réservés.">
+                                            Signaler problème
+                                        </button>
+                                        <button class="quick-message-btn" data-message="Pouvez-vous me donner plus d'informations sur les vélos disponibles ?">
+                                            Informations vélos
+                                        </button>
+                                    </div>
+                                </div>
+                                
                                 <div class="message-form">
                                     {{ form_start(form, {'method': 'POST', 'action': path('app_message_new'), 'attr': {'id': 'message-form', 'class': 'form-group d-flex align-items-center mb-0'}}) }}
-                                        {{ form_widget(form.content, {'attr': {'class': 'form-control flex-grow-1 me-2', 'placeholder': 'Écrivez votre message...', 'id': 'message-input'}}) }}
-                                        <button type="submit" class="btn btn-send d-flex align-items-center justify-content-center">
+                                        <div class="message-input-container">
+                                            {{ form_widget(form.content, {'attr': {'class': 'message-input-field', 'placeholder': 'Écrivez votre message...', 'id': 'message-input'}}) }}
+                                            <div class="message-input-actions">
+                                                <button type="button" class="action-btn" title="Joindre un fichier">
+                                                    <i class="fas fa-paperclip"></i>
+                                                </button>
+                                                <button type="button" class="action-btn" title="Emoji">
+                                                    <i class="far fa-smile"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn-send d-flex align-items-center justify-content-center">
                                             <i class="fas fa-paper-plane"></i>
                                         </button>
                                         <input type="hidden" name="receiver_id" value="{{ selectedCompanyId }}">
@@ -108,6 +143,33 @@
 </div>
 
 <style>
+    .chat-page-title {
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 0;
+    }
+    
+    .btn-reservation {
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(135deg, #6c99bc, #5a7f9c);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(108, 153, 188, 0.2);
+    }
+    
+    .btn-reservation:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(108, 153, 188, 0.3);
+        color: white;
+        background: linear-gradient(135deg, #5a7f9c, #4a6f8c);
+    }
+
     .chat-container {
         display: flex;
         height: calc(100vh - 200px);
@@ -200,8 +262,8 @@
     }
 
     .avatar-wrapper img {
-        width: 48px;
-        height: 48px;
+        width: 38px;
+        height: 38px;
         object-fit: cover;
         border-radius: 50%;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -233,9 +295,10 @@
     }
 
     .chat-header {
-        padding: 20px;
+        padding: 12px 20px;
         background: linear-gradient(135deg, #6c99bc, #5a7f9c);
         color: #fff;
+        min-height: 60px;
     }
 
     .messages-area {
@@ -243,11 +306,12 @@
         padding: 20px;
         overflow-y: auto;
         background: #f8fafc;
+        min-height: 350px;
     }
 
     .message {
-        max-width: 70%;
-        margin-bottom: 20px;
+        max-width: 85%;
+        margin-bottom: 15px;
         display: flex;
         flex-direction: column;
     }
@@ -261,11 +325,12 @@
     }
 
     .message-content {
-        padding: 14px 20px;
-        border-radius: 18px;
+        padding: 12px 18px;
+        border-radius: 16px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        margin-bottom: 5px;
-        line-height: 1.5;
+        margin-bottom: 3px;
+        line-height: 1.4;
+        font-size: 0.95rem;
     }
 
     .user-message .message-content {
@@ -287,38 +352,86 @@
     }
 
     .message-form {
-        padding: 20px;
+        padding: 12px 20px;
         background: #fff;
         border-top: 1px solid #edf2f7;
         position: sticky;
         bottom: 0;
         z-index: 2;
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.03);
     }
 
     #message-form {
         display: flex;
         align-items: center;
+        gap: 15px;
         margin-bottom: 0;
     }
 
-    #message-input {
+    .message-input-container {
         flex-grow: 1;
-        margin-right: 15px;
-        padding: 14px 20px;
-        border: 1px solid #e2e8f0;
-        border-radius: 25px;
+        position: relative;
         background: #f8fafc;
+        border-radius: 25px;
+        border: 1px solid #e2e8f0;
         transition: all 0.3s;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
     }
 
-    #message-input:focus {
+    .message-input-container:focus-within {
         border-color: #6c99bc;
-        box-shadow: 0 0 0 3px rgba(108, 153, 188, 0.2);
+        box-shadow: 0 0 0 3px rgba(108, 153, 188, 0.15);
+    }
+
+    .message-input-field {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        padding: 8px 10px;
+        font-size: 0.95rem;
+        color: #4a5568;
+        width: 100%;
+        min-height: 36px;
+    }
+
+    .message-input-field::placeholder {
+        color: #a0aec0;
+    }
+
+    .message-input-actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-right: 5px;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        color: #a0aec0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+    }
+
+    .action-btn:hover {
+        background: #e9ecef;
+        color: #6c99bc;
     }
 
     .btn-send {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         background: linear-gradient(135deg, #6c99bc, #5a7f9c);
         color: #fff;
@@ -328,12 +441,17 @@
         border: none;
         transition: all 0.3s ease;
         box-shadow: 0 4px 10px rgba(108, 153, 188, 0.3);
+        flex-shrink: 0;
     }
 
     .btn-send:hover {
         background: linear-gradient(135deg, #5a7f9c, #4a6f8c);
         transform: translateY(-2px);
         box-shadow: 0 6px 15px rgba(108, 153, 188, 0.4);
+    }
+
+    .btn-send i {
+        font-size: 18px;
     }
 
     /* Custom Scrollbar */
@@ -401,6 +519,55 @@
     .no-chat-selected i {
         color: #cbd5e0;
     }
+
+    .quick-messages {
+        padding: 8px 20px;
+        background: #fff;
+        border-top: 1px solid #edf2f7;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .quick-messages-container {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 5px;
+    }
+    
+    .quick-messages-container::-webkit-scrollbar {
+        height: 4px;
+    }
+    
+    .quick-messages-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .quick-messages-container::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 2px;
+    }
+    
+    .quick-message-btn {
+        padding: 6px 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        color: #4a5568;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .quick-message-btn:hover {
+        background: #e6f1fc;
+        border-color: #6c99bc;
+        color: #6c99bc;
+        transform: translateY(-1px);
+    }
 </style>
 
 <script>
@@ -465,6 +632,15 @@
         item.addEventListener('click', function() {
             const companyId = this.dataset.companyId;
             window.location.href = `{{ path('app_message_voyageurs') }}?company=${companyId}`;
+        });
+    });
+
+    // Handle quick message buttons
+    document.querySelectorAll('.quick-message-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const messageText = this.dataset.message;
+            document.getElementById('message-input').value = messageText;
+            document.getElementById('message-input').focus();
         });
     });
 </script>
