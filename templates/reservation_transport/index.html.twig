@@ -315,9 +315,14 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6>Liste des réservations</h6>
-        <a href="{{ path('app_reservation_transport_station') }}" class="btn-new-reservation">
-            <i class="fas fa-plus"></i> Nouvelle réservation
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_message_voyageurs') }}" class="btn-new-reservation" style="background-color: #11cdef;">
+                <i class="fas fa-comments"></i> Mes discussions
+            </a>
+            <a href="{{ path('app_reservation_transport_station') }}" class="btn-new-reservation">
+                <i class="fas fa-plus"></i> Nouvelle réservation
+            </a>
+        </div>
     </div>
     
     <div class="filter-buttons">
@@ -376,10 +381,6 @@
                                 </td>
                                 <td class="actions-col">
                                     <div class="actions-cell">
-                                        <a href="{{ path('app_reservation_transport_chat', {'id': reservation_transport.id}) }}" class="action-btn btn-primary" style="background-color: #11cdef;" title="Discuter avec le service client">
-                                            <i class="fas fa-comments"></i>
-                                        </a>
-                                        
                                         {% if status != 'past' %}
                                             <a href="{{ path('app_reservation_transport_edit', {'id': reservation_transport.id}) }}" class="action-btn btn-edit" title="Modifier">
                                                 <i class="fas fa-pencil-alt"></i>

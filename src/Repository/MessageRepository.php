@@ -111,4 +111,67 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Find all users who have chatted with a specific user
+     */
+    public function findChatUsers(int $userId): array
+    {
+        // First get users from sender relationship
+        $qb1 = $this->createQueryBuilder('m')
+            ->select('DISTINCT u.id_U')
+            ->join('m.receiver', 'u')
+            ->where('m.sender = :userId')
+            ->setParameter('userId', $userId);
+
+        // Then get users from receiver relationship
+        $qb2 = $this->createQueryBuilder('m')
+            ->select('DISTINCT u.id_U')
+            ->join('m.sender', 'u')
+            ->where('m.receiver = :userId')
+            ->setParameter('userId', $userId);
+
+        // Combine both queries
+        $users = array_merge(
+            array_column($qb1->getQuery()->getArrayResult(), 'id_U'),
+            array_column($qb2->getQuery()->getArrayResult(), 'id_U')
+        );
+
+        // Remove duplicates and the current user
+        return array_unique(array_filter($users, function($id) use ($userId) {
+            return $id != $userId;
+        }));
+    }
+
+    /**
+     * Find companies that a voyageur has reservations with
+     * or has previously chatted with
+     */
+    public function findCompaniesForVoyageur(int $voyageurId): array
+    {
+        $entityManager = $this->getEntityManager();
+        
+        // Get companies from reservations
+        $companiesFromReservations = $entityManager->createQuery(
+            'SELECT DISTINCT u.id_U AS companyId
+            FROM App\Entity\ReservationTransport r
+            JOIN r.station s
+            JOIN s.user u
+            WHERE r.user = :voyageurId'
+        )
+        ->setParameter('voyageurId', $voyageurId)
+        ->getArrayResult();
+        
+        // Get companies from chat history
+        $companiesFromChat = $this->findChatUsers($voyageurId);
+        
+        // Combine both results
+        $allCompanies = array_merge(
+            array_column($companiesFromReservations, 'companyId'),
+            $companiesFromChat
+        );
+        
+        // Return unique list of company IDs
+        return array_unique(array_filter($allCompanies));
+    }
 }
