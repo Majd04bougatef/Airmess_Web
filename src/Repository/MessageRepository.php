@@ -111,4 +111,35 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Find all users who have chatted with a specific user
+     */
+    public function findChatUsers(int $userId): array
+    {
+        // First get users from sender relationship
+        $qb1 = $this->createQueryBuilder('m')
+            ->select('DISTINCT u.id_U')
+            ->join('m.receiver', 'u')
+            ->where('m.sender = :userId')
+            ->setParameter('userId', $userId);
+
+        // Then get users from receiver relationship
+        $qb2 = $this->createQueryBuilder('m')
+            ->select('DISTINCT u.id_U')
+            ->join('m.sender', 'u')
+            ->where('m.receiver = :userId')
+            ->setParameter('userId', $userId);
+
+        // Combine both queries
+        $users = array_merge(
+            array_column($qb1->getQuery()->getArrayResult(), 'id_U'),
+            array_column($qb2->getQuery()->getArrayResult(), 'id_U')
+        );
+
+        // Remove duplicates and the current user
+        return array_unique(array_filter($users, function($id) use ($userId) {
+            return $id != $userId;
+        }));
+    }
 }
