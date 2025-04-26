@@ -132,67 +132,88 @@ final class MessageController extends AbstractController
     #[Route('/chatVoyageurs', name: 'app_message_voyageurs', methods: ['GET', 'POST'])]
     public function chatVoyageurs(Request $request, MessageRepository $messageRepository, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
-        // Récupérer les utilisateurs pour le formulaire
-        $sender = $userRepository->find(40);
-        $receiver = $userRepository->find(57);
+        // Get the current user from session
+        $session = $request->getSession();
+        $userId = $session->get('user_id');
         
-        // Créer le message et le formulaire
-        $message = new Message();
-        if ($sender && $receiver) {
-            $message->setSender($sender);
-            $message->setReceiver($receiver);
+        if (!$userId) {
+            return $this->redirectToRoute('app_login');
         }
         
+        $currentUser = $userRepository->find($userId);
+        
+        if (!$currentUser) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Find all companies that the user has reservations with
+        $companies = $messageRepository->findCompaniesForVoyageur($userId);
+        $companyDetails = [];
+        
+        foreach ($companies as $company) {
+            $companyEntity = $userRepository->find($company);
+            if ($companyEntity) {
+                $lastMessage = $messageRepository->findOneBy(
+                    ['sender' => [$currentUser, $companyEntity], 'receiver' => [$currentUser, $companyEntity]],
+                    ['dateM' => 'DESC']
+                );
+                
+                $companyDetails[] = [
+                    'id' => $companyEntity->getIdU(),
+                    'name' => $companyEntity->getName(),
+                    'image' => $companyEntity->getImagesU() ?: 'company-avatar.svg',
+                    'status' => 'En ligne', // Can implement real status later
+                    'lastMessage' => $lastMessage ? $lastMessage->getContent() : null,
+                    'lastMessageTime' => $lastMessage ? $lastMessage->getDateM() : null
+                ];
+            }
+        }
+        
+        // Create the message form
+        $message = new Message();
         $form = $this->createForm(MessageType::class, $message);
         
-        // Traitement des requêtes POST AJAX directes (pour compatibilité)
-        if ($request->isMethod('POST') && $request->isXmlHttpRequest() && $request->getContentType() === 'json') {
-            $data = json_decode($request->getContent(), true);
-            $messageContent = $data['message'] ?? null;
+        // Handle form submissions via AJAX
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
+            $receiverId = $request->request->get('receiver_id');
+            $receiver = $userRepository->find($receiverId);
             
-            if ($messageContent && $sender && $receiver) {
-                // Créer une nouvelle instance de Message
-                $message = new Message();
-                
-                // Configurer le message
-                $message->setSender($sender);
+            if ($receiver) {
+                $message->setSender($currentUser);
                 $message->setReceiver($receiver);
-                $message->setContent($messageContent);
                 $message->setDateM(new \DateTime());
                 
-                // Persister le message
                 $entityManager->persist($message);
                 $entityManager->flush();
                 
-                // Retourner une réponse
-                return new JsonResponse([
-                    'success' => true,
-                    'response' => 'Nous avons bien reçu votre message et nous vous répondrons bientôt.',
-                    'messageId' => $message->getId()
-                ]);
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'message' => $message->getContent(),
+                        'messageId' => $message->getId(),
+                        'time' => $message->getDateM()->format('H:i')
+                    ]);
+                }
+                
+                return $this->redirectToRoute('app_message_voyageurs', ['company' => $receiverId]);
             }
-            
-            return new JsonResponse(['success' => false, 'error' => 'Message vide']);
         }
         
-        // Pour les requêtes GET, charger les messages de conversation
-        if ($request->isMethod('GET')) {
-            // Charger l'historique des messages entre ces deux utilisateurs
-            $messages = $messageRepository->findMessagesForChat(40, 57);
-            
-            if ($request->isXmlHttpRequest()) {
-                return $this->render('message/_message.html.twig', [
-                    'messages' => $messages
-                ]);
-            }
-            
-            return $this->render('message/chat.html.twig', [
-                'messages' => $messages,
-                'form' => $form,
-            ]);
+        // For GET requests, load conversation with the selected company
+        $selectedCompanyId = $request->query->get('company', $companies[0] ?? null);
+        $messages = [];
+        
+        if ($selectedCompanyId) {
+            $messages = $messageRepository->findMessagesForChat($userId, $selectedCompanyId);
         }
         
-        return new Response('Méthode non autorisée', Response::HTTP_METHOD_NOT_ALLOWED);
+        // Render the template (we'll create a new one based on chatEntreprise design)
+        return $this->render('message/chatVoyageurs.html.twig', [
+            'companies' => $companyDetails,
+            'messages' => $messages,
+            'form' => $form,
+            'selectedCompanyId' => $selectedCompanyId
+        ]);
     }
 
     #[Route('/chatEntreprise', name: 'app_message_entreprise', methods: ['GET', 'POST'])]
