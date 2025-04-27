@@ -61,6 +61,27 @@ class StationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Incrémente le nombre de vélos disponibles pour une station donnée
+     */
+    public function incrementNbVelosDispo(int $stationId, int $nbVelos): void
+    {
+        $em = $this->getEntityManager();
+        
+        $station = $this->find($stationId);
+
+        if (!$station) {
+            throw new \InvalidArgumentException("Station avec ID $stationId non trouvée.");
+        }
+
+        $currentNbVelos = $station->getNombreVelo();
+
+        $station->setNombreVelo($currentNbVelos+$nbVelos);
+
+        $em->persist($station);
+        $em->flush();
+    }
+
+    /**
      * Find all active stations
      * @return Station[] Returns an array of active Station objects
      */
