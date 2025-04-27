@@ -71,4 +71,22 @@ class ReservationTransportRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Find reservations that are finished (end date is in the past) and not marked as 'terminé'
+     */
+    public function findFinishedReservations(): array
+    {
+        $now = new \DateTime();
+        
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.dateFin < :now')
+            ->andWhere('r.statut != :statut')
+            ->setParameter('now', $now)
+            ->setParameter('statut', 'terminé')
+            ->orderBy('r.dateFin', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
 }
