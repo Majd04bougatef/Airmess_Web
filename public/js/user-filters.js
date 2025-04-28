@@ -21,13 +21,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const userTableBody = document.getElementById('userTableBody');
     const userCountDisplay = document.querySelector('.user-counter');
     const paginationContainer = document.querySelector('nav[aria-label="Navigation des pages"]');
+    const exportExcelButton = document.getElementById('exportExcelButton');
+    const exportPdfButton = document.getElementById('exportPdfButton');
     
     console.log('Filter elements found:', {
         roleFilters: roleFilterRadios.length,
         statusFilters: statusFilterRadios.length,
         searchInput: searchInput ? true : false,
         tableSearchInput: tableSearchInput ? true : false,
-        resetButton: resetFiltersButton ? true : false
+        resetButton: resetFiltersButton ? true : false,
+        exportExcelButton: exportExcelButton ? true : false,
+        exportPdfButton: exportPdfButton ? true : false
     });
     
     // Get CSRF token from meta tag
@@ -73,6 +77,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Add event listeners for export buttons
+    if (exportExcelButton) {
+        exportExcelButton.addEventListener('click', function() {
+            console.log('Export Excel button clicked');
+            exportToExcel();
+        });
+    }
+    
+    if (exportPdfButton) {
+        exportPdfButton.addEventListener('click', function() {
+            console.log('Export PDF button clicked');
+            exportToPdf();
+        });
+    }
+    
     // Apply filters function
     function applyFilters() {
         console.log('Applying filters');
@@ -113,14 +132,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Filter values:', { role: roleFilter, status: statusFilter, search: searchText });
         
-        // Prepare filter data for AJAX
+        // Create JSON data for the request
         const filterData = {
-            page: page,
-            filters: {}
+            filters: {
+                role: roleFilter,
+                status: statusFilter,
+                search: searchText
+            },
+            page: page
         };
-        if (roleFilter) filterData.filters.role = roleFilter;
-        if (statusFilter) filterData.filters.status = statusFilter;
-        if (searchText) filterData.filters.search = searchText;
         
         fetchFilteredUsers(filterData);
     }
@@ -128,18 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch filtered users via AJAX
     function fetchFilteredUsers(filterData) {
         console.log('Fetching filtered users with data:', filterData);
-        
-        // Create form data
-        const formData = new FormData();
-        formData.append('page', filterData.page);
-        if (filterData.filters) {
-            Object.keys(filterData.filters).forEach(key => {
-                formData.append(`filters[${key}]`, filterData.filters[key]);
-            });
-        }
-        if (csrfToken) {
-            formData.append('_token', csrfToken);
-        }
         
         // Show loading spinner
         if (userTableBody) {
@@ -154,12 +162,14 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
         
+        // Send as JSON instead of FormData
         fetch('/admin/users/filter', {
             method: 'POST',
-            body: formData,
             headers: {
+                'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
-            }
+            },
+            body: JSON.stringify(filterData)
         })
         .then(response => {
             if (!response.ok) {
@@ -168,24 +178,24 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
+            console.log('Received data:', data);
+            
             // Update the table body
             if (userTableBody && data.html) {
                 userTableBody.innerHTML = data.html;
+                
+                // Re-attach event listeners to edit and delete buttons
+                attachButtonEventListeners();
             }
+            
             // Update pagination
             if (paginationContainer && data.pagination) {
                 paginationContainer.innerHTML = data.pagination;
+                
                 // Add click event listeners to pagination links
-                document.querySelectorAll('.page-link').forEach(link => {
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const pageNum = this.getAttribute('data-page');
-                        if (pageNum) {
-                            loadPageWithFilters(parseInt(pageNum));
-                        }
-                    });
-                });
+                attachPaginationEventListeners();
             }
+            
             // Update user count display
             if (userCountDisplay && data.totalItems !== undefined) {
                 userCountDisplay.textContent = data.totalItems;
@@ -198,7 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <tr>
                         <td colspan="6" class="text-center">
                             <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-circle me-2"></i> Une erreur s'est produite lors de la récupération des données.
+                                Une erreur est survenue lors du chargement des données.
+                                <br>
+                                ${error.message}
                             </div>
                         </td>
                     </tr>
@@ -207,18 +219,86 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Debounce function to prevent too many requests
+    // Export to Excel function
+    function exportToExcel() {
+        // Get current filter values
+        const roleFilter = document.querySelector('input[name="roleFilter"]:checked')?.value || '';
+        const statusFilter = document.querySelector('input[name="statusFilter"]:checked')?.value || '';
+        const searchText = (searchInput ? searchInput.value.trim() : '') || 
+                         (tableSearchInput ? tableSearchInput.value.trim() : '');
+        
+        // Set form values
+        document.getElementById('excelRoleFilterValue').value = roleFilter;
+        document.getElementById('excelStatusFilterValue').value = statusFilter;
+        document.getElementById('excelSearchFilterValue').value = searchText;
+        
+        // Submit the form
+        document.getElementById('excelExportForm').submit();
+    }
+    
+    // Export to PDF function
+    function exportToPdf() {
+        // Get current filter values
+        const roleFilter = document.querySelector('input[name="roleFilter"]:checked')?.value || '';
+        const statusFilter = document.querySelector('input[name="statusFilter"]:checked')?.value || '';
+        const searchText = (searchInput ? searchInput.value.trim() : '') || 
+                         (tableSearchInput ? tableSearchInput.value.trim() : '');
+        
+        // Set form values
+        document.getElementById('roleFilterValue').value = roleFilter;
+        document.getElementById('statusFilterValue').value = statusFilter;
+        document.getElementById('searchFilterValue').value = searchText;
+        
+        // Submit the form
+        document.getElementById('pdfExportForm').submit();
+    }
+    
+    // Attach pagination event listeners
+    function attachPaginationEventListeners() {
+        document.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.getAttribute('data-page');
+                if (page) {
+                    loadPageWithFilters(parseInt(page));
+                }
+            });
+        });
+    }
+    
+    // Attach event listeners to edit and delete buttons in table rows
+    function attachButtonEventListeners() {
+        // For edit buttons (modal triggers)
+        document.querySelectorAll('.btn-outline-primary[data-bs-toggle="modal"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modalId = this.getAttribute('data-bs-target');
+                // Ensure modal is initialized
+                const modalElement = document.querySelector(modalId);
+                if (modalElement && typeof bootstrap !== 'undefined') {
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                }
+            });
+        });
+        
+        // For delete buttons
+        document.querySelectorAll('.btn-outline-danger').forEach(btn => {
+            // Button already has onclick attribute, so no need to add event listener
+        });
+    }
+    
+    // Debounce function to limit how often a function can be called
     function debounce(func, delay) {
-        let timeout;
-        return function() {
-            const context = this;
-            const args = arguments;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(context, args), delay);
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
         };
     }
     
-    // Initial load - apply default filters
-    console.log('Initial loading of filters');
-    applyFilters();
+    // Initialize
+    attachPaginationEventListeners();
+    attachButtonEventListeners();
 }); 

@@ -947,8 +947,6 @@ class AdminController extends AbstractController
 
     /**
      * Handle AJAX filtering for users table
-     * 
-     * @Route("/admin/users/filter", name="admin_users_filter", methods={"POST"})
      */
     #[Route('/admin/users/filter', name: 'admin_users_filter', methods: ['POST'])]
     public function filterUsers(
