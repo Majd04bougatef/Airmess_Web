@@ -9,6 +9,7 @@ use App\Repository\UserRepository;
 use App\Repository\StationRepository;
 use App\Repository\BonPlanRepository;
 use App\Repository\ReservationTransportRepository;
+use App\Repository\PageViewRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +38,7 @@ class AdminController extends AbstractController
         StationRepository $stationRepository,
         ReservationTransportRepository $reservationRepository,
         OffreRepository $offreRepository,
+        PageViewRepository $pageViewRepository,
         EntityManagerInterface $entityManager
     ): Response
     {
@@ -46,12 +48,36 @@ class AdminController extends AbstractController
         $reservationCount = $reservationRepository->count([]);
         $offerCount = $offreRepository->count([]);
 
+        // Get page view statistics
+        $totalPageViews = $pageViewRepository->getTotalPageViews();
+        $todayPageViews = $pageViewRepository->getTodayPageViews();
+        $currentMonthPageViews = $pageViewRepository->getCurrentMonthPageViews();
+        
+        // Get page views by day for chart
+        $pageViewsByDay = $pageViewRepository->getPageViewsByDay(7);
+        $viewLabels = [];
+        $viewData = [];
+        
+        foreach ($pageViewsByDay as $dayView) {
+            $viewLabels[] = (new \DateTime($dayView['date']))->format('d/m');
+            $viewData[] = $dayView['count'];
+        }
+        
+        // Get most viewed pages
+        $mostViewedPages = $pageViewRepository->getMostViewedPages(5);
+
         // User role distribution for charts
         $usersByRole = $this->getUserCountByRole($userRepository);
         
         // Get user activity stats
         $onlineUsersCount = count($userRepository->findCurrentlyOnlineUsers());
         $activeLastMonthCount = count($userRepository->findUsersActiveInLastMonth());
+        $activeTodayCount = count($userRepository->findUsersActiveToday());
+        $activeThisMonthCount = count($userRepository->findUsersActiveThisMonth());
+        
+        // Calculate activity rates
+        $activityRateToday = $userCount > 0 ? round(($activeTodayCount / $userCount) * 100) : 0;
+        $activityRateMonth = $userCount > 0 ? round(($activeThisMonthCount / $userCount) * 100) : 0;
         
         return $this->render('dashAdmin/dashboardPage.html.twig', [
             'userCount' => $userCount,
@@ -60,7 +86,17 @@ class AdminController extends AbstractController
             'offerCount' => $offerCount,
             'usersByRole' => $usersByRole,
             'onlineUsersCount' => $onlineUsersCount,
-            'activeLastMonthCount' => $activeLastMonthCount
+            'activeLastMonthCount' => $activeLastMonthCount,
+            'activeTodayCount' => $activeTodayCount,
+            'activeThisMonthCount' => $activeThisMonthCount,
+            'activityRateToday' => $activityRateToday,
+            'activityRateMonth' => $activityRateMonth,
+            'totalPageViews' => $totalPageViews,
+            'todayPageViews' => $todayPageViews,
+            'currentMonthPageViews' => $currentMonthPageViews,
+            'viewLabels' => json_encode($viewLabels),
+            'viewData' => json_encode($viewData),
+            'mostViewedPages' => $mostViewedPages,
         ]);
     }
 
@@ -137,6 +173,11 @@ class AdminController extends AbstractController
         // User role distribution for charts
         $usersByRole = $this->getUserCountByRole($userRepository);
         
+        // Get user activity statistics
+        $onlineUsersCount = count($userRepository->findCurrentlyOnlineUsers());
+        $activeTodayCount = count($userRepository->findUsersActiveToday());
+        $activeMonthCount = count($userRepository->findUsersActiveThisMonth());
+        
         // Recent user activities - this would typically come from a separate activity log
         $recentActivities = [
             [
@@ -206,7 +247,11 @@ class AdminController extends AbstractController
             'totalPages' => $results['totalPages'],
             'pageSize' => $results['itemsPerPage'],
             'totalUsers' => $results['totalItems'],
-            'filters' => $filters
+            'filters' => $filters,
+            // Add user activity statistics
+            'onlineUsersCount' => $onlineUsersCount,
+            'activeTodayCount' => $activeTodayCount,
+            'activeMonthCount' => $activeMonthCount
         ]);
     }
 
@@ -859,6 +904,118 @@ class AdminController extends AbstractController
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
         
         return $response;
+    }
+
+    #[Route('/admin/pageviews', name: 'admin_page_views')]
+    public function pageViews(
+        PageViewRepository $pageViewRepository
+    ): Response
+    {
+        // Get total page views
+        $totalPageViews = $pageViewRepository->getTotalPageViews();
+        
+        // Get today's page views
+        $todayPageViews = $pageViewRepository->getTodayPageViews();
+        
+        // Get current month's page views
+        $currentMonthPageViews = $pageViewRepository->getCurrentMonthPageViews();
+        
+        // Get page views by day for the past 30 days (for chart)
+        $pageViewsByDay = $pageViewRepository->getPageViewsByDay(30);
+        
+        // Format data for chart
+        $labels = [];
+        $data = [];
+        
+        foreach ($pageViewsByDay as $dayView) {
+            $labels[] = (new \DateTime($dayView['date']))->format('d/m');
+            $data[] = $dayView['count'];
+        }
+        
+        // Get most viewed pages
+        $mostViewedPages = $pageViewRepository->getMostViewedPages(10);
+        
+        return $this->render('dashAdmin/pageViews.html.twig', [
+            'totalPageViews' => $totalPageViews,
+            'todayPageViews' => $todayPageViews,
+            'currentMonthPageViews' => $currentMonthPageViews,
+            'chartLabels' => json_encode($labels),
+            'chartData' => json_encode($data),
+            'mostViewedPages' => $mostViewedPages
+        ]);
+    }
+
+    /**
+     * Handle AJAX filtering for users table
+     * 
+     * @Route("/admin/users/filter", name="admin_users_filter", methods={"POST"})
+     */
+    #[Route('/admin/users/filter', name: 'admin_users_filter', methods: ['POST'])]
+    public function filterUsers(
+        Request $request, 
+        UserRepository $userRepository
+    ): JsonResponse
+    {
+        if (!$request->isXmlHttpRequest()) {
+            error_log('Request is not AJAX: ' . $request->headers->get('X-Requested-With'));
+            return new JsonResponse(['success' => false, 'message' => 'AJAX request required'], 400);
+        }
+        
+        try {
+            // Parse JSON from request
+            $content = $request->getContent();
+            error_log('Received filter request: ' . $content);
+            
+            $data = json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log('JSON decode error: ' . json_last_error_msg());
+                return new JsonResponse(['success' => false, 'message' => 'Invalid JSON: ' . json_last_error_msg()], 400);
+            }
+            
+            // Get page number
+            $page = isset($data['page']) ? (int)$data['page'] : 1;
+            
+            // Get filters
+            $filters = isset($data['filters']) ? $data['filters'] : [];
+            error_log('Applying filters: ' . json_encode($filters) . ' on page ' . $page);
+            
+            // Get paginated results with filters
+            $results = $userRepository->findPaginatedUsers($page, 10, $filters);
+            error_log('Found ' . $results['totalItems'] . ' users matching filters');
+            
+            // Render the table rows
+            $html = $this->renderView('dashAdmin/_user_table_rows.html.twig', [
+                'users' => $results['items']
+            ]);
+            
+            // Render the pagination
+            $pagination = $this->renderView('dashAdmin/_pagination.html.twig', [
+                'currentPage' => $results['currentPage'],
+                'totalPages' => $results['totalPages'],
+                'filterParams' => $filters
+            ]);
+            
+            // Pagination info text
+            $paginationInfo = sprintf(
+                'Affichage de %d utilisateur(s)',
+                $results['totalItems']
+            );
+            
+            return new JsonResponse([
+                'success' => true,
+                'html' => $html,
+                'pagination' => $pagination,
+                'totalItems' => $results['totalItems'],
+                'currentPage' => $results['currentPage'],
+                'paginationInfo' => $paginationInfo
+            ]);
+        } catch (\Exception $e) {
+            error_log('Error in filterUsers: ' . $e->getMessage());
+            return new JsonResponse([
+                'success' => false, 
+                'message' => 'Error processing request: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
 
