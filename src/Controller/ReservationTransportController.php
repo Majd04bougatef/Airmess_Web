@@ -17,12 +17,13 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Stripe\Stripe;
 use Stripe\Charge;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[Route('/reservation/transport')]
 final class ReservationTransportController extends AbstractController
 {
     #[Route(name: 'app_reservation_transport_index', methods: ['GET'])]
-    public function index(ReservationTransportRepository $reservationTransportRepository, SessionInterface $session, UserRepository $userRepository, StationRepository $stationRepository, EntityManagerInterface $entityManager): Response
+    public function index(ReservationTransportRepository $reservationTransportRepository,SessionInterface $session,UserRepository $userRepository,StationRepository $stationRepository,EntityManagerInterface $entityManager,PaginatorInterface $paginator,Request $request): Response
     {
         if (!$session->has('user_id')) {
             return $this->redirectToRoute('app_login');
@@ -31,26 +32,33 @@ final class ReservationTransportController extends AbstractController
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
         
-        $reservations = $reservationTransportRepository->findByUserId($user->getIdU());
+        $query = $reservationTransportRepository->createQueryBuilder('r')
+            ->andWhere('r.user = :userId')
+            ->setParameter('userId', $userId)
+            ->orderBy('r.dateRes', 'DESC')
+            ->getQuery();
+        
+        $reservations = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            20 
+        );
         
         $finishedReservations = $reservationTransportRepository->findFinishedReservations();
 
         foreach ($finishedReservations as $reservation) {
-            // Increment the available bikes in the station
             $stationRepository->incrementNbVelosDispo($reservation->getStation()->getIdS(), $reservation->getNombreVelo());
             
-            // Mark the reservation as 'terminé' so it won't be processed again
             $reservation->setStatut('terminé');
             $entityManager->persist($reservation);
         }
         
-        // Save changes if any reservations were processed
         if (count($finishedReservations) > 0) {
             $entityManager->flush();
         }
 
         return $this->render('reservation_transport/index.html.twig', [
-            'reservation_transports' => $reservations,
+            'reservations' => $reservations,
             'finished_reservations' => $finishedReservations,
         ]);
     }
