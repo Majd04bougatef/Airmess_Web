@@ -1,41 +1,51 @@
+<nav aria-label="Navigation des pages">
 {% if totalPages > 1 %}
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-        {% if currentPage > 1 %}
-            <li class="page-item">
-                <a class="page-link pagination-link" href="{{ path('user_page', {'page': currentPage - 1}) }}" aria-label="Précédent">
-                    <span aria-hidden="true">&laquo;</span> Précédent
-                </a>
-            </li>
-        {% else %}
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo; Précédent</a>
-            </li>
-        {% endif %}
-        
-        {% set startPage = max(1, currentPage - 2) %}
-        {% set endPage = min(totalPages, startPage + 4) %}
-        {% if endPage - startPage < 4 and totalPages > 5 %}
-            {% set startPage = max(1, endPage - 4) %}
-        {% endif %}
-        
-        {% for i in startPage..endPage %}
-            <li class="page-item {{ currentPage == i ? 'active' : '' }}">
-                <a class="page-link pagination-link" href="{{ path('user_page', {'page': i}) }}">{{ i }}</a>
-            </li>
-        {% endfor %}
-        
-        {% if currentPage < totalPages %}
-            <li class="page-item">
-                <a class="page-link pagination-link" href="{{ path('user_page', {'page': currentPage + 1}) }}" aria-label="Suivant">
-                    Suivant <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        {% else %}
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Suivant &raquo;</a>
-            </li>
-        {% endif %}
-    </ul>
-</nav>
-{% endif %} 
+<ul class="pagination pagination-sm justify-content-center m-0">
+  {% if currentPage > 1 %}
+    <li class="page-item">
+      <a class="page-link" href="{{ path('user_page', {'page': 1}|merge(filterParams|default({}))) }}">
+        <i class="fas fa-angle-double-left"></i>
+      </a>
+    </li>
+    <li class="page-item">
+      <a class="page-link" href="{{ path('user_page', {'page': currentPage - 1}|merge(filterParams|default({}))) }}">
+        <i class="fas fa-angle-left"></i>
+      </a>
+    </li>
+  {% else %}
+    <li class="page-item disabled">
+      <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+    </li>
+    <li class="page-item disabled">
+      <span class="page-link"><i class="fas fa-angle-left"></i></span>
+    </li>
+  {% endif %}
+  
+  {% for i in max(1, currentPage - 2)..min(totalPages, currentPage + 2) %}
+    <li class="page-item {{ currentPage == i ? 'active' : '' }}">
+      <a class="page-link" href="{{ path('user_page', {'page': i}|merge(filterParams|default({}))) }}">{{ i }}</a>
+    </li>
+  {% endfor %}
+  
+  {% if currentPage < totalPages %}
+    <li class="page-item">
+      <a class="page-link" href="{{ path('user_page', {'page': currentPage + 1}|merge(filterParams|default({}))) }}">
+        <i class="fas fa-angle-right"></i>
+      </a>
+    </li>
+    <li class="page-item">
+      <a class="page-link" href="{{ path('user_page', {'page': totalPages}|merge(filterParams|default({}))) }}">
+        <i class="fas fa-angle-double-right"></i>
+      </a>
+    </li>
+  {% else %}
+    <li class="page-item disabled">
+      <span class="page-link"><i class="fas fa-angle-right"></i></span>
+    </li>
+    <li class="page-item disabled">
+      <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+    </li>
+  {% endif %}
+</ul>
+{% endif %}
+</nav> 

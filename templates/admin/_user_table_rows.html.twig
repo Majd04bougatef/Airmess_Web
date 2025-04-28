@@ -1,0 +1,54 @@
+{% for user in users %}
+    <tr>
+        <td>{{ user.id_U }}</td>
+        <td>
+            <div class="d-flex align-items-center">
+                {% if user.photo %}
+                    <img src="{{ asset('uploads/photos/' ~ user.photo) }}" class="rounded-circle me-2" width="40" height="40" alt="{{ user.name }}">
+                {% else %}
+                    <div class="bg-light rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fas fa-user text-secondary"></i>
+                    </div>
+                {% endif %}
+                <div>
+                    <div class="fw-bold">{{ user.name }} {{ user.prenom }}</div>
+                    <div class="small text-muted">{{ user.email }}</div>
+                </div>
+            </div>
+        </td>
+        <td>
+            {% if user.roleUser == 'Admin' %}
+                <span class="badge bg-danger">{{ user.roleUser }}</span>
+            {% elseif user.roleUser == 'Entreprise' %}
+                <span class="badge bg-warning text-dark">{{ user.roleUser }}</span>
+            {% else %}
+                <span class="badge bg-info">{{ user.roleUser }}</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if user.statut == 1 %}
+                <span class="badge bg-success">Actif</span>
+            {% else %}
+                <span class="badge bg-secondary">Inactif</span>
+            {% endif %}
+        </td>
+        <td class="text-end">
+            <div class="btn-group">
+                <a href="{{ path('admin_user_edit', {id: user.id_U}) }}" class="btn btn-sm btn-outline-primary btn-edit-user" data-user-id="{{ user.id_U }}">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-danger btn-delete-user" data-user-id="{{ user.id_U }}" data-user-name="{{ user.name }} {{ user.prenom }}">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="5" class="text-center py-4">
+            <div class="text-muted">
+                <i class="fas fa-search me-2"></i> Aucun utilisateur trouvé
+            </div>
+        </td>
+    </tr>
+{% endfor %} 
