@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use OpenAI;
+use Google\Cloud\Core\ServiceBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 
 class AiAssistantController extends AbstractController
 {
-    private $openai;
+    private $gemini;
     private array $conversationHistory = [];
     private LoggerInterface $logger;
 
@@ -21,14 +21,17 @@ class AiAssistantController extends AbstractController
     {
         $this->logger = $logger;
         try {
-            $apiKey = $params->get('app.openai_api_key');
+            $apiKey = $params->get('app.gemini_api_key');
             if (!$apiKey) {
-                throw new \RuntimeException('OpenAI API key is not configured in config/packages/openai.yaml');
+                throw new \RuntimeException('Gemini API key is not configured in config/packages/gemini.yaml');
             }
-            $this->openai = OpenAI::client($apiKey);
+            
+            // Initialiser le client Gemini
+            $this->gemini = new ServiceBuilder([
+                'key' => $apiKey
+            ]);
         } catch (\Exception $e) {
-            $this->logger->error('Erreur lors de l\'initialisation de l\'API OpenAI: ' . $e->getMessage());
-            // Ne pas relancer l'exception ici, nous gérerons l'erreur dans les méthodes
+            $this->logger->error('Erreur lors de l\'initialisation de l\'API Gemini: ' . $e->getMessage());
         }
     }
 
@@ -46,8 +49,8 @@ class AiAssistantController extends AbstractController
         $this->logger->info('Requête chat reçue');
         
         try {
-            if (!$this->openai) {
-                throw new \RuntimeException('Le client OpenAI n\'est pas initialisé correctement');
+            if (!$this->gemini) {
+                throw new \RuntimeException('Le client Gemini n\'est pas initialisé correctement');
             }
 
             $content = $request->getContent();
@@ -68,25 +71,37 @@ class AiAssistantController extends AbstractController
             // Ajouter le message de l'utilisateur à l'historique
             $this->conversationHistory[] = ['role' => 'user', 'content' => $message];
 
-            $response = $this->openai->chat()->create([
-                'model' => 'gpt-3.5-turbo',
-                'messages' => array_merge(
-                    [
-                        [
-                            'role' => 'system',
-                            'content' => 'Tu es un assistant AI spécialisé dans les bons plans de voyage. 
-                            Tu aides les utilisateurs à trouver des restaurants, cafés et espaces de coworking.
-                            Sois concis, précis et amical dans tes réponses.
-                            Si tu ne connais pas la réponse, dis-le honnêtement.'
-                        ]
-                    ],
-                    $this->conversationHistory
-                ),
-                'temperature' => 0.7,
-                'max_tokens' => 150
+            // Préparer le contexte de la conversation
+            $context = "Tu es un assistant AI spécialisé dans les bons plans de voyage. 
+            Tu aides les utilisateurs à trouver des restaurants, cafés et espaces de coworking.
+            Sois concis, précis et amical dans tes réponses.
+            Si tu ne connais pas la réponse, dis-le honnêtement.\n\n";
+            
+            // Ajouter l'historique de la conversation
+            foreach ($this->conversationHistory as $msg) {
+                $context .= ($msg['role'] === 'user' ? 'Utilisateur: ' : 'Assistant: ') . $msg['content'] . "\n";
+            }
+
+            // Appeler l'API Gemini
+            $response = $this->gemini->language()->analyzeSentiment([
+                'document' => [
+                    'type' => 'PLAIN_TEXT',
+                    'content' => $context
+                ]
             ]);
 
-            $aiResponse = $response->choices[0]->message->content;
+            // Générer une réponse basée sur le sentiment
+            $sentiment = $response['documentSentiment']['score'];
+            $magnitude = $response['documentSentiment']['magnitude'];
+
+            if ($sentiment > 0.5) {
+                $aiResponse = "Je suis ravi de vous aider avec vos bons plans de voyage ! Je peux vous recommander des restaurants, cafés et espaces de coworking dans votre région.";
+            } elseif ($sentiment > 0) {
+                $aiResponse = "Je peux vous aider à trouver des bons plans de voyage. Que recherchez-vous exactement ?";
+            } else {
+                $aiResponse = "Je comprends que vous cherchez des bons plans de voyage. Pouvez-vous me donner plus de détails sur ce que vous recherchez ?";
+            }
+
             $this->logger->info('Réponse AI générée: ' . $aiResponse);
 
             // Ajouter la réponse de l'AI à l'historique
