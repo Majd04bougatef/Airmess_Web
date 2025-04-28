@@ -305,6 +305,74 @@
         pointer-events: none;
         opacity: 0.6;
     }
+
+    .pagination-container {
+        padding: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        gap: 0.5rem;
+    }
+
+    .pagination li {
+        display: inline-block;
+    }
+
+    .pagination a,
+    .pagination span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2.5rem;
+        height: 2.5rem;
+        padding: 0 0.5rem;
+        border-radius: 0.5rem;
+        background-color: #f6f9fc;
+        color: #8392ab;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .pagination a:hover {
+        background-color: #e9ecef;
+        color: #344767;
+    }
+
+    .pagination .active a,
+    .pagination .active span {
+        background-color: #5e72e4;
+        color: white;
+    }
+
+    .pagination .disabled a,
+    .pagination .disabled span {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #5e72e4;
+        border-color: #5e72e4;
+    }
+
+    .pagination .page-link {
+        color: #8392ab;
+        border: 1px solid #e9ecef;
+    }
+
+    .pagination .page-link:hover {
+        color: #344767;
+        background-color: #e9ecef;
+        border-color: #e9ecef;
+    }
 </style>
 
 <div class="page-header">
@@ -333,7 +401,7 @@
     </div>
     
     <div class="card-body p-0">
-        {% if reservation_transports is not empty %}
+        {% if reservations is not empty %}
             <div class="table-responsive">
                 <table class="table align-items-center mb-0">
                     <thead>
@@ -348,13 +416,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for reservation_transport in reservation_transports %}
+                        {% for reservation in reservations %}
                             {% set now = "now"|date("Y-m-d H:i:s") %}
                             {% set status = "" %}
                             
-                            {% if reservation_transport.dateFin|date("Y-m-d H:i:s") < now %}
+                            {% if reservation.dateFin|date("Y-m-d H:i:s") < now %}
                                 {% set status = "past" %}
-                            {% elseif reservation_transport.dateRes|date("Y-m-d H:i:s") > now %}
+                            {% elseif reservation.dateRes|date("Y-m-d H:i:s") > now %}
                                 {% set status = "upcoming" %}
                             {% else %}
                                 {% set status = "current" %}
@@ -362,27 +430,21 @@
                             
                             <tr class="reservation-row" data-status="{{ status }}">
                                 <td class="reference-col">
-                                    <span class="font-weight-bold">{{ reservation_transport.reference }}</span>
+                                    <span class="font-weight-bold">{{ reservation.reference }}</span>
                                 </td>
-                                <td class="date-col">{{ reservation_transport.dateRes ? reservation_transport.dateRes|date('d/m/Y H:i') : '' }}</td>
-                                <td class="date-col">{{ reservation_transport.dateFin ? reservation_transport.dateFin|date('d/m/Y H:i') : '' }}</td>
-                                <td class="number-col">{{ reservation_transport.nombreVelo }}</td>
-                                <td class="price-col">{{ reservation_transport.prix }} €</td>
+                                <td class="date-col">{{ reservation.dateRes ? reservation.dateRes|date('d/m/Y H:i') : '' }}</td>
+                                <td class="date-col">{{ reservation.dateFin ? reservation.dateFin|date('d/m/Y H:i') : '' }}</td>
+                                <td class="number-col">{{ reservation.nombreVelo }}</td>
+                                <td class="price-col">{{ reservation.prix }} €</td>
                                 <td class="status-col">
-                                    <span class="badge {% if status == 'past' %}badge-info{% elseif status == 'current' %}badge-warning{% else %}badge-success{% endif %}">
-                                        {% if status == 'past' %}
-                                            Terminée
-                                        {% elseif status == 'current' %}
-                                            En cours
-                                        {% else %}
-                                            À venir
-                                        {% endif %}
+                                    <span class="badge badge-{{ status == 'past' ? 'secondary' : (status == 'current' ? 'success' : 'primary') }}">
+                                        {{ status == 'past' ? 'Terminé' : (status == 'current' ? 'En cours' : 'À venir') }}
                                     </span>
                                 </td>
                                 <td class="actions-col">
                                     <div class="actions-cell">
                                         {% if status != 'past' %}
-                                            <a href="{{ path('app_reservation_transport_edit', {'id': reservation_transport.id}) }}" class="action-btn btn-edit" title="Modifier">
+                                            <a href="{{ path('app_reservation_transport_edit', {'id': reservation.id}) }}" class="action-btn btn-edit" title="Modifier">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </a>
                                         {% else %}
@@ -391,8 +453,8 @@
                                             </span>
                                         {% endif %}
                                         
-                                        <form method="post" action="{{ path('app_reservation_transport_delete', {'id': reservation_transport.id}) }}" style="display:inline;">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation_transport.id) }}">
+                                        <form method="post" action="{{ path('app_reservation_transport_delete', {'id': reservation.id}) }}" style="display:inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
                                             <button type="submit" class="action-btn btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');" title="Supprimer">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -403,6 +465,11 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            
+            {# Pagination #}
+            <div class="pagination-container">
+                {{ knp_pagination_render(reservations) }}
             </div>
         {% else %}
             <div class="empty-state">
