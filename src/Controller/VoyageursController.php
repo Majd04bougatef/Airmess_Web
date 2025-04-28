@@ -25,6 +25,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Repository\ReservationRepository;
+use App\Repository\ReservationTransportRepository;
+use App\Repository\StationRepository;
 
 class VoyageursController extends AuthenticatedController
 {
@@ -674,6 +676,91 @@ class VoyageursController extends AuthenticatedController
             'active_bookings' => $activeBookings,
             'recent_activities' => $recentActivities,
             'user' => $user
+        ]);
+    }
+
+    #[Route('/voyageurs/statistiques', name: 'app_voyageurs_statistiques')]
+    public function statistiques( ReservationTransportRepository $reservationRepository, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository ): Response
+    {
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+
+        $reservations = $reservationRepository->findByUserId($userId);
+
+        $totalReservations = count($reservations);
+        $now = new \DateTime();
+        
+        $activeReservations = count(array_filter($reservations, function($reservation) use ($now) {
+            return $reservation->getDateRes() <= $now && $reservation->getDateFin() >= $now;
+        }));
+
+        // Réservations terminées
+        $finishedReservations = count(array_filter($reservations, function($reservation) use ($now) {
+            return $reservation->getDateFin() < $now;
+        }));
+
+        $upcomingReservations = count(array_filter($reservations, function($reservation) use ($now) {
+            return $reservation->getDateRes() > $now;
+        }));
+
+        $totalSpent = array_reduce($reservations, function($carry, $reservation) {
+            return $carry + $reservation->getPrix();
+        }, 0);
+
+        // Trouver les stations les plus fréquentées
+        $stationCounts = [];
+        foreach ($reservations as $reservation) {
+            $stationId = $reservation->getStation()->getIdS();
+            if (!isset($stationCounts[$stationId])) {
+                $stationCounts[$stationId] = [
+                    'count' => 0,
+                    'station' => $reservation->getStation()
+                ];
+            }
+            $stationCounts[$stationId]['count']++;
+        }
+
+        // Trier les stations par nombre de réservations
+        uasort($stationCounts, function($a, $b) {
+            return $b['count'] - $a['count'];
+        });
+
+        // Prendre les 5 stations les plus fréquentées
+        $topStations = array_slice($stationCounts, 0, 5, true);
+
+        // Calculer les statistiques mensuelles
+        $monthlyStats = [];
+        $currentYear = (int)$now->format('Y');
+        
+        for ($month = 1; $month <= 12; $month++) {
+            $monthStart = new \DateTime("$currentYear-$month-01");
+            $monthEnd = (clone $monthStart)->modify('last day of this month');
+            
+            $monthlyReservations = array_filter($reservations, function($reservation) use ($monthStart, $monthEnd) {
+                return $reservation->getDateRes() >= $monthStart && $reservation->getDateRes() <= $monthEnd;
+            });
+            
+            $monthlyStats[$month] = [
+                'count' => count($monthlyReservations),
+                'total' => array_reduce($monthlyReservations, function($carry, $reservation) {
+                    return $carry + $reservation->getPrix();
+                }, 0)
+            ];
+        }
+
+        return $this->render('dashVoyageurs/statistiques.html.twig', [
+            'user' => $user,
+            'totalReservations' => $totalReservations,
+            'activeReservations' => $activeReservations,
+            'finishedReservations' => $finishedReservations,
+            'upcomingReservations' => $upcomingReservations,
+            'totalSpent' => $totalSpent,
+            'topStations' => $topStations,
+            'monthlyStats' => $monthlyStats
         ]);
     }
 }
