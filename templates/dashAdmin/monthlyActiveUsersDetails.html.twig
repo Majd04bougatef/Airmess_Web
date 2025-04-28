@@ -1,0 +1,572 @@
+{% extends 'dashAdmin/dashboard.html.twig' %}
+
+{% block title %}Utilisateurs actifs récemment{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+  /* Tab styling */
+  .nav-pills .nav-link {
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    background-color: #f8f9fa;
+    color: #344767;
+    margin-right: 8px;
+  }
+  
+  .nav-pills .nav-link.active {
+    background: linear-gradient(310deg, #2152ff, #21d4fd);
+    color: white;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-pills .nav-link:not(.active):hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+  }
+  
+  /* Online status indicator */
+  .online-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+  }
+  
+  .online-yes {
+    background-color: #2dce89;
+    box-shadow: 0 0 6px #2dce89;
+  }
+  
+  .online-no {
+    background-color: #adb5bd;
+  }
+  
+  .last-activity {
+    font-size: 10px;
+    color: #8392ab;
+    margin-top: 3px;
+  }
+  
+  /* User actions */
+  .user-actions-container {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .user-action-btn {
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  
+  .user-action-btn:hover {
+    background-color: rgba(52, 71, 103, 0.1);
+  }
+  
+  /* Activity indicators */
+  .time-indicator {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+  
+  .today {
+    background-color: rgba(45, 206, 137, 0.1);
+    color: #2dce89;
+  }
+  
+  .this-week {
+    background-color: rgba(17, 205, 239, 0.1);
+    color: #11cdef;
+  }
+  
+  .this-month {
+    background-color: rgba(94, 114, 228, 0.1);
+    color: #5e72e4;
+  }
+  
+  .older {
+    background-color: rgba(251, 99, 64, 0.1);
+    color: #fb6340;
+  }
+  
+  /* Card counter badge */
+  .stat-counter {
+    background: linear-gradient(310deg, #2152ff, #21d4fd);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-left: 8px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+  <div class="container-fluid py-1 px-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="{{ path('dashboard_page') }}">Dashboard</a></li>
+        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Utilisateurs actifs récemment</li>
+      </ol>
+      <h6 class="font-weight-bolder text-white mb-0">Utilisateurs actifs récemment</h6>
+    </nav>
+    <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+      <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+        <div class="input-group">
+          <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
+          <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid py-4">
+  <!-- Activity Summary Cards -->
+  <div class="row">
+    <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold">Utilisateurs aujourd'hui</p>
+                <h5 class="font-weight-bolder">
+                  {{ activeUsersToday|length }}
+                </h5>
+                <p class="mb-0">
+                  <span class="text-success text-sm font-weight-bolder">
+                    {% if userCount > 0 %}
+                      {{ ((activeUsersToday|length / userCount) * 100)|round }}%
+                    {% else %}
+                      0%
+                    {% endif %}
+                  </span>
+                  des utilisateurs
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
+                <i class="fas fa-bolt text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold">Ce mois-ci</p>
+                <h5 class="font-weight-bolder">
+                  {{ activeUsersThisMonth|length }}
+                </h5>
+                <p class="mb-0">
+                  <span class="text-primary text-sm font-weight-bolder">
+                    {% if userCount > 0 %}
+                      {{ ((activeUsersThisMonth|length / userCount) * 100)|round }}%
+                    {% else %}
+                      0%
+                    {% endif %}
+                  </span>
+                  des utilisateurs
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                <i class="fas fa-calendar-alt text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-sm-6">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold">Cette année</p>
+                <h5 class="font-weight-bolder">
+                  {{ activeUsersThisYear|length }}
+                </h5>
+                <p class="mb-0">
+                  <span class="text-info text-sm font-weight-bolder">
+                    {% if userCount > 0 %}
+                      {{ ((activeUsersThisYear|length / userCount) * 100)|round }}%
+                    {% else %}
+                      0%
+                    {% endif %}
+                  </span>
+                  des utilisateurs
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-info shadow-info text-center rounded-circle">
+                <i class="fas fa-chart-line text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs for different time periods -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h6>Filtres de période d'activité</h6>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <ul class="nav nav-pills mx-3 mt-3 mb-4" id="activityTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="today-tab" data-bs-toggle="tab" data-bs-target="#today" type="button" role="tab" aria-controls="today" aria-selected="true">
+                Aujourd'hui <span class="stat-counter">{{ activeUsersToday|length }}</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="month-tab" data-bs-toggle="tab" data-bs-target="#month" type="button" role="tab" aria-controls="month" aria-selected="false">
+                Ce mois <span class="stat-counter">{{ activeUsersThisMonth|length }}</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="year-tab" data-bs-toggle="tab" data-bs-target="#year" type="button" role="tab" aria-controls="year" aria-selected="false">
+                Cette année <span class="stat-counter">{{ activeUsersThisYear|length }}</span>
+              </button>
+            </li>
+          </ul>
+          
+          <div class="tab-content" id="activityTabsContent">
+            <!-- Today's Active Users -->
+            <div class="tab-pane fade show active" id="today" role="tabpanel" aria-labelledby="today-tab">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Utilisateur</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Rôle</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dernière activité</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                      <th class="text-secondary opacity-7"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for user in activeUsersToday %}
+                      <tr>
+                        <td class="user-info-cell">
+                          <div class="d-flex px-2 py-1">
+                            <div>
+                              <img src="{{ path('app_profile_image', {'filename': user.imagesU }) }}" 
+                                   class="avatar avatar-sm me-3"
+                                   alt="{{ user.name }}" 
+                                   onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                              {% if user.isOnline %}
+                                <span class="online-indicator online-yes" title="En ligne"></span>
+                              {% else %}
+                                <span class="online-indicator online-no" title="Hors ligne"></span>
+                              {% endif %}
+                            </div>
+                            <div class="d-flex flex-column justify-content-center">
+                              <h6 class="mb-0 text-sm">{{ user.name }} {{ user.prenom }}</h6>
+                              <p class="text-xs text-secondary mb-0">{{ user.email }}</p>
+                              <span class="time-indicator today">Aujourd'hui</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <p class="text-xs font-weight-bold mb-0">{{ user.roleUser }}</p>
+                        </td>
+                        <td class="align-middle text-center">
+                          <span class="text-secondary text-xs font-weight-bold">{{ user.lastActivity|date("d/m/Y H:i:s") }}</span>
+                        </td>
+                        <td class="align-middle text-center text-sm">
+                          {% if user.isOnline %}
+                            <span class="badge badge-sm bg-gradient-success">En ligne</span>
+                          {% else %}
+                            <span class="badge badge-sm bg-gradient-secondary">Hors ligne</span>
+                          {% endif %}
+                        </td>
+                        <td class="align-middle">
+                          <div class="user-actions-container">
+                            <a href="{{ path('admin_user_edit', {'id_U': user.idU}) }}" class="btn btn-link text-warning user-action-btn px-2 mb-0">
+                              <i class="fas fa-edit me-2"></i>Modifier
+                            </a>
+                            <a href="#" class="btn btn-link text-info user-action-btn px-2 mb-0">
+                              <i class="fas fa-eye me-2"></i>Détails
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    {% else %}
+                      <tr>
+                        <td colspan="5" class="text-center py-4">
+                          <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-users fa-3x text-secondary mb-3"></i>
+                            <h6 class="font-weight-normal text-secondary">Aucun utilisateur actif aujourd'hui</h6>
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- This Month's Active Users -->
+            <div class="tab-pane fade" id="month" role="tabpanel" aria-labelledby="month-tab">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Utilisateur</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Rôle</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dernière activité</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                      <th class="text-secondary opacity-7"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for user in activeUsersThisMonth %}
+                      <tr>
+                        <td class="user-info-cell">
+                          <div class="d-flex px-2 py-1">
+                            <div>
+                              <img src="{{ path('app_profile_image', {'filename': user.imagesU }) }}" 
+                                   class="avatar avatar-sm me-3"
+                                   alt="{{ user.name }}" 
+                                   onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                              {% if user.isOnline %}
+                                <span class="online-indicator online-yes" title="En ligne"></span>
+                              {% else %}
+                                <span class="online-indicator online-no" title="Hors ligne"></span>
+                              {% endif %}
+                            </div>
+                            <div class="d-flex flex-column justify-content-center">
+                              <h6 class="mb-0 text-sm">{{ user.name }} {{ user.prenom }}</h6>
+                              <p class="text-xs text-secondary mb-0">{{ user.email }}</p>
+                              <span class="time-indicator this-month">Ce mois</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <p class="text-xs font-weight-bold mb-0">{{ user.roleUser }}</p>
+                        </td>
+                        <td class="align-middle text-center">
+                          <span class="text-secondary text-xs font-weight-bold">{{ user.lastActivity|date("d/m/Y H:i:s") }}</span>
+                        </td>
+                        <td class="align-middle text-center text-sm">
+                          {% if user.isOnline %}
+                            <span class="badge badge-sm bg-gradient-success">En ligne</span>
+                          {% else %}
+                            <span class="badge badge-sm bg-gradient-secondary">Hors ligne</span>
+                          {% endif %}
+                        </td>
+                        <td class="align-middle">
+                          <div class="user-actions-container">
+                            <a href="{{ path('admin_user_edit', {'id_U': user.idU}) }}" class="btn btn-link text-warning user-action-btn px-2 mb-0">
+                              <i class="fas fa-edit me-2"></i>Modifier
+                            </a>
+                            <a href="#" class="btn btn-link text-info user-action-btn px-2 mb-0">
+                              <i class="fas fa-eye me-2"></i>Détails
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    {% else %}
+                      <tr>
+                        <td colspan="5" class="text-center py-4">
+                          <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-users fa-3x text-secondary mb-3"></i>
+                            <h6 class="font-weight-normal text-secondary">Aucun utilisateur actif ce mois-ci</h6>
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- This Year's Active Users -->
+            <div class="tab-pane fade" id="year" role="tabpanel" aria-labelledby="year-tab">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Utilisateur</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Rôle</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dernière activité</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                      <th class="text-secondary opacity-7"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for user in activeUsersThisYear %}
+                      <tr>
+                        <td class="user-info-cell">
+                          <div class="d-flex px-2 py-1">
+                            <div>
+                              <img src="{{ path('app_profile_image', {'filename': user.imagesU }) }}" 
+                                   class="avatar avatar-sm me-3"
+                                   alt="{{ user.name }}" 
+                                   onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
+                              {% if user.isOnline %}
+                                <span class="online-indicator online-yes" title="En ligne"></span>
+                              {% else %}
+                                <span class="online-indicator online-no" title="Hors ligne"></span>
+                              {% endif %}
+                            </div>
+                            <div class="d-flex flex-column justify-content-center">
+                              <h6 class="mb-0 text-sm">{{ user.name }} {{ user.prenom }}</h6>
+                              <p class="text-xs text-secondary mb-0">{{ user.email }}</p>
+                              <span class="time-indicator this-month">Cette année</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <p class="text-xs font-weight-bold mb-0">{{ user.roleUser }}</p>
+                        </td>
+                        <td class="align-middle text-center">
+                          <span class="text-secondary text-xs font-weight-bold">{{ user.lastActivity|date("d/m/Y H:i:s") }}</span>
+                        </td>
+                        <td class="align-middle text-center text-sm">
+                          {% if user.isOnline %}
+                            <span class="badge badge-sm bg-gradient-success">En ligne</span>
+                          {% else %}
+                            <span class="badge badge-sm bg-gradient-secondary">Hors ligne</span>
+                          {% endif %}
+                        </td>
+                        <td class="align-middle">
+                          <div class="user-actions-container">
+                            <a href="{{ path('admin_user_edit', {'id_U': user.idU}) }}" class="btn btn-link text-warning user-action-btn px-2 mb-0">
+                              <i class="fas fa-edit me-2"></i>Modifier
+                            </a>
+                            <a href="#" class="btn btn-link text-info user-action-btn px-2 mb-0">
+                              <i class="fas fa-eye me-2"></i>Détails
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    {% else %}
+                      <tr>
+                        <td colspan="5" class="text-center py-4">
+                          <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-users fa-3x text-secondary mb-3"></i>
+                            <h6 class="font-weight-normal text-secondary">Aucun utilisateur actif cette année</h6>
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-end">
+        <a href="{{ path('dashboard_page') }}" class="btn btn-primary">
+          <i class="fas fa-arrow-left me-2"></i> Retour au tableau de bord
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer pt-3 mt-4">
+    <div class="container-fluid">
+      <div class="row align-items-center justify-content-lg-between">
+        <div class="col-lg-6 mb-lg-0 mb-4">
+          <div class="copyright text-center text-sm text-muted text-lg-start">
+            © {{ "now"|date("Y") }} Airmess
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize tooltips
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  });
+  
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('keyup', function() {
+    const searchText = this.value.toLowerCase();
+    const allTables = document.querySelectorAll('.tab-pane table tbody');
+    
+    allTables.forEach(table => {
+      const rows = table.querySelectorAll('tr');
+      
+      rows.forEach(row => {
+        if (row.querySelector('td:first-child')) {
+          const userName = row.querySelector('.user-name')?.textContent.toLowerCase() || '';
+          const userInfo = row.querySelector('.text-secondary')?.textContent.toLowerCase() || '';
+          const userRole = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+          
+          if (userName.includes(searchText) || userInfo.includes(searchText) || userRole.includes(searchText)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        }
+      });
+      
+      // Check if all rows are hidden
+      let allHidden = true;
+      rows.forEach(row => {
+        if (row.style.display !== 'none' && row.querySelector('td:first-child')) {
+          allHidden = false;
+        }
+      });
+      
+      // If all rows are hidden and no "no users" message exists, add one
+      const existingNoUsers = table.querySelector('.no-search-results');
+      if (allHidden && !existingNoUsers) {
+        const noUsersRow = document.createElement('tr');
+        noUsersRow.className = 'no-search-results';
+        noUsersRow.innerHTML = `
+          <td colspan="5" class="text-center py-4">
+            <div class="d-flex flex-column align-items-center">
+              <i class="fas fa-search fa-3x text-secondary mb-3"></i>
+              <h6 class="font-weight-normal text-secondary">Aucun résultat trouvé pour "${searchText}"</h6>
+            </div>
+          </td>
+        `;
+        table.appendChild(noUsersRow);
+      } else if (!allHidden && existingNoUsers) {
+        existingNoUsers.remove();
+      }
+    });
+  });
+});
+</script>
+{% endblock %} 

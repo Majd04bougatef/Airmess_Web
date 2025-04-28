@@ -1,0 +1,201 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Dashboard Voyageur - Airmess{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .dashboard-container {
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #2b3a5c 0%, #3a5ca5 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #3a5ca5;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #3a5ca5;
+        }
+
+        .recent-activity {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: #f0f7ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: #3a5ca5;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h1>Bienvenue, {{ user.prenom }}!</h1>
+        <p class="lead">Gérez vos voyages et découvrez de nouvelles destinations</p>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                <h3>Vos Voyages</h3>
+                <p class="h4">{{ total_trips|default(0) }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>Points Fidélité</h3>
+                <p class="h4">{{ loyalty_points|default(0) }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <h3>Réservations Actives</h3>
+                <p class="h4">{{ active_bookings|default(0) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="action-card" onclick="window.location.href='{{ path('app_offre_voyageurs') }}'">
+            <div class="action-icon">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            <h4>Nouvelle Réservation</h4>
+            <p>Planifiez votre prochain voyage</p>
+        </div>
+        <div class="action-card" onclick="window.location.href='{{ path('bonplanVoyageurs_page') }}'">
+            <div class="action-icon">
+                <i class="fas fa-percent"></i>
+            </div>
+            <h4>Bons Plans</h4>
+            <p>Découvrez nos offres spéciales</p>
+        </div>
+        <div class="action-card" onclick="window.location.href='{{ path('stationVoyageurs_page') }}'">
+            <div class="action-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h4>Stations</h4>
+            <p>Explorez nos destinations</p>
+        </div>
+        <div class="action-card" onclick="window.location.href='{{ path('socialVoyageurs_page') }}'">
+            <div class="action-icon">
+                <i class="fas fa-share-alt"></i>
+            </div>
+            <h4>Réseau Social</h4>
+            <p>Partagez vos expériences</p>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-activity">
+        <h3>Activité Récente</h3>
+        {% for activity in recent_activities|default([]) %}
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-{{ activity.icon }}"></i>
+                </div>
+                <div>
+                    <h5>{{ activity.title }}</h5>
+                    <p class="text-muted">{{ activity.date|date('d/m/Y H:i') }}</p>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center text-muted">Aucune activité récente</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Add any necessary JavaScript here
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize any dashboard-specific functionality
+        });
+    </script>
+{% endblock %} 

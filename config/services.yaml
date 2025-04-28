@@ -10,11 +10,15 @@ parameters:
     user_images_directory: 'C:/xampp/htdocs/images_users'
     expense_images_directory: 'C:/xampp/htdocs/images_expenses'
     bonplan_uploads_directory: 'C:/xampp/htdocs/images_bonplans'
+    images_directory: '%kernel.project_dir%/public/images'
+
+    # ReCaptcha keys - removed
+    # env(RECAPTCHA_SITE_KEY): '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'  # Test key
+    # env(RECAPTCHA_SECRET_KEY): '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'  # Test key
 
     # Replace these with your actual reCAPTCHA keys from https://www.google.com/recaptcha/admin
-    recaptcha_site_key: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'  # Test key
-    recaptcha_secret_key: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'  # Test key
-
+    # recaptcha_site_key: '%env(RECAPTCHA_SITE_KEY)%'
+    # recaptcha_secret_key: '%env(RECAPTCHA_SECRET_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -34,6 +38,27 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
+    # Register the user activity event listener
+    App\EventListener\UserActivityListener:
+        tags:
+            - { name: kernel.event_subscriber }
+
+    # User inactivity listener
+    App\EventListener\UserInactivityListener:
+        tags:
+            - { name: kernel.event_subscriber }
+
+    # Page view tracking listener
+    App\EventListener\PageViewListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.terminate, method: onKernelTerminate }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

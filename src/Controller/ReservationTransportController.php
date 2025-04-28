@@ -22,7 +22,7 @@ use Stripe\Charge;
 final class ReservationTransportController extends AbstractController
 {
     #[Route(name: 'app_reservation_transport_index', methods: ['GET'])]
-    public function index(ReservationTransportRepository $reservationTransportRepository, SessionInterface $session, UserRepository $userRepository): Response
+    public function index(ReservationTransportRepository $reservationTransportRepository, SessionInterface $session, UserRepository $userRepository, StationRepository $stationRepository, EntityManagerInterface $entityManager): Response
     {
         if (!$session->has('user_id')) {
             return $this->redirectToRoute('app_login');
@@ -31,11 +31,27 @@ final class ReservationTransportController extends AbstractController
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
         
-      
         $reservations = $reservationTransportRepository->findByUserId($user->getIdU());
+        
+        $finishedReservations = $reservationTransportRepository->findFinishedReservations();
+
+        foreach ($finishedReservations as $reservation) {
+            // Increment the available bikes in the station
+            $stationRepository->incrementNbVelosDispo($reservation->getStation()->getIdS(), $reservation->getNombreVelo());
+            
+            // Mark the reservation as 'terminé' so it won't be processed again
+            $reservation->setStatut('terminé');
+            $entityManager->persist($reservation);
+        }
+        
+        // Save changes if any reservations were processed
+        if (count($finishedReservations) > 0) {
+            $entityManager->flush();
+        }
 
         return $this->render('reservation_transport/index.html.twig', [
             'reservation_transports' => $reservations,
+            'finished_reservations' => $finishedReservations,
         ]);
     }
 
@@ -593,12 +609,9 @@ final class ReservationTransportController extends AbstractController
         // Get the station owner
         $stationOwner = $reservation->getStation()->getUser();
         
-        // Get messages between the current user and the station owner
+        // Get messages for this specific reservation reference
         $messages = $entityManager->getRepository('App\Entity\Message')->findBy(
-            [
-                'sender' => [$currentUser->getIdU(), $stationOwner->getIdU()],
-                'receiver' => [$currentUser->getIdU(), $stationOwner->getIdU()]
-            ],
+            ['refRes' => $reservation->getReference()],
             ['dateM' => 'ASC']
         );
         
@@ -653,6 +666,7 @@ final class ReservationTransportController extends AbstractController
         $message->setSender($currentUser);
         $message->setReceiver($stationOwner);
         $message->setDateM(new \DateTime());
+        $message->setRefRes($reservation->getReference()); // Set the reservation reference
         
         // Save to database
         $entityManager->persist($message);

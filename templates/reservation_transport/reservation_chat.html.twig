@@ -230,6 +230,30 @@
         display: flex;
         align-items: center;
     }
+
+    .quick-messages {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .quick-message-btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        margin: 0.25rem;
+        border-radius: 20px;
+        background-color: #fff;
+        color: #5e72e4;
+        border: 1px solid #5e72e4;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+    
+    .quick-message-btn:hover {
+        background-color: #5e72e4;
+        color: #fff;
+    }
 </style>
 
 <div class="page-header">
@@ -309,6 +333,24 @@
         {% endif %}
     </div>
     
+    <div class="quick-messages">
+        <button type="button" class="quick-message-btn" data-message="Signaler un problème avec les vélos réservés">
+            Problème avec les vélos
+        </button>
+        <button type="button" class="quick-message-btn" data-message="Problème avec la réservation">
+            Problème de réservation
+        </button>
+        <button type="button" class="quick-message-btn" data-message="Demande d'annulation de la réservation">
+            Annuler la réservation
+        </button>
+        <button type="button" class="quick-message-btn" data-message="Demande de modification de la réservation">
+            Modifier la réservation
+        </button>
+        <button type="button" class="quick-message-btn" data-message="Question sur le paiement">
+            Question paiement
+        </button>
+    </div>
+    
     <div class="message-form">
         <button type="button" class="file-button">
             <i class="fas fa-paperclip"></i>
@@ -356,6 +398,18 @@
         
         // Check for new messages every 10 seconds
         setInterval(checkForNewMessages, 10000);
+
+        // Add quick message functionality
+        const quickMessageButtons = document.querySelectorAll('.quick-message-btn');
+        
+        quickMessageButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const message = button.getAttribute('data-message');
+                messageInput.value = message;
+                // Optional: Submit the form automatically when a quick message is selected
+                document.getElementById('message-form').submit();
+            });
+        });
     });
 </script>
 {% endblock %} 

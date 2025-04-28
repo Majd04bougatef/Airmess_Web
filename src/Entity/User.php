@@ -91,6 +91,12 @@ class User
     )]
     private string $statut;
 
+    #[ORM\Column(name: "isOnline", type: "boolean", options: ["default" => false])]
+    private bool $isOnline = false;
+
+    #[ORM\Column(name: "lastActivity", type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $lastActivity = null;
+
     #[ORM\Column(name: "diamond", type: "integer", nullable: false)]
     #[Assert\NotNull(message: "Le nombre de diamants est obligatoire")]
     #[Assert\PositiveOrZero(message: "Le nombre de diamants ne peut pas être négatif")]
@@ -235,6 +241,28 @@ class User
     public function setStatut(string $statut): self
     {
         $this->statut = $statut;
+        return $this;
+    }
+
+    public function isOnline(): bool
+    {
+        return $this->isOnline;
+    }
+
+    public function setIsOnline(bool $isOnline): self
+    {
+        $this->isOnline = $isOnline;
+        return $this;
+    }
+
+    public function getLastActivity(): ?\DateTimeInterface
+    {
+        return $this->lastActivity;
+    }
+
+    public function setLastActivity(?\DateTimeInterface $lastActivity): self
+    {
+        $this->lastActivity = $lastActivity;
         return $this;
     }
 

@@ -29,6 +29,9 @@ class Message
     #[ORM\Column(name: "dateM", type: "datetime")]
     private \DateTimeInterface $dateM;
 
+    #[ORM\Column(name: "refRes", length: 255, nullable: true)]
+    private ?string $refRes = null;
+
     public function __construct()
     {
         $this->dateM = new \DateTime();
@@ -80,6 +83,18 @@ class Message
     public function setDateM(\DateTimeInterface $dateM): self
     {
         $this->dateM = $dateM;
+        return $this;
+    }
+
+    public function getRefRes(): ?string
+    {
+        return $this->refRes;
+    }
+
+    public function setRefRes(?string $refRes): static
+    {
+        $this->refRes = $refRes;
+
         return $this;
     }
 }

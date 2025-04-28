@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Repository\ReservationRepository;
 
 class VoyageursController extends AuthenticatedController
 {
@@ -617,6 +618,63 @@ class VoyageursController extends AuthenticatedController
         $response->headers->set('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
         
         return $response;
+    }
+
+    #[Route('/dashboardVoyageurs', name: 'app_dashboard_voyageurs')]
+    public function dashboardVoyageurs(ReservationRepository $reservationRepository, UserRepository $userRepository, SessionInterface $session): Response
+    {
+        // Check if user is authenticated
+        if ($redirectResponse = $this->checkAuthentication()) {
+            return $redirectResponse;
+        }
+        
+        // Check if user has the right role
+        if (!$this->hasRole('Voyageurs')) {
+            // Redirect to appropriate dashboard based on role
+            $userRole = $this->authService->getUserRole();
+            if ($userRole === 'Admin' || $userRole === 'ROLE_ADMIN') {
+                return $this->redirectToRoute('app_dash');
+            } elseif ($userRole === 'Entreprise') {
+                return $this->redirectToRoute('app_dashEntreprise');
+            }
+        }
+
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        if (!$user) {
+            $this->addFlash('error', 'User not found. Please log in again.');
+            return $this->redirectToRoute('login');
+        }
+
+        // Get user's reservations
+        $reservations = $reservationRepository->findBy(['user' => $user]);
+
+        // Calculate statistics
+        $totalTrips = count($reservations);
+        $now = new \DateTime();
+        $activeBookings = count(array_filter($reservations, function($reservation) use ($now) {
+            return $reservation->getDateRes() > $now;
+        }));
+
+        // Get recent activities
+        $recentActivities = [];
+        foreach ($reservations as $reservation) {
+            $recentActivities[] = [
+                'title' => 'Réservation pour ' . $reservation->getOffre()->getPlace(),
+                'date' => $reservation->getDateRes(),
+                'icon' => 'ticket-alt'
+            ];
+        }
+
+        return $this->render('dashVoyageurs/dashboardPageVoyageurs.html.twig', [
+            'total_trips' => $totalTrips,
+            'loyalty_points' => $user->getDiamond(),
+            'active_bookings' => $activeBookings,
+            'recent_activities' => $recentActivities,
+            'user' => $user
+        ]);
     }
 }
 
