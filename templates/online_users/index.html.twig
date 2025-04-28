@@ -37,12 +37,12 @@
                                             </td>
                                             <td>{{ user.name }}</td>
                                             <td>
-                                                {% if user.role == 'Admin' %}
-                                                    <span class="badge bg-danger">{{ user.role }}</span>
-                                                {% elseif user.role == 'Entreprise' %}
-                                                    <span class="badge bg-primary">{{ user.role }}</span>
+                                                {% if user.roleUser == 'Admin' %}
+                                                    <span class="badge bg-danger">{{ user.roleUser }}</span>
+                                                {% elseif user.roleUser == 'Entreprise' %}
+                                                    <span class="badge bg-primary">{{ user.roleUser }}</span>
                                                 {% else %}
-                                                    <span class="badge bg-success">{{ user.role }}</span>
+                                                    <span class="badge bg-success">{{ user.roleUser }}</span>
                                                 {% endif %}
                                             </td>
                                             <td>

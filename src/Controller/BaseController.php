@@ -10,6 +10,8 @@ use App\Repository\StationRepository;
 
 class BaseController extends AbstractController
 {
+    use TrackPageViewTrait;
+
     #[Route('/', name: 'homepage')]
     #[Route('/base', name: 'app_base')]
     public function index(SocialMediaRepository $socialMediaRepository, StationRepository $stationRepository): Response
@@ -85,6 +87,17 @@ class BaseController extends AbstractController
             'regularStations' => $regularStations,
             'chargingPoints' => $chargingPoints
         ]);
+    }
+
+    /**
+     * Override the render method to automatically track page views
+     */
+    protected function render(string $view, array $parameters = [], Response $response = null): Response
+    {
+        $response = parent::render($view, $parameters, $response);
+        
+        // Track the page view
+        return $this->trackPageView($response);
     }
 }
 

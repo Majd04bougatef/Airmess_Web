@@ -1,6 +1,6 @@
 {% extends 'dashAdmin/dashboard.html.twig' %}
 
-{% block title %}Gestion des Utilisateurs{% endblock %}
+{% block title %}Gestion des utilisateurs{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -207,6 +207,45 @@
     color: #8392ab;
     margin-top: 3px;
   }
+  
+  /* Table loading state */
+  table.loading {
+    position: relative;
+  }
+  
+  table.loading::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  table.loading::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #5e72e4;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 2;
+  }
+  
+  @keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
 </style>
 {% endblock %}
 
@@ -217,6 +256,445 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Add our custom user filter JS -->
+<script src="{{ asset('js/user-filters.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Setup pour le graphique de répartition des utilisateurs
+  var ctx = document.getElementById('userRoleChart').getContext('2d');
+  var userRoleChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Voyageurs', 'Entreprise', 'Admin'],
+      datasets: [{
+        label: 'Utilisateurs par rôle',
+        data: [
+          {{ usersByRole.Voyageurs }}, 
+          {{ usersByRole.Entreprise }}, 
+          {{ usersByRole.Admin }}
+        ],
+        backgroundColor: [
+          'rgba(94, 114, 228, 0.8)',
+          'rgba(233, 196, 106, 0.8)',
+          'rgba(92, 184, 92, 0.8)'
+        ],
+        borderColor: [
+          'rgba(94, 114, 228, 1)',
+          'rgba(233, 196, 106, 1)',
+          'rgba(92, 184, 92, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+  
+  // Graphique d'activité des utilisateurs
+  var activityCtx = document.getElementById('userActivityChart').getContext('2d');
+  
+  // Données simulées pour l'activité - remplacer par des données réelles
+  var weekData = {
+    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+    datasets: [
+      {
+        label: 'Utilisateurs en ligne',
+        data: [15, 20, 18, 25, 30, 22, 18],
+        borderColor: 'rgba(45, 206, 137, 1)',
+        backgroundColor: 'rgba(45, 206, 137, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true
+      },
+      {
+        label: 'Utilisateurs actifs',
+        data: [30, 35, 28, 45, 40, 50, 35],
+        borderColor: 'rgba(94, 114, 228, 1)',
+        backgroundColor: 'rgba(94, 114, 228, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true
+      }
+    ]
+  };
+  
+  var monthData = {
+    labels: Array.from({length: 30}, (_, i) => i + 1),
+    datasets: [
+      {
+        label: 'Utilisateurs en ligne',
+        data: Array.from({length: 30}, () => Math.floor(Math.random() * 30) + 10),
+        borderColor: 'rgba(45, 206, 137, 1)',
+        backgroundColor: 'rgba(45, 206, 137, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true
+      },
+      {
+        label: 'Utilisateurs actifs',
+        data: Array.from({length: 30}, () => Math.floor(Math.random() * 40) + 20),
+        borderColor: 'rgba(94, 114, 228, 1)',
+        backgroundColor: 'rgba(94, 114, 228, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true
+      }
+    ]
+  };
+  
+  var yearData = {
+    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+    datasets: [
+      {
+        label: 'Utilisateurs en ligne',
+        data: Array.from({length: 12}, () => Math.floor(Math.random() * 30) + 10),
+        borderColor: 'rgba(45, 206, 137, 1)',
+        backgroundColor: 'rgba(45, 206, 137, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true
+      },
+      {
+        label: 'Utilisateurs actifs',
+        data: Array.from({length: 12}, () => Math.floor(Math.random() * 100) + 50),
+        borderColor: 'rgba(94, 114, 228, 1)',
+        backgroundColor: 'rgba(94, 114, 228, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true
+      }
+    ]
+  };
+  
+  var activityChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      intersect: false,
+      mode: 'index',
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          drawBorder: false,
+          display: true,
+          drawOnChartArea: true,
+          drawTicks: false,
+          borderDash: [5, 5]
+        },
+        ticks: {
+          padding: 10,
+          color: '#b2b9bf',
+          font: {
+            size: 11,
+            family: "Open Sans",
+            style: 'normal',
+            lineHeight: 2
+          },
+        }
+      },
+      x: {
+        grid: {
+          drawBorder: false,
+          display: false,
+          drawOnChartArea: false,
+          drawTicks: false,
+          borderDash: [5, 5]
+        },
+        ticks: {
+          display: true,
+          color: '#b2b9bf',
+          padding: 10,
+          font: {
+            size: 11,
+            family: "Open Sans",
+            style: 'normal',
+            lineHeight: 2
+          },
+        }
+      },
+    },
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          padding: 10,
+          font: {
+            size: 12,
+            family: "Open Sans",
+            style: 'normal',
+            lineHeight: 2
+          }
+        }
+      },
+      tooltip: {
+        usePointStyle: true,
+        position: 'nearest',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        titleColor: '#5e72e4',
+        bodyColor: '#344767',
+        borderColor: '#e9ecef',
+        borderWidth: 1,
+        bodySpacing: 5,
+        padding: 10,
+        displayColors: true
+      }
+    }
+  };
+  
+  var userActivityChart = new Chart(activityCtx, {
+    type: 'line',
+    data: weekData,
+    options: activityChartOptions
+  });
+  
+  // Gestion des périodes pour le graphique d'activité
+  document.querySelectorAll('.dropdown-item[data-period]').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Mettre à jour la classe active
+      document.querySelectorAll('.dropdown-item[data-period]').forEach(function(el) {
+        el.classList.remove('active');
+      });
+      this.classList.add('active');
+      
+      // Mettre à jour le texte du bouton
+      var periodText = '';
+      switch(this.dataset.period) {
+        case 'week':
+          periodText = '7 derniers jours';
+          userActivityChart.data = weekData;
+          break;
+        case 'month':
+          periodText = '30 derniers jours';
+          userActivityChart.data = monthData;
+          break;
+        case 'year':
+          periodText = '12 derniers mois';
+          userActivityChart.data = yearData;
+          break;
+      }
+      
+      document.getElementById('activityPeriodDropdown').innerHTML = 
+        '<i class="fas fa-calendar me-1"></i> ' + periodText;
+      
+      userActivityChart.update();
+    });
+  });
+  
+  // Fonction de confirmation de suppression
+  window.confirmDelete = function(userId) {
+    if (confirm("Êtes-vous sûr de vouloir désactiver cet utilisateur ?")) {
+      const deletePath = document.getElementById('usersTable').dataset.deletePath.replace('/0', '/' + userId);
+      
+      fetch(deletePath, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Utilisateur désactivé avec succès');
+          // Reload page to update the user list, keeping the current page
+          window.location.href = '{{ path('user_page', {'page': currentPage}) }}';
+        } else {
+          alert('Erreur lors de la désactivation');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue');
+      });
+    }
+  };
+
+  // Fonction pour enregistrer les modifications d'un utilisateur
+  window.submitEditForm = function(userId) {
+    // Get the form element directly
+    var form = document.getElementById('editUserForm' + userId);
+    
+    if (!form) {
+      console.error('Form not found:', 'editUserForm' + userId);
+      alert('Erreur: Formulaire non trouvé');
+      return;
+    }
+    
+    // Check required fields
+    var name = form.querySelector('[name="name"]');
+    var prenom = form.querySelector('[name="prenom"]');
+    var email = form.querySelector('[name="email"]');
+    
+    if (!name.value || !prenom.value || !email.value) {
+      alert('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+    
+    // Create FormData from the form
+    var formData = new FormData(form);
+    
+    // Debug form data
+    console.log('Form data entries:');
+    for (var pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
+    
+    // Use fetch API to submit the form
+    fetch(form.action, {
+      method: form.method,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: formData
+    })
+    .then(response => {
+      console.log('Response status:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('Response data:', data);
+      if (data.success) {
+        alert('Utilisateur modifié avec succès');
+        // Reload page to see the updated user, keeping the current page
+        window.location.href = '{{ path('user_page', {'page': currentPage}) }}';
+      } else {
+        alert('Erreur: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Une erreur est survenue');
+    });
+  };
+
+  // Fonction de soumission du formulaire d'ajout d'utilisateur
+  window.submitAddForm = function() {
+    var form = document.getElementById('addUserForm');
+    
+    if (!form) {
+      console.error('Form not found: addUserForm');
+      alert('Erreur: Formulaire non trouvé');
+      return;
+    }
+    
+    // Check required fields
+    var name = form.querySelector('[name="name"]');
+    var prenom = form.querySelector('[name="prenom"]');
+    var email = form.querySelector('[name="email"]');
+    var password = form.querySelector('[name="password"]');
+    
+    if (!name.value || !prenom.value || !email.value || !password.value) {
+      alert('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+    
+    // Create FormData from the form
+    var formData = new FormData(form);
+    
+    // Debug form data
+    console.log('Add user form data:');
+    for (var pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
+    
+    // Use fetch API to submit the form
+    fetch(form.action, {
+      method: form.method,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: formData
+    })
+    .then(response => {
+      console.log('Response status:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('Response data:', data);
+      if (data.success) {
+        alert('Utilisateur créé avec succès');
+        // Reload page to see the new user, staying on current page
+        window.location.href = '{{ path('user_page', {'page': currentPage}) }}';
+      } else {
+        alert('Erreur: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Une erreur est survenue');
+    });
+  };
+
+  // Fonction pour activer tous les utilisateurs
+  document.getElementById('activateAllButton').addEventListener('click', function() {
+    if (confirm("Êtes-vous sûr de vouloir activer tous les utilisateurs?")) {
+      fetch('{{ path('admin_activate_all_users') }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Tous les utilisateurs ont été activés avec succès');
+          // Reload page to update the user list
+          window.location.href = '{{ path('user_page', {'page': currentPage}) }}';
+        } else {
+          alert('Erreur lors de l\'activation des utilisateurs: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de l\'activation des utilisateurs');
+      });
+    }
+  });
+
+  // Excel Export
+  document.getElementById('exportExcelButton').addEventListener('click', function() {
+    // Récupérer les valeurs des filtres actifs
+    let roleFilter = document.querySelector('input[name="roleFilter"]:checked').value;
+    let statusFilter = document.querySelector('input[name="statusFilter"]:checked').value;
+    let searchFilter = document.getElementById('searchInput').value || document.getElementById('tableSearchInput').value || '';
+    
+    // Mettre à jour les champs cachés du formulaire Excel
+    document.getElementById('excelRoleFilterValue').value = roleFilter;
+    document.getElementById('excelStatusFilterValue').value = statusFilter;
+    document.getElementById('excelSearchFilterValue').value = searchFilter;
+    
+    // Afficher le modal Excel
+    new bootstrap.Modal(document.getElementById('excelExportModal')).show();
+  });
+
+  // Préparer les données du formulaire d'export PDF et Excel
+  document.getElementById('exportPdfButton').addEventListener('click', function() {
+    // Récupérer les valeurs des filtres actifs
+    let roleFilter = document.querySelector('input[name="roleFilter"]:checked').value;
+    let statusFilter = document.querySelector('input[name="statusFilter"]:checked').value;
+    let searchFilter = document.getElementById('searchInput').value || document.getElementById('tableSearchInput').value || '';
+    
+    // Mettre à jour les champs cachés du formulaire PDF
+    document.getElementById('roleFilterValue').value = roleFilter;
+    document.getElementById('statusFilterValue').value = statusFilter;
+    document.getElementById('searchFilterValue').value = searchFilter;
+    
+    // Afficher le modal PDF
+    new bootstrap.Modal(document.getElementById('pdfExportModal')).show();
+  });
+});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -243,201 +721,275 @@
 <div class="container-fluid py-4">
   <div class="row">
     <div class="col-12">
-      <div class="card mb-4">
-        <div class="card-header pb-0">
-          <div class="d-flex justify-content-between align-items-center">
-            <h6>Liste des utilisateurs <span class="user-counter">{{ users|length }}</span></h6>
-            <div class="action-buttons-container d-flex gap-2">
-              <button type="button" class="btn btn-sm bg-gradient-primary mb-0" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                <i class="fas fa-plus me-2"></i> Ajouter un utilisateur
-              </button>
-              <button type="button" class="btn btn-sm bg-gradient-success mb-0" id="activateAllButton">
-                <i class="fas fa-check-circle me-2"></i> Activer tous
-              </button>
-              <div class="dropdown">
-                <button class="btn btn-sm bg-gradient-info mb-0 dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fas fa-file-export me-2"></i> Exporter
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                  <li><a class="dropdown-item" href="#" id="exportPdfButton" data-bs-toggle="modal" data-bs-target="#pdfExportModal"><i class="fas fa-file-pdf me-2"></i>PDF</a></li>
-                  <li><a class="dropdown-item" href="#" id="exportExcelButton"><i class="fas fa-file-excel me-2"></i>Excel (CSV)</a></li>
-                </ul>
-              </div>
-            </div>
+      <div class="card shadow mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center py-3">
+          <div class="d-flex align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+              <i class="fas fa-users me-2"></i> Liste des utilisateurs
+            </h6>
+            <span class="badge bg-primary ms-2 user-counter">{{ users|length }}</span>
           </div>
-          
-          <!-- Filtres -->
-          <div class="mt-3 filter-section">
-            <div class="row g-2 align-items-center">
-              <div class="col-md-5">
-                <div class="btn-group w-100" role="group" aria-label="Role toggle">
-                  <input type="radio" class="btn-check" name="roleFilter" id="roleAll" value="" checked>
-                  <label class="btn btn-sm btn-outline-secondary" for="roleAll">Tous</label>
-                  
-                  <input type="radio" class="btn-check" name="roleFilter" id="roleAdmin" value="Admin">
-                  <label class="btn btn-sm btn-outline-primary" for="roleAdmin">Admin</label>
-                  
-                  <input type="radio" class="btn-check" name="roleFilter" id="roleVoyageurs" value="Voyageurs">
-                  <label class="btn btn-sm btn-outline-info" for="roleVoyageurs">Voyageurs</label>
-                  
-                  <input type="radio" class="btn-check" name="roleFilter" id="roleEntreprise" value="Entreprise">
-                  <label class="btn btn-sm btn-outline-warning" for="roleEntreprise">Entreprise</label>
-                </div>
-              </div>
-              <div class="col-md-5">
-                <div class="btn-group w-100" role="group" aria-label="Status toggle">
-                  <input type="radio" class="btn-check" name="statusFilter" id="statusAll" value="" checked>
-                  <label class="btn btn-sm btn-outline-secondary" for="statusAll">Tous</label>
-                  
-                  <input type="radio" class="btn-check" name="statusFilter" id="statusActive" value="actif">
-                  <label class="btn btn-sm btn-outline-success" for="statusActive">Actif</label>
-                  
-                  <input type="radio" class="btn-check" name="statusFilter" id="statusInactive" value="inactif">
-                  <label class="btn btn-sm btn-outline-danger" for="statusInactive">Inactif</label>
-                </div>
-              </div>
-              <div class="col-md-2">
-                <button class="btn btn-sm btn-outline-secondary w-100" id="resetFilters">
-                  <i class="fas fa-undo me-2"></i> Réinitialiser
-                </button>
-              </div>
-            </div>
+          <div class="d-flex align-items-center">
+            <div class="input-group me-2" style="width: 250px;">
+               <span class="input-group-text"><i class="fas fa-search"></i></span>
+               <input type="text" id="tableSearchInput" class="form-control" placeholder="Rechercher...">
+             </div>
+            <button type="button" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#excelExportModal">
+              <i class="fas fa-file-csv me-1"></i> CSV
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#pdfExportModal">
+              <i class="fas fa-file-pdf me-1"></i> PDF
+            </button>
           </div>
-        </div>
-        <div class="card-body px-0 pt-0 pb-2">
-          <div class="table-responsive p-0">
-            <table class="table align-items-center mb-0" id="usersTable" 
-                  data-edit-path="{{ path('admin_user_edit', {'id_U': 0}) }}"
-                  data-delete-path="{{ path('admin_user_delete', {'id_U': 0}) }}">
-              <thead>
-                <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Utilisateur</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Rôle</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de naissance</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Téléphone</th>
-                  <th class="text-secondary opacity-7">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for user in users %}
-                  <tr>
-                    <td class="user-info-cell">
-                      <div class="d-flex px-2 py-1">
-                        <div>
-                          <img src="{{ path('app_profile_image', {'filename': user.imagesU }) }}" 
-                               class="avatar avatar-sm me-3"
-                               alt="{{ user.name }}" 
-                               onerror="this.src='{{ asset('images/user-avatar.svg') }}'">
-                          {% if user.isOnline %}
-                          <span class="online-indicator online-yes" title="En ligne"></span>
+         </div>
+         
+         <!-- Filter section -->
+         <div class="card-header bg-light py-2">
+           <div class="row g-2">
+             <div class="col-md-6">
+               <div class="filter-group">
+                 <label class="d-flex align-items-center mb-1">
+                   <i class="fas fa-filter me-1"></i> Filtrer par rôle:
+                 </label>
+                 <div class="btn-group w-100" role="group">
+                   <input type="radio" class="btn-check" name="roleFilter" id="roleAll" value="" checked>
+                   <label class="btn btn-outline-secondary btn-sm" for="roleAll">
+                     <i class="fas fa-users me-1"></i> Tous
+                   </label>
+                   
+                   <input type="radio" class="btn-check" name="roleFilter" id="roleAdmin" value="Admin">
+                   <label class="btn btn-outline-primary btn-sm" for="roleAdmin">
+                     <i class="fas fa-user-shield me-1"></i> Admin
+                   </label>
+                   
+                   <input type="radio" class="btn-check" name="roleFilter" id="roleVoyageur" value="Voyageurs">
+                   <label class="btn btn-outline-info btn-sm" for="roleVoyageur">
+                     <i class="fas fa-plane me-1"></i> Voyageurs
+                   </label>
+                   
+                   <input type="radio" class="btn-check" name="roleFilter" id="roleEntreprise" value="Entreprise">
+                   <label class="btn btn-outline-success btn-sm" for="roleEntreprise">
+                     <i class="fas fa-building me-1"></i> Entreprise
+                   </label>
+                 </div>
+               </div>
+             </div>
+             
+             <div class="col-md-6">
+               <div class="filter-group">
+                 <label class="d-flex align-items-center mb-1">
+                   <i class="fas fa-toggle-on me-1"></i> Filtrer par statut:
+                 </label>
+                 <div class="btn-group w-100" role="group">
+                   <input type="radio" class="btn-check" name="statusFilter" id="statusAll" value="" checked>
+                   <label class="btn btn-outline-secondary btn-sm" for="statusAll">
+                     <i class="fas fa-list me-1"></i> Tous
+                   </label>
+                   
+                   <input type="radio" class="btn-check" name="statusFilter" id="statusOnline" value="online">
+                   <label class="btn btn-outline-success btn-sm" for="statusOnline">
+                     <i class="fas fa-circle me-1"></i> En ligne
+                   </label>
+                   
+                   <input type="radio" class="btn-check" name="statusFilter" id="statusActive" value="actif">
+                   <label class="btn btn-outline-primary btn-sm" for="statusActive">
+                     <i class="fas fa-check-circle me-1"></i> Actifs
+                   </label>
+                   
+                   <input type="radio" class="btn-check" name="statusFilter" id="statusInactive" value="inactive">
+                   <label class="btn btn-outline-danger btn-sm" for="statusInactive">
+                     <i class="fas fa-times-circle me-1"></i> Inactifs
+                   </label>
+                 </div>
+               </div>
+             </div>
+             
+             <div class="col-12 text-end mt-2">
+               <button id="resetFilters" class="btn btn-sm btn-outline-secondary">
+                 <i class="fas fa-undo me-1"></i> Réinitialiser les filtres
+               </button>
+             </div>
+           </div>
+         </div>
+         
+         <div class="card-body">
+           <div class="table-responsive">
+            <table class="table table-hover" id="usersTable" data-delete-path="{{ path('admin_user_delete', {'id_U': 0}) }}" data-ajax-url="{{ path('admin_users_filter') }}">
+               <thead>
+                 <tr>
+                  <th><i class="fas fa-user me-1"></i> Nom</th>
+                  <th><i class="fas fa-envelope me-1"></i> Email</th>
+                  <th><i class="fas fa-tag me-1"></i> Rôle</th>
+                  <th><i class="fas fa-calendar-alt me-1"></i> Inscrit le</th>
+                  <th><i class="fas fa-signal me-1"></i> Statut</th>
+                  <th class="text-center"><i class="fas fa-cogs me-1"></i> Actions</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {% for user in users %}
+                   <tr data-role="{{ user.roleUser }}" data-status="{% if user.isOnline == 1 %}online{% elseif user.statut == 'actif' %}active{% else %}inactive{% endif %}">
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-container position-relative me-3">
+                          {% if user.imagesU is not empty %}
+                            <img src="{{ asset('images_users/' ~ user.imagesU) }}" alt="Avatar" class="avatar rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
                           {% else %}
-                          <span class="online-indicator online-no" title="Hors ligne"></span>
+                            <div class="avatar rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                              <span class="text-white">{{ user.name|first|upper }}{{ user.prenom ? user.prenom|first|upper : '' }}</span>
+                            </div>
                           {% endif %}
+                          
+                          <span class="position-absolute bg-{{ user.isOnline == 1 ? 'success' : 'secondary' }} border border-white rounded-circle"
+                                style="width: 12px; height: 12px; bottom: 0; right: 0;"
+                                title="{{ user.isOnline == 1 ? 'En ligne' : 'Hors ligne' }}">
+                          </span>
                         </div>
-                        <div class="d-flex flex-column justify-content-center">
-                          <h6 class="mb-0 text-sm user-name">{{ user.name }} {{ user.prenom }}</h6>
-                          <p class="text-xs text-secondary mb-0">{{ user.email }}</p>
-                          {% if user.lastActivity %}
-                          <p class="last-activity">
-                            Dernière activité: {{ user.lastActivity|date("d/m/Y H:i") }}
-                          </p>
-                          {% endif %}
+                        
+                        <div>
+                          <p class="fw-bold mb-0 user-name">{{ user.prenom }} {{ user.name }}</p>
+                          <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i> 
+                            {% if user.lastActivity %}
+                              Dernière activité: {{ user.lastActivity|date('d/m/Y H:i') }}
+                            {% else %}
+                              Jamais connecté
+                            {% endif %}
+                          </small><br>
+                          <small class="text-muted">
+                            <i class="fas fa-phone me-1"></i> {{ user.phoneNumber|default('Non renseigné') }}
+                          </small>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <p class="text-xs font-weight-bold mb-0">{{ user.roleUser }}</p>
+                      <p class="mb-0">{{ user.email }}</p>
                     </td>
-                    <td class="align-middle text-center text-sm">
-                      <!-- Debug: {{ user.statut }} -->
-                      {% if user.statut == 'actif' or user.statut == 'active' %}
-                        <span class="badge badge-sm bg-gradient-success">Actif</span>
-                      {% elseif user.statut == 'inactif' or user.statut == 'inactive' %}
-                        <span class="badge badge-sm bg-gradient-danger">Inactif</span>
+                    <td>
+                      <p class="mb-0">
+                        {% if user.roleUser == 'Admin' %}
+                          <span class="badge bg-primary"><i class="fas fa-user-shield me-1"></i> Admin</span>
+                        {% elseif user.roleUser == 'Voyageurs' %}
+                          <span class="badge bg-info"><i class="fas fa-plane me-1"></i> Voyageur</span>
+                        {% elseif user.roleUser == 'Entreprise' %}
+                          <span class="badge bg-success"><i class="fas fa-building me-1"></i> Entreprise</span>
+                        {% endif %}
+                      </p>
+                    </td>
+                    <td>
+                      <p class="mb-0">{{ user.dateNaiss|date('d/m/Y') }}</p>
+                      <small class="text-muted">{{ user.dateNaiss|date('H:i') }}</small>
+                    </td>
+                    <td>
+                      {% if user.deleteFlag == 1 %}
+                        <span class="badge bg-danger">Supprimé</span>
+                      {% elseif user.statut == 'actif' %}
+                        <span class="badge bg-success">Actif</span>
                       {% else %}
-                        <span class="badge badge-sm bg-gradient-warning">{{ user.statut }}</span>
+                        <span class="badge bg-warning text-dark">Inactif</span>
                       {% endif %}
                     </td>
-                    <td class="align-middle text-center">
-                      <span class="text-secondary text-xs font-weight-bold">{{ user.dateNaiss|date("d/m/Y") }}</span>
-                    </td>
-                    <td class="align-middle text-center">
-                      <span class="text-secondary text-xs font-weight-bold">{{ user.phoneNumber }}</span>
-                    </td>
-                    <td class="align-middle">
-                      <div class="user-actions-container">
-                        <button class="btn btn-link text-warning user-action-btn px-2 mb-0" data-bs-toggle="modal" data-bs-target="#editUserModal{{ user.idU }}">
-                          <i class="fas fa-edit me-2"></i>Modifier
+                    <td class="text-center">
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{user.idU}}">
+                          <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-link text-danger user-action-btn px-2 mb-0" onclick="confirmDelete({{ user.idU }})">
-                          <i class="fas fa-trash me-2"></i>Supprimer
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete({{user.idU}})">
+                          <i class="fas fa-trash-alt"></i>
                         </button>
+                        {# Removed impersonate button as the route doesn't exist #}
+                        {# <a href="{{ path('app_impersonate', {'id': user.id}) }}" class="btn btn-sm btn-outline-info">
+                          <i class="fas fa-user-secret" title="Se connecter en tant que {{ user.prenom }}"></i>
+                        </a> #}
                       </div>
                     </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <!-- Pagination -->
-          <div class="d-flex justify-content-center mt-4">
-            <nav aria-label="Page navigation">
-              <ul class="pagination">
-                {% if currentPage > 1 %}
+                   </tr>
+                 {% endfor %}
+               </tbody>
+             </table>
+           </div>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+             <div>
+              <span class="text-muted">
+                <i class="fas fa-info-circle me-1"></i> Affichage de {{ users|length }} utilisateur(s)
+              </span>
+             </div>
+            
+            <nav aria-label="Navigation des pages">
+              <ul class="pagination pagination-sm justify-content-center m-0">
+               {% if currentPage > 1 %}
                   <li class="page-item">
-                    <a class="page-link pagination-link" href="{{ path('user_page', {'page': currentPage - 1}) }}" aria-label="Précédent">
-                      <span aria-hidden="true">&laquo;</span> Précédent
+                    <a class="page-link" href="{{ path('user_page', {'page': 1}) }}">
+                      <i class="fas fa-angle-double-left"></i>
+                    </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="{{ path('user_page', {'page': currentPage - 1}) }}">
+                      <i class="fas fa-angle-left"></i>
                     </a>
                   </li>
                 {% else %}
                   <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo; Précédent</a>
+                    <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
                   </li>
-                {% endif %}
-                
-                {% set startPage = max(1, currentPage - 2) %}
-                {% set endPage = min(totalPages, startPage + 4) %}
-                {% if endPage - startPage < 4 and totalPages > 5 %}
-                  {% set startPage = max(1, endPage - 4) %}
-                {% endif %}
-                
-                {% for i in startPage..endPage %}
-                  <li class="page-item {{ currentPage == i ? 'active' : '' }}">
-                    <a class="page-link pagination-link" href="{{ path('user_page', {'page': i}) }}">{{ i }}</a>
+                  <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-angle-left"></i></span>
                   </li>
+               {% endif %}
+                
+                 {% for i in max(1, currentPage - 2)..min(totalPages, currentPage + 2) %}
+                   <li class="page-item {{ currentPage == i ? 'active' : '' }}">
+                     <a class="page-link" href="{{ path('user_page', {'page': i}) }}">{{ i }}</a>
+                   </li>
                 {% endfor %}
                 
                 {% if currentPage < totalPages %}
-                  <li class="page-item">
-                    <a class="page-link pagination-link" href="{{ path('user_page', {'page': currentPage + 1}) }}" aria-label="Suivant">
-                      Suivant <span aria-hidden="true">&raquo;</span>
-                    </a>
-                  </li>
-                {% else %}
-                  <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Suivant &raquo;</a>
-                  </li>
+                   <li class="page-item">
+                     <a class="page-link" href="{{ path('user_page', {'page': currentPage + 1}) }}">
+                       <i class="fas fa-angle-right"></i>
+                     </a>
+                   </li>
+                   <li class="page-item">
+                     <a class="page-link" href="{{ path('user_page', {'page': totalPages}) }}">
+                       <i class="fas fa-angle-double-right"></i>
+                     </a>
+                   </li>
+                 {% else %}
+                   <li class="page-item disabled">
+                     <span class="page-link"><i class="fas fa-angle-right"></i></span>
+                   </li>
+                   <li class="page-item disabled">
+                     <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+                   </li>
                 {% endif %}
               </ul>
             </nav>
-          </div>
-          
-          <!-- Pagination info -->
-          <div class="text-center text-sm text-muted mt-2">
-            Affichage des utilisateurs {{ (currentPage - 1) * pageSize + 1 }} à {{ min(currentPage * pageSize, totalUsers) }} sur {{ totalUsers }} utilisateurs
-          </div>
-        </div>
+            
+            <div>
+              <button id="addUserBtn" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="fas fa-user-plus me-1"></i> Ajouter un utilisateur
+              </button>
+              <button id="exportExcelButton" class="btn btn-sm btn-outline-success ms-2">
+                <i class="fas fa-file-excel me-1"></i> Excel
+              </button>
+              <button id="exportPdfButton" class="btn btn-sm btn-outline-danger ms-2">
+                <i class="fas fa-file-pdf me-1"></i> PDF
+              </button>
+              <button id="activateAllButton" class="btn btn-sm btn-outline-primary ms-2">
+                <i class="fas fa-users-cog me-1"></i> Activer tous
+              </button>
+             </div>
+           </div>
+         </div>
       </div>
     </div>
   </div>
   
   <!-- Statistiques Utilisateurs -->
   <div class="row">
-    <div class="col-lg-7 mb-lg-0 mb-4">
+    <div class="col-lg-5 mb-lg-0 mb-4">
       <div class="card mb-4">
         <div class="card-header pb-0">
-          <h6>Répartition des utilisateurs</h6>
+          <h6><i class="fas fa-chart-pie me-2"></i>Répartition des utilisateurs</h6>
         </div>
         <div class="card-body p-3">
           <div class="chart">
@@ -446,7 +998,144 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-5">
+    <div class="col-lg-7">
+      <div class="card mb-4">
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+          <h6><i class="fas fa-chart-line me-2"></i>Activité des utilisateurs</h6>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="activityPeriodDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-calendar me-1"></i> Période
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="activityPeriodDropdown">
+              <li><a class="dropdown-item active" href="#" data-period="week">7 derniers jours</a></li>
+              <li><a class="dropdown-item" href="#" data-period="month">30 derniers jours</a></li>
+              <li><a class="dropdown-item" href="#" data-period="year">12 derniers mois</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-body p-3">
+          <div class="chart">
+            <canvas id="userActivityChart" class="chart-canvas" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Cartes d'état des utilisateurs -->
+  <div class="row">
+    <div class="col-lg-3 col-md-6">
+      <div class="card mb-4">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold text-muted">Utilisateurs en ligne</p>
+                <h5 class="font-weight-bolder text-success mt-2">
+                  {{ onlineUsersCount|default(0) }}
+                </h5>
+                <p class="mb-0 text-sm">
+                  <span class="text-success font-weight-bolder">
+                    <i class="fas fa-signal me-1"></i> Actifs
+                  </span>
+                  maintenant
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
+                <i class="fas fa-users text-lg opacity-10"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+      <div class="card mb-4">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold text-muted">Actifs aujourd'hui</p>
+                <h5 class="font-weight-bolder text-primary mt-2">
+                  {{ activeTodayCount|default(12) }}
+                </h5>
+                <p class="mb-0 text-sm">
+                  <span class="text-primary font-weight-bolder">
+                    <i class="fas fa-calendar-day me-1"></i> Aujourd'hui
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-primary shadow text-center rounded-circle">
+                <i class="fas fa-user-clock text-lg opacity-10"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+      <div class="card mb-4">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold text-muted">Actifs ce mois</p>
+                <h5 class="font-weight-bolder text-info mt-2">
+                  {{ activeMonthCount|default(45) }}
+                </h5>
+                <p class="mb-0 text-sm">
+                  <span class="text-info font-weight-bolder">
+                    <i class="fas fa-calendar-week me-1"></i> Ce mois
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-info shadow text-center rounded-circle">
+                <i class="fas fa-chart-bar text-lg opacity-10"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+      <div class="card mb-4">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold text-muted">Taux d'activité</p>
+                <h5 class="font-weight-bolder text-warning mt-2">
+                  {{ ((activeMonthCount|default(45) / totalUsers|default(100)) * 100)|round }}%
+                </h5>
+                <p class="mb-0 text-sm">
+                  <span class="text-warning font-weight-bolder">
+                    <i class="fas fa-percentage me-1"></i> des utilisateurs
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
+                <i class="fas fa-chart-pie text-lg opacity-10"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-lg-7 mb-lg-0 mb-4">
       <div class="card mb-4">
         <div class="card-header pb-0">
           <h6>Activité des utilisateurs</h6>
@@ -468,8 +1157,48 @@
         </div>
       </div>
     </div>
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h6><i class="fas fa-user-plus me-2"></i>Dernières inscriptions</h6>
+        </div>
+        <div class="card-body p-3">
+          <ul class="list-group">
+            {% for i in 1..5 %}
+              {% set colors = ['primary', 'info', 'success', 'warning', 'danger'] %}
+              {% set initials = ['JD', 'MS', 'AL', 'RM', 'KS'] %}
+              {% set names = ['Jean Dupont', 'Marie Smith', 'Antoine Laurent', 'Robert Martin', 'Karine Soulier'] %}
+              {% set emails = ['admin@airmess.com', 'voyageur@airmess.com', 'entreprise@airmess.com', 'contact@airmess.com', 'support@airmess.com'] %}
+              {% set times = ['il y a 2h', 'il y a 1j', 'il y a 3j', 'il y a 5j', 'il y a 1 sem'] %}
+              
+              {% set colorIndex = (i - 1) % colors|length %}
+              {% set nameIndex = (i - 1) % names|length %}
+              {% set timeIndex = (i - 1) % times|length %}
+              
+              <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                <div class="d-flex align-items-center">
+                  <div class="avatar-container me-3">
+                    <div class="avatar rounded-circle bg-{{ colors[colorIndex] }} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                      <span class="text-white">{{ initials[colorIndex] }}</span>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <h6 class="mb-1 text-dark text-sm">{{ names[nameIndex] }}</h6>
+                    <span class="text-xs">{{ emails[nameIndex] }}</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center text-sm">
+                  {{ times[timeIndex] }}
+                  <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4"><i class="fas fa-file-pdf text-lg me-1"></i> Doc</button>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
-  
+
   <!-- Footer -->
   <footer class="footer pt-3">
     <div class="container-fluid">
@@ -563,11 +1292,11 @@
           </div>
           <div class="mb-3">
             <label for="editPhone{{ user.idU }}" class="form-label">Téléphone</label>
-            <input type="tel" class="form-control" id="editPhone{{ user.idU }}" name="phone" value="{{ user.phoneNumber }}">
+            <input type="tel" class="form-control" id="editPhone{{ user.idU }}" name="phoneNumber" value="{{ user.phoneNumber }}">
           </div>
           <div class="mb-3">
             <label for="editRole{{ user.idU }}" class="form-label">Rôle</label>
-            <select class="form-select" id="editRole{{ user.idU }}" name="role">
+            <select class="form-select" id="editRole{{ user.idU }}" name="roleUser">
               <option value="Voyageurs" {% if user.roleUser == 'Voyageurs' %}selected{% endif %}>Voyageurs</option>
               <option value="Entreprise" {% if user.roleUser == 'Entreprise' %}selected{% endif %}>Entreprise</option>
               <option value="Admin" {% if user.roleUser == 'Admin' %}selected{% endif %}>Admin</option>
@@ -584,7 +1313,7 @@
             <label for="editPhoto{{ user.idU }}" class="form-label">Photo de profil</label>
             <div class="mb-3">
               <img src="{{ '/images_users/' ~ user.imagesU }}" alt="Photo de profil actuelle"
-                class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                class="img-fluid rounded mb-2" style="max-height: 100px;">
             </div>
             <input type="file" class="form-control" id="editPhoto{{ user.idU }}" name="photo" accept="image/*">
           </div>
@@ -741,387 +1470,4 @@
     </div>
   </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Setup pour le graphique de répartition des utilisateurs
-  var ctx = document.getElementById('userRoleChart').getContext('2d');
-  var userRoleChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Voyageurs', 'Entreprise', 'Admin'],
-      datasets: [{
-        label: 'Utilisateurs par rôle',
-        data: [
-          {{ usersByRole.Voyageurs }}, 
-          {{ usersByRole.Entreprise }}, 
-          {{ usersByRole.Admin }}
-        ],
-        backgroundColor: [
-          'rgba(94, 114, 228, 0.8)',
-          'rgba(233, 196, 106, 0.8)',
-          'rgba(92, 184, 92, 0.8)'
-        ],
-        borderColor: [
-          'rgba(94, 114, 228, 1)',
-          'rgba(233, 196, 106, 1)',
-          'rgba(92, 184, 92, 1)'
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom'
-        }
-      }
-    }
-  });
-  
-  // Fonction de filtrage des utilisateurs
-  function applyFilters() {
-    // Récupérer les valeurs des filtres
-    const roleFilter = document.querySelector('input[name="roleFilter"]:checked').value;
-    const statusFilter = document.querySelector('input[name="statusFilter"]:checked').value;
-    const searchFilter = document.getElementById('searchInput').value;
-
-    // Afficher un indicateur de chargement
-    const tableBody = document.querySelector('#usersTable tbody');
-    tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Chargement...</td></tr>';
-    
-    // Mettre à jour le compteur temporairement
-    document.querySelector('.user-counter').textContent = '...';
-    
-    // Faire une requête AJAX pour obtenir les données filtrées
-    fetch('{{ path('user_page', {'page': 1}) }}', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      body: JSON.stringify({
-        search: searchFilter,
-        role: roleFilter,
-        status: statusFilter
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Mettre à jour le tableau avec les données filtrées
-        tableBody.innerHTML = data.html;
-        
-        // Mettre à jour la pagination
-        const paginationContainer = document.querySelector('.pagination');
-        if (paginationContainer) {
-          paginationContainer.innerHTML = data.pagination;
-          
-          // Mettre à jour les liens de pagination avec les filtres
-          updatePaginationLinks();
-        }
-        
-        // Mettre à jour le compteur d'utilisateurs
-        document.querySelector('.user-counter').textContent = data.totalItems;
-        
-        // Mettre à jour les informations de pagination
-        const paginationInfoEl = document.querySelector('.text-center.text-sm.text-muted.mt-2');
-        if (paginationInfoEl && data.paginationInfo) {
-          paginationInfoEl.textContent = data.paginationInfo;
-        }
-      } else {
-        console.error('Erreur lors du filtrage:', data.message);
-        tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-3"><i class="fas fa-exclamation-triangle text-warning me-2"></i> Erreur lors du chargement des données</td></tr>';
-      }
-    })
-    .catch(error => {
-      console.error('Erreur lors du filtrage:', error);
-      tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-3"><i class="fas fa-exclamation-triangle text-warning me-2"></i> Erreur lors du chargement des données</td></tr>';
-    });
-  }
-  
-  // Event listeners for role radio buttons
-  document.querySelectorAll('input[name="roleFilter"]').forEach(function(radio) {
-    radio.addEventListener('change', applyFilters);
-  });
-  
-  // Event listeners for status radio buttons
-  document.querySelectorAll('input[name="statusFilter"]').forEach(function(radio) {
-    radio.addEventListener('change', applyFilters);
-  });
-  
-  // Réinitialiser les filtres
-  document.getElementById('resetFilters').addEventListener('click', function() {
-    document.getElementById('roleAll').checked = true;
-    document.getElementById('statusAll').checked = true;
-    document.getElementById('searchInput').value = '';
-    
-    // Appliquer les filtres réinitialisés
-    applyFilters();
-  });
-  
-  // AJAX Search functionality
-  const searchInput = document.getElementById('searchInput');
-  let searchTimeout;
-
-  searchInput.addEventListener('input', function() {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-      applyFilters();
-    }, 500); // Délai de 500ms pour éviter trop de requêtes
-  });
-  
-  // Fonction pour soumettre le formulaire d'ajout d'utilisateur
-  function submitAddForm() {
-    var form = document.getElementById('addUserForm');
-    
-    if (!form) {
-      console.error('Form not found: addUserForm');
-      alert('Erreur: Formulaire non trouvé');
-      return;
-    }
-    
-    // Check required fields
-    var name = form.querySelector('[name="name"]');
-    var prenom = form.querySelector('[name="prenom"]');
-    var email = form.querySelector('[name="email"]');
-    var password = form.querySelector('[name="password"]');
-    
-    if (!name.value || !prenom.value || !email.value || !password.value) {
-      alert('Veuillez remplir tous les champs obligatoires');
-      return;
-    }
-    
-    // Create FormData from the form
-    var formData = new FormData(form);
-    
-    // Debug form data
-    console.log('Add user form data:');
-    for (var pair of formData.entries()) {
-      console.log(pair[0] + ': ' + pair[1]);
-    }
-    
-    // Use fetch API to submit the form
-    fetch(form.action, {
-      method: form.method,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      body: formData
-    })
-    .then(response => {
-      console.log('Response status:', response.status);
-      return response.json();
-    })
-    .then(data => {
-      console.log('Response data:', data);
-      if (data.success) {
-        alert('Utilisateur créé avec succès');
-        // Reload page to see the new user, staying on current page
-        window.location.href = '{{ path('user_page', {'page': currentPage}) }}';
-      } else {
-        alert('Erreur: ' + data.message);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Une erreur est survenue');
-    });
-  }
-
-  // Fonction pour activer tous les utilisateurs
-  document.getElementById('activateAllButton').addEventListener('click', function() {
-    if (confirm("Êtes-vous sûr de vouloir activer tous les utilisateurs?")) {
-      fetch('{{ path('admin_activate_all_users') }}', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Tous les utilisateurs ont été activés avec succès');
-          // Reload page to update the user list
-          window.location.href = '{{ path('user_page', {'page': currentPage}) }}';
-        } else {
-          alert('Erreur lors de l\'activation des utilisateurs: ' + data.message);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Une erreur est survenue lors de l\'activation des utilisateurs');
-      });
-    }
-  });
-
-  // Excel Export
-  document.getElementById('exportExcelButton').addEventListener('click', function() {
-    // Récupérer les valeurs des filtres actifs
-    let roleFilter = document.querySelector('input[name="roleFilter"]:checked').value;
-    let statusFilter = document.querySelector('input[name="statusFilter"]:checked').value;
-    let searchFilter = document.getElementById('searchInput').value;
-    
-    // Mettre à jour les champs cachés du formulaire Excel
-    document.getElementById('excelRoleFilterValue').value = roleFilter;
-    document.getElementById('excelStatusFilterValue').value = statusFilter;
-    document.getElementById('excelSearchFilterValue').value = searchFilter;
-    
-    // Afficher le modal Excel
-    new bootstrap.Modal(document.getElementById('excelExportModal')).show();
-  });
-
-  // Préparer les données du formulaire d'export PDF et Excel
-  document.getElementById('exportPdfButton').addEventListener('click', function() {
-    // Récupérer les valeurs des filtres actifs
-    let roleFilter = document.querySelector('input[name="roleFilter"]:checked').value;
-    let statusFilter = document.querySelector('input[name="statusFilter"]:checked').value;
-    let searchFilter = document.getElementById('searchInput').value;
-    
-    // Mettre à jour les champs cachés du formulaire PDF
-    document.getElementById('roleFilterValue').value = roleFilter;
-    document.getElementById('statusFilterValue').value = statusFilter;
-    document.getElementById('searchFilterValue').value = searchFilter;
-  });
-  
-  // Ajouter les filtres aux liens de pagination
-  function updatePaginationLinks() {
-    const roleFilter = document.querySelector('input[name="roleFilter"]:checked').value;
-    const statusFilter = document.querySelector('input[name="statusFilter"]:checked').value;
-    const searchFilter = document.getElementById('searchInput').value;
-    
-    const params = new URLSearchParams();
-    if (roleFilter) params.append('role', roleFilter);
-    if (statusFilter) params.append('status', statusFilter);
-    if (searchFilter) params.append('search', searchFilter);
-    
-    const queryString = params.toString();
-    
-    document.querySelectorAll('.pagination-link').forEach(link => {
-      const url = new URL(link.href);
-      
-      // Ajouter les paramètres de filtre à l'URL
-      if (roleFilter) url.searchParams.set('role', roleFilter);
-      if (statusFilter) url.searchParams.set('status', statusFilter);
-      if (searchFilter) url.searchParams.set('search', searchFilter);
-      
-      link.href = url.toString();
-    });
-  }
-  
-  // Mettre à jour les liens de pagination quand les filtres changent
-  document.querySelectorAll('input[name="roleFilter"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-      updatePaginationLinks();
-      applyFilters();
-    });
-  });
-  
-  document.querySelectorAll('input[name="statusFilter"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-      updatePaginationLinks();
-      applyFilters();
-    });
-  });
-  
-  document.getElementById('searchInput').addEventListener('input', function() {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-      updatePaginationLinks();
-    }, 300);
-  });
-  
-  // Initialiser les liens de pagination
-  updatePaginationLinks();
-});
-
-// Fonction de confirmation de suppression
-function confirmDelete(userId) {
-  if (confirm("Êtes-vous sûr de vouloir désactiver cet utilisateur ?")) {
-    const deletePath = document.getElementById('usersTable').dataset.deletePath.replace('/0', '/' + userId);
-    
-    fetch(deletePath, {
-      method: 'POST',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Utilisateur désactivé avec succès');
-        // Reload page to update the user list, keeping the current page
-        window.location.href = '{{ path('user_page', {'page': currentPage}) }}';
-      } else {
-        alert('Erreur lors de la désactivation');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Une erreur est survenue');
-    });
-  }
-}
-
-// Fonction pour enregistrer les modifications d'un utilisateur
-function submitEditForm(userId) {
-  // Get the form element directly
-  var form = document.getElementById('editUserForm' + userId);
-  
-  if (!form) {
-    console.error('Form not found:', 'editUserForm' + userId);
-    alert('Erreur: Formulaire non trouvé');
-    return;
-  }
-  
-  // Check required fields
-  var name = form.querySelector('[name="name"]');
-  var prenom = form.querySelector('[name="prenom"]');
-  var email = form.querySelector('[name="email"]');
-  
-  if (!name.value || !prenom.value || !email.value) {
-    alert('Veuillez remplir tous les champs obligatoires');
-    return;
-  }
-  
-  // Create FormData from the form
-  var formData = new FormData(form);
-  
-  // Debug form data
-  console.log('Form data entries:');
-  for (var pair of formData.entries()) {
-    console.log(pair[0] + ': ' + pair[1]);
-  }
-  
-  // Use fetch API to submit the form
-  fetch(form.action, {
-    method: form.method,
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest'
-    },
-    body: formData
-  })
-  .then(response => {
-    console.log('Response status:', response.status);
-    return response.json();
-  })
-  .then(data => {
-    console.log('Response data:', data);
-    if (data.success) {
-      alert('Utilisateur modifié avec succès');
-      // Reload page to see the updated user, keeping the current page
-      window.location.href = '{{ path('user_page', {'page': currentPage}) }}';
-    } else {
-      alert('Erreur: ' + data.message);
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('Une erreur est survenue');
-  });
-}
-</script>
 {% endblock %}

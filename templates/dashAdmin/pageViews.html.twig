@@ -1,0 +1,272 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques de vues de page - Admin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .stats-card {
+            transition: all 0.3s;
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .page-url {
+            word-break: break-all;
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+        .stats-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+        .chart-container {
+            background: rgba(240, 242, 245, 0.1); 
+            border-radius: 10px; 
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: box-shadow 0.3s ease;
+            height: 400px;
+        }
+        .chart-container:hover {
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .page-row {
+            transition: background-color 0.2s ease;
+        }
+        .page-row:hover {
+            background-color: rgba(240, 242, 245, 0.5);
+        }
+        .views-badge {
+            font-size: 0.85rem;
+            padding: 0.35em 0.65em;
+            border-radius: 6px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4 py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="m-0">Statistiques de vues de page</h1>
+        <a href="{{ path('dashboard_page') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Retour au dashboard
+        </a>
+    </div>
+    
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card stats-card bg-gradient-primary text-white">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title text-white">Total des vues</h5>
+                            <h2 class="display-4 fw-bold mb-0">{{ totalPageViews|number_format(0, ',', ' ') }}</h2>
+                            <p class="card-text opacity-75">Depuis le début</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="ni ni-chart-bar-32 stats-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card stats-card bg-gradient-success text-white">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title text-white">Vues aujourd'hui</h5>
+                            <h2 class="display-4 fw-bold mb-0">{{ todayPageViews|number_format(0, ',', ' ') }}</h2>
+                            <p class="card-text opacity-75">Aujourd'hui</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="ni ni-watch-time stats-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card stats-card bg-gradient-info text-white">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title text-white">Vues ce mois</h5>
+                            <h2 class="display-4 fw-bold mb-0">{{ currentMonthPageViews|number_format(0, ',', ' ') }}</h2>
+                            <p class="card-text opacity-75">Ce mois-ci</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="ni ni-calendar-grid-58 stats-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0 fw-bold">Évolution des vues sur les 30 derniers jours</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="pageViewsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Most Viewed Pages -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0 fw-bold">Pages les plus consultées</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="text-center" width="5%">#</th>
+                                    <th width="20%">Page</th>
+                                    <th width="60%">URL</th>
+                                    <th class="text-center" width="15%">Nombre de vues</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for page in mostViewedPages %}
+                                <tr class="page-row">
+                                    <td class="text-center"><strong>{{ loop.index }}</strong></td>
+                                    <td>{{ page.pageTitle ?? 'Sans titre' }}</td>
+                                    <td>
+                                        <span class="page-url" title="{{ page.path }}">{{ page.path }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-gradient-info text-white views-badge">{{ page.viewCount|number_format(0, ',', ' ') }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Page views chart
+            var ctx = document.getElementById('pageViewsChart').getContext('2d');
+            var labels = {{ chartLabels|raw }};
+            var data = {{ chartData|raw }};
+            
+            // Create gradient
+            var gradientStroke = ctx.createLinearGradient(0, 400, 0, 50);
+            gradientStroke.addColorStop(1, 'rgba(32, 201, 255, 0.3)');
+            gradientStroke.addColorStop(0.2, 'rgba(32, 201, 255, 0.1)');
+            gradientStroke.addColorStop(0, 'rgba(32, 201, 255, 0)');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre de vues',
+                        data: data,
+                        backgroundColor: gradientStroke,
+                        borderColor: 'rgba(32, 201, 255, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(32, 201, 255, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(32, 201, 255, 1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + ' vues';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                precision: 0,
+                                color: 'rgba(0, 0, 0, 0.6)',
+                                font: {
+                                    family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+                                    size: 11
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: 'rgba(0, 0, 0, 0.6)',
+                                font: {
+                                    family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %} 
