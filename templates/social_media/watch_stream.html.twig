@@ -196,12 +196,14 @@
                 <div class="stream-player-wrapper">
                     <div class="stream-player">
                         <mux-player
-                            playback-id="{{ stream.playback_ids[0].id }}"
                             stream-type="live"
+                            playback-id="{{ stream.playback_ids[0].id }}"
+                            env-key="{{ mux_env_key|default('') }}"
                             title="{{ stream.new_asset_settings.title|default('Live Stream')|e('html_attr') }}"
-                            poster="https://image.mux.com/{{ stream.playback_ids[0].id }}/thumbnail.jpg"
+                            poster="https://image.mux.com/{{ stream.playback_ids[0].id }}/thumbnail.jpg?time=0&width=1280"
                             primary-color="#5e72e4"
                             secondary-color="white"
+                            stream-url="https://stream.mux.com/{{ stream.playback_ids[0].id }}.m3u8"
                             autoplay
                             muted
                             default-hidden-captions
@@ -210,7 +212,8 @@
                             start-time="0"
                             prefer-playback="mse"
                             metadata-video-title="{{ stream.new_asset_settings.title|default('Live Stream')|e('html_attr') }}"
-                            metadata-viewer-user-id="anonymous"
+                            metadata-viewer-user-id="{{ app.user ? app.user.id : 'anonymous' }}"
+                            beaconCollectionDomain="in.data.mux.com"
                             crossorigin
                         ></mux-player>
                         
@@ -261,6 +264,9 @@
         const errorDisplay = document.querySelector('.stream-error');
         const loadingDisplay = document.querySelector('.stream-loading');
         const statusMessage = document.querySelector('.stream-status-message');
+        
+        // Configuration du monitoring Mux Data
+        player.env_key = '{{ mux_env_key|default('') }}';
         
         function showError(show) {
             errorDisplay.style.display = show ? 'block' : 'none';
@@ -322,6 +328,13 @@
                     console.error('Error checking stream status:', error);
                 });
         }, 5000);
+        
+        // Force HLS playback URL if needed
+        const playbackId = '{{ stream.playback_ids[0].id }}';
+        const hlsUrl = `https://stream.mux.com/${playbackId}.m3u8`;
+        if (!player.src) {
+            player.src = hlsUrl;
+        }
     });
 </script>
 {% endblock %} 

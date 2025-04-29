@@ -2,6 +2,50 @@
 
 {% block title %}Streams en direct{% endblock %}
 
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="streams-container">
+                        {% if streams is empty %}
+                            <div class="text-center py-5">
+                                <h3>Aucun stream en direct pour le moment</h3>
+                                <p class="text-muted">Revenez plus tard pour voir les nouveaux streams</p>
+                            </div>
+                        {% else %}
+                            <div class="streams-grid">
+                                {% for stream in streams %}
+                                    <a href="{{ path('app_social_media_watch_stream', {'streamId': stream.id}) }}" class="stream-card">
+                                        <div class="stream-preview">
+                                            <span class="live-badge">LIVE</span>
+                                            <img 
+                                                src="https://image.mux.com/{{ stream.playback_ids[0].id }}/thumbnail.jpg?time=0&width=640" 
+                                                alt="{{ stream.new_asset_settings.title|default('Live Stream') }}"
+                                            />
+                                            <div class="play-overlay">
+                                                <i class="fas fa-play-circle play-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="stream-info">
+                                            <h3 class="stream-title">{{ stream.new_asset_settings.title|default('Live Stream') }}</h3>
+                                            <div class="stream-status status-{{ stream.status }}">
+                                                {{ stream.status|title }}
+                                            </div>
+                                        </div>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {% block stylesheets %}
 {{ parent() }}
 <style>
@@ -123,50 +167,6 @@
         100% { opacity: 1; }
     }
 </style>
-{% endblock %}
-
-{% block body %}
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="streams-container">
-                        {% if streams is empty %}
-                            <div class="text-center py-5">
-                                <h3>Aucun stream en direct pour le moment</h3>
-                                <p class="text-muted">Revenez plus tard pour voir les nouveaux streams</p>
-                            </div>
-                        {% else %}
-                            <div class="streams-grid">
-                                {% for stream in streams %}
-                                    <a href="{{ path('app_social_media_watch_stream', {'streamId': stream.id}) }}" class="stream-card">
-                                        <div class="stream-preview">
-                                            <span class="live-badge">LIVE</span>
-                                            <img 
-                                                src="https://image.mux.com/{{ stream.playback_ids[0].id }}/thumbnail.jpg?time=0&width=640" 
-                                                alt="{{ stream.new_asset_settings.title|default('Live Stream') }}"
-                                            />
-                                            <div class="play-overlay">
-                                                <i class="fas fa-play-circle play-icon"></i>
-                                            </div>
-                                        </div>
-                                        <div class="stream-info">
-                                            <h3 class="stream-title">{{ stream.new_asset_settings.title|default('Live Stream') }}</h3>
-                                            <div class="stream-status status-{{ stream.status }}">
-                                                {{ stream.status|title }}
-                                            </div>
-                                        </div>
-                                    </a>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block javascripts %}

@@ -254,8 +254,6 @@
                     <div class="live-container">
                         <h2 class="stream-title">Live Stream</h2>
                         
-                        <div class="alert" role="alert"></div>
-                        
                         <div class="stream-preview">
                             <div class="stream-overlay">
                                 <div class="stream-info">
@@ -272,20 +270,17 @@
                                 <video id="localVideo" autoplay muted playsinline></video>
                                 <div class="camera-placeholder">
                                     <i class="fas fa-video fa-3x mb-3"></i>
-                                    <h3>Caméra non activée</h3>
-                                    <p>Cliquez sur le bouton démarrer pour activer votre caméra</p>
+                                    <p>Activez votre caméra pour commencer</p>
                                 </div>
-                                <div class="camera-controls">
-                                    <button class="camera-btn" id="toggleVideo" title="Activer/Désactiver la caméra">
-                                        <i class="fas fa-video"></i>
-                                    </button>
-                                    <button class="camera-btn" id="toggleAudio" title="Activer/Désactiver le micro">
-                                        <i class="fas fa-microphone"></i>
-                                    </button>
-                                    <button class="camera-btn" id="switchCamera" title="Changer de caméra">
-                                        <i class="fas fa-sync"></i>
-                                    </button>
-                                </div>
+                            </div>
+
+                            <div class="camera-controls">
+                                <button class="camera-btn" id="toggleCamera" title="Activer/Désactiver la caméra">
+                                    <i class="fas fa-video"></i>
+                                </button>
+                                <button class="camera-btn" id="toggleMic" title="Activer/Désactiver le micro">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
                             </div>
                         </div>
                         
@@ -314,7 +309,10 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block javascripts %}
+{{ parent() }}
 <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player"></script>
 <script>
 let mediaStream = null;
@@ -348,57 +346,24 @@ async function initializeCamera() {
 }
 
 function initializeCameraControls() {
-    const toggleVideo = document.getElementById('toggleVideo');
-    const toggleAudio = document.getElementById('toggleAudio');
-    const switchCamera = document.getElementById('switchCamera');
+    const toggleCamera = document.getElementById('toggleCamera');
+    const toggleMic = document.getElementById('toggleMic');
     
-    toggleVideo.addEventListener('click', () => {
+    toggleCamera.addEventListener('click', () => {
         if (mediaStream) {
             const videoTrack = mediaStream.getVideoTracks()[0];
             videoTrack.enabled = !videoTrack.enabled;
-            toggleVideo.classList.toggle('active');
-            toggleVideo.querySelector('i').className = videoTrack.enabled ? 'fas fa-video' : 'fas fa-video-slash';
+            toggleCamera.classList.toggle('active');
+            toggleCamera.querySelector('i').className = videoTrack.enabled ? 'fas fa-video' : 'fas fa-video-slash';
         }
     });
     
-    toggleAudio.addEventListener('click', () => {
+    toggleMic.addEventListener('click', () => {
         if (mediaStream) {
             const audioTrack = mediaStream.getAudioTracks()[0];
             audioTrack.enabled = !audioTrack.enabled;
-            toggleAudio.classList.toggle('active');
-            toggleAudio.querySelector('i').className = audioTrack.enabled ? 'fas fa-microphone' : 'fas fa-microphone-slash';
-        }
-    });
-    
-    switchCamera.addEventListener('click', async () => {
-        try {
-            // Arrêter tous les tracks actuels
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-            }
-            
-            // Obtenir la liste des caméras
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const videoDevices = devices.filter(device => device.kind === 'videoinput');
-            
-            if (videoDevices.length > 1) {
-                // Trouver la prochaine caméra à utiliser
-                const currentDevice = mediaStream.getVideoTracks()[0].getSettings().deviceId;
-                const currentIndex = videoDevices.findIndex(device => device.deviceId === currentDevice);
-                const nextIndex = (currentIndex + 1) % videoDevices.length;
-                
-                // Démarrer la nouvelle caméra
-                const newStream = await navigator.mediaDevices.getUserMedia({
-                    video: { deviceId: { exact: videoDevices[nextIndex].deviceId } },
-                    audio: true
-                });
-                
-                document.getElementById('localVideo').srcObject = newStream;
-                mediaStream = newStream;
-            }
-        } catch (error) {
-            console.error('Erreur lors du changement de caméra:', error);
-            showAlert('Impossible de changer de caméra.', 'danger');
+            toggleMic.classList.toggle('active');
+            toggleMic.querySelector('i').className = audioTrack.enabled ? 'fas fa-microphone' : 'fas fa-microphone-slash';
         }
     });
 }
@@ -520,8 +485,4 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('stop-stream').addEventListener('click', stopStream);
 });
 </script>
-{% endblock %}
-
-{% block javascripts %}
-{{ parent() }}
 {% endblock %} 

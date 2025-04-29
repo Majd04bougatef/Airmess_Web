@@ -972,30 +972,16 @@ class SocialMediaController extends AbstractController
                 throw new \Exception('Format de réponse Mux invalide');
             }
 
-            // Debug: Afficher tous les streams et leurs statuts
-            foreach ($allStreams['data'] as $stream) {
-                $this->addFlash('info', sprintf(
-                    'Stream trouvé - ID: %s, Status: %s', 
-                    $stream['id'], 
-                    $stream['status']
-                ));
-            }
-
             // Filtrer les streams qui sont soit actifs soit connectés
             $activeStreams = array_filter($allStreams['data'], function($stream) {
                 return in_array($stream['status'], ['active', 'connected', 'idle']);
             });
-
-            if (empty($activeStreams)) {
-                $this->addFlash('info', 'Aucun stream actif trouvé');
-            }
             
             return $this->render('social_media/watch.html.twig', [
                 'streams' => array_values($activeStreams) // array_values pour réindexer le tableau
             ]);
 
         } catch (\Exception $e) {
-            $this->addFlash('error', 'Erreur: ' . $e->getMessage());
             return $this->json([
                 'success' => false,
                 'error' => 'Erreur lors de la récupération des streams: ' . $e->getMessage()
@@ -1015,17 +1001,11 @@ class SocialMediaController extends AbstractController
             }
 
             $stream = $streamData['data'];
-            
-            // Vérifier si le stream est actif
-            if (!in_array($stream['status'], ['active', 'connected', 'idle'])) {
-                $this->addFlash('warning', 'Ce stream n\'est pas actuellement en direct');
-            }
 
             return $this->render('social_media/watch_stream.html.twig', [
                 'stream' => $stream
             ]);
         } catch (\Exception $e) {
-            $this->addFlash('error', 'Erreur lors de la récupération du stream: ' . $e->getMessage());
             return $this->redirectToRoute('app_social_media_live_list');
         }
     }
