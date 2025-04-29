@@ -1,0 +1,5 @@
+parameters:
+    # Default values for environment variables
+    env(TWILIO_ACCOUNT_SID): 'TEST_SID'
+    env(TWILIO_AUTH_TOKEN): 'TEST_TOKEN'
+    env(TWILIO_PHONE_NUMBER): '+12345678900' 
