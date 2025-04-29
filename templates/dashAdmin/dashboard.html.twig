@@ -95,6 +95,55 @@
             <span class="nav-link-text ms-1">Social Media</span>
           </a>
         </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('admin_online_users_details') }}" id="online-users-button">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-users text-info"></i>
+            </div>
+            <span class="nav-link-text ms-1">Utilisateurs en ligne</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('admin_monthly_users_details') }}" id="monthly-users-button">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-user-clock text-primary"></i>
+            </div>
+            <span class="nav-link-text ms-1">Utilisateurs actifs</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('admin_reservations') }}">
+            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-calendar-alt text-primary"></i>
+            </div>
+            <span class="nav-link-text ms-1">Réservations</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('admin_stations_dashboard') }}">
+            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-bicycle text-success"></i>
+            </div>
+            <span class="nav-link-text ms-1">Stations</span>
+          </a>
+        </li>
+        
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Statistiques</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('vues_page') }}" id="vues-page-button">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-chart-bar-32 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Vues de page</span>
+          </a>
+        </li>
+        
         <li class="nav-item mt-3">
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
         </li>
@@ -240,6 +289,11 @@
         window.location.href = "{{ path('bonplan_page') }}";
       });
 
+      document.getElementById("vues-page-button").addEventListener("click", function(e) {
+        e.preventDefault();
+        window.location.href = "{{ path('vues_page') }}";
+      });
+
       // Initialize user management features if on the user page
       if (document.getElementById('usersTable')) {
         userManagement.init();
@@ -252,11 +306,13 @@
     });
   </script>
   
-  <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="{{asset('js/argon-dashboard.min.js')}}"></script>
-  <!-- Custom JS for Dashboard -->
-  <script src="{{asset('js/dashAdmin.js')}}"></script>
+  {% block javascripts %}
+    <!-- Github buttons -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="{{asset('js/argon-dashboard.min.js')}}"></script>
+    <!-- Custom JS for Dashboard -->
+    <script src="{{asset('js/dashAdmin.js')}}"></script>
+  {% endblock %}
 </body>
 </html>

@@ -1,0 +1,91 @@
+{% extends 'dashAdmin/dashboard.html.twig' %}
+
+{% block title %}Publications Planifiées{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Publications Planifiées</h6>
+                    <a href="{{ path('admin_scheduled_posts_new') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i>Nouvelle Publication Planifiée
+                    </a>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Titre</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Contenu</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lieu</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de Publication</th>
+                                    <th class="text-secondary opacity-7">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if scheduled_posts|length > 0 %}
+                                    {% for post in scheduled_posts %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    {% if post.imagemedia %}
+                                                        <div>
+                                                            <img src="{{ asset('http://localhost/ImageSocialMedia/' ~ post.imagemedia) }}" class="avatar avatar-sm me-3" alt="Image">
+                                                        </div>
+                                                    {% else %}
+                                                        <div>
+                                                            <div class="avatar avatar-sm me-3 bg-gradient-primary">
+                                                                <i class="fas fa-image text-white"></i>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">{{ post.titre }}</h6>
+                                                        <p class="text-xs text-secondary mb-0">
+                                                            {% if post.user %}
+                                                                {{ post.user.name|default('') }} {{ post.user.prenom|default('') }}
+                                                            {% else %}
+                                                                Utilisateur inconnu
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">{{ post.contenu|slice(0, 100) }}{% if post.contenu|length > 100 %}...{% endif %}</p>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="badge badge-sm bg-gradient-info">{{ post.lieu }}</span>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <span class="text-secondary text-xs font-weight-bold">{{ post.publicationDate|date('d/m/Y H:i') }}</span>
+                                            </td>
+                                            <td class="align-middle">
+                                                <form method="post" action="{{ path('admin_scheduled_posts_delete', {'idEB': post.idEB}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication planifiée?');" style="display: inline-block;">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.idEB) }}">
+                                                    <button type="submit" class="btn btn-link text-danger text-gradient px-3 mb-0">
+                                                        <i class="fas fa-trash me-2"></i>Supprimer
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4">
+                                            <p class="text-muted">Aucune publication planifiée</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

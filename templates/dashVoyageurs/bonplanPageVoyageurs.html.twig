@@ -414,663 +414,853 @@
     z-index: 2;
     pointer-events: auto !important;
   }
+
+  /* Styles pour la modale */
+  .modal {
+    z-index: 1060 !important;
+  }
+
+  .modal-backdrop {
+    z-index: 1050 !important;
+  }
+
+  .modal-dialog {
+    z-index: 1070 !important;
+  }
+
+  .modal-content {
+    background-color: #fff !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Styles pour les étoiles dans la modale */
+  .modal .rating-star {
+    color: #ccc;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    font-size: 1.5rem;
+    margin-right: 5px;
+    transition: color 0.2s ease;
+  }
+
+  .modal .rating-star:hover,
+  .modal .rating-star.fas {
+    color: #f8ce0b;
+  }
+
+  /* Styles pour les boutons de la modale */
+  .modal .btn {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+  }
+
+  .modal .btn-primary {
+    background-color: #5e72e4 !important;
+    border-color: #5e72e4 !important;
+    color: white !important;
+  }
+
+  .modal .btn-secondary {
+    background-color: #8392ab !important;
+    border-color: #8392ab !important;
+    color: white !important;
+  }
+
+  .modal textarea {
+    pointer-events: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+  }
+
+  /* Assurer que la modale est au-dessus de tout */
+  #addReviewModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1060 !important;
+  }
+
+  #addReviewModal.show {
+    display: block;
+  }
+
+  /* Rendre tous les éléments de la modale cliquables */
+  #addReviewModal * {
+    pointer-events: auto !important;
+  }
+
+  .modal {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .star-rating-control {
+    cursor: pointer;
+  }
+  
+  .star-rating {
+    color: #ccc;
+    transition: color 0.2s;
+  }
+  
+  .star-rating.active {
+    color: #ffc107;
+  }
+  
+  .star-rating:hover {
+    color: #ffc107;
+  }
+  
+  .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal.show {
+    display: block;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-dialog {
+    margin: 1.75rem auto;
+    max-width: 500px;
+  }
+
+  /* Styles pour le bouton de filtrage */
+  .filter-dropdown {
+    background-color: #fff;
+    border: 1px solid #5e72e4;
+    color: #5e72e4;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .filter-dropdown:hover {
+    background-color: #5e72e4;
+    color: #fff;
+  }
+  
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 200px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    z-index: 1000;
+  }
+  
+  .dropdown-menu.show {
+    display: block;
+  }
+  
+  .dropdown-item {
+    padding: 8px 15px;
+    cursor: pointer;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  .custom-dropdown {
+    position: relative;
+  }
+
+  .custom-dropdown-menu {
+    padding: 0.5rem 0;
+  }
+
+  .custom-dropdown-menu .dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    clear: both;
+    font-weight: 400;
+    color: #67748e;
+    text-align: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+  }
+
+  .custom-dropdown-menu .dropdown-item:hover {
+    color: #344767;
+    background-color: #f8f9fa;
+  }
+
+  .weather-info {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    padding: 8px;
+  }
+  
+  .weather-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .temperature {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #344767;
+  }
+  
+  .weather-description {
+    font-size: 0.9rem;
+    color: #67748e;
+    margin-left: 8px;
+  }
+  
+  .weather-recommendation .badge,
+  .seasonal-badge .badge {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .weather-recommendation .badge i,
+  .seasonal-badge .badge i {
+    font-size: 0.9rem;
+  }
 </style>
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
-<script>
-console.log('Test - Le script est chargé');
-
-// Fonction pour gérer l'ajout d'avis
-function handleAddReview(button) {
-    console.log('=== Debug handleAddReview ===');
+<script type="text/javascript">
+    console.log("Début du script de la page des bons plans");
     
-    // Récupérer l'ID du bon plan
-    const bonplanId = button.getAttribute('data-bonplan-id');
-    console.log('1. ID du bon plan:', bonplanId);
-    
-    // Vérifier la correspondance des IDs
-    console.log('2. Vérification des éléments:');
-    console.log('- Bouton ID:', bonplanId);
-    console.log('- Collapse existe:', document.getElementById(`reviewCollapse${bonplanId}`) !== null);
-    console.log('- Formulaire existe:', document.getElementById(`quick-review-form-${bonplanId}`) !== null);
-    
-    // Trouver le formulaire dans l'accordion correspondant
-    const collapse = document.getElementById(`reviewCollapse${bonplanId}`);
-    if (!collapse) {
-        console.error(`Collapse #reviewCollapse${bonplanId} non trouvé`);
-        return;
-    }
-    
-    const quickForm = collapse.querySelector('.quick-review-form');
-    if (!quickForm) {
-        console.error('Formulaire non trouvé dans le collapse');
-        return;
-    }
-    
-    console.log('3. Formulaire trouvé, affichage...');
-    
-    // Ouvrir l'accordion si nécessaire
-    const accordionButton = document.querySelector(`[data-bs-target="#reviewCollapse${bonplanId}"]`);
-    if (accordionButton && accordionButton.classList.contains('collapsed')) {
-        accordionButton.click();
-    }
-    
-    // Cacher tous les autres formulaires
-    document.querySelectorAll('.quick-review-form').forEach(form => {
-        form.style.display = 'none';
-    });
-    
-    // Afficher ce formulaire
-    quickForm.style.display = 'block';
-    console.log('4. Formulaire affiché');
-    
-    // Faire défiler jusqu'au formulaire
-    setTimeout(() => {
-        quickForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 300);
-}
-
-// Initialisation
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== Vérification des correspondances d\'IDs ===');
-    
-    document.querySelectorAll('.add-card-review-btn').forEach(btn => {
-        const bonplanId = btn.getAttribute('data-bonplan-id');
-        console.log(`\nBon plan ${bonplanId}:`);
-        console.log('- Bouton:', btn.getAttribute('data-bonplan-id'));
-        console.log('- Collapse:', document.getElementById(`reviewCollapse${bonplanId}`)?.id);
-        console.log('- Formulaire:', document.getElementById(`quick-review-form-${bonplanId}`)?.id);
-    });
-    
-    // Event listeners
-    document.querySelectorAll('.add-card-review-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+    // Attendre que le document soit prêt
+    $(function() {
+        console.log("Document prêt - Initialisation des événements");
+        
+        // Gestionnaire pour le bouton de filtrage
+        var $filterButton = $('.filter-dropdown');
+        var $dropdownMenu = $('.dropdown-menu');
+        
+        console.log("Bouton de filtrage trouvé:", $filterButton.length > 0);
+        console.log("Menu déroulant trouvé:", $dropdownMenu.length > 0);
+        
+        $filterButton.on('click', function(e) {
+            console.log("Clic sur le bouton de filtrage");
             e.preventDefault();
             e.stopPropagation();
-            handleAddReview(this);
+            $dropdownMenu.toggle();
         });
-    });
-    
-    document.querySelectorAll('.card-cancel-review').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        
+        // Gestionnaire pour les options de filtrage
+        $('.filter-option').on('click', function(e) {
+            var filter = $(this).data('filter');
+            console.log("Option sélectionnée:", filter);
             e.preventDefault();
             e.stopPropagation();
-            const form = this.closest('.quick-review-form');
-            if (form) {
-                form.style.display = 'none';
+            
+            // Mise à jour du texte du bouton
+            $filterButton.html('<i class="fas fa-filter"></i> ' + $(this).text().trim());
+            
+            // Fermeture du menu
+            $dropdownMenu.hide();
+        });
+        
+        // Fermer le menu si on clique ailleurs
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.dropdown').length) {
+                $dropdownMenu.hide();
             }
         });
     });
-});
 </script>
 {% endblock %}
 
 {% block body %}
 <div class="container-fluid py-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4">
-        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-          <h6>{% if app.request.query.get('action') == 'add' %}Ajouter un bon plan{% else %}Bons Plans{% endif %}</h6>
-          {% if app.request.query.get('action') != 'add' %}
-          <a href="{{ path('bonplanVoyageurs_page') }}?action=add" class="btn btn-primary btn-sm">Ajouter un bon plan</a>
-          {% endif %}
-        </div>
-        <div class="card-body px-0 pt-0 pb-2">
-          {% if app.request.query.get('action') == 'add' %}
-          <div id="bonplan-form-container">
-            <!-- Le formulaire sera chargé ici -->
-            {% include 'dashVoyageurs/bonplanForm.html.twig' %}
-          </div>
-          {% else %}
-          <div class="p-4">
-            <p>Liste des bons plans disponibles:</p>
-            <!-- Liste des bons plans sous forme de cards -->
-            <div class="row g-3">
-              {% if bonplans is defined and bonplans|length > 0 %}
-                {% for bonplan in bonplans %}
-                  <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card h-100 card-bonplan">
-                      <div class="card-img-top-container">
-                        <img src="{{ asset('uploads/bonplans/' ~ bonplan.imageBP) }}" class="card-img-top" alt="{{ bonplan.nomplace }}" onerror="this.src='{{ asset('uploads/default.jpg') }}';">
-                        <div class="card-img-overlay card-actions">
-                          <div class="d-flex justify-content-between">
-                            <span class="badge bg-{{ bonplan.typePlace == 'resto' ? 'danger' : (bonplan.typePlace == 'cafe' ? 'success' : (bonplan.typePlace == 'coworkingspace' ? 'primary' : 'warning')) }}">
-                              {{ bonplan.typePlace }}
-                            </span>
-                            <div class="action-buttons">
-                              <a href="{{ path('bonplan_edit_form', {'idP': bonplan.idP}) }}" class="btn btn-sm btn-light">
-                                <i class="fas fa-edit"></i>
-                              </a>
-                              <button class="btn btn-sm btn-light delete-bonplan ms-1" data-id="{{ bonplan.idP }}">
-                                <i class="fas fa-trash"></i>
-                              </button>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>{% if app.request.query.get('action') == 'add' %}Ajouter un bon plan{% else %}Bons Plans{% endif %}</h6>
+                    {% if app.request.query.get('action') != 'add' %}
+                    <div class="d-flex align-items-center">
+                        <div class="custom-dropdown me-2" style="position: relative;">
+                            <button type="button" class="btn btn-primary filter-dropdown" data-custom-toggle="dropdown">
+                                <i class="fas fa-filter"></i> Filtrer par avis
+                            </button>
+                            <div class="custom-dropdown-menu" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1000; min-width: 200px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-top: 0.5rem;">
+                                <a class="dropdown-item filter-option" href="#" data-filter="all">
+                                    <i class="fas fa-list me-2"></i>Tous les bons plans
+                                </a>
+                                <a class="dropdown-item filter-option" href="#" data-filter="rating-5">
+                                    <i class="fas fa-star me-2"></i>5 étoiles
+                                </a>
+                                <a class="dropdown-item filter-option" href="#" data-filter="rating-4">
+                                    <i class="fas fa-star me-2"></i>4 étoiles et plus
+                                </a>
+                                <a class="dropdown-item filter-option" href="#" data-filter="rating-3">
+                                    <i class="fas fa-star me-2"></i>3 étoiles et plus
+                                </a>
+                                <a class="dropdown-item filter-option" href="#" data-filter="most-reviewed">
+                                    <i class="fas fa-comments me-2"></i>Plus d'avis
+                                </a>
                             </div>
-                          </div>
                         </div>
-                      </div>
-                      
-                      <!-- Zone cliquable pour la modale -->
-                      <div class="modal-trigger" data-bs-toggle="modal" data-bs-target="#viewModal{{ bonplan.idP }}" style="cursor: pointer;">
-                        <div class="card-body">
-                        <h5 class="card-title">{{ bonplan.nomplace }}</h5>
-                        <p class="card-text small text-muted">
-                          <i class="fas fa-map-marker-alt me-1"></i> {{ bonplan.localisation }}
-                        </p>
-                        <p class="card-text description-text">
-                          {{ bonplan.description|slice(0, 100) }}{% if bonplan.description|length > 100 %}...{% endif %}
-                        </p>
-                        <div class="rating-container mt-2">
-                          <div class="stars-outer">
-                            <div class="stars-inner" style="width: {{ (ratings[bonplan.idP] * 20) }}%"></div>
-                          </div>
-                          <span class="rating-text">{{ ratings[bonplan.idP] }} <small>({{ reviewsCount[bonplan.idP] }} avis)</small></span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <!-- Section des avis avec le bouton et l'accordion -->
-                      <div class="card-footer p-0">
-                        <!-- Bouton Ajouter un avis -->
-                        <div class="text-center py-2" style="position: relative; z-index: 1000;">
-                          <button type="button" 
-                                  class="btn btn-sm btn-primary add-card-review-btn" 
-                                  data-bonplan-id="{{ bonplan.idP }}"
-                                  data-bs-toggle="collapse"
-                                  data-bs-target="#reviewCollapse{{ bonplan.idP }}"
-                                  aria-expanded="false"
-                                  aria-controls="reviewCollapse{{ bonplan.idP }}">
-                            <i class="fas fa-plus me-1"></i> Ajouter un avis
-                          </button>
-                        </div>
-
-                        <!-- Accordion pour les avis -->
-                        <div class="accordion" id="reviewAccordion{{ bonplan.idP }}">
-                          <div class="accordion-item border-0">
-                            <h2 class="accordion-header" id="reviewHeading{{ bonplan.idP }}">
-                              <button class="accordion-button collapsed py-2 px-3" 
-                                      type="button" 
-                                      data-bs-toggle="collapse" 
-                                      data-bs-target="#reviewCollapse{{ bonplan.idP }}" 
-                                      aria-expanded="false" 
-                                      aria-controls="reviewCollapse{{ bonplan.idP }}">
-                                <i class="fas fa-comments me-2"></i> Afficher les avis ({{ reviewsCount[bonplan.idP] }})
-                              </button>
-                            </h2>
-                            <div id="reviewCollapse{{ bonplan.idP }}" 
-                                 class="accordion-collapse collapse" 
-                                 aria-labelledby="reviewHeading{{ bonplan.idP }}" 
-                                 data-bs-parent="#reviewAccordion{{ bonplan.idP }}">
-                              <div class="accordion-body p-3">
-                                <!-- Liste des avis existants -->
-                                {% if reviewsByBonPlan[bonplan.idP] is defined %}
-                                    {% if reviewsByBonPlan[bonplan.idP]|length > 0 %}
-                                        <div class="reviews-list mb-2" data-bonplan-id="{{ bonplan.idP }}">
-                                    {% for review in reviewsByBonPlan[bonplan.idP] %}
-                                                <div class="review-item-card mb-2 pb-2 border-bottom" 
-                                                     id="card-review-{{ review.idR }}" 
-                                                     data-bonplan-id="{{ bonplan.idP }}">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                          <div class="stars-outer small">
-                                            <div class="stars-inner" style="width: {{ (review.rating * 20) }}%"></div>
-                                          </div>
-                                          <div class="review-actions">
-                                                            <button type="button" class="btn btn-sm card-edit-review" data-id="{{ review.idR }}" data-rating="{{ review.rating }}" data-comment="{{ review.commente }}" title="Modifier">
-                                              <i class="fas fa-edit text-primary"></i>
-                                            </button>
-                                                            <button type="button" class="btn btn-sm card-delete-review" data-id="{{ review.idR }}" title="Supprimer">
-                                              <i class="fas fa-trash text-danger"></i>
-                                            </button>
-                                          </div>
-                                        </div>
-                                        <p class="review-text small mt-1 mb-0">{{ review.commente }}</p>
-                                      </div>
-                                    {% endfor %}
-                                  </div>
-                                {% else %}
-                                        <p class="text-muted small no-review-msg">Aucun avis pour le moment</p>
-                                    {% endif %}
-                                {% endif %}
-                                
-                                <!-- Formulaire d'ajout rapide d'avis -->
-                                <div class="quick-review-form mt-3 pt-3 border-top" 
-                                     id="quick-review-form-{{ bonplan.idP }}" 
-                                     data-bonplan-id="{{ bonplan.idP }}" 
-                                     style="display: none;">
-                                  <form class="card-review-form" data-bonplan-id="{{ bonplan.idP }}">
-                                        <div class="mb-3">
-                                            <label class="form-label">Note</label>
-                                            <div class="rating-select" data-bonplan-id="{{ bonplan.idP }}">
-                                        {% for i in 1..5 %}
-                                                    <i class="far fa-star card-rating-star" 
-                                                       data-rating="{{ i }}" 
-                                                       data-bonplan-id="{{ bonplan.idP }}"
-                                                       style="cursor: pointer; font-size: 1.5rem; margin-right: 5px;"></i>
-                                        {% endfor %}
-                                      </div>
-                                      <input type="hidden" name="rating" class="card-rating-input" value="0">
-                                    </div>
-                                    
-                                        <div class="mb-3">
-                                            <label class="form-label">Commentaire</label>
-                                            <textarea name="comment" 
-                                                      class="form-control card-comment-input" 
-                                                      rows="3" 
-                                                      placeholder="Écrivez votre avis ici..."
-                                                      required></textarea>
-                                    </div>
-                                    
-                                        <div class="d-flex justify-content-between mt-3">
-                                            <button type="button" 
-                                                    class="btn btn-secondary card-cancel-review" 
-                                                    data-bonplan-id="{{ bonplan.idP }}">
-                                                <i class="fas fa-times me-1"></i> Annuler
-                                            </button>
-                                            <button type="submit" 
-                                                    class="btn btn-primary" 
-                                                    data-bonplan-id="{{ bonplan.idP }}">
-                                                <i class="fas fa-check me-1"></i> Publier
-                                            </button>
-                                    </div>
-                                  </form>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                        <a href="{{ path('bonplanVoyageurs_page') }}?action=add" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus me-1"></i>Ajouter un bon plan
+                        </a>
                     </div>
-                  </div>
-                {% endfor %}
-              {% else %}
-                <div class="col-12 text-center py-5">
-                  <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i> Aucun bon plan n'a été ajouté.
-                  </div>
+                    {% endif %}
                 </div>
-              {% endif %}
-            </div>
-          </div>
-          {% endif %}
+                <div class="card-body px-0 pt-0 pb-2">
+                    {% if app.request.query.get('action') == 'add' %}
+                    <div id="bonplan-form-container">
+                        <!-- Le formulaire sera chargé ici -->
+                        {% include 'dashVoyageurs/bonplanForm.html.twig' %}
+                    </div>
+                    {% else %}
+                    <div class="p-4">
+                        <p>Liste des bons plans disponibles:</p>
+                        <!-- Liste des bons plans sous forme de cards -->
+                        <div class="row g-3">
+                            {% if bonplans is defined and bonplans|length > 0 %}
+                                {% for bonplan in bonplans %}
+                                    <div class="col-12 col-md-6 col-lg-4">
+                                        <div class="card h-100 card-bonplan">
+                                            <div class="card-img-top-container">
+                                                <img src="{{ asset('uploads/bonplans/' ~ bonplan.imageBP) }}" class="card-img-top" alt="{{ bonplan.nomplace }}" onerror="this.src='{{ asset('uploads/default.jpg') }}';">
+                                                <div class="card-img-overlay card-actions">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="badge bg-{{ bonplan.typePlace == 'resto' ? 'danger' : (bonplan.typePlace == 'cafe' ? 'success' : (bonplan.typePlace == 'coworkingspace' ? 'primary' : 'warning')) }}">
+                                                            {{ bonplan.typePlace }}
+                                                        </span>
+                                                        <div class="action-buttons">
+                                                            <a href="{{ path('bonplan_edit_form', {'idP': bonplan.idP}) }}" class="btn btn-sm btn-light">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                            <button class="btn btn-sm btn-light delete-bonplan ms-1" data-id="{{ bonplan.idP }}">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Zone cliquable pour la modale -->
+                                            <div class="modal-trigger" data-bs-toggle="modal" data-bs-target="#viewModal{{ bonplan.idP }}" style="cursor: pointer;">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ bonplan.nomplace }}</h5>
+                                                    <p class="card-text small text-muted">
+                                                        <i class="fas fa-map-marker-alt me-1"></i> {{ bonplan.localisation }}
+                                                    </p>
+                                                    {% if weatherData[bonplan.idP] is not null %}
+                                                        <div class="weather-info mb-2">
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="http://openweathermap.org/img/wn/{{ weatherData[bonplan.idP].weather[0].icon }}@2x.png" 
+                                                                     alt="Météo" class="weather-icon me-2">
+                                                                <div>
+                                                                    <span class="temperature">{{ weatherData[bonplan.idP].main.temp|round }}°C</span>
+                                                                    <span class="weather-description">{{ weatherData[bonplan.idP].weather[0].description }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                    <p class="card-text description-text">
+                                                        {{ bonplan.description|slice(0, 100) }}{% if bonplan.description|length > 100 %}...{% endif %}
+                                                    </p>
+                                                    <div class="rating-container mt-2">
+                                                        <div class="stars-outer">
+                                                            <div class="stars-inner" style="width: {{ (ratings[bonplan.idP] * 20) }}%"></div>
+                                                        </div>
+                                                        <span class="rating-text">{{ ratings[bonplan.idP] }} <small>({{ reviewsCount[bonplan.idP] }} avis)</small></span>
+                                                    </div>
+                                                    {% if weatherRecommendations[bonplan.idP] != 'unknown' %}
+                                                        <div class="weather-recommendation mt-2">
+                                                            {% if weatherRecommendations[bonplan.idP] == 'good' %}
+                                                                <span class="badge bg-success">
+                                                                    <i class="fas fa-sun me-1"></i> Idéal pour cette activité
+                                                                </span>
+                                                            {% elseif weatherRecommendations[bonplan.idP] == 'cold' %}
+                                                                <span class="badge bg-info">
+                                                                    <i class="fas fa-snowflake me-1"></i> Temps froid
+                                                                </span>
+                                                            {% elseif weatherRecommendations[bonplan.idP] == 'hot' %}
+                                                                <span class="badge bg-warning">
+                                                                    <i class="fas fa-fire me-1"></i> Temps chaud
+                                                                </span>
+                                                            {% elseif weatherRecommendations[bonplan.idP] == 'rainy' %}
+                                                                <span class="badge bg-primary">
+                                                                    <i class="fas fa-cloud-rain me-1"></i> Pluvieux
+                                                                </span>
+                                                            {% elseif weatherRecommendations[bonplan.idP] == 'snowy' %}
+                                                                <span class="badge bg-secondary">
+                                                                    <i class="fas fa-snowflake me-1"></i> Neigeux
+                                                                </span>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if seasonalActivities[bonplan.idP] %}
+                                                        <div class="seasonal-badge mt-2">
+                                                            <span class="badge bg-success">
+                                                                <i class="fas fa-calendar-check me-1"></i> Activité de saison
+                                                            </span>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Section des avis avec le bouton et l'accordion -->
+                                            <div class="card-footer p-0">
+                                                <!-- Bouton pour ajouter un avis -->
+                                                <div class="text-center py-2">
+                                                    <button type="button" class="btn btn-primary btn-sm add-review-btn" data-bonplan-id="{{ bonplan.idP }}">
+                                                        <i class="fas fa-plus me-1"></i> Ajouter un avis
+                                                    </button>
+                                                </div>
 
+                                                <!-- Interface d'ajout d'avis (cachée par défaut) -->
+                                                <div class="quick-review-form mt-3" id="quick-review-form-{{ bonplan.idP }}" style="display: none;">
+                                                    <form class="card-review-form" data-bonplan-id="{{ bonplan.idP }}">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Note</label>
+                                                            <div class="rating-select" data-bonplan-id="{{ bonplan.idP }}">
+                                                                {% for i in 1..5 %}
+                                                                    <i class="far fa-star card-rating-star" 
+                                                                       data-rating="{{ i }}" 
+                                                                       data-bonplan-id="{{ bonplan.idP }}"
+                                                                       style="cursor: pointer; font-size: 1.5rem; margin-right: 5px;"></i>
+                                                                {% endfor %}
+                                                            </div>
+                                                            <input type="hidden" name="rating" class="card-rating-input" value="0">
+                                                        </div>
+                                                        
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Commentaire</label>
+                                                            <textarea name="comment" 
+                                                                      class="form-control card-comment-input" 
+                                                                      rows="3" 
+                                                                      placeholder="Écrivez votre avis ici..."
+                                                                      required></textarea>
+                                                        </div>
+                                                        
+                                                        <div class="d-flex justify-content-between mt-3">
+                                                            <button type="button" 
+                                                                    class="btn btn-secondary card-cancel-review" 
+                                                                    data-bonplan-id="{{ bonplan.idP }}">
+                                                                <i class="fas fa-times me-1"></i> Annuler
+                                                            </button>
+                                                            <button type="submit" 
+                                                                    class="btn btn-primary" 
+                                                                    data-bonplan-id="{{ bonplan.idP }}">
+                                                                <i class="fas fa-check me-1"></i> Publier
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+
+                                                <!-- Accordion pour les avis existants -->
+                                                <div class="accordion" id="reviewAccordion{{ bonplan.idP }}">
+                                                    <div class="accordion-item border-0">
+                                                        <h2 class="accordion-header" id="reviewHeading{{ bonplan.idP }}">
+                                                            <button class="accordion-button collapsed py-2 px-3" 
+                                                                    type="button" 
+                                                                    data-bs-toggle="collapse" 
+                                                                    data-bs-target="#reviewCollapse{{ bonplan.idP }}" 
+                                                                    aria-expanded="false" 
+                                                                    aria-controls="reviewCollapse{{ bonplan.idP }}">
+                                                                <i class="fas fa-comments me-2"></i> Afficher les avis ({{ reviewsCount[bonplan.idP] }})
+                                                            </button>
+                                                        </h2>
+                                                        <div id="reviewCollapse{{ bonplan.idP }}" 
+                                                             class="accordion-collapse collapse" 
+                                                             aria-labelledby="reviewHeading{{ bonplan.idP }}" 
+                                                             data-bs-parent="#reviewAccordion{{ bonplan.idP }}">
+                                                            <div class="accordion-body p-3">
+                                                                <!-- Liste des avis existants -->
+                                                                {% if reviewsByBonPlan[bonplan.idP] is defined %}
+                                                                    {% if reviewsByBonPlan[bonplan.idP]|length > 0 %}
+                                                                        <div class="reviews-list mb-2" data-bonplan-id="{{ bonplan.idP }}">
+                                                                            {% for review in reviewsByBonPlan[bonplan.idP] %}
+                                                                                <div class="review-item-card mb-2 pb-2 border-bottom" 
+                                                                                     id="card-review-{{ review.idR }}" 
+                                                                                     data-bonplan-id="{{ bonplan.idP }}">
+                                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                                        <div class="stars-outer small">
+                                                                                            <div class="stars-inner" style="width: {{ (review.rating * 20) }}%"></div>
+                                                                                        </div>
+                                                                                        <div class="review-actions">
+                                                                                            <button type="button" class="btn btn-sm card-edit-review" data-id="{{ review.idR }}" data-rating="{{ review.rating }}" data-comment="{{ review.commente }}" title="Modifier">
+                                                                                                <i class="fas fa-edit text-primary"></i>
+                                                                                            </button>
+                                                                                            <button type="button" class="btn btn-sm card-delete-review" data-id="{{ review.idR }}" title="Supprimer">
+                                                                                                <i class="fas fa-trash text-danger"></i>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <p class="review-text small mt-1 mb-0">{{ review.commente }}</p>
+                                                                                </div>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <p class="text-muted small no-review-msg">Aucun avis pour le moment</p>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="col-12 text-center py-5">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i> Aucun bon plan n'a été ajouté.
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- Section des formulaires de review -->
 <div class="container-fluid py-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4">
-        <div class="card-body px-0 pt-0 pb-2">
-          <div class="p-4">
-            <div class="row g-3">
-              {% if bonplans is defined and bonplans|length > 0 %}
-                {% for bonplan in bonplans %}
-                  <div class="col-12 col-md-6 col-lg-4">
-                    <div class="review-form-container" id="review-form-{{ bonplan.idP }}" style="display: none;">
-                      <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title">{{ bonplan.nomplace }}</h5>
-                          <form class="card-review-form" data-bonplan-id="{{ bonplan.idP }}">
-                            <div class="mb-2">
-                              <label class="form-label small">Note</label>
-                              <div class="rating-select">
-                                {% for i in 1..5 %}
-                                  <i class="far fa-star card-rating-star" data-rating="{{ i }}"></i>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="p-4">
+                        <div class="row g-3">
+                            {% if bonplans is defined and bonplans|length > 0 %}
+                                {% for bonplan in bonplans %}
+                                    <div class="col-12 col-md-6 col-lg-4">
+                                        <div class="review-form-container" id="review-form-{{ bonplan.idP }}" style="display: none;">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ bonplan.nomplace }}</h5>
+                                                    <form class="card-review-form" data-bonplan-id="{{ bonplan.idP }}">
+                                                        <div class="mb-2">
+                                                            <label class="form-label small">Note</label>
+                                                            <div class="rating-select">
+                                                                {% for i in 1..5 %}
+                                                                    <i class="far fa-star card-rating-star" data-rating="{{ i }}"></i>
+                                                                {% endfor %}
+                                                            </div>
+                                                            <input type="hidden" name="rating" class="card-rating-input" value="0">
+                                                        </div>
+                                                        
+                                                        <div class="mb-2">
+                                                            <label class="form-label small">Commentaire</label>
+                                                            <textarea name="comment" class="form-control form-control-sm card-comment-input" rows="2" required></textarea>
+                                                        </div>
+                                                        
+                                                        <div class="d-flex justify-content-between">
+                                                            <button type="button" class="btn btn-sm btn-secondary card-cancel-review">Annuler</button>
+                                                            <button type="submit" class="btn btn-sm btn-primary">Soumettre</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 {% endfor %}
-                              </div>
-                              <input type="hidden" name="rating" class="card-rating-input" value="0">
-                            </div>
-                            
-                            <div class="mb-2">
-                              <label class="form-label small">Commentaire</label>
-                              <textarea name="comment" class="form-control form-control-sm card-comment-input" rows="2" required></textarea>
-                            </div>
-                            
-                            <div class="d-flex justify-content-between">
-                              <button type="button" class="btn btn-sm btn-secondary card-cancel-review">Annuler</button>
-                              <button type="submit" class="btn btn-sm btn-primary">Soumettre</button>
-                            </div>
-                          </form>
+                            {% endif %}
                         </div>
-                      </div>
                     </div>
-                  </div>
-                {% endfor %}
-              {% endif %}
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 {% if app.request.query.get('action') == 'add' %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Setup form submission
-    const bonplanForm = document.getElementById('bonplan-form');
-    if (bonplanForm) {
-      bonplanForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Create FormData object to handle file uploads
-        const formData = new FormData(bonplanForm);
-        
-        // Submit form using fetch API
-        fetch('{{ path('bonplan_add') }}', {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert('Bon plan ajouté avec succès!');
-            // Redirect to the bons plans list page
-            window.location.href = '{{ path('bonplanVoyageurs_page') }}';
-          } else {
-            alert('Erreur: ' + data.message);
-          }
-        })
-        .catch(error => {
-          console.error('Erreur:', error);
-          alert('Une erreur est survenue lors de l\'ajout du bon plan.');
-        });
-      });
-    }
-  });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup form submission
+        const bonplanForm = document.getElementById('bonplan-form');
+        if (bonplanForm) {
+            bonplanForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Create FormData object to handle file uploads
+                const formData = new FormData(bonplanForm);
+                
+                // Submit form using fetch API
+                fetch('{{ path('bonplan_add') }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Bon plan ajouté avec succès!');
+                        // Redirect to the bons plans list page
+                        window.location.href = '{{ path('bonplanVoyageurs_page') }}';
+                    } else {
+                        alert('Erreur: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de l\'ajout du bon plan.');
+                });
+            });
+        }
+    });
 </script>
 {% endif %}
 
 <!-- Modals de vue détaillée -->
 {% if bonplans is defined and bonplans|length > 0 %}
-  {% for bonplan in bonplans %}
-    <div class="modal fade" id="viewModal{{ bonplan.idP }}" tabindex="-1" aria-labelledby="viewModalLabel{{ bonplan.idP }}" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="viewModalLabel{{ bonplan.idP }}">{{ bonplan.nomplace }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="text-center mb-4">
-              <img src="{{ asset('uploads/bonplans/' ~ bonplan.imageBP) }}" class="img-fluid rounded" style="max-height: 200px;" alt="{{ bonplan.nomplace }}" onerror="this.src='{{ asset('uploads/default.jpg') }}';">
-            </div>
-            
-            <div class="mb-3">
-              <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Type</h6>
-              <p>{{ bonplan.typePlace }}</p>
-            </div>
-            
-            <div class="mb-3">
-              <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Localisation</h6>
-              <p>{{ bonplan.localisation }}</p>
-            </div>
-            
-            <div class="mb-3">
-              <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Description</h6>
-              <p>{{ bonplan.description }}</p>
-            </div>
-            
-            <!-- Section des avis -->
-            <div class="mb-3">
-              <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Avis</h6>
-              
-              <!-- Liste des avis -->
-              <div class="review-list mb-3">
-                {% if reviewsByBonPlan[bonplan.idP] is defined and reviewsByBonPlan[bonplan.idP]|length > 0 %}
-                  {% for review in reviewsByBonPlan[bonplan.idP] %}
-                    <div class="review-item p-2 border-bottom" id="review-{{ review.idR }}">
-                      <div class="d-flex justify-content-between">
-                        <div class="stars-outer small">
-                          <div class="stars-inner" style="width: {{ (review.rating * 20) }}%"></div>
-                        </div>
-                        <div class="review-actions">
-                          <button class="btn btn-sm edit-review" data-id="{{ review.idR }}" data-rating="{{ review.rating }}" data-comment="{{ review.commente }}" onclick="editReview(this)">
-                            <i class="fas fa-edit text-primary"></i>
-                          </button>
-                          <button class="btn btn-sm delete-review" data-id="{{ review.idR }}" onclick="deleteReview(this)">
-                            <i class="fas fa-trash text-danger"></i>
-                          </button>
-                        </div>
-                      </div>
-                      <p class="review-text mt-1 mb-0">{{ review.commente }}</p>
+    {% for bonplan in bonplans %}
+        <div class="modal fade" id="viewModal{{ bonplan.idP }}" tabindex="-1" aria-labelledby="viewModalLabel{{ bonplan.idP }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewModalLabel{{ bonplan.idP }}">{{ bonplan.nomplace }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                  {% endfor %}
-                {% else %}
-                  <p class="text-muted">Aucun avis pour le moment</p>
-                {% endif %}
-              </div>
-              
-              <!-- Formulaire d'ajout d'avis -->
-              <div class="add-review-container">
-                <button class="btn btn-sm btn-primary toggle-review-form mb-2" onclick="toggleReviewForm(this)">
-                  <i class="fas fa-plus me-1"></i> Ajouter un avis
-                </button>
-                
-                <form class="review-form mt-3" style="display: none;" data-bonplan-id="{{ bonplan.idP }}">
-                  <input type="hidden" name="review_id" class="review-id-input" value="">
-                  
-                  <div class="mb-3">
-                    <label class="form-label small">Note</label>
-                    <div class="rating-select">
-                      {% for i in 1..5 %}
-                        <i class="far fa-star rating-star" data-rating="{{ i }}"></i>
-                      {% endfor %}
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <img src="{{ asset('uploads/bonplans/' ~ bonplan.imageBP) }}" class="img-fluid rounded" style="max-height: 200px;" alt="{{ bonplan.nomplace }}" onerror="this.src='{{ asset('uploads/default.jpg') }}';">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Type</h6>
+                            <p>{{ bonplan.typePlace }}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Localisation</h6>
+                            <p>{{ bonplan.localisation }}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Description</h6>
+                            <p>{{ bonplan.description }}</p>
+                        </div>
+                        
+                        <!-- Section des avis -->
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-secondary text-xs font-weight-bolder">Avis</h6>
+                            
+                            <!-- Liste des avis -->
+                            <div class="review-list mb-3">
+                                {% if reviewsByBonPlan[bonplan.idP] is defined and reviewsByBonPlan[bonplan.idP]|length > 0 %}
+                                    {% for review in reviewsByBonPlan[bonplan.idP] %}
+                                        <div class="review-item p-2 border-bottom" id="review-{{ review.idR }}">
+                                            <div class="d-flex justify-content-between">
+                                                <div class="stars-outer small">
+                                                    <div class="stars-inner" style="width: {{ (review.rating * 20) }}%"></div>
+                                                </div>
+                                                <div class="review-actions">
+                                                    <button class="btn btn-sm edit-review" data-id="{{ review.idR }}" data-rating="{{ review.rating }}" data-comment="{{ review.commente }}" onclick="editReview(this)">
+                                                        <i class="fas fa-edit text-primary"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm delete-review" data-id="{{ review.idR }}" onclick="deleteReview(this)">
+                                                        <i class="fas fa-trash text-danger"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p class="review-text mt-1 mb-0">{{ review.commente }}</p>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">Aucun avis pour le moment</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Formulaire d'ajout d'avis -->
+                            <div class="add-review-container">
+                                <button class="btn btn-sm btn-primary toggle-review-form mb-2" onclick="toggleReviewForm(this)">
+                                    <i class="fas fa-plus me-1"></i> Ajouter un avis
+                                </button>
+                                
+                                <form class="review-form mt-3" style="display: none;" data-bonplan-id="{{ bonplan.idP }}">
+                                    <input type="hidden" name="review_id" class="review-id-input" value="">
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label small">Note</label>
+                                        <div class="rating-select">
+                                            {% for i in 1..5 %}
+                                                <i class="far fa-star rating-star" data-rating="{{ i }}"></i>
+                                            {% endfor %}
+                                        </div>
+                                        <input type="hidden" name="rating" class="rating-input" value="0">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label small">Commentaire</label>
+                                        <textarea name="comment" class="form-control form-control-sm comment-input" rows="3" required></textarea>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-sm btn-secondary cancel-review" onclick="cancelReviewForm(this)">Annuler</button>
+                                        <button type="submit" class="btn btn-sm btn-primary">Soumettre</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <input type="hidden" name="rating" class="rating-input" value="0">
-                  </div>
-                  
-                  <div class="mb-3">
-                    <label class="form-label small">Commentaire</label>
-                    <textarea name="comment" class="form-control form-control-sm comment-input" rows="3" required></textarea>
-                  </div>
-                  
-                  <div class="d-flex justify-content-between">
-                    <button type="button" class="btn btn-sm btn-secondary cancel-review" onclick="cancelReviewForm(this)">Annuler</button>
-                    <button type="submit" class="btn btn-sm btn-primary">Soumettre</button>
-                  </div>
-                </form>
-              </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                        <a href="{{ path('bonplan_edit_form', {'idP': bonplan.idP}) }}" class="btn btn-primary">Modifier</a>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-            <a href="{{ path('bonplan_edit_form', {'idP': bonplan.idP}) }}" class="btn btn-primary">Modifier</a>
-          </div>
         </div>
-      </div>
-    </div>
-  {% endfor %}
+    {% endfor %}
 {% endif %}
 
-<!-- Script global pour les fonctions d'interaction -->
+<!-- Modale pour ajouter un avis -->
+<div class="modal fade" id="addReviewModal" tabindex="-1" role="dialog" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addReviewModalLabel">Ajouter un avis</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm" class="review-form">
+                    <input type="hidden" id="bonplanId" name="bonplanId">
+                    
+                    <div class="form-group mb-3">
+                        <label class="form-label d-block">Note</label>
+                        <div class="rating-container d-flex align-items-center">
+                            <div class="stars d-flex">
+                                {% for i in 1..5 %}
+                                    <span class="star-rating-control">
+                                        <i class="far fa-star star-rating" data-rating="{{ i }}" style="font-size: 24px; margin-right: 5px; cursor: pointer;"></i>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <input type="hidden" name="rating" id="ratingInput" value="0">
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="comment" class="form-label">Commentaire</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submitReview">Soumettre</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-function toggleReviewForm(button) {
-  console.log("toggleReviewForm appelé");
-  var form = button.nextElementSibling;
-  if (form.style.display === 'none' || !form.style.display) {
-    form.style.display = 'block';
-    button.innerHTML = '<i class="fas fa-times me-1"></i> Annuler';
-  } else {
-    form.style.display = 'none';
-    button.innerHTML = '<i class="fas fa-plus me-1"></i> Ajouter un avis';
-    form.reset();
-    var reviewIdInput = form.querySelector('.review-id-input');
-    if (reviewIdInput) {
-      reviewIdInput.value = '';
-    }
-  }
-}
-
-function cancelReviewForm(button) {
-  var form = button.closest('form');
-  var toggleBtn = form.previousElementSibling;
-  
-  form.style.display = 'none';
-  toggleBtn.innerHTML = '<i class="fas fa-plus me-1"></i> Ajouter un avis';
-  form.reset();
-  var reviewIdInput = form.querySelector('.review-id-input');
-  if (reviewIdInput) {
-    reviewIdInput.value = '';
-  }
-}
-
-function editReview(button) {
-  console.log("editReview appelé");
-  var reviewId = button.getAttribute('data-id');
-  var rating = button.getAttribute('data-rating');
-  var comment = button.getAttribute('data-comment');
-  
-  var modal = button.closest('.modal');
-  var form = modal.querySelector('.review-form');
-  var toggleBtn = form.previousElementSibling;
-  
-  form.querySelector('.review-id-input').value = reviewId;
-  form.querySelector('.rating-input').value = rating;
-  form.querySelector('.comment-input').value = comment;
-  
-  form.style.display = 'block';
-  toggleBtn.innerHTML = '<i class="fas fa-times me-1"></i> Annuler';
-}
-
-function deleteReview(button) {
-  console.log("deleteReview appelé");
-  if (confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
-    var reviewId = button.getAttribute('data-id');
+// Fonction d'initialisation
+function initializeDropdown() {
+    // Sélectionner les éléments avec les nouvelles classes
+    var filterBtn = document.querySelector('.filter-dropdown');
+    var dropdownMenu = document.querySelector('.custom-dropdown-menu');
     
-    fetch('{{ path('api_reviewbonplan_delete', {'idR': 'PLACEHOLDER'}) }}'.replace('PLACEHOLDER', reviewId), {
-      method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Avis supprimé avec succès');
-        window.location.reload();
-      } else {
-        alert('Erreur: ' + data.message);
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Une erreur est survenue lors de la suppression');
-    });
-  }
+    if (filterBtn && dropdownMenu) {
+        // Gestionnaire pour le bouton
+        filterBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Toggle du menu personnalisé
+            var isVisible = dropdownMenu.style.display === 'block';
+            dropdownMenu.style.display = isVisible ? 'none' : 'block';
+        });
+        
+        // Gestionnaire pour les options
+        var options = dropdownMenu.querySelectorAll('.filter-option');
+        options.forEach(function(option) {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var filter = this.getAttribute('data-filter');
+                
+                // Mise à jour du bouton
+                filterBtn.innerHTML = '<i class="fas fa-filter"></i> ' + this.textContent.trim();
+                
+                // Récupérer toutes les cartes
+                var cards = document.querySelectorAll('.col-12.col-md-6.col-lg-4');
+                
+                // Appliquer le filtre
+                cards.forEach(function(card) {
+                    var ratingText = card.querySelector('.rating-text');
+                    if (!ratingText) return;
+                    
+                    var rating = parseFloat(ratingText.textContent);
+                    var reviewCount = parseInt(ratingText.querySelector('small').textContent.match(/\d+/)[0]);
+                    
+                    switch(filter) {
+                        case 'all':
+                            card.style.display = 'block';
+                            break;
+                        case 'rating-5':
+                            card.style.display = rating === 5 ? 'block' : 'none';
+                            break;
+                        case 'rating-4':
+                            card.style.display = rating >= 4 ? 'block' : 'none';
+                            break;
+                        case 'rating-3':
+                            card.style.display = rating >= 3 ? 'block' : 'none';
+                            break;
+                        case 'most-reviewed':
+                            card.style.display = 'block';
+                            break;
+                    }
+                });
+                
+                // Tri spécial pour "Plus d'avis"
+                if (filter === 'most-reviewed') {
+                    var container = document.querySelector('.row.g-3');
+                    var cardsArray = Array.from(cards);
+                    cardsArray.sort(function(a, b) {
+                        var aReviews = parseInt(a.querySelector('.rating-text small').textContent.match(/\d+/)[0]);
+                        var bReviews = parseInt(b.querySelector('.rating-text small').textContent.match(/\d+/)[0]);
+                        return bReviews - aReviews;
+                    });
+                    cardsArray.forEach(function(card) {
+                        container.appendChild(card);
+                    });
+                }
+                
+                // Fermer le menu
+                dropdownMenu.style.display = 'none';
+            });
+        });
+        
+        // Fermer le menu en cliquant ailleurs
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.custom-dropdown')) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+    }
 }
 
-// S'assurer que tous les boutons toggle-review-form sont cliquables
-document.addEventListener('DOMContentLoaded', function() {
-  // Ajouter des onclick directement aux boutons
-  document.querySelectorAll('.toggle-review-form').forEach(function(btn) {
-    btn.onclick = function(e) {
-      e.preventDefault();
-      toggleReviewForm(this);
-    };
-  });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Gestion de la suppression des bons plans
-  const deleteButtons = document.querySelectorAll('.delete-bonplan');
-  deleteButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      if (confirm('Êtes-vous sûr de vouloir supprimer ce bon plan ?')) {
-        const id = this.getAttribute('data-id');
-        
-        fetch(`/BonplanDelete/${id}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // Supprimer la carte du DOM
-            this.closest('.col-12').remove();
-            // Afficher un message de succès
-            alert('Bon plan supprimé avec succès');
-          } else {
-            alert('Erreur: ' + data.message);
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Une erreur est survenue lors de la suppression');
-        });
-      }
-    });
-  });
-});
-
-// Gestion des étoiles de notation
-document.querySelectorAll('.card-rating-star').forEach(star => {
-    star.addEventListener('click', function() {
-        const rating = parseInt(this.getAttribute('data-rating'));
-        const bonplanId = this.getAttribute('data-bonplan-id');
-        const form = document.querySelector(`.quick-review-form[data-bonplan-id="${bonplanId}"]`);
-        
-        // Mettre à jour les étoiles
-        form.querySelectorAll('.card-rating-star').forEach((s, index) => {
-            if (index < rating) {
-                s.classList.remove('far');
-                s.classList.add('fas', 'active');
-            } else {
-                s.classList.remove('fas', 'active');
-                s.classList.add('far');
-            }
-        });
-        
-        // Mettre à jour la valeur cachée
-        form.querySelector('.card-rating-input').value = rating;
-    });
-});
-
-// Gestion de la soumission du formulaire
-document.querySelectorAll('.card-review-form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const bonplanId = this.getAttribute('data-bonplan-id');
-        const rating = this.querySelector('.card-rating-input').value;
-        const comment = this.querySelector('.card-comment-input').value;
-        
-        if (!rating || !comment) {
-            alert('Veuillez remplir tous les champs');
-            return;
-        }
-        
-        // Envoyer les données au serveur
-        fetch('{{ path('api_reviewbonplan_add') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                bonPlanId: bonplanId,
-                rating: rating,
-                comment: comment
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Votre avis a été publié avec succès!');
-                location.reload();
-            } else {
-                alert('Erreur: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            alert('Une erreur est survenue lors de la publication de votre avis');
-    });
-  });
-});
+// Attendre que le DOM soit chargé
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeDropdown);
+} else {
+    initializeDropdown();
+}
 </script>
 {% endblock %}

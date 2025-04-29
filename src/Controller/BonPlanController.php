@@ -12,6 +12,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use TCPDF;
 
 
 #[Route('/bon/plan')]
@@ -198,5 +203,265 @@ final class BonPlanController extends AbstractController
                 'message' => 'Une erreur est survenue: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    #[Route('/admin/export/{format}', name: 'admin_bonplan_export', methods: ['GET'])]
+    public function export(BonPlanRepository $bonPlanRepository, string $format): Response
+    {
+        $bonPlans = $bonPlanRepository->findAll();
+        
+        if ($format === 'pdf') {
+            return $this->exportPDF($bonPlans);
+        }
+        
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // En-têtes
+        $sheet->setCellValue('A1', 'Nom du lieu');
+        $sheet->setCellValue('B1', 'Localisation');
+        $sheet->setCellValue('C1', 'Description');
+        $sheet->setCellValue('D1', 'Type de lieu');
+        $sheet->setCellValue('E1', 'Image');
+        
+        // Données
+        $row = 2;
+        foreach ($bonPlans as $bonPlan) {
+            $sheet->setCellValue('A' . $row, $bonPlan->getNomplace());
+            $sheet->setCellValue('B' . $row, $bonPlan->getLocalisation());
+            $sheet->setCellValue('C' . $row, $bonPlan->getDescription());
+            $sheet->setCellValue('D' . $row, $bonPlan->getTypePlace());
+            $sheet->setCellValue('E' . $row, $bonPlan->getImageBP());
+            $row++;
+        }
+        
+        // Auto-dimensionnement des colonnes
+        foreach (range('A', 'E') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
+        $fileName = 'bons_plans_' . date('Y-m-d_H-i-s');
+        
+        if ($format === 'csv') {
+            $writer = new Csv($spreadsheet);
+            $fileName .= '.csv';
+            $contentType = 'text/csv';
+        } else {
+            $writer = new Xlsx($spreadsheet);
+            $fileName .= '.xlsx';
+            $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        }
+        
+        $response = new StreamedResponse(
+            function () use ($writer) {
+                $writer->save('php://output');
+            }
+        );
+        
+        $response->headers->set('Content-Type', $contentType);
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+        
+        return $response;
+    }
+    
+    private function exportPDF(array $bonPlans): Response
+    {
+        // Créer un nouveau document PDF en mode paysage
+        $pdf = new TCPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+        
+        // Définir les informations du document
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor('Airmess Admin');
+        $pdf->SetTitle('Liste des Bons Plans');
+        
+        // Supprimer les en-têtes et pieds de page par défaut
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        
+        // Définir les marges (gauche, haut, droite)
+        $pdf->SetMargins(15, 15, 15);
+        
+        // Définir la police par défaut
+        $pdf->SetFont('helvetica', '', 11);
+        
+        // Ajouter une page
+        $pdf->AddPage();
+        
+        // Logo et titre
+        $pdf->SetFont('helvetica', 'B', 24);
+        $pdf->SetTextColor(44, 62, 80); // Bleu foncé
+        $pdf->Cell(0, 15, 'Liste des Bons Plans', 0, 1, 'C');
+        $pdf->Ln(10);
+        
+        // Date d'export
+        $pdf->SetFont('helvetica', '', 10);
+        $pdf->SetTextColor(127, 140, 141); // Gris
+        $pdf->Cell(0, 10, 'Exporté le ' . date('d/m/Y à H:i'), 0, 1, 'R');
+        $pdf->Ln(5);
+        
+        // En-têtes de colonnes avec des largeurs optimisées
+        $pdf->SetFont('helvetica', 'B', 11);
+        $pdf->SetFillColor(52, 73, 94); // Bleu-gris foncé
+        $pdf->SetTextColor(255, 255, 255); // Blanc
+        
+        // Définir les largeurs des colonnes
+        $colWidth1 = 60; // Nom du lieu
+        $colWidth2 = 70; // Localisation
+        $colWidth3 = 100; // Description
+        $colWidth4 = 35; // Type
+        
+        $pdf->Cell($colWidth1, 10, 'Nom du lieu', 1, 0, 'C', true);
+        $pdf->Cell($colWidth2, 10, 'Localisation', 1, 0, 'C', true);
+        $pdf->Cell($colWidth3, 10, 'Description', 1, 0, 'C', true);
+        $pdf->Cell($colWidth4, 10, 'Type', 1, 1, 'C', true);
+        
+        // Données
+        $pdf->SetFont('helvetica', '', 10);
+        $pdf->SetTextColor(44, 62, 80); // Bleu foncé pour le texte
+        
+        // Couleurs alternées pour les lignes
+        $fillColors = [
+            [247, 249, 249], // Gris très clair
+            [255, 255, 255]  // Blanc
+        ];
+        
+        $row = 0;
+        foreach ($bonPlans as $bonPlan) {
+            // Hauteur de ligne automatique
+            $rowColor = $fillColors[$row % 2];
+            $pdf->SetFillColor($rowColor[0], $rowColor[1], $rowColor[2]);
+            
+            // Calculer la hauteur nécessaire pour le texte
+            $description = $bonPlan->getDescription();
+            if (strlen($description) > 100) {
+                $description = substr($description, 0, 97) . '...';
+            }
+            
+            $height = max(
+                $pdf->getStringHeight($colWidth1, $bonPlan->getNomplace()),
+                $pdf->getStringHeight($colWidth2, $bonPlan->getLocalisation()),
+                $pdf->getStringHeight($colWidth3, $description),
+                $pdf->getStringHeight($colWidth4, $bonPlan->getTypePlace())
+            );
+            
+            $height = max($height, 8); // Hauteur minimum
+            
+            // Écrire les cellules avec MultiCell
+            $startY = $pdf->GetY();
+            $currentX = $pdf->GetX();
+            
+            // Nom du lieu
+            $pdf->MultiCell($colWidth1, $height, $bonPlan->getNomplace(), 1, 'L', true, 0, $currentX);
+            $currentX += $colWidth1;
+            
+            // Localisation
+            $pdf->MultiCell($colWidth2, $height, $bonPlan->getLocalisation(), 1, 'L', true, 0, $currentX);
+            $currentX += $colWidth2;
+            
+            // Description
+            $pdf->MultiCell($colWidth3, $height, $description, 1, 'L', true, 0, $currentX);
+            $currentX += $colWidth3;
+            
+            // Type
+            $pdf->MultiCell($colWidth4, $height, $bonPlan->getTypePlace(), 1, 'L', true, 1, $currentX);
+            
+            $row++;
+            
+            // Vérifier si on a besoin d'une nouvelle page
+            if ($pdf->GetY() > $pdf->getPageHeight() - 20) {
+                $pdf->AddPage();
+                
+                // Répéter les en-têtes
+                $pdf->SetFont('helvetica', 'B', 11);
+                $pdf->SetFillColor(52, 73, 94);
+                $pdf->SetTextColor(255, 255, 255);
+                $pdf->Cell($colWidth1, 10, 'Nom du lieu', 1, 0, 'C', true);
+                $pdf->Cell($colWidth2, 10, 'Localisation', 1, 0, 'C', true);
+                $pdf->Cell($colWidth3, 10, 'Description', 1, 0, 'C', true);
+                $pdf->Cell($colWidth4, 10, 'Type', 1, 1, 'C', true);
+                
+                $pdf->SetFont('helvetica', '', 10);
+                $pdf->SetTextColor(44, 62, 80);
+            }
+        }
+        
+        // Ajouter le nombre total en bas de page
+        $pdf->Ln(10);
+        $pdf->SetFont('helvetica', 'I', 10);
+        $pdf->SetTextColor(127, 140, 141);
+        $pdf->Cell(0, 10, 'Total : ' . count($bonPlans) . ' bon(s) plan(s)', 0, 1, 'R');
+        
+        // Générer le PDF
+        $response = new Response(
+            $pdf->Output('bons_plans_' . date('Y-m-d_H-i-s') . '.pdf', 'S'),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="bons_plans_' . date('Y-m-d_H-i-s') . '.pdf"'
+            ]
+        );
+        
+        return $response;
+    }
+    
+    #[Route('/admin/import', name: 'admin_bonplan_import', methods: ['POST'])]
+    public function import(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    {
+        try {
+            $file = $request->files->get('file');
+            
+            if (!$file) {
+                throw new \Exception('Aucun fichier n\'a été uploadé');
+            }
+            
+            $extension = $file->getClientOriginalExtension();
+            if (!in_array($extension, ['csv', 'xlsx', 'xls'])) {
+                throw new \Exception('Format de fichier non supporté');
+            }
+            
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+            $worksheet = $spreadsheet->getActiveSheet();
+            $rows = $worksheet->toArray();
+            
+            // Supprimer l'en-tête
+            array_shift($rows);
+            
+            $imported = 0;
+            $errors = [];
+            
+            foreach ($rows as $row) {
+                try {
+                    if (empty($row[0])) continue; // Ignorer les lignes vides
+                    
+                    $bonPlan = new BonPlan();
+                    $bonPlan->setNomplace($row[0]);
+                    $bonPlan->setLocalisation($row[1]);
+                    $bonPlan->setDescription($row[2]);
+                    $bonPlan->setTypePlace($row[3]);
+                    
+                    // Gérer l'image si elle existe
+                    if (!empty($row[4])) {
+                        $bonPlan->setImageBP($row[4]);
+                    }
+                    
+                    $entityManager->persist($bonPlan);
+                    $imported++;
+                } catch (\Exception $e) {
+                    $errors[] = "Erreur ligne " . ($imported + 2) . ": " . $e->getMessage();
+                }
+            }
+            
+            $entityManager->flush();
+            
+            $this->addFlash('success', $imported . ' bons plans ont été importés avec succès.');
+            if (!empty($errors)) {
+                $this->addFlash('warning', 'Certaines lignes n\'ont pas pu être importées : ' . implode(', ', $errors));
+            }
+            
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'import : ' . $e->getMessage());
+        }
+        
+        return $this->redirectToRoute('bonplan_page');
     }
 }

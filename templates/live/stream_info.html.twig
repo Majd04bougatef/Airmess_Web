@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Stream Information{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Stream Information</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h5>Stream Key</h5>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="{{ stream_key }}" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">Copy</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5>Ingest URL</h5>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="{{ ingest_url }}" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>Watch URL</h5>
+                        <a href="{{ path('live_watch', {'playbackId': playback_id}) }}" class="btn btn-primary">
+                            Watch Stream
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(button) {
+    const input = button.previousElementSibling;
+    input.select();
+    document.execCommand('copy');
+    button.textContent = 'Copied!';
+    setTimeout(() => {
+        button.textContent = 'Copy';
+    }, 2000);
+}
+</script>
+{% endblock %} 

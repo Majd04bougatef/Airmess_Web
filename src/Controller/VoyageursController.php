@@ -24,6 +24,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Repository\ReservationRepository;
+
+use App\Service\WeatherService;
 
 class VoyageursController extends AuthenticatedController
 {
@@ -94,8 +97,7 @@ class VoyageursController extends AuthenticatedController
     }
 
     #[Route('/BonplanVoyageursPage', name: 'bonplanVoyageurs_page')]
-
-    public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager)
+    public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager, WeatherService $weatherService)
     {
         // Récupérer tous les bons plans
         $bonplans = $bonPlanRepository->findAll();
@@ -104,6 +106,9 @@ class VoyageursController extends AuthenticatedController
         $ratings = [];
         $reviewsCount = [];
         $reviewsByBonPlan = [];
+        $weatherData = [];
+        $weatherRecommendations = [];
+        $seasonalActivities = [];
         
         foreach ($bonplans as $bonplan) {
             // Requête pour calculer la note moyenne
@@ -134,6 +139,19 @@ class VoyageursController extends AuthenticatedController
             ->setParameter('bonplanId', $bonplan->getIdP())
             ->getResult();
             
+            // Récupérer les données météo pour la localisation du bon plan
+            try {
+                $weather = $weatherService->getCurrentWeather($bonplan->getLocalisation());
+                $weatherData[$bonplan->getIdP()] = $weather;
+                $weatherRecommendations[$bonplan->getIdP()] = $weatherService->getWeatherRecommendation($weather);
+                $seasonalActivities[$bonplan->getIdP()] = $weatherService->isSeasonalActivity($bonplan->getTypePlace());
+            } catch (\Exception $e) {
+                // En cas d'erreur, on met des valeurs par défaut
+                $weatherData[$bonplan->getIdP()] = null;
+                $weatherRecommendations[$bonplan->getIdP()] = 'unknown';
+                $seasonalActivities[$bonplan->getIdP()] = false;
+            }
+            
             // Stocker les résultats
             $ratings[$bonplan->getIdP()] = $averageRating ? round($averageRating, 1) : 0;
             $reviewsCount[$bonplan->getIdP()] = $count;
@@ -145,7 +163,10 @@ class VoyageursController extends AuthenticatedController
             'bonplans' => $bonplans,
             'ratings' => $ratings,
             'reviewsCount' => $reviewsCount,
-            'reviewsByBonPlan' => $reviewsByBonPlan
+            'reviewsByBonPlan' => $reviewsByBonPlan,
+            'weatherData' => $weatherData,
+            'weatherRecommendations' => $weatherRecommendations,
+            'seasonalActivities' => $seasonalActivities
         ]);
     }
 
@@ -582,9 +603,17 @@ class VoyageursController extends AuthenticatedController
     }
 
     // Add this new method to serve user profile images
-    #[Route('/profile-image/{filename}', name: 'app_profile_image')]
-    public function serveProfileImage(string $filename): Response
+    #[Route('/profile-image/{filename}', name: 'app_profile_image', requirements: ['filename' => '.+'])]
+    public function serveProfileImage(?string $filename = null): Response
     {
+        // Si filename est null ou vide, utiliser l'image par défaut
+        if (!$filename) {
+            $defaultImagePath = $this->getParameter('kernel.project_dir') . '/public/images/user-avatar.svg';
+            if (file_exists($defaultImagePath)) {
+                return new BinaryFileResponse($defaultImagePath);
+            }
+        }
+
         // Check in public directory first (web accessible)
         $publicImagesDir = $this->getParameter('kernel.project_dir') . '/public/images_users';
         $filePath = $publicImagesDir . '/' . $filename;
@@ -595,20 +624,13 @@ class VoyageursController extends AuthenticatedController
             $filePath = $externalImagesDir . '/' . $filename;
         }
         
-        // If still not found, check in public/images directory for default images
+        // If still not found, return default image
         if (!file_exists($filePath)) {
-            $defaultImageDir = $this->getParameter('kernel.project_dir') . '/public/images';
-            $filePath = $defaultImageDir . '/user-avatar.svg';
-            
-            // If even the default image doesn't exist, try another default
-            if (!file_exists($filePath)) {
-                $filePath = $defaultImageDir . '/default.png';
-                
-                // If no defaults are found, throw 404
-                if (!file_exists($filePath)) {
-                    throw new NotFoundHttpException('Profile image not found');
-                }
+            $defaultImagePath = $this->getParameter('kernel.project_dir') . '/public/images/user-avatar.svg';
+            if (file_exists($defaultImagePath)) {
+                return new BinaryFileResponse($defaultImagePath);
             }
+            throw new NotFoundHttpException('Profile image not found');
         }
         
         // Create a response with appropriate headers
@@ -617,6 +639,148 @@ class VoyageursController extends AuthenticatedController
         $response->headers->set('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
         
         return $response;
+    }
+
+    #[Route('/dashboardVoyageurs', name: 'app_dashboard_voyageurs')]
+    public function dashboardVoyageurs(ReservationRepository $reservationRepository, UserRepository $userRepository, SessionInterface $session): Response
+    {
+        // Check if user is authenticated
+        if ($redirectResponse = $this->checkAuthentication()) {
+            return $redirectResponse;
+        }
+        
+        // Check if user has the right role
+        if (!$this->hasRole('Voyageurs')) {
+            // Redirect to appropriate dashboard based on role
+            $userRole = $this->authService->getUserRole();
+            if ($userRole === 'Admin' || $userRole === 'ROLE_ADMIN') {
+                return $this->redirectToRoute('app_dash');
+            } elseif ($userRole === 'Entreprise') {
+                return $this->redirectToRoute('app_dashEntreprise');
+            }
+        }
+
+        // Get user from session
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+        
+        if (!$user) {
+            $this->addFlash('error', 'User not found. Please log in again.');
+            return $this->redirectToRoute('login');
+        }
+
+        // Get user's reservations
+        $reservations = $reservationRepository->findBy(['user' => $user]);
+
+        // Calculate statistics
+        $totalTrips = count($reservations);
+        $now = new \DateTime();
+        $activeBookings = count(array_filter($reservations, function($reservation) use ($now) {
+            return $reservation->getDateRes() > $now;
+        }));
+
+        // Get recent activities
+        $recentActivities = [];
+        foreach ($reservations as $reservation) {
+            $recentActivities[] = [
+                'title' => 'Réservation pour ' . $reservation->getOffre()->getPlace(),
+                'date' => $reservation->getDateRes(),
+                'icon' => 'ticket-alt'
+            ];
+        }
+
+        return $this->render('dashVoyageurs/dashboardPageVoyageurs.html.twig', [
+            'total_trips' => $totalTrips,
+            'loyalty_points' => $user->getDiamond(),
+            'active_bookings' => $activeBookings,
+            'recent_activities' => $recentActivities,
+            'user' => $user
+        ]);
+    }
+
+    #[Route('/voyageurs/statistiques', name: 'app_voyageurs_statistiques')]
+    public function statistiques( ReservationTransportRepository $reservationRepository, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository ): Response
+    {
+        if (!$session->has('user_id')) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+
+        $reservations = $reservationRepository->findByUserId($userId);
+
+        $totalReservations = count($reservations);
+        $now = new \DateTime();
+        
+        $activeReservations = count(array_filter($reservations, function($reservation) use ($now) {
+            return $reservation->getDateRes() <= $now && $reservation->getDateFin() >= $now;
+        }));
+
+        // Réservations terminées
+        $finishedReservations = count(array_filter($reservations, function($reservation) use ($now) {
+            return $reservation->getDateFin() < $now;
+        }));
+
+        $upcomingReservations = count(array_filter($reservations, function($reservation) use ($now) {
+            return $reservation->getDateRes() > $now;
+        }));
+
+        $totalSpent = array_reduce($reservations, function($carry, $reservation) {
+            return $carry + $reservation->getPrix();
+        }, 0);
+
+        // Trouver les stations les plus fréquentées
+        $stationCounts = [];
+        foreach ($reservations as $reservation) {
+            $stationId = $reservation->getStation()->getIdS();
+            if (!isset($stationCounts[$stationId])) {
+                $stationCounts[$stationId] = [
+                    'count' => 0,
+                    'station' => $reservation->getStation()
+                ];
+            }
+            $stationCounts[$stationId]['count']++;
+        }
+
+        // Trier les stations par nombre de réservations
+        uasort($stationCounts, function($a, $b) {
+            return $b['count'] - $a['count'];
+        });
+
+        // Prendre les 5 stations les plus fréquentées
+        $topStations = array_slice($stationCounts, 0, 5, true);
+
+        // Calculer les statistiques mensuelles
+        $monthlyStats = [];
+        $currentYear = (int)$now->format('Y');
+        
+        for ($month = 1; $month <= 12; $month++) {
+            $monthStart = new \DateTime("$currentYear-$month-01");
+            $monthEnd = (clone $monthStart)->modify('last day of this month');
+            
+            $monthlyReservations = array_filter($reservations, function($reservation) use ($monthStart, $monthEnd) {
+                return $reservation->getDateRes() >= $monthStart && $reservation->getDateRes() <= $monthEnd;
+            });
+            
+            $monthlyStats[$month] = [
+                'count' => count($monthlyReservations),
+                'total' => array_reduce($monthlyReservations, function($carry, $reservation) {
+                    return $carry + $reservation->getPrix();
+                }, 0)
+            ];
+        }
+
+        return $this->render('dashVoyageurs/statistiques.html.twig', [
+            'user' => $user,
+            'totalReservations' => $totalReservations,
+            'activeReservations' => $activeReservations,
+            'finishedReservations' => $finishedReservations,
+            'upcomingReservations' => $upcomingReservations,
+            'totalSpent' => $totalSpent,
+            'topStations' => $topStations,
+            'monthlyStats' => $monthlyStats
+        ]);
     }
 }
 

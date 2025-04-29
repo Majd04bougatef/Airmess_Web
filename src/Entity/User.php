@@ -91,6 +91,12 @@ class User
     )]
     private string $statut;
 
+    #[ORM\Column(name: "isOnline", type: "boolean", options: ["default" => false])]
+    private bool $isOnline = false;
+
+    #[ORM\Column(name: "lastActivity", type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $lastActivity = null;
+
     #[ORM\Column(name: "diamond", type: "integer", nullable: false)]
     #[Assert\NotNull(message: "Le nombre de diamants est obligatoire")]
     #[Assert\PositiveOrZero(message: "Le nombre de diamants ne peut pas être négatif")]
@@ -134,6 +140,9 @@ class User
     #[ORM\OneToMany(mappedBy: "user", targetEntity: Commentaire::class, orphanRemoval: true)]
     private Collection $commentaires;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ScheduledPost::class)]
+    private Collection $scheduledPosts;
+
     public function __construct()
     {
         $this->stations = new ArrayCollection();
@@ -142,6 +151,7 @@ class User
         $this->receivedMessages = new ArrayCollection();
         $this->socialMedias = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
+        $this->scheduledPosts = new ArrayCollection();
     }
 
     // Getters et Setters
@@ -235,6 +245,28 @@ class User
     public function setStatut(string $statut): self
     {
         $this->statut = $statut;
+        return $this;
+    }
+
+    public function isOnline(): bool
+    {
+        return $this->isOnline;
+    }
+
+    public function setIsOnline(bool $isOnline): self
+    {
+        $this->isOnline = $isOnline;
+        return $this;
+    }
+
+    public function getLastActivity(): ?\DateTimeInterface
+    {
+        return $this->lastActivity;
+    }
+
+    public function setLastActivity(?\DateTimeInterface $lastActivity): self
+    {
+        $this->lastActivity = $lastActivity;
         return $this;
     }
 
@@ -450,4 +482,36 @@ class User
 
         return $this;
     }
+
+
+    /**
+     * @return Collection<int, ScheduledPost>
+     */
+    public function getScheduledPosts(): Collection
+    {
+        return $this->scheduledPosts;
+    }
+
+    public function addScheduledPost(ScheduledPost $scheduledPost): static
+    {
+        if (!$this->scheduledPosts->contains($scheduledPost)) {
+            $this->scheduledPosts->add($scheduledPost);
+            $scheduledPost->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScheduledPost(ScheduledPost $scheduledPost): static
+    {
+        if ($this->scheduledPosts->removeElement($scheduledPost)) {
+            // set the owning side to null (unless already changed)
+            if ($scheduledPost->getUser() === $this) {
+                $scheduledPost->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

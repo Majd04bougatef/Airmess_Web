@@ -276,3 +276,32 @@
     </div>
 </div>
 {% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sortSelect = document.getElementById('sort-select');
+            const directionSelect = document.getElementById('direction-select');
+            const postsContainer = document.getElementById('posts-container');
+
+            function handleSort() {
+                const sortBy = sortSelect.value;
+                const direction = directionSelect.value;
+
+                fetch(`/social_media/sort?sort_by=${sortBy}&direction=${direction}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    postsContainer.innerHTML = html;
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            sortSelect.addEventListener('change', handleSort);
+            directionSelect.addEventListener('change', handleSort);
+        });
+    </script>
+{% endblock %}

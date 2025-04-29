@@ -68,10 +68,7 @@ class Station
 
     #[ORM\Column(name: "typeVelo",type: "string", length: 255)]
     #[Assert\NotBlank(message: "Le type de vélo est obligatoire")]
-    #[Assert\Choice(
-        choices: ["velo électrique", "velo urbain", "velo de route"],
-        message: "Veuillez choisir un type de vélo valide"
-    )]
+    #[Assert\Choice(choices: ["velo électrique", "velo urbain", "velo de route"], message: "Type de vélo invalide")]
     private string $typeVelo;
 
     #[ORM\Column(name: "prixHeure",type: "float")]

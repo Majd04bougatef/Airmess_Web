@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        /* Common styles for all themes */
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            {% if theme == 'dark' %}
+            background-color: #2a3141;
+            color: #e4e6eb;
+            {% elseif theme == 'minimal' %}
+            background-color: #ffffff;
+            color: #333333;
+            {% else %}
+            background-color: #ffffff;
+            color: #333333;
+            {% endif %}
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            {% if theme == 'minimal' %}
+            border-bottom: 1px solid #eeeeee;
+            padding-bottom: 10px;
+            {% endif %}
+        }
+        
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            {% if theme == 'dark' %}
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            {% elseif theme == 'minimal' %}
+            color: #333333;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 16px;
+            {% endif %}
+        }
+        
+        .timestamp {
+            font-size: 10px;
+            {% if theme == 'dark' %}
+            color: #a5b1c2;
+            {% elseif theme == 'minimal' %}
+            color: #999999;
+            {% else %}
+            color: #666666;
+            {% endif %}
+            margin-bottom: 5px;
+        }
+        
+        .filters {
+            font-size: 10px;
+            {% if theme == 'dark' %}
+            color: #a5b1c2;
+            background-color: #384056;
+            {% elseif theme == 'minimal' %}
+            color: #777777;
+            background-color: #ffffff;
+            border: 1px solid #eeeeee;
+            {% else %}
+            color: #666666;
+            background-color: #f9f9f9;
+            {% endif %}
+            margin-bottom: 20px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            {% if theme == 'minimal' %}
+            border: none;
+            {% endif %}
+        }
+        
+        th {
+            {% if theme == 'dark' %}
+            background-color: #4a5568;
+            color: #ffffff;
+            border: 1px solid #2d3748;
+            {% elseif theme == 'minimal' %}
+            background-color: #ffffff;
+            color: #333333;
+            border-top: none;
+            border-right: none;
+            border-left: none;
+            border-bottom: 2px solid #333333;
+            {% else %}
+            background-color: #5e72e4;
+            color: white;
+            border: 1px solid #ddd;
+            {% endif %}
+            font-weight: bold;
+            text-align: left;
+            padding: 8px;
+            font-size: 11px;
+        }
+        
+        td {
+            padding: 6px 8px;
+            {% if theme == 'dark' %}
+            border: 1px solid #2d3748;
+            {% elseif theme == 'minimal' %}
+            border-top: none;
+            border-right: none;
+            border-left: none;
+            border-bottom: 1px solid #eeeeee;
+            {% else %}
+            border: 1px solid #ddd;
+            {% endif %}
+            font-size: 10px;
+        }
+        
+        tr:nth-child(even) {
+            {% if theme == 'dark' %}
+            background-color: #323c52;
+            {% elseif theme == 'minimal' %}
+            background-color: #ffffff;
+            {% else %}
+            background-color: #f2f2f2;
+            {% endif %}
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            {% if theme == 'dark' %}
+            color: #a5b1c2;
+            border-top: 1px solid #4a5568;
+            {% elseif theme == 'minimal' %}
+            color: #999999;
+            border-top: 1px solid #eeeeee;
+            {% else %}
+            color: #666666;
+            {% endif %}
+            margin-top: 20px;
+            padding-top: 10px;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            {% if theme == 'dark' %}
+            color: #e2e8f0;
+            {% endif %}
+        }
+        
+        .user-email {
+            {% if theme == 'dark' %}
+            color: #90cdf4;
+            {% elseif theme == 'minimal' %}
+            color: #666666;
+            {% else %}
+            color: #5e72e4;
+            {% endif %}
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 6px;
+            font-size: 9px;
+            font-weight: bold;
+            border-radius: 10px;
+            {% if theme != 'minimal' %}
+            color: white;
+            {% else %}
+            color: #333333;
+            {% endif %}
+        }
+        
+        {% if theme == 'minimal' %}
+        .badge-success {
+            background-color: #ffffff;
+            border: 1px solid #28a745;
+            color: #28a745;
+        }
+        
+        .badge-danger {
+            background-color: #ffffff;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+        }
+        
+        .badge-warning {
+            background-color: #ffffff;
+            border: 1px solid #ffc107;
+            color: #ffc107;
+        }
+        {% elseif theme == 'dark' %}
+        .badge-success {
+            background-color: #38a169;
+        }
+        
+        .badge-danger {
+            background-color: #e53e3e;
+        }
+        
+        .badge-warning {
+            background-color: #d69e2e;
+        }
+        {% else %}
+        .badge-success {
+            background-color: #2dce89;
+        }
+        
+        .badge-danger {
+            background-color: #f5365c;
+        }
+        
+        .badge-warning {
+            background-color: #fb6340;
+        }
+        {% endif %}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">{{ title }}</div>
+        
+        {% if showTimestamp %}
+        <div class="timestamp">
+            Exporté le {{ timestamp|date('d/m/Y à H:i') }}
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if showFilters %}
+    <div class="filters">
+        <strong>Filtres appliqués:</strong> 
+        {% if filters.role %}Rôle: {{ filters.role }}{% else %}Tous les rôles{% endif %}, 
+        {% if filters.status %}Statut: {{ filters.status }}{% else %}Tous les statuts{% endif %}
+        {% if filters.search %}, Recherche: "{{ filters.search }}"{% endif %}
+    </div>
+    {% endif %}
+    
+    <table>
+        <thead>
+            <tr>
+                {% if columns.user %}<th>Utilisateur</th>{% endif %}
+                {% if columns.role %}<th>Rôle</th>{% endif %}
+                {% if columns.status %}<th>Statut</th>{% endif %}
+                {% if columns.date %}<th>Date de naissance</th>{% endif %}
+                {% if columns.phone %}<th>Téléphone</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                {% if columns.user %}
+                <td>
+                    <div class="user-name">{{ user.name }} {{ user.prenom }}</div>
+                    <div class="user-email">{{ user.email }}</div>
+                    {% if user.lastActivity %}
+                    <div style="font-size: 9px; {% if theme == 'dark' %}color: #a0aec0;{% elseif theme == 'minimal' %}color: #999999;{% else %}color: #888888;{% endif %}">
+                        Dernière activité: {{ user.lastActivity|date("d/m/Y H:i") }}
+                    </div>
+                    {% endif %}
+                </td>
+                {% endif %}
+                
+                {% if columns.role %}
+                <td>{{ user.roleUser }}</td>
+                {% endif %}
+                
+                {% if columns.status %}
+                <td>
+                    {% if user.statut == 'actif' or user.statut == 'active' %}
+                    <span class="badge badge-success">Actif</span>
+                    {% elseif user.statut == 'inactif' or user.statut == 'inactive' %}
+                    <span class="badge badge-danger">Inactif</span>
+                    {% else %}
+                    <span class="badge badge-warning">{{ user.statut }}</span>
+                    {% endif %}
+                </td>
+                {% endif %}
+                
+                {% if columns.date %}
+                <td>{{ user.dateNaiss|date("d/m/Y") }}</td>
+                {% endif %}
+                
+                {% if columns.phone %}
+                <td>{{ user.phoneNumber }}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        Airmess - {{ "now"|date("Y") }} - {{ users|length }} utilisateurs
+    </div>
+</body>
+</html> 
