@@ -241,6 +241,63 @@ class EmailService
         }
     }
     
+    /**
+     * Send a custom email with provided HTML content
+     */
+    public function sendCustomEmail(string $emailAddress, string $subject, string $htmlContent): bool
+    {
+        try {
+            // Log attempt
+            if ($this->logger) {
+                $this->logger->info('Attempting to send custom email to: ' . $emailAddress);
+            } else {
+                error_log('Attempting to send custom email to: ' . $emailAddress);
+            }
+            
+            // Ensure email address is properly formatted
+            if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
+                $errorMsg = 'Invalid email format: ' . $emailAddress;
+                if ($this->logger) {
+                    $this->logger->error($errorMsg);
+                } else {
+                    error_log($errorMsg);
+                }
+                return false;
+            }
+            
+            $email = (new Email())
+                ->from(new Address($this->fromEmail, 'Airmess'))
+                ->to($emailAddress)
+                ->subject($subject)
+                ->html($htmlContent);
+                
+            $this->mailer->send($email);
+            
+            // Log success
+            if ($this->logger) {
+                $this->logger->info('Successfully sent custom email to: ' . $emailAddress);
+            } else {
+                error_log('Successfully sent custom email to: ' . $emailAddress);
+            }
+            
+            return true;
+        } catch (\Exception $e) {
+            // Log error
+            $errorMsg = 'Failed to send custom email to ' . $emailAddress . ': ' . $e->getMessage();
+            $errorTrace = $e->getTraceAsString();
+            
+            if ($this->logger) {
+                $this->logger->error($errorMsg);
+                $this->logger->error('Error trace: ' . $errorTrace);
+            } else {
+                error_log($errorMsg);
+                error_log('Error trace: ' . $errorTrace);
+            }
+            
+            return false;
+        }
+    }
+    
     private function getReactivationEmailTemplate(User $user): string
     {
         return '

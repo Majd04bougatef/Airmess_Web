@@ -1177,6 +1177,106 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/stations/{id}/signaler-probleme', name: 'admin_station_signaler', methods: ['POST'])]
+    public function signalerProblemeStation(
+        int $id, 
+        Request $request, 
+        StationRepository $stationRepository, 
+        EmailService $emailService
+    ): Response
+    {
+        // Récupérer la station
+        $station = $stationRepository->find($id);
+        
+        if (!$station) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Station non trouvée'
+                ], 404);
+            }
+            throw $this->createNotFoundException('Station non trouvée');
+        }
+        
+        // Récupérer la description du problème
+        $description = $request->request->get('description');
+        
+        if (empty($description)) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'La description du problème est requise'
+                ], 400);
+            }
+            $this->addFlash('error', 'La description du problème est requise');
+            return $this->redirectToRoute('station_page');
+        }
+        
+        // Récupérer l'utilisateur (entreprise) associé à la station
+        $entreprise = $station->getUser();
+        
+        if (!$entreprise) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Aucune entreprise associée à cette station'
+                ], 400);
+            }
+            $this->addFlash('error', 'Aucune entreprise associée à cette station');
+            return $this->redirectToRoute('station_page');
+        }
+        
+        // Préparer et envoyer l'email
+        try {
+            $success = $this->sendProblemEmail($entreprise->getEmail(), $station, $description, $emailService);
+            
+            if ($success) {
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'message' => 'Problème signalé avec succès à l\'entreprise'
+                    ]);
+                }
+                $this->addFlash('success', 'Problème signalé avec succès à l\'entreprise');
+            } else {
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => false,
+                        'message' => 'Erreur lors de l\'envoi de l\'email'
+                    ], 500);
+                }
+                $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email');
+            }
+        } catch (\Exception $e) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'envoi de l\'email: ' . $e->getMessage()
+                ], 500);
+            }
+            $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email: ' . $e->getMessage());
+        }
+        
+        return $this->redirectToRoute('station_page');
+    }
+    
+    private function sendProblemEmail(
+        string $destinationEmail, 
+        \App\Entity\Station $station, 
+        string $description, 
+        EmailService $emailService
+    ): bool
+    {
+        $sujet = 'Problème signalé pour la station: ' . $station->getNom();
+        $content = $this->renderView('emails/station_problem.html.twig', [
+            'station' => $station,
+            'description' => $description,
+            'date' => new \DateTime()
+        ]);
+        
+        return $emailService->sendCustomEmail($destinationEmail, $sujet, $content);
+    }
+
     #[Route('/admin/reservations', name: 'admin_reservations')]
     public function reservations(ReservationTransportRepository $reservationRepository): Response
     {

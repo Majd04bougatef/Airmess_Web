@@ -87,6 +87,9 @@
                         <button onclick="showStationDetails({{ station.idS }})" class="btn btn-sm btn-info ms-2">
                           <i class="fas fa-eye"></i> Détails
                         </button>
+                        <button onclick="showProblemModal({{ station.idS }}, '{{ station.nom }}')" class="btn btn-sm btn-warning ms-2">
+                          <i class="fas fa-exclamation-triangle"></i> Signaler Problème
+                        </button>
                       </td>
                     </tr>
                   {% endfor %}
@@ -184,6 +187,17 @@ document.addEventListener('DOMContentLoaded', function() {
       rows[i].style.display = showRow ? '' : 'none';
     }
   });
+  
+  // Initialize problem modal
+  var problemModalEl = document.getElementById('problemModal');
+  if (typeof bootstrap !== 'undefined') {
+    window.problemModal = new bootstrap.Modal(problemModalEl);
+  } else {
+    console.error('Bootstrap is not loaded or not available');
+  }
+  
+  // Setup event listener for send button
+  document.getElementById('send-report').addEventListener('click', sendProblemReport);
 });
 
 function approveStation(stationId) {
@@ -238,7 +252,140 @@ function showStationDetails(stationId) {
   // Redirect to station details page
   window.location.href = `/admin/stations/${stationId}/details`;
 }
+
+// Modal handling
+let currentStationId;
+
+function showProblemModal(stationId, stationName) {
+  currentStationId = stationId;
+  document.getElementById('stationId').value = stationId;
+  document.getElementById('station-name').value = stationName;
+  document.getElementById('description').value = '';
+  
+  // Show modal - using window object to access the modal
+  if (window.problemModal) {
+    window.problemModal.show();
+  } else {
+    // Fallback to jQuery if Bootstrap modal object isn't available
+    try {
+      $('#problemModal').modal('show');
+    } catch (e) {
+      console.error('Error showing modal:', e);
+      alert('Une erreur est survenue lors de l\'ouverture du formulaire. Veuillez réessayer.');
+    }
+  }
+}
+
+function sendProblemReport() {
+  const description = document.getElementById('description').value.trim();
+  
+  // Validate form
+  if (!description) {
+    document.getElementById('description').classList.add('is-invalid');
+    return;
+  }
+  
+  document.getElementById('description').classList.remove('is-invalid');
+  
+  // Disable button and show loading state
+  const sendButton = document.getElementById('send-report');
+  const originalText = sendButton.innerHTML;
+  sendButton.disabled = true;
+  sendButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Envoi...';
+  
+  // Prepare form data
+  const formData = new FormData();
+  formData.append('description', description);
+  
+  console.log('Submitting problem report:', {
+    stationId: currentStationId,
+    description: description
+  });
+  
+  // Send ajax request
+  fetch(`/admin/stations/${currentStationId}/signaler-probleme`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    // Do not set Content-Type header when using FormData
+    // The browser will set it automatically with the correct boundary
+  })
+  .then(response => {
+    if (!response.ok) {
+      console.error('HTTP Error:', response.status, response.statusText);
+      return response.text().then(text => {
+        throw new Error(`HTTP error! Status: ${response.status}, Response: ${text}`);
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Response data:', data);
+    
+    // Close modal
+    if (window.problemModal) {
+      window.problemModal.hide();
+    } else {
+      try {
+        $('#problemModal').modal('hide');
+      } catch (e) {
+        console.error('Error hiding modal:', e);
+      }
+    }
+    
+    // Show result
+    if (data.success) {
+      alert(data.message || 'Problème signalé avec succès');
+    } else {
+      alert(data.message || 'Une erreur est survenue lors de l\'envoi du rapport');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Une erreur est survenue lors de l\'envoi du rapport: ' + error.message);
+  })
+  .finally(() => {
+    // Reset button state
+    sendButton.disabled = false;
+    sendButton.innerHTML = originalText;
+  });
+}
 </script>
 {% endblock %}
+
+<!-- Modal for Problem Reporting -->
+<div class="modal fade" id="problemModal" tabindex="-1" aria-labelledby="problemModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="problemModalLabel">Signaler un problème</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="problemForm">
+          <input type="hidden" id="stationId" name="stationId">
+          <div class="mb-3">
+            <label for="station-name" class="form-label">Station</label>
+            <input type="text" class="form-control" id="station-name" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description du problème</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+            <div class="invalid-feedback">
+              Veuillez fournir une description du problème.
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" id="send-report">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
