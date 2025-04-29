@@ -61,13 +61,24 @@
       {% endif %}
     </td>
     <td class="text-center">
-      <div class="btn-group">
-        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{user.idU}}">
-          <i class="fas fa-edit"></i>
+      <div class="d-flex gap-2 justify-content-center">
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{user.idU}}" title="Modifier l'utilisateur">
+          <i class="fas fa-edit me-1"></i> Éditer
         </button>
-        <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete({{user.idU}})">
-          <i class="fas fa-trash-alt"></i>
-        </button>
+        
+        {% if user.statut == 'actif' and user.deleteFlag != 1 %}
+          <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({{user.idU}})" title="Désactiver l'utilisateur">
+            <i class="fas fa-user-slash me-1"></i> Désactiver
+          </button>
+        {% elseif user.statut == 'inactif' and user.deleteFlag != 1 %}
+          <button type="button" class="btn btn-sm btn-success" onclick="confirmReactivate({{user.idU}})" title="Réactiver l'utilisateur">
+            <i class="fas fa-user-check me-1"></i> Réactiver
+          </button>
+        {% else %}
+          <button type="button" class="btn btn-sm btn-secondary" disabled title="Utilisateur supprimé">
+            <i class="fas fa-user-slash me-1"></i> Supprimé
+          </button>
+        {% endif %}
       </div>
     </td>
   </tr>

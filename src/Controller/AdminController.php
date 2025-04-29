@@ -463,11 +463,25 @@ class AdminController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response
     {
-        // Instead of deleting, set status to inactive
-        $user->setStatut('inactif');
-        $entityManager->flush();
-        
-        return new JsonResponse(['success' => true]);
+        try {
+            // Mark user as inactive and set delete flag
+            $user->setStatut('inactif');
+            $user->setDeleteFlag(1);
+            
+            // Save changes to database
+            $entityManager->flush();
+            
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'L\'utilisateur a été supprimé avec succès',
+                'userName' => $user->getPrenom() . ' ' . $user->getName()
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     #[Route('/UserPage/activate-all', name: 'admin_activate_all_users', methods: ['POST'])]
@@ -778,16 +792,17 @@ class AdminController extends AbstractController
         // Get customization options
         $title = $request->request->get('title', 'Liste des Utilisateurs');
         $orientation = $request->request->get('orientation', 'landscape');
-        $showTimestamp = $request->request->has('showTimestamp');
-        $showFilters = $request->request->has('showFilters');
+        $showTimestamp = $request->request->get('showTimestamp') == '1';
+        $showFilters = $request->request->get('showFilters') == '1';
+        $theme = $request->request->get('theme', 'default');
         
         // Get column selections
         $columns = [
-            'user' => $request->request->has('includeUserColumn'),
-            'role' => $request->request->has('includeRoleColumn'),
-            'status' => $request->request->has('includeStatusColumn'),
-            'date' => $request->request->has('includeDateColumn'),
-            'phone' => $request->request->has('includePhoneColumn'),
+            'user' => $request->request->get('includeUserColumn') == '1',
+            'role' => $request->request->get('includeRoleColumn') == '1',
+            'status' => $request->request->get('includeStatusColumn') == '1',
+            'date' => $request->request->get('includeDateColumn') == '1',
+            'phone' => $request->request->get('includePhoneColumn') == '1',
         ];
         
         // Fetch all users (we'll paginate in the view if needed)
@@ -802,6 +817,7 @@ class AdminController extends AbstractController
             'filters' => $filters,
             'showFilters' => $showFilters,
             'columns' => $columns,
+            'theme' => $theme
         ]);
         
         // Configure Dompdf
@@ -995,7 +1011,8 @@ class AdminController extends AbstractController
             
             // Pagination info text
             $paginationInfo = sprintf(
-                'Affichage de %d utilisateur(s)',
+                'Affichage de <span class="fw-bold">%d</span> sur <span class="fw-bold">%d</span> utilisateur(s)',
+                count($results['items']),
                 $results['totalItems']
             );
             
@@ -1005,7 +1022,8 @@ class AdminController extends AbstractController
                 'pagination' => $pagination,
                 'totalItems' => $results['totalItems'],
                 'currentPage' => $results['currentPage'],
-                'paginationInfo' => $paginationInfo
+                'paginationInfo' => $paginationInfo,
+                'itemsPerPage' => $results['itemsPerPage']
             ]);
         } catch (\Exception $e) {
             error_log('Error in filterUsers: ' . $e->getMessage());
@@ -1014,6 +1032,71 @@ class AdminController extends AbstractController
                 'message' => 'Error processing request: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    #[Route('/UserPage/activate/{id_U}', name: 'admin_user_activate', methods: ['POST'])]
+    public function activateUser(
+        User $user, 
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        try {
+            // Set status to active
+            $user->setStatut('actif');
+            
+            // Save changes to database
+            $entityManager->flush();
+            
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'L\'utilisateur a été réactivé avec succès',
+                'userName' => $user->getPrenom() . ' ' . $user->getName()
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la réactivation: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    #[Route('/VuesPage', name: 'vues_page')]
+    public function vuesPage(
+        PageViewRepository $pageViewRepository
+    ): Response
+    {
+        // Get total page views
+        $totalPageViews = $pageViewRepository->getTotalPageViews();
+        
+        // Get today's page views
+        $todayPageViews = $pageViewRepository->getTodayPageViews();
+        
+        // Get current month's page views
+        $currentMonthPageViews = $pageViewRepository->getCurrentMonthPageViews();
+        
+        // Get page views by day for the past 30 days (for chart)
+        $pageViewsByDay = $pageViewRepository->getPageViewsByDay(30);
+        
+        // Format data for chart
+        $labels = [];
+        $data = [];
+        
+        foreach ($pageViewsByDay as $dayView) {
+            $labels[] = (new \DateTime($dayView['date']))->format('d/m');
+            $data[] = $dayView['count'];
+        }
+        
+        // Get most viewed pages
+        $mostViewedPages = $pageViewRepository->getMostViewedPages(10);
+        
+        return $this->render('dashAdmin/pageViews.html.twig', [
+            'totalPageViews' => $totalPageViews,
+            'todayPageViews' => $todayPageViews,
+            'currentMonthPageViews' => $currentMonthPageViews,
+            'chartLabels' => json_encode($labels),
+            'chartData' => json_encode($data),
+            'mostViewedPages' => $mostViewedPages
+        ]);
     }
 }
 

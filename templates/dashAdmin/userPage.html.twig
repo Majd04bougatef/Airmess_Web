@@ -340,30 +340,233 @@
 <script>
   // Function to confirm deletion of a user
   window.confirmDelete = function(userId) {
-    if (confirm("Êtes-vous sûr de vouloir désactiver cet utilisateur ?")) {
+    // Create a nicer confirmation dialog
+    const confirmDialog = document.createElement('div');
+    confirmDialog.className = 'modal fade';
+    confirmDialog.id = 'confirmDeleteModal';
+    confirmDialog.setAttribute('tabindex', '-1');
+    confirmDialog.setAttribute('aria-hidden', 'true');
+    
+    confirmDialog.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">
+              <i class="fas fa-user-slash me-2"></i>
+              Confirmation de désactivation
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Êtes-vous sûr de vouloir désactiver cet utilisateur ?</p>
+            <p class="mb-0"><small class="text-muted">L'utilisateur ne pourra plus se connecter à son compte, mais ses données seront conservées dans le système.</small></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times me-1"></i> Annuler
+            </button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteButton">
+              <i class="fas fa-user-slash me-1"></i> Désactiver
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add the dialog to the document
+    document.body.appendChild(confirmDialog);
+    
+    // Create and show the modal
+    const modal = new bootstrap.Modal(confirmDialog);
+    modal.show();
+    
+    // Handle confirmation
+    document.getElementById('confirmDeleteButton').addEventListener('click', function() {
       const deletePath = `/admin/UserPage/delete/${userId}`;
+      
+      // Show loading state
+      this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Désactivation...';
+      this.disabled = true;
       
       fetch(deletePath, {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest'
         }
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Server returned ' + response.status);
+        }
+        return response.json();
+      })
       .then(data => {
         if (data.success) {
-          alert('Utilisateur désactivé avec succès');
-          window.location.reload();
+          // Hide the modal
+          modal.hide();
+          
+          // Show success message
+          showAlert('success', 'Utilisateur désactivé avec succès');
+          
+          // Reload the table after a short delay
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
         } else {
-          alert('Erreur lors de la désactivation: ' + (data.message || 'Une erreur est survenue'));
+          throw new Error(data.message || 'Une erreur est survenue');
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        alert('Une erreur est survenue lors de la désactivation');
+        
+        // Hide the modal
+        modal.hide();
+        
+        // Show error message
+        showAlert('danger', 'Erreur lors de la désactivation: ' + error.message);
+      })
+      .finally(() => {
+        // Clean up the modal
+        confirmDialog.addEventListener('hidden.bs.modal', function() {
+          document.body.removeChild(confirmDialog);
+        });
       });
-    }
+    });
+    
+    // Clean up the modal when closed
+    confirmDialog.addEventListener('hidden.bs.modal', function() {
+      document.body.removeChild(confirmDialog);
+    });
   };
+  
+  // Function to confirm reactivation of a user
+  window.confirmReactivate = function(userId) {
+    // Create a confirmation dialog
+    const confirmDialog = document.createElement('div');
+    confirmDialog.className = 'modal fade';
+    confirmDialog.id = 'confirmReactivateModal';
+    confirmDialog.setAttribute('tabindex', '-1');
+    confirmDialog.setAttribute('aria-hidden', 'true');
+    
+    confirmDialog.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">
+              <i class="fas fa-user-check me-2"></i>
+              Confirmation de réactivation
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Êtes-vous sûr de vouloir réactiver cet utilisateur ?</p>
+            <p class="mb-0"><small class="text-muted">L'utilisateur pourra de nouveau se connecter à son compte.</small></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times me-1"></i> Annuler
+            </button>
+            <button type="button" class="btn btn-success" id="confirmReactivateButton">
+              <i class="fas fa-user-check me-1"></i> Réactiver
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add the dialog to the document
+    document.body.appendChild(confirmDialog);
+    
+    // Create and show the modal
+    const modal = new bootstrap.Modal(confirmDialog);
+    modal.show();
+    
+    // Handle confirmation
+    document.getElementById('confirmReactivateButton').addEventListener('click', function() {
+      const reactivatePath = `/admin/UserPage/activate/${userId}`;
+      
+      // Show loading state
+      this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Réactivation...';
+      this.disabled = true;
+      
+      fetch(reactivatePath, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Server returned ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // Hide the modal
+          modal.hide();
+          
+          // Show success message
+          showAlert('success', 'Utilisateur réactivé avec succès');
+          
+          // Reload the table after a short delay
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          throw new Error(data.message || 'Une erreur est survenue');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        
+        // Hide the modal
+        modal.hide();
+        
+        // Show error message
+        showAlert('danger', 'Erreur lors de la réactivation: ' + error.message);
+      })
+      .finally(() => {
+        // Clean up the modal
+        confirmDialog.addEventListener('hidden.bs.modal', function() {
+          document.body.removeChild(confirmDialog);
+        });
+      });
+    });
+    
+    // Clean up the modal when closed
+    confirmDialog.addEventListener('hidden.bs.modal', function() {
+      document.body.removeChild(confirmDialog);
+    });
+  };
+  
+  // Function to show alerts
+  function showAlert(type, message) {
+    const alertContainer = document.createElement('div');
+    alertContainer.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-4 shadow-lg`;
+    alertContainer.style.zIndex = '9999';
+    alertContainer.style.minWidth = '300px';
+    alertContainer.innerHTML = `
+      ${type === 'success' ? '<i class="fas fa-check-circle me-2"></i>' : '<i class="fas fa-exclamation-circle me-2"></i>'}
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    document.body.appendChild(alertContainer);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+      const bsAlert = new bootstrap.Alert(alertContainer);
+      bsAlert.close();
+    }, 5000);
+    
+    // Remove from DOM after hidden
+    alertContainer.addEventListener('hidden.bs.alert', function() {
+      document.body.removeChild(alertContainer);
+    });
+  }
 
   // Function to submit the edit user form
   window.submitEditForm = function(userId) {
@@ -371,7 +574,7 @@
     
     if (!form) {
       console.error('Form not found:', `editUserForm${userId}`);
-      alert('Erreur: Formulaire non trouvé');
+      showAlert('danger', 'Erreur: Formulaire non trouvé');
       return;
     }
     
@@ -381,18 +584,18 @@
     const email = form.querySelector('[name="email"]');
     
     if (!name.value || !prenom.value || !email.value) {
-      alert('Veuillez remplir tous les champs obligatoires');
+      showAlert('warning', 'Veuillez remplir tous les champs obligatoires');
       return;
     }
     
+    // Show loading state on the submit button
+    const submitBtn = document.querySelector(`#editUserModal${userId} .btn-primary`);
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Enregistrement...';
+    submitBtn.disabled = true;
+    
     // Create FormData from the form
     const formData = new FormData(form);
-    
-    // Debug form data
-    console.log('Form data for user', userId);
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ': ' + pair[1]);
-    }
     
     // Use fetch API to submit the form
     fetch(form.action, {
@@ -410,17 +613,90 @@
     })
     .then(data => {
       if (data.success) {
-        alert('Utilisateur modifié avec succès');
-        window.location.reload();
+        // Hide the modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById(`editUserModal${userId}`));
+        modal.hide();
+        
+        // Show success message
+        showAlert('success', 'Utilisateur modifié avec succès');
+        
+        // Reload the table after a short delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
+        throw new Error(data.message || 'Une erreur est survenue');
       }
     })
     .catch(error => {
       console.error('Error:', error);
-      alert('Une erreur est survenue: ' + error.message);
+      
+      // Show error message
+      showAlert('danger', 'Erreur lors de la modification: ' + error.message);
+    })
+    .finally(() => {
+      // Reset button state
+      submitBtn.innerHTML = originalBtnText;
+      submitBtn.disabled = false;
     });
   };
+
+  // Initialize Bootstrap components after page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Initialize modals if they're not already initialized
+    const modalElements = document.querySelectorAll('.modal');
+    modalElements.forEach(modalElement => {
+      new bootstrap.Modal(modalElement);
+    });
+    
+    // Initialize PDF export confirmation button (direct approach in page - alternative to user-filters.js handling)
+    const confirmPdfExportBtn = document.getElementById('confirmPdfExport');
+    if (confirmPdfExportBtn) {
+      confirmPdfExportBtn.addEventListener('click', function() {
+        // Get the current filter values
+        const roleFilter = document.querySelector('input[name="roleFilter"]:checked')?.value || '';
+        const statusFilter = document.querySelector('input[name="statusFilter"]:checked')?.value || '';
+        const searchText = document.getElementById('searchInput')?.value.trim() || 
+                         document.getElementById('tableSearchInput')?.value.trim() || '';
+        
+        // Set filter values
+        document.getElementById('roleFilterValue').value = roleFilter;
+        document.getElementById('statusFilterValue').value = statusFilter;
+        document.getElementById('searchFilterValue').value = searchText;
+        
+        // Transfer values from the modal form to the hidden form
+        document.getElementById('pdfTitleValue').value = document.getElementById('pdfTitle').value;
+        
+        // Get orientation
+        const orientation = document.querySelector('input[name="orientation"]:checked')?.value || 'landscape';
+        document.getElementById('pdfOrientationValue').value = orientation;
+        
+        // Get theme
+        const theme = document.querySelector('input[name="theme"]:checked')?.value || 'default';
+        document.getElementById('pdfThemeValue').value = theme;
+        
+        // Get checkbox values
+        document.getElementById('pdfShowTimestampValue').value = document.getElementById('showTimestamp').checked ? '1' : '0';
+        document.getElementById('pdfShowFiltersValue').value = document.getElementById('showFilters').checked ? '1' : '0';
+        
+        // Get column selection values
+        document.getElementById('pdfIncludeUserColumnValue').value = document.getElementById('includeUserColumn').checked ? '1' : '0';
+        document.getElementById('pdfIncludeRoleColumnValue').value = document.getElementById('includeRoleColumn').checked ? '1' : '0';
+        document.getElementById('pdfIncludeStatusColumnValue').value = document.getElementById('includeStatusColumn').checked ? '1' : '0';
+        document.getElementById('pdfIncludeDateColumnValue').value = document.getElementById('includeDateColumn').checked ? '1' : '0';
+        document.getElementById('pdfIncludePhoneColumnValue').value = document.getElementById('includePhoneColumn').checked ? '1' : '0';
+        
+        // Submit the form
+        document.getElementById('pdfExportForm').submit();
+      });
+    }
+  });
 </script>
 {% endblock %}
 
@@ -449,7 +725,7 @@
       <div>
         <h6 class="mb-0 font-weight-bold">
           <i class="fas fa-users me-2"></i> Liste des utilisateurs
-          <span class="badge bg-primary ms-2 user-counter">{{ users|length }}</span>
+          <span class="badge bg-primary ms-2 user-counter">{{ totalUsers ?? users|length }}</span>
         </h6>
       </div>
       <div class="d-flex">
@@ -460,8 +736,8 @@
         <button class="btn btn-sm btn-outline-success me-2" id="exportExcelButton">
           <i class="fas fa-file-excel me-1"></i> CSV
         </button>
-        <button class="btn btn-sm btn-outline-danger" id="exportPdfButton">
-          <i class="fas fa-file-pdf me-1"></i> PDF
+        <button class="btn btn-sm btn-outline-danger" id="exportPdfButton" data-bs-toggle="modal" data-bs-target="#pdfExportModal">
+          <i class="fas fa-file-pdf me-1"></i> PDF Personnalisé
         </button>
       </div>
     </div>
@@ -541,12 +817,12 @@
         <table class="table align-middle mb-0" id="usersTable" data-delete-path="/admin/user/delete/0">
           <thead class="bg-light">
             <tr>
-              <th>Utilisateur</th>
-              <th>Email</th>
-              <th>Rôle</th>
-              <th>Date de Naissance</th>
-              <th>Statut</th>
-              <th class="text-center">Actions</th>
+              <th style="width: 25%;">Utilisateur</th>
+              <th style="width: 20%;">Email</th>
+              <th style="width: 10%;">Rôle</th>
+              <th style="width: 15%;">Date de Naissance</th>
+              <th style="width: 10%;">Statut</th>
+              <th class="text-center" style="width: 20%;">Actions</th>
             </tr>
           </thead>
           <tbody id="userTableBody">
@@ -600,12 +876,12 @@
                 </span>
               </td>
               <td class="text-center">
-                <div class="btn-group">
-                  <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{user.idU}}">
-                    <i class="fas fa-edit"></i>
+                <div class="d-flex gap-2 justify-content-center">
+                  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{user.idU}}" title="Modifier l'utilisateur">
+                    <i class="fas fa-edit me-1"></i> Éditer
                   </button>
-                  <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete({{user.idU}})">
-                    <i class="fas fa-trash-alt"></i>
+                  <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({{user.idU}})" title="Désactiver l'utilisateur">
+                    <i class="fas fa-trash-alt me-1"></i> Supprimer
                   </button>
                 </div>
               </td>
@@ -627,33 +903,197 @@
     <!-- Pagination -->
     <div class="card-footer d-flex justify-content-between align-items-center bg-light">
       <div class="pagination-info">
-        Affichage de {{ users|length }} utilisateur(s)
+        Affichage de <span class="fw-bold">{{ users|length }}</span> sur <span class="fw-bold">{{ totalUsers ?? users|length }}</span> utilisateur(s)
       </div>
+      {% if totalPages > 1 %}
       <nav aria-label="Navigation des pages">
         <ul class="pagination mb-0">
           {% if currentPage > 1 %}
             <li class="page-item">
-              <a class="page-link" href="{{ path('user_page', {'page': currentPage - 1}) }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
+              <a class="page-link" href="#" data-page="1" aria-label="First">
+                <span aria-hidden="true"><i class="fas fa-angle-double-left"></i></span>
               </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#" data-page="{{ currentPage - 1 }}" aria-label="Previous">
+                <span aria-hidden="true"><i class="fas fa-angle-left"></i></span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link"><i class="fas fa-angle-left"></i></span>
             </li>
           {% endif %}
           
-          {% for i in 1..totalPages %}
+          {% for i in max(1, currentPage - 2)..min(totalPages, currentPage + 2) %}
             <li class="page-item {% if i == currentPage %}active{% endif %}">
-              <a class="page-link" href="{{ path('user_page', {'page': i}) }}">{{ i }}</a>
+              <a class="page-link" href="#" data-page="{{ i }}">{{ i }}</a>
             </li>
           {% endfor %}
           
           {% if currentPage < totalPages %}
             <li class="page-item">
-              <a class="page-link" href="{{ path('user_page', {'page': currentPage + 1}) }}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
+              <a class="page-link" href="#" data-page="{{ currentPage + 1 }}" aria-label="Next">
+                <span aria-hidden="true"><i class="fas fa-angle-right"></i></span>
               </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#" data-page="{{ totalPages }}" aria-label="Last">
+                <span aria-hidden="true"><i class="fas fa-angle-double-right"></i></span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link"><i class="fas fa-angle-right"></i></span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
             </li>
           {% endif %}
         </ul>
       </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- PDF Export Customization Modal -->
+<div class="modal fade" id="pdfExportModal" tabindex="-1" aria-labelledby="pdfExportModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-gradient-danger text-white">
+        <h5 class="modal-title" id="pdfExportModalLabel">
+          <i class="fas fa-file-pdf me-2"></i> Personnaliser l'exportation PDF
+        </h5>
+        <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="pdfExportConfigForm">
+          <!-- Title and Layout Options -->
+          <div class="mb-3">
+            <label for="pdfTitle" class="form-label fw-bold">Titre du document</label>
+            <input type="text" class="form-control" id="pdfTitle" name="title" value="Liste des Utilisateurs">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold">Orientation</label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="orientation" id="orientationLandscape" value="landscape" checked>
+                <label class="form-check-label" for="orientationLandscape">
+                  <i class="fas fa-arrows-alt-h me-1"></i> Paysage
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="orientation" id="orientationPortrait" value="portrait">
+                <label class="form-check-label" for="orientationPortrait">
+                  <i class="fas fa-arrows-alt-v me-1"></i> Portrait
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Columns to Include -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Colonnes à inclure</label>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="includeUserColumn" name="includeUserColumn" checked>
+                  <label class="form-check-label" for="includeUserColumn">
+                    Utilisateur & Email
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="includeRoleColumn" name="includeRoleColumn" checked>
+                  <label class="form-check-label" for="includeRoleColumn">
+                    Rôle
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="includeStatusColumn" name="includeStatusColumn" checked>
+                  <label class="form-check-label" for="includeStatusColumn">
+                    Statut
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="includeDateColumn" name="includeDateColumn" checked>
+                  <label class="form-check-label" for="includeDateColumn">
+                    Date de naissance
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="includePhoneColumn" name="includePhoneColumn" checked>
+                  <label class="form-check-label" for="includePhoneColumn">
+                    Téléphone
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Additional Options -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Options supplémentaires</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showTimestamp" name="showTimestamp" checked>
+              <label class="form-check-label" for="showTimestamp">
+                <i class="fas fa-clock me-1"></i> Afficher la date et l'heure d'exportation
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showFilters" name="showFilters" checked>
+              <label class="form-check-label" for="showFilters">
+                <i class="fas fa-filter me-1"></i> Afficher les filtres appliqués
+              </label>
+            </div>
+          </div>
+          
+          <!-- PDF Theme -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Thème</label>
+            <div class="d-flex gap-2">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="theme" id="themeDefault" value="default" checked>
+                <label class="form-check-label" for="themeDefault">
+                  <span class="badge bg-primary">Défaut</span>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="theme" id="themeDark" value="dark">
+                <label class="form-check-label" for="themeDark">
+                  <span class="badge bg-dark">Sombre</span>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="theme" id="themeMinimal" value="minimal">
+                <label class="form-check-label" for="themeMinimal">
+                  <span class="badge bg-light text-dark">Minimal</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Annuler
+        </button>
+        <button type="button" class="btn btn-danger" id="confirmPdfExport">
+          <i class="fas fa-file-export me-1"></i> Exporter
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -670,6 +1110,20 @@
   <input type="hidden" id="roleFilterValue" name="role" value="">
   <input type="hidden" id="statusFilterValue" name="status" value="">
   <input type="hidden" id="searchFilterValue" name="search" value="">
+  
+  <!-- PDF Customization Options -->
+  <input type="hidden" id="pdfTitleValue" name="title" value="Liste des Utilisateurs">
+  <input type="hidden" id="pdfOrientationValue" name="orientation" value="landscape">
+  <input type="hidden" id="pdfShowTimestampValue" name="showTimestamp" value="0">
+  <input type="hidden" id="pdfShowFiltersValue" name="showFilters" value="0">
+  <input type="hidden" id="pdfThemeValue" name="theme" value="default">
+  
+  <!-- Column Selection -->
+  <input type="hidden" id="pdfIncludeUserColumnValue" name="includeUserColumn" value="0">
+  <input type="hidden" id="pdfIncludeRoleColumnValue" name="includeRoleColumn" value="0">
+  <input type="hidden" id="pdfIncludeStatusColumnValue" name="includeStatusColumn" value="0">
+  <input type="hidden" id="pdfIncludeDateColumnValue" name="includeDateColumn" value="0">
+  <input type="hidden" id="pdfIncludePhoneColumnValue" name="includePhoneColumn" value="0">
 </form>
 
 <!-- Edit User Modals -->
@@ -677,31 +1131,77 @@
 <div class="modal fade" id="editUserModal{{user.idU}}" tabindex="-1" aria-labelledby="editUserModal{{user.idU}}Label" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editUserModal{{user.idU}}Label">Modifier l'utilisateur</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="editUserModal{{user.idU}}Label">
+          <i class="fas fa-user-edit me-2"></i>Modifier l'utilisateur
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="editUserForm{{user.idU}}" action="{{ path('admin_user_edit', {'id_U': user.idU}) }}" method="post" enctype="multipart/form-data">
+          
+          <!-- User Info Header -->
+          <div class="d-flex align-items-center mb-4">
+            <div class="avatar-container position-relative me-3">
+              {% if user.imagesU is not empty %}
+                <img src="{{ asset('images_users/' ~ user.imagesU) }}" alt="Avatar" class="avatar rounded-circle" style="width: 64px; height: 64px; object-fit: cover;">
+              {% else %}
+                <div class="avatar rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                  <span class="text-white fs-4">{{ user.name|first|upper }}{{ user.prenom ? user.prenom|first|upper : '' }}</span>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              <h5 class="mb-1">{{ user.prenom }} {{ user.name }}</h5>
+              <p class="text-muted mb-0">{{ user.email }}</p>
+            </div>
+          </div>
+          
+          <!-- Form Fields -->
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label for="name{{user.idU}}" class="form-label">Nom</label>
+              <label for="name{{user.idU}}" class="form-label">
+                <i class="fas fa-user me-1"></i> Nom
+              </label>
               <input type="text" class="form-control" id="name{{user.idU}}" name="name" value="{{ user.name }}" required>
             </div>
             <div class="col-md-6 mb-3">
-              <label for="prenom{{user.idU}}" class="form-label">Prénom</label>
+              <label for="prenom{{user.idU}}" class="form-label">
+                <i class="fas fa-user me-1"></i> Prénom
+              </label>
               <input type="text" class="form-control" id="prenom{{user.idU}}" name="prenom" value="{{ user.prenom }}" required>
             </div>
           </div>
           
           <div class="mb-3">
-            <label for="email{{user.idU}}" class="form-label">Email</label>
+            <label for="email{{user.idU}}" class="form-label">
+              <i class="fas fa-envelope me-1"></i> Email
+            </label>
             <input type="email" class="form-control" id="email{{user.idU}}" name="email" value="{{ user.email }}" required>
           </div>
           
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label for="role{{user.idU}}" class="form-label">Rôle</label>
+              <label for="phoneNumber{{user.idU}}" class="form-label">
+                <i class="fas fa-phone me-1"></i> Téléphone
+              </label>
+              <input type="tel" class="form-control" id="phoneNumber{{user.idU}}" name="phoneNumber" value="{{ user.phoneNumber }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="dateNaiss{{user.idU}}" class="form-label">
+                <i class="fas fa-calendar me-1"></i> Date de naissance
+              </label>
+              <input type="date" class="form-control" id="dateNaiss{{user.idU}}" name="dateNaiss" value="{{ user.dateNaiss|date('Y-m-d') }}">
+            </div>
+          </div>
+
+          <hr class="my-4">
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="role{{user.idU}}" class="form-label">
+                <i class="fas fa-user-tag me-1"></i> Rôle
+              </label>
               <select class="form-select" id="role{{user.idU}}" name="role">
                 <option value="Admin" {% if user.roleUser == 'Admin' %}selected{% endif %}>Admin</option>
                 <option value="Voyageurs" {% if user.roleUser == 'Voyageurs' %}selected{% endif %}>Voyageurs</option>
@@ -709,18 +1209,32 @@
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label for="status{{user.idU}}" class="form-label">Statut</label>
+              <label for="status{{user.idU}}" class="form-label">
+                <i class="fas fa-toggle-on me-1"></i> Statut
+              </label>
               <select class="form-select" id="status{{user.idU}}" name="status">
                 <option value="actif" {% if user.statut == 'actif' %}selected{% endif %}>Actif</option>
                 <option value="inactif" {% if user.statut == 'inactif' %}selected{% endif %}>Inactif</option>
               </select>
             </div>
           </div>
+          
+          <div class="mb-3">
+            <label for="profileImage{{user.idU}}" class="form-label">
+              <i class="fas fa-image me-1"></i> Photo de profil
+            </label>
+            <input type="file" class="form-control" id="profileImage{{user.idU}}" name="profileImage" accept="image/*">
+            <div class="form-text">Formats acceptés: JPG, PNG, GIF. Taille maximale: 2MB</div>
+          </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-primary" onclick="window.submitEditForm({{user.idU}})">Enregistrer</button>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Annuler
+        </button>
+        <button type="button" class="btn btn-primary" onclick="window.submitEditForm({{user.idU}})">
+          <i class="fas fa-save me-1"></i> Enregistrer
+        </button>
       </div>
     </div>
   </div>
