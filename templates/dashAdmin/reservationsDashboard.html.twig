@@ -1,0 +1,264 @@
+{% extends 'dashAdmin/dashboard.html.twig' %}
+
+{% block title %}Gestion des Réservations{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Statistics Cards -->
+  <div class="row">
+    <div class="col-xl-3 col-sm-6 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Réservations Totales</p>
+                <h5 class="font-weight-bolder mb-0">{{ totalReservations }}</h5>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                <i class="fas fa-calendar-check text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Réservations Actives</p>
+                <h5 class="font-weight-bolder mb-0">{{ activeReservations }}</h5>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
+                <i class="fas fa-bicycle text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Revenu Total</p>
+                <h5 class="font-weight-bolder mb-0">{{ totalRevenue }}€</h5>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-warning shadow text-center border-radius-md">
+                <i class="fas fa-euro-sign text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Taux d'Occupation</p>
+                <h5 class="font-weight-bolder mb-0">{{ occupancyRate }}%</h5>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                <i class="fas fa-percentage text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reservations List -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6>Réservations Récentes</h6>
+            <div class="input-group w-25">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+              <input type="text" class="form-control" id="searchReservation" placeholder="Rechercher...">
+            </div>
+          </div>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Référence</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Client</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Station</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date Début</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date Fin</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for reservation in reservations %}
+                  <tr>
+                    <td>
+                      <div class="d-flex px-2 py-1">
+                        <div class="d-flex flex-column justify-content-center">
+                          <h6 class="mb-0 text-sm">{{ reservation.reference }}</h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ reservation.user.name }} {{ reservation.user.prenom }}</p>
+                      <p class="text-xs text-secondary mb-0">{{ reservation.user.email }}</p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ reservation.station.nom }}</p>
+                    </td>
+                    <td class="align-middle text-center">
+                      <span class="text-secondary text-xs font-weight-bold">{{ reservation.dateRes|date('d/m/Y H:i') }}</span>
+                    </td>
+                    <td class="align-middle text-center">
+                      <span class="text-secondary text-xs font-weight-bold">{{ reservation.dateFin|date('d/m/Y H:i') }}</span>
+                    </td>
+                    <td class="align-middle text-center">
+                      <span class="text-secondary text-xs font-weight-bold">{{ reservation.prix }}€</span>
+                    </td>
+                    <td class="align-middle text-center">
+                      <span class="badge badge-sm bg-gradient-{{ reservation.statut == 'active' ? 'success' : (reservation.statut == 'terminée' ? 'secondary' : 'warning') }}">
+                        {{ reservation.statut }}
+                      </span>
+                    </td>
+                    <td class="align-middle text-center">
+                      <button onclick="showReservationDetails({{ reservation.id }})" class="btn btn-link text-secondary mb-0">
+                        <i class="fa fa-eye text-xs"></i>
+                      </button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="row mt-4">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h6>Réservations par Mois</h6>
+        </div>
+        <div class="card-body">
+          <canvas id="reservationsChart" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h6>Stations les Plus Réservées</h6>
+        </div>
+        <div class="card-body">
+          <canvas id="stationsChart" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Reservations Chart
+    var reservationsCtx = document.getElementById('reservationsChart').getContext('2d');
+    new Chart(reservationsCtx, {
+        type: 'line',
+        data: {
+            labels: {{ monthLabels|json_encode|raw }},
+            datasets: [{
+                label: 'Nombre de Réservations',
+                data: {{ monthlyReservations|json_encode|raw }},
+                borderColor: '#5e72e4',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(94, 114, 228, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Stations Chart
+    var stationsCtx = document.getElementById('stationsChart').getContext('2d');
+    new Chart(stationsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ topStationNames|json_encode|raw }},
+            datasets: [{
+                label: 'Nombre de Réservations',
+                data: {{ topStationReservations|json_encode|raw }},
+                backgroundColor: '#2dce89',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Search functionality
+    document.getElementById('searchReservation').addEventListener('keyup', function() {
+        var searchText = this.value.toLowerCase();
+        var rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(function(row) {
+            var text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchText) ? '' : 'none';
+        });
+    });
+});
+
+function showReservationDetails(id) {
+    window.location.href = `/admin/reservations/${id}/details`;
+}
+</script>
+{% endblock %}
+{% endblock %} 

@@ -518,14 +518,25 @@ class AdminController extends AbstractController
         }
     }
 
-    #[Route('/StationPage', name: 'station_page')]
-    public function stationPage(StationRepository $stationRepository): Response
+    #[Route('/StationPage/{page}', name: 'station_page', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
+    public function stationPage(StationRepository $stationRepository, int $page = 1): Response
     {
-        // Get inactive stations
+        // Get inactive stations with pagination
+        $itemsPerPage = 10;
         $inactiveStations = $stationRepository->findBy(['statut' => 'inactive']);
         
+        // Calculate total pages
+        $totalStations = count($inactiveStations);
+        $totalPages = ceil($totalStations / $itemsPerPage);
+        
+        // Get stations for current page
+        $offset = ($page - 1) * $itemsPerPage;
+        $stations = array_slice($inactiveStations, $offset, $itemsPerPage);
+        
         return $this->render('dashAdmin/stationPage.html.twig', [
-            'stations' => $inactiveStations
+            'stations' => $stations,
+            'currentPage' => $page,
+            'totalPages' => $totalPages
         ]);
     }
 
@@ -646,12 +657,53 @@ class AdminController extends AbstractController
     #[Route('/admin/stations/{id}/approuver', name: 'admin_station_approuver', methods: ['POST'])]
     public function approuverStation(int $id, StationRepository $stationRepository, Request $request): Response
     {
-        if ($this->isCsrfTokenValid('approuver-station', $request->request->get('_token'))) {
-            $stationRepository->approuverStation($id);
-            $this->addFlash('success', 'Station approuvée avec succès');
-        }
+        try {
+            // Check if it's an AJAX request
+            if ($request->isXmlHttpRequest()) {
+                // Validate CSRF token
+                if (!$this->isCsrfTokenValid('approuver-station', $request->headers->get('X-CSRF-TOKEN'))) {
+                    return new JsonResponse([
+                        'success' => false,
+                        'message' => 'Token CSRF invalide'
+                    ], 400);
+                }
 
-        return $this->redirectToRoute('admin_stations');
+                // Find the station
+                $station = $stationRepository->find($id);
+                if (!$station) {
+                    return new JsonResponse([
+                        'success' => false,
+                        'message' => 'Station non trouvée'
+                    ], 404);
+                }
+
+                // Update station status
+                $station->setStatut('active');
+                $stationRepository->save($station, true);
+
+                return new JsonResponse([
+                    'success' => true,
+                    'message' => 'Station approuvée avec succès'
+                ]);
+            }
+
+            // Handle non-AJAX request
+            if ($this->isCsrfTokenValid('approuver-station', $request->request->get('_token'))) {
+                $station = $stationRepository->find($id);
+                if ($station) {
+                    $station->setStatut('active');
+                    $stationRepository->save($station, true);
+                    $this->addFlash('success', 'Station approuvée avec succès');
+                }
+            }
+
+            return $this->redirectToRoute('station_page');
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'approbation: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -1108,6 +1160,105 @@ class AdminController extends AbstractController
             'chartLabels' => json_encode($labels),
             'chartData' => json_encode($data),
             'mostViewedPages' => $mostViewedPages
+        ]);
+    }
+
+    #[Route('/admin/stations/{id}/details', name: 'admin_station_details', methods: ['GET'])]
+    public function stationDetails(int $id, StationRepository $stationRepository): Response
+    {
+        $station = $stationRepository->find($id);
+        
+        if (!$station) {
+            throw $this->createNotFoundException('Station non trouvée');
+        }
+        
+        return $this->render('dashAdmin/stationDetails.html.twig', [
+            'station' => $station
+        ]);
+    }
+
+    #[Route('/admin/reservations', name: 'admin_reservations')]
+    public function reservations(ReservationTransportRepository $reservationRepository): Response
+    {
+        // Get basic statistics
+        $totalReservations = $reservationRepository->count([]);
+        $activeReservations = $reservationRepository->count(['statut' => 'active']);
+        $totalRevenue = $reservationRepository->getTotalRevenue();
+        $occupancyRate = $reservationRepository->getOccupancyRate();
+
+        // Get monthly statistics for chart
+        $monthlyStats = $reservationRepository->getMonthlyStats();
+        $monthLabels = array_column($monthlyStats, 'month');
+        $monthlyReservations = array_column($monthlyStats, 'count');
+
+        // Get top stations
+        $topStations = $reservationRepository->getTopStations();
+        $topStationNames = array_column($topStations, 'station_name');
+        $topStationReservations = array_column($topStations, 'reservation_count');
+
+        // Get recent reservations
+        $reservations = $reservationRepository->findBy(
+            [],
+            ['dateRes' => 'DESC'],
+            10
+        );
+
+        return $this->render('dashAdmin/reservationsDashboard.html.twig', [
+            'totalReservations' => $totalReservations,
+            'activeReservations' => $activeReservations,
+            'totalRevenue' => $totalRevenue,
+            'occupancyRate' => $occupancyRate,
+            'monthLabels' => $monthLabels,
+            'monthlyReservations' => $monthlyReservations,
+            'topStationNames' => $topStationNames,
+            'topStationReservations' => $topStationReservations,
+            'reservations' => $reservations
+        ]);
+    }
+
+    #[Route('/admin/stations-dashboard', name: 'admin_stations_dashboard')]
+    public function stationsDashboard(StationRepository $stationRepository): Response
+    {
+        // Get statistics
+        $totalStations = $stationRepository->count([]);
+        $activeStations = $stationRepository->count(['statut' => 'active']);
+        $totalBikes = $stationRepository->getTotalBikes();
+        $availableBikes = $stationRepository->getAvailableBikes();
+
+        // Get stations by status
+        $stationsByStatus = [
+            'active' => $stationRepository->count(['statut' => 'active']),
+            'inactive' => $stationRepository->count(['statut' => 'inactive'])
+        ];
+
+        // Get stations with low bike availability
+        $lowAvailabilityStations = $stationRepository->findLowAvailabilityStations();
+
+        // Get most popular stations
+        $popularStations = $stationRepository->findMostPopularStations();
+
+        return $this->render('dashAdmin/stationsDashboard.html.twig', [
+            'totalStations' => $totalStations,
+            'activeStations' => $activeStations,
+            'totalBikes' => $totalBikes,
+            'availableBikes' => $availableBikes,
+            'stationsByStatus' => $stationsByStatus,
+            'lowAvailabilityStations' => $lowAvailabilityStations,
+            'popularStations' => $popularStations
+        ]);
+    }
+
+    #[Route('/admin/reservations/{id}/details', name: 'admin_reservation_details')]
+    public function reservationDetails(int $id, ReservationTransportRepository $reservationRepository): Response
+    {
+        $reservation = $reservationRepository->find($id);
+        
+        if (!$reservation) {
+            throw $this->createNotFoundException('Réservation non trouvée');
+        }
+        
+        return $this->render('dashAdmin/reservationDetails.html.twig', [
+            'reservation' => $reservation
         ]);
     }
 }

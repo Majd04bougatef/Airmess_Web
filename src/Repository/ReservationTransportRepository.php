@@ -89,4 +89,47 @@ class ReservationTransportRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function getTotalRevenue(): float
+    {
+        $result = $this->createQueryBuilder('r')
+            ->select('SUM(r.prix) as total')
+            ->getQuery()
+            ->getSingleScalarResult();
+        
+        return $result ?? 0;
+    }
+
+    public function getOccupancyRate(): float
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->select('COUNT(r) as total, SUM(CASE WHEN r.statut = :active THEN 1 ELSE 0 END) as active')
+            ->setParameter('active', 'active');
+        
+        $result = $qb->getQuery()->getSingleResult();
+        
+        return $result['total'] > 0 ? ($result['active'] / $result['total']) * 100 : 0;
+    }
+
+    public function getMonthlyStats(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('SUBSTRING(r.dateRes, 1, 7) as month, COUNT(r) as count')
+            ->groupBy('month')
+            ->orderBy('month', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getTopStations(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('s.nom as station_name, COUNT(r) as reservation_count')
+            ->join('r.station', 's')
+            ->groupBy('s.nom')
+            ->orderBy('reservation_count', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
+
 }

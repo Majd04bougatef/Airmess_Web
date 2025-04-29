@@ -140,4 +140,47 @@ class StationRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    public function getTotalBikes(): int
+    {
+        $result = $this->createQueryBuilder('s')
+            ->select('SUM(s.capacite) as total')
+            ->getQuery()
+            ->getSingleScalarResult();
+        
+        return $result ?? 0;
+    }
+
+    public function getAvailableBikes(): int
+    {
+        $result = $this->createQueryBuilder('s')
+            ->select('SUM(s.nombreVelo) as total')
+            ->getQuery()
+            ->getSingleScalarResult();
+        
+        return $result ?? 0;
+    }
+
+    public function findLowAvailabilityStations(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.nombreVelo <= s.capacite * 0.2')
+            ->andWhere('s.statut = :active')
+            ->setParameter('active', 'active')
+            ->orderBy('s.nombreVelo', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findMostPopularStations(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.nom, COUNT(r) as reservationCount, s.capacite, s.nombreVelo')
+            ->leftJoin('App\Entity\ReservationTransport', 'r', 'WITH', 'r.station = s')
+            ->groupBy('s.nom, s.capacite, s.nombreVelo')
+            ->orderBy('reservationCount', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
 }
