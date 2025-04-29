@@ -2,266 +2,293 @@
 
 {% block title %}Réseaux Sociaux{% endblock %}
 
-{% block javascripts %}
-{{ parent() }}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded');
-    
-    // Initialize Bootstrap dropdown
-    var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-    var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-        return new bootstrap.Dropdown(dropdownToggleEl);
-    });
-    console.log('Dropdowns initialized:', dropdownList);
-    
-    // Test sort select
-    const sortSelect = document.getElementById('sortSelect');
-    if (sortSelect) {
-        console.log('Sort select found:', sortSelect);
-        
-        sortSelect.addEventListener('change', function() {
-            const sortValue = this.value;
-            console.log('Sort value changed to:', sortValue);
-            
-            fetch(`/social-media/sort-ajax?sort=${sortValue}`, {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                console.log('Fetch response:', response);
-                return response.text();
-            })
-            .then(html => {
-                console.log('Received HTML data');
-                const postsContainer = document.getElementById('postsContainer');
-                if (postsContainer) {
-                    postsContainer.innerHTML = html;
-                    console.log('Posts container updated');
-                } else {
-                    console.error('Posts container not found');
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-            });
-        });
-    } else {
-        console.error('Sort select not found');
-    }
-});
-</script>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .dropdown-menu {
+            z-index: 1055 !important;
+            position: absolute !important;
+        }
+        /* Style pour le message de débogage */
+        .debug-info {
+            background-color: yellow;
+            color: black;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid red;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts_head %}
+    {{ parent() }}
+    <script>
+        console.log('Scripts chargés dans socialPage');
+    </script>
 {% endblock %}
 
 {% block body %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
-                <h2 class="text-white mb-0">Réseaux Sociaux</h2>
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-plus me-2"></i> Actions
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="{{ path('social_media_new') }}">
-                                <i class="fas fa-plus-circle me-2"></i> Nouvelle Publication
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="{{ path('live_start') }}">
-                                <i class="fas fa-video me-2"></i> Démarrer un Live
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+    {{ parent() }}
+    
+    <!-- Message de débogage visible -->
+    <div class="debug-info">
+        Template socialPage.html.twig chargé
+        <br>
+        Heure: <span id="debugTime"></span>
+        <script>
+            document.getElementById('debugTime').textContent = new Date().toLocaleTimeString();
+        </script>
     </div>
 
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endfor %}
-
-    <div class="card">
-        <div class="card-header pb-0">
-            <div class="row">
-                <div class="col-md-6">
-                    <h6>Publications</h6>
-                </div>
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-end">
-                        <form method="get" action="{{ path('social_media_index') }}" class="me-3">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                <input type="text" name="search" class="form-control" placeholder="Rechercher..." value="{{ app.request.query.get('search') }}">
-                                <button type="submit" class="btn btn-primary mb-0">Rechercher</button>
-                            </div>
-                        </form>
-                        <div class="d-flex align-items-center">
-                            <span class="me-2">Trier par :</span>
-                            <select class="form-select form-select-sm" style="width: auto;" id="sortSelect">
-                                <option value="date_desc">Date (plus récent)</option>
-                                <option value="date_asc">Date (plus ancien)</option>
-                                <option value="likes_desc">Likes (plus populaire)</option>
-                                <option value="comments_desc">Commentaires (plus populaire)</option>
-                            </select>
-                        </div>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-white mb-0">Réseaux Sociaux</h2>
+                    
+                    <!-- Dropdown avec structure Bootstrap 5 -->
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" 
+                                type="button" 
+                                id="mainActionButton" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false">
+                            <i class="fas fa-plus me-2"></i> Actions
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mainActionButton">
+                            <li>
+                                <a class="dropdown-item" href="{{ path('social_media_new') }}">
+                                    <i class="fas fa-plus-circle me-2"></i> Nouvelle Publication
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ path('live_start') }}">
+                                    <i class="fas fa-video me-2"></i> Démarrer un Live
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="card-body px-0 pt-0 pb-2">
-          <div class="table-responsive p-0">
-            <table class="table align-items-center mb-0">
-              <thead>
-                <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Titre</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Contenu</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lieu</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Likes/Dislikes</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Commentaires</th>
-                  <th class="text-secondary opacity-7">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="postsContainer">
-                {% if pagination is defined and pagination.items|length > 0 %}
-                  {% for social_media in pagination %}
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          {% if social_media.imagemedia %}
-                            <div>
-                              <img src="{{ asset('http://localhost/ImageSocialMedia/' ~ social_media.getImagemedia()) }}" class="avatar avatar-sm me-3" alt="Image">
+                <!-- Contenu principal -->
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Publications</h6>
                             </div>
-                          {% else %}
-                            <div>
-                              <div class="avatar avatar-sm me-3 bg-gradient-primary">
-                                <i class="fas fa-image text-white"></i>
-                              </div>
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-end">
+                                    <form method="get" action="{{ path('social_media_index') }}" class="me-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                            <input type="text" name="search" class="form-control" placeholder="Rechercher..." value="{{ app.request.query.get('search') }}">
+                                            <button type="submit" class="btn btn-primary mb-0">Rechercher</button>
+                                        </div>
+                                    </form>
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2">Trier par :</span>
+                                        <select class="form-select form-select-sm" style="width: auto;" id="sortSelect">
+                                            <option value="date_desc">Date (plus récent)</option>
+                                            <option value="date_asc">Date (plus ancien)</option>
+                                            <option value="likes_desc">Likes (plus populaire)</option>
+                                            <option value="comments_desc">Commentaires (plus populaire)</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                          {% endif %}
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">{{ social_media.titre }}</h6>
-                            <p class="text-xs text-secondary mb-0">
-                              {% if social_media.user %}
-                                {{ social_media.user.name|default('') }} {{ social_media.user.prenom|default('') }}
+                        </div>
+                    </div>
+
+                    <div class="card-body px-0 pt-0 pb-2">
+                      <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                          <thead>
+                            <tr>
+                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Titre</th>
+                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Contenu</th>
+                              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lieu</th>
+                              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Likes/Dislikes</th>
+                              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Commentaires</th>
+                              <th class="text-secondary opacity-7">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody id="postsContainer">
+                            {% if pagination is defined and pagination.items|length > 0 %}
+                              {% for social_media in pagination %}
+                                <tr>
+                                  <td>
+                                    <div class="d-flex px-2 py-1">
+                                      {% if social_media.imagemedia %}
+                                        <div>
+                                          <img src="{{ asset('http://localhost/ImageSocialMedia/' ~ social_media.getImagemedia()) }}" class="avatar avatar-sm me-3" alt="Image">
+                                        </div>
+                                      {% else %}
+                                        <div>
+                                          <div class="avatar avatar-sm me-3 bg-gradient-primary">
+                                            <i class="fas fa-image text-white"></i>
+                                          </div>
+                                        </div>
+                                      {% endif %}
+                                      <div class="d-flex flex-column justify-content-center">
+                                        <h6 class="mb-0 text-sm">{{ social_media.titre }}</h6>
+                                        <p class="text-xs text-secondary mb-0">
+                                          {% if social_media.user %}
+                                            {{ social_media.user.name|default('') }} {{ social_media.user.prenom|default('') }}
+                                          {% else %}
+                                            Utilisateur inconnu
+                                          {% endif %}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <p class="text-xs font-weight-bold mb-0">{{ social_media.contenu|slice(0, 100) }}{% if social_media.contenu|length > 100 %}...{% endif %}</p>
+                                  </td>
+                                  <td class="align-middle text-center text-sm">
+                                    <span class="badge badge-sm bg-gradient-info">{{ social_media.lieu }}</span>
+                                  </td>
+                                  <td class="align-middle text-center">
+                                    <span class="text-secondary text-xs font-weight-bold">{{ social_media.publicationDate|date('d/m/Y') }}</span>
+                                  </td>
+                                  <td class="align-middle text-center">
+                                    <div class="d-flex justify-content-center">
+                                      <span class="me-2 badge bg-gradient-success"><i class="fas fa-thumbs-up me-1"></i>{{ social_media.likee }}</span>
+                                      <span class="badge bg-gradient-danger"><i class="fas fa-thumbs-down me-1"></i>{{ social_media.dislike }}</span>
+                                    </div>
+                                  </td>
+                                  <td class="align-middle text-center">
+                                    <span class="badge badge-sm bg-gradient-warning">{{ social_media.commentaires|length }}</span>
+                                  </td>
+                                  <td class="align-middle">
+                                    <div class="d-flex">
+                                      <a href="{{ path('social_media_show', {'idEB': social_media.idEB}) }}" class="btn btn-link text-info text-gradient px-3 mb-0" data-toggle="tooltip" data-original-title="Voir">
+                                        <i class="fas fa-eye me-2"></i>Voir
+                                      </a>
+                                      <a href="{{ path('social_media_edit', {'idEB': social_media.idEB}) }}" class="btn btn-link text-dark px-3 mb-0" data-toggle="tooltip" data-original-title="Éditer">
+                                        <i class="fas fa-pencil-alt me-2"></i>Éditer
+                                      </a>
+                                      <form method="post" action="{{ path('social_media_delete', {'idEB': social_media.idEB}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication?');" style="display: inline-block;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
+                                        <button type="submit" class="btn btn-link text-danger text-gradient px-3 mb-0">
+                                          <i class="fas fa-trash me-2"></i>Supprimer
+                                        </button>
+                                      </form>
+                                    </div>
+                                  </td>
+                                </tr>
                               {% else %}
-                                Utilisateur inconnu
+                                <tr>
+                                  <td colspan="7" class="text-center py-4">
+                                    <p class="text-muted">Aucune publication trouvée</p>
+                                  </td>
+                                </tr>
+                              {% endfor %}
+                            {% else %}
+                              <tr>
+                                <td colspan="7" class="text-center py-4">
+                                  <p class="text-muted">Aucune publication trouvée</p>
+                                </td>
+                              </tr>
+                            {% endif %}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {% if pagination is defined and pagination.paginationData.pageCount > 1 %}
+                        <div class="navigation d-flex justify-content-center mt-4">
+                          <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                              {% if pagination.paginationData.current > 1 %}
+                                <li class="page-item">
+                                  <a class="page-link" href="{{ path('social_media_index', {'page': 1}) }}" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                  </a>
+                                </li>
+                                <li class="page-item">
+                                  <a class="page-link" href="{{ path('social_media_index', {'page': pagination.paginationData.current - 1}) }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                  </a>
+                                </li>
                               {% endif %}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0">{{ social_media.contenu|slice(0, 100) }}{% if social_media.contenu|length > 100 %}...{% endif %}</p>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="badge badge-sm bg-gradient-info">{{ social_media.lieu }}</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">{{ social_media.publicationDate|date('d/m/Y') }}</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <div class="d-flex justify-content-center">
-                          <span class="me-2 badge bg-gradient-success"><i class="fas fa-thumbs-up me-1"></i>{{ social_media.likee }}</span>
-                          <span class="badge bg-gradient-danger"><i class="fas fa-thumbs-down me-1"></i>{{ social_media.dislike }}</span>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center">
-                        <span class="badge badge-sm bg-gradient-warning">{{ social_media.commentaires|length }}</span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="d-flex">
-                          <a href="{{ path('social_media_show', {'idEB': social_media.idEB}) }}" class="btn btn-link text-info text-gradient px-3 mb-0" data-toggle="tooltip" data-original-title="Voir">
-                            <i class="fas fa-eye me-2"></i>Voir
-                          </a>
-                          <a href="{{ path('social_media_edit', {'idEB': social_media.idEB}) }}" class="btn btn-link text-dark px-3 mb-0" data-toggle="tooltip" data-original-title="Éditer">
-                            <i class="fas fa-pencil-alt me-2"></i>Éditer
-                          </a>
-                          <form method="post" action="{{ path('social_media_delete', {'idEB': social_media.idEB}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication?');" style="display: inline-block;">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ social_media.idEB) }}">
-                            <button type="submit" class="btn btn-link text-danger text-gradient px-3 mb-0">
-                              <i class="fas fa-trash me-2"></i>Supprimer
-                            </button>
-                          </form>
-                        </div>
-                      </td>
-                    </tr>
-                  {% else %}
-                    <tr>
-                      <td colspan="7" class="text-center py-4">
-                        <p class="text-muted">Aucune publication trouvée</p>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                {% else %}
-                  <tr>
-                    <td colspan="7" class="text-center py-4">
-                      <p class="text-muted">Aucune publication trouvée</p>
-                    </td>
-                  </tr>
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
 
-          {% if pagination is defined and pagination.paginationData.pageCount > 1 %}
-            <div class="navigation d-flex justify-content-center mt-4">
-              <nav aria-label="Page navigation">
-                <ul class="pagination">
-                  {% if pagination.paginationData.current > 1 %}
-                    <li class="page-item">
-                      <a class="page-link" href="{{ path('social_media_index', {'page': 1}) }}" aria-label="First">
-                        <span aria-hidden="true">&laquo;&laquo;</span>
-                      </a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="{{ path('social_media_index', {'page': pagination.paginationData.current - 1}) }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                      </a>
-                    </li>
-                  {% endif %}
+                              {% set startPage = max(1, pagination.paginationData.current - 2) %}
+                              {% set endPage = min(pagination.paginationData.pageCount, startPage + 4) %}
+                              
+                              {% for page in startPage..endPage %}
+                                <li class="page-item {% if page == pagination.paginationData.current %}active{% endif %}">
+                                  <a class="page-link" href="{{ path('social_media_index', {'page': page}) }}">{{ page }}</a>
+                                </li>
+                              {% endfor %}
 
-                  {% set startPage = max(1, pagination.paginationData.current - 2) %}
-                  {% set endPage = min(pagination.paginationData.pageCount, startPage + 4) %}
-                  
-                  {% for page in startPage..endPage %}
-                    <li class="page-item {% if page == pagination.paginationData.current %}active{% endif %}">
-                      <a class="page-link" href="{{ path('social_media_index', {'page': page}) }}">{{ page }}</a>
-                    </li>
-                  {% endfor %}
-
-                  {% if pagination.paginationData.current < pagination.paginationData.pageCount %}
-                    <li class="page-item">
-                      <a class="page-link" href="{{ path('social_media_index', {'page': pagination.paginationData.current + 1}) }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                      </a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="{{ path('social_media_index', {'page': pagination.paginationData.pageCount}) }}" aria-label="Last">
-                        <span aria-hidden="true">&raquo;&raquo;</span>
-                      </a>
-                    </li>
-                  {% endif %}
-                </ul>
-              </nav>
+                              {% if pagination.paginationData.current < pagination.paginationData.pageCount %}
+                                <li class="page-item">
+                                  <a class="page-link" href="{{ path('social_media_index', {'page': pagination.paginationData.current + 1}) }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                  </a>
+                                </li>
+                                <li class="page-item">
+                                  <a class="page-link" href="{{ path('social_media_index', {'page': pagination.paginationData.pageCount}) }}" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                  </a>
+                                </li>
+                              {% endif %}
+                            </ul>
+                          </nav>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
             </div>
-          {% endif %}
         </div>
-      </div>
     </div>
-  </div>
-</div>
+
+    <!-- Script de débogage -->
+    <script>
+        console.log('=== DÉBOGAGE SOCIAL PAGE ===');
+        console.log('Template chargé à:', new Date().toLocaleTimeString());
+        
+        // Fonction pour vérifier un élément
+        function checkElement(id) {
+            const element = document.getElementById(id);
+            console.log(`Élément ${id}:`, element ? 'TROUVÉ' : 'NON TROUVÉ');
+            return element;
+        }
+        
+        // Vérification immédiate
+        checkElement('mainActionButton');
+        
+        // Vérification après chargement du DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM chargé - Nouvelle vérification');
+            const button = checkElement('mainActionButton');
+            
+            if (button) {
+                try {
+                    const dropdown = new bootstrap.Dropdown(button);
+                    console.log('Dropdown initialisé avec succès');
+                    
+                    // Ajouter un message visible sur la page
+                    const debugInfo = document.querySelector('.debug-info');
+                    if (debugInfo) {
+                        debugInfo.innerHTML += '<br>Bouton trouvé et initialisé';
+                    }
+                } catch (error) {
+                    console.error('Erreur Bootstrap:', error);
+                }
+            }
+        });
+    </script>
 {% endblock %} 

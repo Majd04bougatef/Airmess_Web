@@ -241,6 +241,7 @@ window.addEventListener('load', function() {
 {% endblock %}
 
 {% block stylesheets %}
+{{ parent() }}
 {# Keep these includes as they were in the source template #}
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">

@@ -1,0 +1,340 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}{{ stream.new_asset_settings.title|default('Live Stream') }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .stream-container {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .stream-player-wrapper {
+        position: relative;
+        width: 100%;
+        background: #000;
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .stream-player {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000;
+        position: relative;
+    }
+    
+    .stream-player mux-player {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        --controls: true;
+        --primary-color: #5e72e4;
+        --secondary-color: white;
+        --video-quality-default-auto: true;
+    }
+    
+    .stream-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stream-info {
+        flex: 1;
+    }
+    
+    .stream-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stream-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .stream-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .status-active {
+        background-color: #2dce89;
+        color: white;
+    }
+    
+    .status-idle {
+        background-color: #fb6340;
+        color: white;
+    }
+    
+    .status-connected {
+        background-color: #11cdef;
+        color: white;
+    }
+
+    .stream-error {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+        z-index: 20;
+        background: rgba(0, 0, 0, 0.9);
+        padding: 2rem;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        width: 80%;
+        max-width: 400px;
+    }
+
+    .stream-error i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #fb6340;
+    }
+
+    .stream-error h3 {
+        margin-bottom: 0.5rem;
+        font-size: 1.25rem;
+    }
+
+    .stream-error p {
+        opacity: 0.8;
+        font-size: 0.875rem;
+    }
+
+    .stream-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+        z-index: 10;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .powered-by-mux {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        z-index: 5;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+    }
+
+    .powered-by-mux:hover {
+        opacity: 1;
+    }
+
+    .viewer-guide {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="stream-container">
+                <div class="stream-header">
+                    <div class="stream-info">
+                        <h1 class="stream-title">{{ stream.new_asset_settings.title|default('Live Stream') }}</h1>
+                        <div class="stream-meta">
+                            <div class="stream-status status-{{ stream.status }}">
+                                <i class="fas fa-broadcast-tower"></i>
+                                <span>{{ stream.status|title }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stream-actions">
+                        <a href="{{ path('app_social_media_live_list') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Retour aux streams
+                        </a>
+                    </div>
+                </div>
+
+                <div class="stream-player-wrapper">
+                    <div class="stream-player">
+                        <mux-player
+                            stream-type="live"
+                            playback-id="{{ stream.playback_ids[0].id }}"
+                            env-key="{{ mux_env_key|default('') }}"
+                            title="{{ stream.new_asset_settings.title|default('Live Stream')|e('html_attr') }}"
+                            poster="https://image.mux.com/{{ stream.playback_ids[0].id }}/thumbnail.jpg?time=0&width=1280"
+                            primary-color="#5e72e4"
+                            secondary-color="white"
+                            stream-url="https://stream.mux.com/{{ stream.playback_ids[0].id }}.m3u8"
+                            autoplay
+                            muted
+                            default-hidden-captions
+                            forward-seek-offset="10"
+                            backward-seek-offset="10"
+                            start-time="0"
+                            prefer-playback="mse"
+                            metadata-video-title="{{ stream.new_asset_settings.title|default('Live Stream')|e('html_attr') }}"
+                            metadata-viewer-user-id="{{ app.user ? app.user.id : 'anonymous' }}"
+                            beaconCollectionDomain="in.data.mux.com"
+                            crossorigin
+                        ></mux-player>
+                        
+                        <div class="stream-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Chargement du stream...</p>
+                        </div>
+
+                        <div class="stream-error" style="display: none;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>Stream non disponible</h3>
+                            <p>Le stream n'est pas encore démarré ou est temporairement indisponible.</p>
+                        </div>
+
+                        <div class="powered-by-mux">
+                            <a href="https://mux.com" target="_blank" rel="noopener noreferrer">
+                                <img src="https://mux.com/images/mux-logo-white.svg" alt="Powered by Mux" height="24">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="viewer-guide">
+                    <h3><i class="fas fa-info-circle"></i> État du stream</h3>
+                    <p class="stream-status-message">
+                        {% if stream.status == 'active' %}
+                            Le stream est en direct ! Cliquez sur le player pour activer le son.
+                        {% elseif stream.status == 'connected' %}
+                            Le streamer est connecté et va bientôt commencer.
+                        {% else %}
+                            En attente du début du stream...
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script type="module">
+    import 'https://cdn.jsdelivr.net/npm/@mux/mux-player@latest/dist/mux-player.min.js';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const player = document.querySelector('mux-player');
+        const errorDisplay = document.querySelector('.stream-error');
+        const loadingDisplay = document.querySelector('.stream-loading');
+        const statusMessage = document.querySelector('.stream-status-message');
+        
+        // Configuration du monitoring Mux Data
+        player.env_key = '{{ mux_env_key|default('') }}';
+        
+        function showError(show) {
+            errorDisplay.style.display = show ? 'block' : 'none';
+            loadingDisplay.style.display = show ? 'none' : 'block';
+        }
+        
+        // Enhanced error handling
+        player.addEventListener('error', function(e) {
+            console.error('Stream error:', e.detail);
+            showError(true);
+            statusMessage.textContent = 'Une erreur est survenue lors du chargement du stream.';
+        });
+
+        // Enhanced playback state handling
+        player.addEventListener('playing', function() {
+            console.log('Stream started playing');
+            showError(false);
+            loadingDisplay.style.display = 'none';
+            statusMessage.textContent = 'Stream en direct ! Double-cliquez pour le plein écran.';
+        });
+
+        player.addEventListener('waiting', function() {
+            console.log('Stream buffering...');
+            loadingDisplay.style.display = 'block';
+            statusMessage.textContent = 'Chargement du stream...';
+        });
+
+        // Handle player ready state
+        player.addEventListener('loadedmetadata', function() {
+            console.log('Player ready with metadata');
+            loadingDisplay.style.display = 'none';
+        });
+
+        // Handle stream quality changes
+        player.addEventListener('qualitychanged', function(e) {
+            console.log('Stream quality changed:', e.detail);
+        });
+
+        // Handle fullscreen changes
+        player.addEventListener('enterfullscreen', () => {
+            console.log('Entered fullscreen mode');
+        });
+
+        player.addEventListener('exitfullscreen', () => {
+            console.log('Exited fullscreen mode');
+        });
+
+        // Periodic status check
+        setInterval(() => {
+            fetch('/social/media/live/{{ stream.id }}/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.active && player.paused) {
+                        showError(true);
+                        statusMessage.textContent = 'Le stream n\'est pas actif pour le moment.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking stream status:', error);
+                });
+        }, 5000);
+        
+        // Force HLS playback URL if needed
+        const playbackId = '{{ stream.playback_ids[0].id }}';
+        const hlsUrl = `https://stream.mux.com/${playbackId}.m3u8`;
+        if (!player.src) {
+            player.src = hlsUrl;
+        }
+    });
+</script>
+{% endblock %} 

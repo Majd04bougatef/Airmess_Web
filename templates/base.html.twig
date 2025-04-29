@@ -6,6 +6,63 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+    <!-- Script de débogage immédiat -->
+    <script>
+        (function() {
+            // Forcer la console à s'afficher
+            console.clear();
+            console.log('=== DÉMARRAGE DU DÉBOGAGE ===');
+            
+            // Fonction de log avec timestamp
+            function debugLog(msg) {
+                console.log((new Date()).toISOString() + ' - ' + msg);
+            }
+            
+            debugLog('Script de débogage chargé');
+            
+            // Vérifier si la console fonctionne
+            debugLog('Test de la console');
+            
+            // Surveiller le chargement du document
+            document.addEventListener('DOMContentLoaded', function() {
+                debugLog('DOM chargé');
+            });
+            
+            // Surveiller le chargement complet
+            window.addEventListener('load', function() {
+                debugLog('Page entièrement chargée');
+                
+                // Vérifier jQuery
+                if (typeof jQuery !== 'undefined') {
+                    debugLog('jQuery est disponible');
+                } else {
+                    console.error('jQuery n\'est pas chargé');
+                }
+                
+                // Vérifier Bootstrap
+                if (typeof bootstrap !== 'undefined') {
+                    debugLog('Bootstrap est disponible');
+                } else {
+                    console.error('Bootstrap n\'est pas chargé');
+                }
+                
+                // Vérifier le dropdown
+                var dropdownElement = document.querySelector('.dropdown-toggle');
+                if (dropdownElement) {
+                    debugLog('Élément dropdown trouvé');
+                    try {
+                        new bootstrap.Dropdown(dropdownElement);
+                        debugLog('Dropdown initialisé');
+                    } catch (e) {
+                        console.error('Erreur lors de l\'initialisation du dropdown:', e);
+                    }
+                } else {
+                    console.error('Élément dropdown non trouvé');
+                }
+            });
+        })();
+    </script>
+
     <title>{% block title %}Airmess{% endblock %}</title>
     <link rel="icon" href="{{ asset('images/logo-airmess.png') }}" type="image/png">
 
@@ -28,6 +85,17 @@
         <link href="{{asset('css/main.css')}}" rel="stylesheet">
         <link href="{{ asset('css/feed.css') }}" rel="stylesheet">
         <link href="{{ asset('css/socialmedia.css') }}" rel="stylesheet">
+    {% endblock %}
+
+    {% block javascripts_head %}
+        <!-- jQuery first, then Bootstrap Bundle JS -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- Activation du débogage console -->
+        <script>
+            console.log('Scripts chargés dans le head');
+        </script>
     {% endblock %}
   </head>
   <body class="index-page">
@@ -1245,8 +1313,9 @@
     {% endblock %}
 
     <!-- Scripts -->
-    {% block js %}
+    {% block javascripts %}
         <!-- Vendor JS Files -->
+
   <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
   <script src="{{asset('vendor/aos/aos.js')}}"></script>
   <script src="{{asset('vendor/glightbox/js/glightbox.min.js')}}"></script>
