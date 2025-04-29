@@ -1,10 +1,6 @@
-
-
-
-<script>
 console.log("Script externe station.js exécuté !");
 
-alert("srgezrgerg");
-</script>
+// Remove the alert as it's just for testing
+// alert("srgezrgerg");
 
 
