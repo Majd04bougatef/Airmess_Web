@@ -119,6 +119,26 @@ class MuxService
         }
     }
 
+    public function getAllLiveStreams(): array
+    {
+        try {
+            $response = $this->httpClient->request('GET', 'https://api.mux.com/video/v1/live-streams', [
+                'auth_basic' => [$this->muxTokenId, $this->muxTokenSecret]
+            ]);
+
+            $content = $response->toArray();
+            
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Erreur lors de la récupération des streams: ' . ($content['message'] ?? 'Erreur inconnue'));
+            }
+
+            return $content;
+        } catch (\Exception $e) {
+            $this->log('error', 'Erreur lors de la récupération des streams: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
     private function log(string $message, string $level = 'info'): void
     {
         if ($this->logger) {

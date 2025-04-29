@@ -27,6 +27,9 @@ use App\Service\ForbiddenWordsChecker;
 use App\Service\GeminiService;
 use App\Service\MuxService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RequestStack;
+use App\Repository\LiveStreamRepository;
 
 
 #[Route('/social/media')]
@@ -44,6 +47,8 @@ class SocialMediaController extends AbstractController
     private string $uploadsDirectory;
     private ForbiddenWordsChecker $forbiddenWordsChecker;
     private GeminiService $geminiService;
+    private RequestStack $requestStack;
+    private LiveStreamRepository $liveStreamRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -53,7 +58,9 @@ class SocialMediaController extends AbstractController
         MuxService $muxService,
         string $uploadsDirectory = 'C:/xampp/htdocs/ImageSocialMedia',
         ForbiddenWordsChecker $forbiddenWordsChecker,
-        GeminiService $geminiService
+        GeminiService $geminiService,
+        RequestStack $requestStack,
+        LiveStreamRepository $liveStreamRepository
     ) {
         $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
@@ -63,6 +70,8 @@ class SocialMediaController extends AbstractController
         $this->uploadsDirectory = $uploadsDirectory;
         $this->forbiddenWordsChecker = $forbiddenWordsChecker;
         $this->geminiService = $geminiService;
+        $this->requestStack = $requestStack;
+        $this->liveStreamRepository = $liveStreamRepository;
 
         if (!file_exists($this->uploadsDirectory)) {
             mkdir($this->uploadsDirectory, 0777, true);
@@ -942,5 +951,130 @@ class SocialMediaController extends AbstractController
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    #[Route('/social/media/live/list', name: 'app_social_media_live_list', methods: ['GET'])]
+    public function listLiveStreams(): Response
+    {
+        try {
+            // Vérifier si les clés Mux sont disponibles
+            $muxTokenId = $this->getParameter('mux.token_id');
+            $muxTokenSecret = $this->getParameter('mux.token_secret');
+            
+            if (empty($muxTokenId) || empty($muxTokenSecret)) {
+                throw new \Exception('Configuration Mux manquante');
+            }
+
+            // Récupérer tous les streams depuis Mux
+            $allStreams = $this->muxService->getAllLiveStreams();
+            
+            if (!isset($allStreams['data'])) {
+                throw new \Exception('Format de réponse Mux invalide');
+            }
+
+            // Debug: Afficher tous les streams et leurs statuts
+            foreach ($allStreams['data'] as $stream) {
+                $this->addFlash('info', sprintf(
+                    'Stream trouvé - ID: %s, Status: %s', 
+                    $stream['id'], 
+                    $stream['status']
+                ));
+            }
+
+            // Filtrer les streams qui sont soit actifs soit connectés
+            $activeStreams = array_filter($allStreams['data'], function($stream) {
+                return in_array($stream['status'], ['active', 'connected', 'idle']);
+            });
+
+            if (empty($activeStreams)) {
+                $this->addFlash('info', 'Aucun stream actif trouvé');
+            }
+            
+            return $this->render('social_media/watch.html.twig', [
+                'streams' => array_values($activeStreams) // array_values pour réindexer le tableau
+            ]);
+
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur: ' . $e->getMessage());
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur lors de la récupération des streams: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    #[Route('/social/media/watch/{streamId}', name: 'app_social_media_watch_stream', methods: ['GET'])]
+    public function watchStream(string $streamId): Response
+    {
+        try {
+            // Récupérer les informations du stream depuis Mux
+            $streamData = $this->muxService->getLiveStream($streamId);
+            
+            if (!isset($streamData['data'])) {
+                throw new \Exception('Stream non trouvé');
+            }
+
+            $stream = $streamData['data'];
+            
+            // Vérifier si le stream est actif
+            if (!in_array($stream['status'], ['active', 'connected', 'idle'])) {
+                $this->addFlash('warning', 'Ce stream n\'est pas actuellement en direct');
+            }
+
+            return $this->render('social_media/watch_stream.html.twig', [
+                'stream' => $stream
+            ]);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de la récupération du stream: ' . $e->getMessage());
+            return $this->redirectToRoute('app_social_media_live_list');
+        }
+    }
+
+    /**
+     * @Route("/social/media/stream/{streamId}/stats", name="app_social_media_stream_stats")
+     */
+    public function getStreamStats(string $streamId): JsonResponse
+    {
+        try {
+            $stream = $this->liveStreamRepository->find($streamId);
+            
+            if (!$stream) {
+                throw new NotFoundHttpException('Stream non trouvé');
+            }
+            
+            return $this->json([
+                'success' => true,
+                'viewerCount' => $stream->getViewerCount(),
+                'duration' => $this->formatDuration($stream->getStartedAt())
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur lors de la récupération des statistiques'
+            ]);
+        }
+    }
+
+    private function formatDuration(\DateTime $startTime): string
+    {
+        $now = new \DateTime();
+        $diff = $startTime->diff($now);
+        
+        if ($diff->h > 0) {
+            return sprintf('%dh%02dm%02ds', $diff->h, $diff->i, $diff->s);
+        } else if ($diff->i > 0) {
+            return sprintf('%dm%02ds', $diff->i, $diff->s);
+        } else {
+            return sprintf('%ds', $diff->s);
+        }
+    }
+
+    private function generateWebsocketUrl(string $streamId): string
+    {
+        // Générer une URL WebSocket sécurisée pour le chat
+        $protocol = $this->requestStack->getCurrentRequest()->isSecure() ? 'wss' : 'ws';
+        $host = $this->requestStack->getCurrentRequest()->getHost();
+        
+        return sprintf('%s://%s/ws/chat/%s', $protocol, $host, $streamId);
     }
 }
