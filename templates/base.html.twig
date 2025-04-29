@@ -1248,13 +1248,34 @@
     <!-- Scripts -->
     {% block js %}
         <!-- Vendor JS Files -->
-  <script src="{{asset('bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-  <script src="{{asset('vendor/php-email-form/validate.js')}}"></script>
+  <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
   <script src="{{asset('vendor/aos/aos.js')}}"></script>
   <script src="{{asset('vendor/glightbox/js/glightbox.min.js')}}"></script>
   <script src="{{asset('vendor/swiper/swiper-bundle.min.js')}}"></script>
   <script src="{{asset('vendor/purecounter/purecounter_vanilla.js')}}"></script>
-  <script src="{{asset('js/station.js')}}"></script>
+
+  <!-- Initialize libraries before loading main.js -->
+  <script>
+    // Initialize libraries with default configurations if they exist
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize AOS if it exists
+      if (typeof AOS !== 'undefined') {
+        AOS.init();
+      }
+      
+      // Initialize GLightbox if it exists
+      if (typeof GLightbox !== 'undefined') {
+        GLightbox({
+          selector: '.glightbox'
+        });
+      }
+      
+      // Initialize PureCounter if it exists
+      if (typeof PureCounter !== 'undefined') {
+        new PureCounter();
+      }
+    });
+  </script>
 
   <!-- Main JS File -->
   <script src="{{asset('js/main.js')}}"></script>
