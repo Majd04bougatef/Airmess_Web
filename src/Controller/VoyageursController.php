@@ -25,7 +25,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Repository\ReservationRepository;
-
+use App\Repository\ReservationTransportRepository;
+use App\Repository\StationRepository;
 use App\Service\WeatherService;
 
 class VoyageursController extends AuthenticatedController
@@ -699,7 +700,7 @@ class VoyageursController extends AuthenticatedController
     }
 
     #[Route('/voyageurs/statistiques', name: 'app_voyageurs_statistiques')]
-    public function statistiques( ReservationTransportRepository $reservationRepository, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository ): Response
+    public function statistiques(ReservationTransportRepository $reservationTransportRepository, StationRepository $stationRepository, SessionInterface $session, UserRepository $userRepository): Response
     {
         if (!$session->has('user_id')) {
             return $this->redirectToRoute('app_login');
@@ -708,7 +709,7 @@ class VoyageursController extends AuthenticatedController
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
 
-        $reservations = $reservationRepository->findByUserId($userId);
+        $reservations = $reservationTransportRepository->findByUserId($userId);
 
         $totalReservations = count($reservations);
         $now = new \DateTime();
