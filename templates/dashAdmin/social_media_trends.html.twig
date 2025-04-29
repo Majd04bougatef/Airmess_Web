@@ -1,28 +1,126 @@
 {% extends 'dashAdmin/dashboard.html.twig' %}
 
-{% block title %}Tendances et Hashtags{% endblock %}
+{% block title %}Tendances et Hashtags - Airmess Admin{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .trend-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .trend-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .trend-header {
+        background: linear-gradient(135deg, #4158D0 0%, #C850C0 100%);
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+        color: white;
+    }
+
+    .trend-icon {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .trend-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+
+    .hashtag-item {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+    }
+
+    .hashtag-item:hover {
+        background: rgba(65, 88, 208, 0.05);
+    }
+
+    .hashtag-item:last-child {
+        border-bottom: none;
+    }
+
+    .hashtag-badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        background: linear-gradient(135deg, #4158D0 0%, #C850C0 100%);
+        color: white;
+        font-weight: 600;
+    }
+
+    .trend-count {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        background: rgba(65, 88, 208, 0.1);
+        color: #4158D0;
+    }
+
+    .trend-chart {
+        padding: 1.5rem;
+    }
+
+    .trend-filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .trend-filter {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        background: rgba(65, 88, 208, 0.1);
+        color: #4158D0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .trend-filter.active {
+        background: #4158D0;
+        color: white;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row">
         <!-- Hashtags Populaires -->
         <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-header p-3 pt-2">
-                    <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                        <i class="fas fa-hashtag text-white"></i>
+            <div class="trend-card">
+                <div class="trend-header">
+                    <div class="trend-icon">
+                        <i class="fas fa-hashtag"></i>
                     </div>
-                    <div class="text-end pt-1">
-                        <p class="text-sm mb-0 text-capitalize">Hashtags Populaires</p>
-                        <h4 class="mb-0">Top 10</h4>
-                    </div>
+                    <h5 class="mb-0">Hashtags Populaires</h5>
+                    <p class="text-sm mb-0">Les plus utilisés cette semaine</p>
                 </div>
                 <div class="card-body p-3">
-                    <div class="list-group">
+                    <div class="trend-filters">
+                        <span class="trend-filter active">Semaine</span>
+                        <span class="trend-filter">Mois</span>
+                        <span class="trend-filter">Année</span>
+                    </div>
+                    <div class="hashtag-list">
                         {% for hashtag, count in topHashtags %}
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <span class="badge bg-gradient-primary rounded-pill">#{{ hashtag }}</span>
-                                <span class="badge bg-gradient-info rounded-pill">{{ count }} posts</span>
+                            <div class="hashtag-item d-flex justify-content-between align-items-center">
+                                <span class="hashtag-badge">#{{ hashtag }}</span>
+                                <span class="trend-count">{{ count }} posts</span>
                             </div>
                         {% endfor %}
                     </div>
@@ -30,69 +128,174 @@
             </div>
         </div>
 
-        <!-- Mots-clés Tendances -->
-        <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-header p-3 pt-2">
-                    <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
-                        <i class="fas fa-chart-line text-white"></i>
+        <!-- Graphique des Tendances -->
+        <div class="col-xl-8 col-sm-6 mb-xl-0 mb-4">
+            <div class="trend-card">
+                <div class="trend-header">
+                    <div class="trend-icon">
+                        <i class="fas fa-chart-line"></i>
                     </div>
-                    <div class="text-end pt-1">
-                        <p class="text-sm mb-0 text-capitalize">Mots-clés Tendances</p>
-                        <h4 class="mb-0">Top 20</h4>
-                    </div>
+                    <h5 class="mb-0">Évolution des Tendances</h5>
+                    <p class="text-sm mb-0">Analyse temporelle des hashtags</p>
                 </div>
-                <div class="card-body p-3">
-                    <div class="list-group">
-                        {% for keyword, count in topKeywords %}
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <span class="badge bg-gradient-success rounded-pill">{{ keyword }}</span>
-                                <span class="badge bg-gradient-info rounded-pill">{{ count }} occurrences</span>
-                            </div>
-                        {% endfor %}
-                    </div>
+                <div class="trend-chart">
+                    <canvas id="trendChart" height="300"></canvas>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Posts les plus engageants -->
-        <div class="col-xl-4 col-sm-6">
-            <div class="card">
-                <div class="card-header p-3 pt-2">
-                    <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
-                        <i class="fas fa-fire text-white"></i>
+    <!-- Analyse des Mots-clés -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="trend-card">
+                <div class="trend-header">
+                    <div class="trend-icon">
+                        <i class="fas fa-tags"></i>
                     </div>
-                    <div class="text-end pt-1">
-                        <p class="text-sm mb-0 text-capitalize">Posts les plus engageants</p>
-                        <h4 class="mb-0">Top 5</h4>
-                    </div>
+                    <h5 class="mb-0">Analyse des Mots-clés</h5>
+                    <p class="text-sm mb-0">Distribution et fréquence des termes</p>
                 </div>
-                <div class="card-body p-3">
-                    <div class="list-group">
-                        {% for post in engagingPosts %}
-                            <div class="list-group-item">
-                                <h6 class="mb-1">{{ post.titre }}</h6>
-                                <p class="text-sm mb-1">{{ post.contenu|slice(0, 100) }}...</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">{{ post.publicationDate|date('d/m/Y') }}</small>
-                                    <div>
-                                        <span class="badge bg-gradient-success me-1">
-                                            <i class="fas fa-thumbs-up"></i> {{ post.likee }}
-                                        </span>
-                                        <span class="badge bg-gradient-danger me-1">
-                                            <i class="fas fa-thumbs-down"></i> {{ post.dislike }}
-                                        </span>
-                                        <span class="badge bg-gradient-info">
-                                            <i class="fas fa-comments"></i> {{ post.commentCount }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+                <div class="trend-chart">
+                    <canvas id="keywordChart" height="200"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuration du graphique des tendances
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    
+    // Données simulées pour l'exemple (à remplacer par les vraies données)
+    const trendData = {
+        labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+        datasets: [
+            {
+                label: 'Top Hashtag',
+                data: [65, 59, 80, 81, 56, 55, 40],
+                borderColor: '#4158D0',
+                backgroundColor: 'rgba(65, 88, 208, 0.1)',
+                tension: 0.4,
+                fill: true
+            },
+            {
+                label: 'Second Hashtag',
+                data: [28, 48, 40, 19, 86, 27, 90],
+                borderColor: '#C850C0',
+                backgroundColor: 'rgba(200, 80, 192, 0.1)',
+                tension: 0.4,
+                fill: true
+            }
+        ]
+    };
+
+    new Chart(trendCtx, {
+        type: 'line',
+        data: trendData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#4158D0',
+                    borderWidth: 1,
+                    padding: 10
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Configuration du graphique des mots-clés
+    const keywordCtx = document.getElementById('keywordChart').getContext('2d');
+    
+    // Données des mots-clés (à remplacer par les vraies données)
+    const keywordData = {
+        labels: Object.keys({{ topHashtags|json_encode|raw }}),
+        datasets: [{
+            data: Object.values({{ topHashtags|json_encode|raw }}),
+            backgroundColor: [
+                '#4158D0',
+                '#C850C0',
+                '#ffbe0b',
+                '#fb5607',
+                '#ff006e',
+                '#8338ec',
+                '#3a86ff'
+            ],
+            borderWidth: 0
+        }]
+    };
+
+    new Chart(keywordCtx, {
+        type: 'bar',
+        data: keywordData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderWidth: 1,
+                    padding: 10
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Gestion des filtres de tendances
+    document.querySelectorAll('.trend-filter').forEach(filter => {
+        filter.addEventListener('click', function() {
+            document.querySelectorAll('.trend-filter').forEach(f => f.classList.remove('active'));
+            this.classList.add('active');
+            // Ici, vous pouvez ajouter la logique pour mettre à jour les données en fonction du filtre
+        });
+    });
+});
+</script>
 {% endblock %} 

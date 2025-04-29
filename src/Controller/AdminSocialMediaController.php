@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use App\Service\ForbiddenWordsChecker;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/admin/social-media')]
 class AdminSocialMediaController extends AbstractController
@@ -454,6 +455,93 @@ class AdminSocialMediaController extends AbstractController
             'mostCommentedPosts' => $mostCommentedPosts,
             'postsByLocation' => $postsByLocation,
             'lastWeekPosts' => $lastWeekPosts
+        ]);
+    }
+
+    #[Route('/search', name: 'admin_social_media_search', methods: ['POST'])]
+    public function search(Request $request, SocialMediaRepository $socialMediaRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        
+        $keyword = $data['keyword'] ?? '';
+        $type = $data['type'] ?? 'all';
+        $date = $data['date'] ?? 'all';
+        $location = $data['location'] ?? 'all';
+
+        $queryBuilder = $socialMediaRepository->createQueryBuilder('s');
+
+        // Recherche par mot-clé
+        if ($keyword) {
+            $queryBuilder
+                ->andWhere('s.titre LIKE :keyword OR s.contenu LIKE :keyword')
+                ->setParameter('keyword', '%' . $keyword . '%');
+        }
+
+        // Filtre par type de contenu
+        switch ($type) {
+            case 'posts':
+                $queryBuilder->andWhere('s.type = :type')
+                    ->setParameter('type', 'post');
+                break;
+            case 'comments':
+                $queryBuilder->andWhere('s.type = :type')
+                    ->setParameter('type', 'comment');
+                break;
+            case 'hashtags':
+                $queryBuilder->andWhere('s.contenu LIKE :hashtag')
+                    ->setParameter('hashtag', '%#%');
+                break;
+        }
+
+        // Filtre par date
+        switch ($date) {
+            case 'today':
+                $queryBuilder->andWhere('s.publicationDate >= :today')
+                    ->setParameter('today', new \DateTime('today'));
+                break;
+            case 'week':
+                $queryBuilder->andWhere('s.publicationDate >= :week')
+                    ->setParameter('week', new \DateTime('-7 days'));
+                break;
+            case 'month':
+                $queryBuilder->andWhere('s.publicationDate >= :month')
+                    ->setParameter('month', new \DateTime('-1 month'));
+                break;
+            case 'year':
+                $queryBuilder->andWhere('s.publicationDate >= :year')
+                    ->setParameter('year', new \DateTime('-1 year'));
+                break;
+        }
+
+        // Filtre par lieu
+        if ($location !== 'all') {
+            $queryBuilder->andWhere('s.lieu = :location')
+                ->setParameter('location', $location);
+        }
+
+        // Trier par date de publication
+        $queryBuilder->orderBy('s.publicationDate', 'DESC');
+
+        $results = $queryBuilder->getQuery()->getResult();
+
+        // Formater les résultats
+        $formattedResults = array_map(function($item) {
+            return [
+                'id' => $item->getIdEB(),
+                'titre' => $item->getTitre(),
+                'contenu' => $item->getContenu(),
+                'lieu' => $item->getLieu(),
+                'date' => $item->getPublicationDate()->format('Y-m-d H:i:s'),
+                'likes' => $item->getLikee(),
+                'dislikes' => $item->getDislike(),
+                'commentCount' => count($item->getCommentaires())
+            ];
+        }, $results);
+
+        return new JsonResponse([
+            'success' => true,
+            'results' => $formattedResults,
+            'total' => count($formattedResults)
         ]);
     }
 
