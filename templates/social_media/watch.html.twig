@@ -21,6 +21,7 @@
         overflow: hidden;
         transition: transform 0.3s ease;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
     }
     
     .stream-card:hover {
@@ -32,6 +33,36 @@
         aspect-ratio: 16/9;
         background: #000;
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stream-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .stream-preview .play-overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .stream-card:hover .play-overlay {
+        opacity: 1;
+    }
+
+    .play-icon {
+        color: white;
+        font-size: 3rem;
     }
     
     .stream-info {
@@ -83,18 +114,13 @@
         border-radius: 4px;
         font-weight: bold;
         animation: pulse 2s infinite;
+        z-index: 2;
     }
     
     @keyframes pulse {
-        0% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.5;
-        }
-        100% {
-            opacity: 1;
-        }
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
     }
 </style>
 {% endblock %}
@@ -117,13 +143,13 @@
                                     <a href="{{ path('app_social_media_watch_stream', {'streamId': stream.id}) }}" class="stream-card">
                                         <div class="stream-preview">
                                             <span class="live-badge">LIVE</span>
-                                            <mux-player
-                                                stream-type="live"
-                                                playback-id="{{ stream.playback_ids[0].id }}"
-                                                metadata-video-title="{{ stream.new_asset_settings.title|default('Live Stream') }}"
-                                                style="height: 100%; width: 100%;"
-                                                muted
-                                            ></mux-player>
+                                            <img 
+                                                src="https://image.mux.com/{{ stream.playback_ids[0].id }}/thumbnail.jpg?time=0&width=640" 
+                                                alt="{{ stream.new_asset_settings.title|default('Live Stream') }}"
+                                            />
+                                            <div class="play-overlay">
+                                                <i class="fas fa-play-circle play-icon"></i>
+                                            </div>
                                         </div>
                                         <div class="stream-info">
                                             <h3 class="stream-title">{{ stream.new_asset_settings.title|default('Live Stream') }}</h3>
