@@ -3,45 +3,239 @@
 {% block js%}
 {# Keep these includes as they were in the source template #}
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    // Get forbidden words from template if they exist
-    const forbiddenWords = {
+// Attendre que le DOM soit complètement chargé
+window.addEventListener('load', function() {
+    // Créer la modal de prévisualisation
+    const modalHtml = `
+        <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="previewModalLabel">Prévisualisation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="preview-content"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Modifier</button>
+                        <button type="button" class="btn btn-primary" id="confirmPublish">Publier</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Ajouter le bouton de prévisualisation
+    const formActions = document.createElement('div');
+    formActions.className = 'form-actions';
+    formActions.innerHTML = `
+        <button type="button" class="btn btn-secondary" id="previewButton">Prévisualiser</button>
+        <button type="submit" class="btn btn-primary" style="display: none;">Publier</button>
+    `;
+    document.querySelector('.social-media-form').appendChild(formActions);
+
+    // Initialiser la modal
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+
+    // Gérer le clic sur le bouton de prévisualisation
+    document.getElementById('previewButton').addEventListener('click', function() {
+        const title = document.getElementById('social_media_titre').value.trim();
+        const content = document.getElementById('social_media_contenu').value.trim();
+
+        if (!title || !content) {
+            alert('Veuillez remplir tous les champs');
+            return;
+        }
+
+        // Afficher l'état de chargement
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Chargement...';
+
+        // Envoyer la requête de prévisualisation
+        fetch('{{ path('app_social_media_preview_post') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'title': title,
+                'content': content
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                // Afficher les mots interdits
+                let errorMessage = '<div class="alert alert-danger">';
+                if (data.forbiddenWords.title) {
+                    errorMessage += `<p><strong>Mots interdits dans le titre:</strong> ${data.forbiddenWords.title.join(', ')}</p>`;
+                }
+                if (data.forbiddenWords.content) {
+                    errorMessage += `<p><strong>Mots interdits dans le contenu:</strong> ${data.forbiddenWords.content.join(', ')}</p>`;
+                }
+                errorMessage += '</div>';
+                document.querySelector('.preview-content').innerHTML = errorMessage;
+                document.getElementById('confirmPublish').disabled = true;
+            } else {
+                // Afficher la prévisualisation
+                document.querySelector('.preview-content').innerHTML = `
+                    <div class="preview-post">
+                        <h3>${data.preview.title}</h3>
+                        <div class="preview-content-text">${data.preview.content}</div>
+                    </div>
+                `;
+                document.getElementById('confirmPublish').disabled = false;
+            }
+            previewModal.show();
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue lors de la prévisualisation');
+        })
+        .finally(() => {
+            // Réinitialiser le bouton
+            this.disabled = false;
+            this.innerHTML = 'Prévisualiser';
+        });
+    });
+
+    // Gérer la confirmation de publication
+    document.getElementById('confirmPublish').addEventListener('click', function() {
+        document.querySelector('.social-media-form').submit();
+    });
+
+    // Get all forbidden words from template if they exist
+    const allForbiddenWords = {{ app.container.get('App\\Service\\ForbiddenWordsChecker').getForbiddenWords()|json_encode|raw }};
+    
+    // Already detected forbidden words from server validation
+    const detectedForbiddenWords = {
         title: {{ forbidden_words.title is defined ? forbidden_words.title|json_encode|raw : '[]' }},
         content: {{ forbidden_words.content is defined ? forbidden_words.content|json_encode|raw : '[]' }}
     };
 
-    // Highlight forbidden words in fields
-    function highlightForbiddenWords(fieldId, words) {
-        const field = $(`#${fieldId}`);
-        const text = field.val();
+    // Preview modal
+    const previewModal = `
+        <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="previewModalLabel">Prévisualisation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="preview-content"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Modifier</button>
+                        <button type="button" class="btn btn-primary" id="confirmPublish">Publier</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    $('body').append(previewModal);
+
+    // Preview button
+    $('.social-media-form').append(`
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="previewButton">Prévisualiser</button>
+            <button type="submit" class="btn btn-primary" style="display: none;">Publier</button>
+        </div>
+    `);
+
+    // Real-time forbidden word detection
+    function checkForbiddenWords(text) {
+        const found = [];
+        if (!text) return found;
         
-        words.forEach(word => {
-            const regex = new RegExp(word, 'gi');
-            const highlighted = text.replace(regex, 
-                `<span class="forbidden-word-highlight">${word}</span>`);
-            field.next('.forbidden-words-preview').html(highlighted);
+        allForbiddenWords.forEach(word => {
+            // Use word boundary to match whole words only
+            const regex = new RegExp('\\b' + word + '\\b', 'i');
+            if (regex.test(text)) {
+                found.push(word);
+            }
         });
+        
+        return found;
     }
 
-    // Add preview divs after fields
-    $('#social_media_titre').after('<div class="forbidden-words-preview"></div>');
-    $('#social_media_contenu').after('<div class="forbidden-words-preview"></div>');
+    // Highlight forbidden words in fields and show real-time feedback
+    function updateFieldWithForbiddenCheck(fieldId, fieldType) {
+        const field = $(`#${fieldId}`);
+        const text = field.val();
+        const foundWords = checkForbiddenWords(text);
+        
+        // Clear any previous warning
+        field.removeClass('has-forbidden-words');
+        field.closest('.form-floating').find('.forbidden-word-warning').remove();
+        
+        if (foundWords.length > 0) {
+            // Add warning class and message
+            field.addClass('has-forbidden-words');
+            field.closest('.form-floating').append(
+                `<div class="forbidden-word-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Mots interdits détectés: ${foundWords.join(', ')}
+                </div>`
+            );
+        }
+    }
 
-    // Check on input
+    // Setup real-time checks on input fields
     $('#social_media_titre').on('input', function() {
-        highlightForbiddenWords('social_media_titre', forbiddenWords.title);
+        updateFieldWithForbiddenCheck('social_media_titre', 'title');
     });
 
     $('#social_media_contenu').on('input', function() {
-        highlightForbiddenWords('social_media_contenu', forbiddenWords.content);
+        updateFieldWithForbiddenCheck('social_media_contenu', 'content');
     });
 
-    // Initial check
-    highlightForbiddenWords('social_media_titre', forbiddenWords.title);
-    highlightForbiddenWords('social_media_contenu', forbiddenWords.content);
+    // Check form before submit
+    $('form.social-media-form').on('submit', function(e) {
+        const titleForbidden = checkForbiddenWords($('#social_media_titre').val());
+        const contentForbidden = checkForbiddenWords($('#social_media_contenu').val());
+        
+        if (titleForbidden.length > 0 || contentForbidden.length > 0) {
+            e.preventDefault();
+            
+            // Create alert if not exists
+            if ($('.realtime-forbidden-alert').length === 0) {
+                const alertHtml = `
+                    <div class="alert alert-danger realtime-forbidden-alert">
+                        <h5>Impossible de soumettre - Mots interdits détectés:</h5>
+                        ${titleForbidden.length > 0 ? `<p><strong>Titre:</strong> ${titleForbidden.join(', ')}</p>` : ''}
+                        ${contentForbidden.length > 0 ? `<p><strong>Contenu:</strong> ${contentForbidden.join(', ')}</p>` : ''}
+                        <p>Veuillez retirer ces mots avant de soumettre à nouveau.</p>
+                    </div>
+                `;
+                
+                $(this).prepend(alertHtml);
+                
+                // Scroll to alert
+                $('html, body').animate({
+                    scrollTop: $('.realtime-forbidden-alert').offset().top - 100
+                }, 500);
+            }
+        }
+    });
+
+    // Initial check when page loads
+    updateFieldWithForbiddenCheck('social_media_titre', 'title');
+    updateFieldWithForbiddenCheck('social_media_contenu', 'content');
+    
+    // Highlight already detected words
+    if (detectedForbiddenWords.title.length > 0) {
+        $('#social_media_titre').addClass('has-forbidden-words');
+    }
+    
+    if (detectedForbiddenWords.content.length > 0) {
+        $('#social_media_contenu').addClass('has-forbidden-words');
+    }
 });
 </script>
 {% endblock %}
@@ -76,6 +270,7 @@ $(document).ready(function() {
                             {% if forbidden_words.content is defined and forbidden_words.content is not empty %}
                                 <p><strong>Contenu:</strong> {{ forbidden_words.content|join(', ') }}</p>
                             {% endif %}
+                            <p>Veuillez retirer ces mots avant de soumettre à nouveau.</p>
                         </div>
                     {% endif %}
                     
@@ -199,13 +394,33 @@ $(document).ready(function() {
   .forbidden-words-alert p {
     color: #dc3545 !important;
   }
-
-  .forbidden-words-alert h5 {
-    font-weight: bold;
+  
+  /* Real-time forbidden word highlighting */
+  .has-forbidden-words {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
   }
-
-  .forbidden-words-alert p:last-child {
-    margin-bottom: 0;
+  
+  .forbidden-word-warning {
+    color: #dc3545;
+    font-size: 0.85em;
+    margin-top: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .forbidden-word-warning i {
+    margin-right: 5px;
+  }
+  
+  .realtime-forbidden-alert {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
   }
 
   /* Form card styles */
@@ -563,18 +778,27 @@ $(document).ready(function() {
     display: block;
   }
 
-  /* Forbidden words highlighting */
-  .forbidden-word-highlight {
-    background-color: #ffcccc;
-    color: #d9534f;
-    padding: 2px;
-    border-radius: 3px;
+  .preview-post {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
   }
 
-  .forbidden-words-preview {
-    margin-top: 5px;
-    font-size: 0.8rem;
-    color: #d9534f;
+  .preview-post h3 {
+    color: #333;
+    margin-bottom: 15px;
+  }
+
+  .preview-content-text {
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+
+  .form-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
   }
 </style>
 {% endblock %}

@@ -23,6 +23,17 @@
           </div>
         </form>
       </div>
+      <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+        <a href="{{ path('admin_scheduled_posts_index') }}" class="btn btn-sm btn-success mb-0 me-2">
+          <i class="fas fa-calendar-alt me-1"></i> Planification
+        </a>
+        <a href="{{ path('admin_social_media_statistics') }}" class="btn btn-sm btn-info mb-0 me-2">
+          <i class="fas fa-chart-bar me-1"></i> Statistiques
+        </a>
+        <a href="{{ path('admin_social_media_trends') }}" class="btn btn-sm btn-warning mb-0">
+          <i class="fas fa-fire me-1"></i> Tendances
+        </a>
+      </div>
     </div>
   </div>
 </nav>
@@ -194,4 +205,75 @@
     </div>
   </div>
 </div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    let searchTimeout;
+
+    // Fonction de recherche AJAX
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const searchValue = this.value;
+            fetch(`/admin/social-media/search-ajax?search=${encodeURIComponent(searchValue)}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('socialMediaList').innerHTML = html;
+                });
+        }, 300);
+    });
+
+    // Chargement initial des statistiques
+    loadStatistics();
+
+    // Fonction pour charger les statistiques
+    function loadStatistics() {
+        fetch('/admin/social-media/statistics-ajax')
+            .then(response => response.json())
+            .then(data => {
+                const statsHtml = `
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Posts</h5>
+                                <p class="card-text">${data.totalPosts}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Comments</h5>
+                                <p class="card-text">${data.totalComments}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Likes</h5>
+                                <p class="card-text">${data.totalLikes}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Dislikes</h5>
+                                <p class="card-text">${data.totalDislikes}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('statistics').innerHTML = statsHtml;
+            });
+    }
+
+    // Actualiser les statistiques toutes les 5 minutes
+    setInterval(loadStatistics, 300000);
+});
+</script>
+{% endblock %}
 {% endblock %}

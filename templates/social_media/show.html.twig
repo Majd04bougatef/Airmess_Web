@@ -635,6 +635,144 @@
             color: #dc3545 !important;
             background-color: rgba(220, 53, 69, 0.15) !important;
         }
+        
+        /* Forbidden words styling */
+        .forbidden-words-warning {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid #dc3545;
+            color: #dc3545;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        
+        .shake-animation {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        
+        textarea.is-invalid {
+            border-color: #dc3545 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .post-content {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+
+        /* Styles pour les alertes */
+        .alert {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .alert-danger {
+            background-color: #fff5f5;
+            color: #dc3545;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-danger strong {
+            color: #dc3545;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-dismissible {
+            padding-right: 3rem;
+        }
+
+        .alert-dismissible .btn-close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 1rem;
+            color: #dc3545;
+        }
+
+        /* Animation pour les alertes */
+        .alert {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Style pour les erreurs de formulaire */
+        .form-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        /* Style pour le formulaire de commentaire */
+        .comment-input {
+            border: 1px solid #e0e4e8;
+            transition: all 0.3s ease;
+        }
+
+        .comment-input:focus {
+            border-color: #4a6bda;
+            box-shadow: 0 0 0 0.2rem rgba(74, 107, 218, 0.25);
+        }
+
+        .comment-input.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .preview-comment {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .preview-comment-text {
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
     </style>
 {% endblock %}
 
@@ -784,27 +922,17 @@
                 <div id="comments-area" class="comments-section p-3">
                     <h3 class="section-title fs-5">Commentaires</h3>
 
-                    {# Affichage des erreurs basé sur les paramètres d'URL #}
-                    {% if app.request.query.get('error') %}
-                        {% set error_type = app.request.query.get('error') %}
-                        <div class="alert alert-danger mb-3">
-                            {% if error_type == 'empty_comment' %}
-                                <strong>Erreur :</strong> Le commentaire ne peut pas être vide.
-                            {% elseif error_type == 'validation_failed' %}
-                                <strong>Erreur :</strong> {{ app.request.query.get('message', 'Erreur de validation du formulaire.') }}
-                            {% elseif error_type == 'forbidden_words' %}
-                                <strong>Erreur :</strong> Votre commentaire contient des mots interdits: {{ app.request.query.get('words') }}
-                            {% elseif error_type == 'database_error' %}
-                                <strong>Erreur :</strong> Une erreur s'est produite lors de l'enregistrement du commentaire.
-                            {% elseif error_type == 'form_not_submitted' %}
-                                <strong>Erreur :</strong> Le formulaire n'a pas été soumis correctement.
-                            {% else %}
-                                <strong>Erreur :</strong> Une erreur est survenue.
-                            {% endif %}
-                        </div>
-                    {% endif %}
+                    {# Affichage des messages flash #}
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                                {{ message|raw }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
 
-                {# Formulaire Ajout Commentaire #}
+                    {# Formulaire Ajout Commentaire #}
                     <div class="add-comment-form-container d-flex align-items-start">
                         {% set current_user = app.user %}
                         <div class="flex-shrink-0 me-2">
@@ -813,25 +941,122 @@
                                 class="comment-author-img rounded-circle" width="32" height="32">
                      </div>
                      <div class="flex-grow-1">
-                        {# Noter que la route 'ajouter_commentaire' est dépréciée. Utiliser 'app_social_media_ajouter_commentaire' à la place #}
-                        <form name="{{ comment_form.vars.name }}" method="{{ comment_form.vars.method }}" action="{{ comment_form.vars.action }}" class="add-comment-form" id="comment-form" novalidate>
+                        {{ form_start(comment_form, {
+                            'action': path('app_social_media_ajouter_commentaire', {'idEB': social_media.idEB}),
+                            'method': 'POST',
+                            'attr': {
+                                'class': 'add-comment-form',
+                                'id': 'comment-form',
+                                'novalidate': 'novalidate'
+                            }
+                        }) }}
                             <div class="position-relative">
-                                {{ form_widget(comment_form.description, {'attr': {'rows': 2, 'placeholder': 'Écrivez un commentaire...', 'class': 'form-control comment-input py-2 px-3', 'id': 'comment-input', 'required': 'required', 'minlength': '5'}}) }}
+                                {{ form_widget(comment_form.description, {
+                                    'attr': {
+                                        'class': 'form-control comment-input py-2 px-3',
+                                        'rows': '2',
+                                        'placeholder': 'Écrivez un commentaire...',
+                                        'id': 'comment-input'
+                                    }
+                                }) }}
                                 {{ form_errors(comment_form.description) }}
-                                <div id="empty-comment-error" class="alert alert-danger mt-2" style="display: none;">Le commentaire ne peut pas être vide.</div>
-                                <button type="submit" class="btn btn-primary btn-send-comment" id="submit-comment" aria-label="Publier le commentaire">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
+                                <div class="comment-actions mt-2">
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-paper-plane me-1"></i> Publier
+                                    </button>
+                                </div>
                             </div>
                             {{ form_rest(comment_form) }}
-                            <input type="hidden" name="_token" value="{{ csrf_token('comment_token') }}">
-                            <div class="d-none">
-                                <p>DEBUG - Nom du formulaire: {{ comment_form.vars.name }}</p>
-                                <p>DEBUG - Nom du champ description: {{ comment_form.description.vars.full_name }}</p>
-                            </div>
-                        </form>
+                        {{ form_end(comment_form) }}
                      </div>
                 </div>
+
+                {# Modal de prévisualisation des commentaires #}
+                <div class="modal fade" id="previewCommentModal" tabindex="-1" aria-labelledby="previewCommentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="previewCommentModalLabel">Prévisualisation du commentaire</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="preview-comment-content"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Modifier</button>
+                                <button type="button" class="btn btn-primary" id="confirmCommentPublish">Publier</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const previewCommentModal = new bootstrap.Modal(document.getElementById('previewCommentModal'));
+                    const commentForm = document.getElementById('comment-form');
+                    const previewButton = document.getElementById('previewCommentButton');
+                    const submitButton = document.getElementById('submit-comment');
+                    const confirmButton = document.getElementById('confirmCommentPublish');
+
+                    previewButton.addEventListener('click', function() {
+                        const content = document.getElementById('comment-input').value.trim();
+
+                        if (!content) {
+                            alert('Veuillez écrire un commentaire');
+                            return;
+                        }
+
+                        // Afficher l'état de chargement
+                        this.disabled = true;
+                        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Chargement...';
+
+                        // Envoyer la requête de prévisualisation
+                        fetch('{{ path('app_social_media_preview_comment') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                'content': content
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                // Afficher les mots interdits
+                                let errorMessage = '<div class="alert alert-danger">';
+                                errorMessage += `<p><strong>Mots interdits détectés:</strong> ${data.forbiddenWords.join(', ')}</p>`;
+                                errorMessage += '</div>';
+                                document.querySelector('.preview-comment-content').innerHTML = errorMessage;
+                                confirmButton.disabled = true;
+                            } else {
+                                // Afficher la prévisualisation
+                                document.querySelector('.preview-comment-content').innerHTML = `
+                                    <div class="preview-comment">
+                                        <div class="preview-comment-text">${data.preview}</div>
+                                    </div>
+                                `;
+                                confirmButton.disabled = false;
+                            }
+                            previewCommentModal.show();
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            alert('Une erreur est survenue lors de la prévisualisation');
+                        })
+                        .finally(() => {
+                            // Réinitialiser le bouton
+                            this.disabled = false;
+                            this.innerHTML = '<i class="fas fa-eye me-1"></i> Prévisualiser';
+                        });
+                    });
+
+                    // Gérer la confirmation de publication du commentaire
+                    confirmButton.addEventListener('click', function() {
+                        commentForm.submit();
+                    });
+                });
+                </script>
 
                     {# Séparateur visuel #}
                     <hr class="my-2 text-muted">
@@ -928,170 +1153,119 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Force style des boutons actifs (like/dislike)
-            function applyActiveStyles() {
-                // Gestion du bouton like
-                const likeButton = document.querySelector('.like-button');
-                if (likeButton && likeButton.classList.contains('active')) {
-                    likeButton.style.color = '#4a6bda';
-                    likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
-                    likeButton.style.fontWeight = '500';
-                    const icon = likeButton.querySelector('i');
-                    if (icon) icon.style.transform = 'scale(1.15)';
-                }
-                
-                // Gestion du bouton dislike
-                const dislikeButton = document.querySelector('.dislike-button');
-                if (dislikeButton && dislikeButton.classList.contains('active')) {
-                    dislikeButton.style.color = '#dc3545';
-                    dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
-                    dislikeButton.style.fontWeight = '500';
-                    const icon = dislikeButton.querySelector('i');
-                    if (icon) icon.style.transform = 'scale(1.15)';
-                }
-            }
+            // Get forbidden words list from backend
+            const forbiddenWords = {{ app.container.get('App\\Service\\ForbiddenWordsChecker').getForbiddenWords()|json_encode|raw }};
             
-            // Appliquer les styles immédiatement
-            applyActiveStyles();
-            
-            // Appliquer les styles à nouveau après un court délai (pour être sûr que le DOM est entièrement chargé)
-            setTimeout(applyActiveStyles, 100);
-            
-            // -------------------- GESTION DES LIKES/DISLIKES --------------------
-            const likeButton = document.querySelector('.like-button');
-            const dislikeButton = document.querySelector('.dislike-button');
-            
-            // Mettre en évidence les boutons actifs
-            if (likeButton && likeButton.classList.contains('active')) {
-                likeButton.style.backgroundColor = 'rgba(74, 107, 218, 0.15)';
-                likeButton.style.color = '#4a6bda';
-                const icon = likeButton.querySelector('i');
-                if (icon) icon.style.transform = 'scale(1.15)';
-            }
-            
-            if (dislikeButton && dislikeButton.classList.contains('active')) {
-                dislikeButton.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
-                dislikeButton.style.color = '#dc3545';
-                const icon = dislikeButton.querySelector('i');
-                if (icon) icon.style.transform = 'scale(1.15)';
-            }
-            
-            // Effets au survol
-            if (likeButton) {
-                likeButton.addEventListener('mouseenter', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.color = '#4a6bda';
-                        this.style.backgroundColor = 'rgba(74, 107, 218, 0.05)';
-                    }
-                });
-                
-                likeButton.addEventListener('mouseleave', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.color = '';
-                        this.style.backgroundColor = '';
-                    }
-                });
-            }
-            
-            if (dislikeButton) {
-                dislikeButton.addEventListener('mouseenter', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.color = '#dc3545';
-                        this.style.backgroundColor = 'rgba(220, 53, 69, 0.05)';
-                    }
-                });
-                
-                dislikeButton.addEventListener('mouseleave', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.color = '';
-                        this.style.backgroundColor = '';
-                    }
-                });
-            }
-            
-            // -------------------- VALIDATION DES COMMENTAIRES --------------------
+            // Initialize modal
+            const previewCommentModal = new bootstrap.Modal(document.getElementById('previewCommentModal'));
             const commentForm = document.getElementById('comment-form');
+            const previewButton = document.getElementById('previewCommentButton');
+            const submitButton = document.getElementById('submit-comment');
+            const confirmButton = document.getElementById('confirmCommentPublish');
             const commentInput = document.getElementById('comment-input');
-            const errorMessage = document.getElementById('empty-comment-error');
-            
-            if (commentForm && commentInput && errorMessage) {
-                // Fonction de validation
-                function validateComment() {
-                    const content = commentInput.value.trim();
-                    
-                    if (!content) {
-                        commentInput.classList.add('is-invalid');
-                        errorMessage.textContent = 'Le commentaire ne peut pas être vide.';
-                        errorMessage.style.display = 'block';
-                        return false;
-                    } else if (content.length < 5) {
-                        commentInput.classList.add('is-invalid');
-                        errorMessage.textContent = 'Le commentaire doit contenir au moins 5 caractères.';
-                        errorMessage.style.display = 'block';
-                        return false;
+
+            // Preview button click handler
+            previewButton.addEventListener('click', function() {
+                const content = commentInput.value.trim();
+
+                if (!content) {
+                    alert('Veuillez écrire un commentaire');
+                    return;
+                }
+
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Chargement...';
+
+                // Send preview request
+                fetch('{{ path('app_social_media_preview_comment') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'content': content
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        // Show forbidden words warning
+                        document.querySelector('.preview-comment-content').innerHTML = `
+                            <div class="alert alert-danger">
+                                <p><strong>Mots interdits détectés:</strong> ${data.forbiddenWords.join(', ')}</p>
+                            </div>
+                        `;
+                        confirmButton.disabled = true;
                     } else {
-                        commentInput.classList.remove('is-invalid');
-                        errorMessage.style.display = 'none';
-                        return true;
+                        // Show preview
+                        document.querySelector('.preview-comment-content').innerHTML = `
+                            <div class="preview-comment">
+                                <div class="preview-comment-text">${data.preview}</div>
+                            </div>
+                        `;
+                        confirmButton.disabled = false;
                     }
-                }
-                
-                // Validation en temps réel
-                commentInput.addEventListener('input', validateComment);
-                
-                // Validation à la soumission
-                commentForm.addEventListener('submit', function(e) {
-                    if (!validateComment()) {
-                        e.preventDefault();
-                        return false;
-                    }
-                    return true;
+                    previewCommentModal.show();
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de la prévisualisation');
+                })
+                .finally(() => {
+                    // Reset button state
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-eye me-1"></i> Prévisualiser';
                 });
+            });
+
+            // Confirm publish button click handler
+            confirmButton.addEventListener('click', function() {
+                commentForm.submit();
+            });
+
+            // Real-time forbidden words check
+            function checkForbiddenWords(text) {
+                if (!text) return [];
+                const foundWords = [];
+                
+                forbiddenWords.forEach(word => {
+                    const regex = new RegExp('\\b' + word + '\\b', 'i');
+                    if (regex.test(text)) {
+                        foundWords.push(word);
+                    }
+                });
+                
+                return foundWords;
             }
-            
-            // -------------------- ANIMATIONS --------------------
-            // Animation image de publication
-            const postImage = document.querySelector('.post-image-container img');
-            if (postImage) {
-                postImage.style.opacity = '0';
-                setTimeout(() => {
-                    postImage.style.opacity = '1';
-                }, 300);
-            }
-            
-            // Animation bouton retour
-            const backButton = document.querySelector('.btn-back');
-            if (backButton) {
-                backButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const href = this.getAttribute('href');
+
+            // Create forbidden words warning element
+            const forbiddenWordsWarning = document.createElement('div');
+            forbiddenWordsWarning.className = 'alert alert-danger mt-2 forbidden-words-warning';
+            forbiddenWordsWarning.style.display = 'none';
+            commentInput.parentNode.insertBefore(forbiddenWordsWarning, commentInput.nextSibling);
+
+            // Check comment text on input
+            commentInput.addEventListener('input', function() {
+                const text = this.value.trim();
+                const foundWords = checkForbiddenWords(text);
+                
+                // Hide any previous warnings
+                forbiddenWordsWarning.style.display = 'none';
+                commentInput.classList.remove('is-invalid');
+                
+                if (foundWords.length > 0) {
+                    // Show warning with forbidden words
+                    forbiddenWordsWarning.innerHTML = '<strong>Mots interdits détectés:</strong> ' + 
+                        foundWords.join(', ') + '. Votre commentaire ne peut pas être publié avec ces mots.';
+                    forbiddenWordsWarning.style.display = 'block';
                     
-                    document.querySelector('.post-card').style.opacity = '0';
-                    
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 300);
-                });
-            }
-            
-            // Animation des boutons like des commentaires
-            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
-            commentLikeButtons.forEach(button => {
-                if (button.classList.contains('active')) {
-                    button.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
+                    // Add highlighting
+                    commentInput.classList.add('is-invalid');
                 }
-                
-                button.addEventListener('mouseenter', function() {
-                    this.style.backgroundColor = 'rgba(74, 107, 218, 0.1)';
-                });
-                
-                button.addEventListener('mouseleave', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.backgroundColor = '';
-                    }
-                });
             });
         });
     </script>

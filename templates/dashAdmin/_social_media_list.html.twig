@@ -1,0 +1,24 @@
+{% for social_media in pagination %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ social_media.titre }}</h5>
+            <p class="card-text">{{ social_media.contenu }}</p>
+            {% if social_media.imagemedia %}
+                <img src="{{ asset('uploads/' ~ social_media.imagemedia) }}" class="img-fluid" alt="Image">
+            {% endif %}
+            <div class="mt-2">
+                <small class="text-muted">
+                    Publié le {{ social_media.publicationDate|date('d/m/Y H:i') }} 
+                    par {{ social_media.user.username }}
+                    à {{ social_media.lieu }}
+                </small>
+            </div>
+            <div class="mt-2">
+                <span class="badge bg-success">Likes: {{ social_media.likee }}</span>
+                <span class="badge bg-danger">Dislikes: {{ social_media.dislike }}</span>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+{{ knp_pagination_render(pagination) }} 

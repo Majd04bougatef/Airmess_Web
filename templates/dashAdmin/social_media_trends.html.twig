@@ -1,0 +1,98 @@
+{% extends 'dashAdmin/dashboard.html.twig' %}
+
+{% block title %}Tendances et Hashtags{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Hashtags Populaires -->
+        <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-header p-3 pt-2">
+                    <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                        <i class="fas fa-hashtag text-white"></i>
+                    </div>
+                    <div class="text-end pt-1">
+                        <p class="text-sm mb-0 text-capitalize">Hashtags Populaires</p>
+                        <h4 class="mb-0">Top 10</h4>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <div class="list-group">
+                        {% for hashtag, count in topHashtags %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="badge bg-gradient-primary rounded-pill">#{{ hashtag }}</span>
+                                <span class="badge bg-gradient-info rounded-pill">{{ count }} posts</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mots-clés Tendances -->
+        <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-header p-3 pt-2">
+                    <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+                        <i class="fas fa-chart-line text-white"></i>
+                    </div>
+                    <div class="text-end pt-1">
+                        <p class="text-sm mb-0 text-capitalize">Mots-clés Tendances</p>
+                        <h4 class="mb-0">Top 20</h4>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <div class="list-group">
+                        {% for keyword, count in topKeywords %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="badge bg-gradient-success rounded-pill">{{ keyword }}</span>
+                                <span class="badge bg-gradient-info rounded-pill">{{ count }} occurrences</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Posts les plus engageants -->
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-header p-3 pt-2">
+                    <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
+                        <i class="fas fa-fire text-white"></i>
+                    </div>
+                    <div class="text-end pt-1">
+                        <p class="text-sm mb-0 text-capitalize">Posts les plus engageants</p>
+                        <h4 class="mb-0">Top 5</h4>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <div class="list-group">
+                        {% for post in engagingPosts %}
+                            <div class="list-group-item">
+                                <h6 class="mb-1">{{ post.titre }}</h6>
+                                <p class="text-sm mb-1">{{ post.contenu|slice(0, 100) }}...</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ post.publicationDate|date('d/m/Y') }}</small>
+                                    <div>
+                                        <span class="badge bg-gradient-success me-1">
+                                            <i class="fas fa-thumbs-up"></i> {{ post.likee }}
+                                        </span>
+                                        <span class="badge bg-gradient-danger me-1">
+                                            <i class="fas fa-thumbs-down"></i> {{ post.dislike }}
+                                        </span>
+                                        <span class="badge bg-gradient-info">
+                                            <i class="fas fa-comments"></i> {{ post.commentCount }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

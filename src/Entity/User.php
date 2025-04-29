@@ -140,6 +140,9 @@ class User
     #[ORM\OneToMany(mappedBy: "user", targetEntity: Commentaire::class, orphanRemoval: true)]
     private Collection $commentaires;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ScheduledPost::class)]
+    private Collection $scheduledPosts;
+
     public function __construct()
     {
         $this->stations = new ArrayCollection();
@@ -148,6 +151,7 @@ class User
         $this->receivedMessages = new ArrayCollection();
         $this->socialMedias = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
+        $this->scheduledPosts = new ArrayCollection();
     }
 
     // Getters et Setters
@@ -478,4 +482,36 @@ class User
 
         return $this;
     }
+
+
+    /**
+     * @return Collection<int, ScheduledPost>
+     */
+    public function getScheduledPosts(): Collection
+    {
+        return $this->scheduledPosts;
+    }
+
+    public function addScheduledPost(ScheduledPost $scheduledPost): static
+    {
+        if (!$this->scheduledPosts->contains($scheduledPost)) {
+            $this->scheduledPosts->add($scheduledPost);
+            $scheduledPost->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScheduledPost(ScheduledPost $scheduledPost): static
+    {
+        if ($this->scheduledPosts->removeElement($scheduledPost)) {
+            // set the owning side to null (unless already changed)
+            if ($scheduledPost->getUser() === $this) {
+                $scheduledPost->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
