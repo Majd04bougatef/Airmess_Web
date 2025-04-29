@@ -665,4 +665,212 @@ class SecurityController extends AbstractController
             ]);
         }
     }
+    
+    #[Route('/offre/save-in-session', name: 'app_save_offre_session', methods: ['POST'])]
+    public function saveOffreSession(Request $request, SessionInterface $session): Response
+    {
+        // Vérifier si l'utilisateur est connecté
+        if (!$session->has('user_id')) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour effectuer cette action.'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        // Récupérer les données de l'offre depuis la requête
+        $offreId = $request->request->get('offre_id');
+        $offreData = [
+            'id' => $offreId,
+            'place' => $request->request->get('place'),
+            'description' => $request->request->get('description'),
+            'price' => $request->request->get('price_after'),
+            'date' => new \DateTime(),
+        ];
+        
+        // Stocker les données dans la session
+        $session->set('current_offre', $offreData);
+        
+        return $this->json([
+            'success' => true,
+            'message' => 'Les données de l\'offre ont été sauvegardées dans la session.'
+        ]);
+    }
+    
+    #[Route('/offre/get-from-session', name: 'app_get_offre_session', methods: ['GET'])]
+    public function getOffreSession(SessionInterface $session): Response
+    {
+        // Vérifier si l'utilisateur est connecté
+        if (!$session->has('user_id')) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour effectuer cette action.'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        // Récupérer les données de l'offre depuis la session
+        $offreData = $session->get('current_offre', null);
+        
+        if (!$offreData) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Aucune offre en cours dans la session.'
+            ]);
+        }
+        
+        return $this->json([
+            'success' => true,
+            'data' => $offreData
+        ]);
+    }
+    
+    #[Route('/offre/clear-session', name: 'app_clear_offre_session', methods: ['POST'])]
+    public function clearOffreSession(SessionInterface $session): Response
+    {
+        // Vérifier si l'utilisateur est connecté
+        if (!$session->has('user_id')) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour effectuer cette action.'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        // Supprimer les données de l'offre de la session
+        $session->remove('current_offre');
+        
+        return $this->json([
+            'success' => true,
+            'message' => 'Les données de l\'offre ont été supprimées de la session.'
+        ]);
+    }
+    
+    #[Route('/reservation/save-in-session', name: 'app_save_reservation_session', methods: ['POST'])]
+    public function saveReservationSession(Request $request, SessionInterface $session): Response
+    {
+        // Vérifier si l'utilisateur est connecté
+        if (!$session->has('user_id')) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour effectuer cette action.'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        // Récupérer les données de la réservation depuis la requête
+        $reservationId = $request->request->get('reservation_id');
+        $offreId = $request->request->get('offre_id');
+        
+        // Générer une référence unique pour la réservation si nécessaire
+        $reference = $request->request->get('reference');
+        if (!$reference) {
+            $prefix = 'RE'; // Préfixe pour les réservations
+            $userId = $session->get('user_id');
+            $timestamp = time();
+            $reference = $prefix . $userId . $timestamp . random_int(1000, 9999);
+        }
+        
+        $reservationData = [
+            'id' => $reservationId,
+            'offre_id' => $offreId,
+            'user_id' => $session->get('user_id'),
+            'date_res' => new \DateTime(),
+            'price' => $request->request->get('price'),
+            'reference' => $reference,
+            'status' => 'pending' // Statut initial de la réservation
+        ];
+        
+        // Stocker les données dans la session
+        $session->set('current_reservation', $reservationData);
+        
+        return $this->json([
+            'success' => true,
+            'message' => 'Les données de la réservation ont été sauvegardées dans la session.',
+            'reference' => $reference
+        ]);
+    }
+    
+    #[Route('/reservation/get-from-session', name: 'app_get_reservation_session', methods: ['GET'])]
+    public function getReservationSession(SessionInterface $session): Response
+    {
+        // Vérifier si l'utilisateur est connecté
+        if (!$session->has('user_id')) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour effectuer cette action.'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        // Récupérer les données de la réservation depuis la session
+        $reservationData = $session->get('current_reservation', null);
+        
+        if (!$reservationData) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Aucune réservation en cours dans la session.'
+            ]);
+        }
+        
+        return $this->json([
+            'success' => true,
+            'data' => $reservationData
+        ]);
+    }
+    
+    #[Route('/reservation/clear-session', name: 'app_clear_reservation_session', methods: ['POST'])]
+    public function clearReservationSession(SessionInterface $session): Response
+    {
+        // Vérifier si l'utilisateur est connecté
+        if (!$session->has('user_id')) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour effectuer cette action.'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        // Supprimer les données de la réservation de la session
+        $session->remove('current_reservation');
+        
+        return $this->json([
+            'success' => true,
+            'message' => 'Les données de la réservation ont été supprimées de la session.'
+        ]);
+    }
+    
+    #[Route('/reservation/update-status', name: 'app_update_reservation_status', methods: ['POST'])]
+    public function updateReservationStatus(Request $request, SessionInterface $session): Response
+    {
+        // Vérifier si l'utilisateur est connecté
+        if (!$session->has('user_id')) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour effectuer cette action.'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        // Récupérer les données de la réservation depuis la session
+        $reservationData = $session->get('current_reservation', null);
+        
+        if (!$reservationData) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Aucune réservation en cours dans la session.'
+            ]);
+        }
+        
+        // Mettre à jour le statut de la réservation
+        $newStatus = $request->request->get('status');
+        if (!$newStatus) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Le nouveau statut est requis.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        
+        $reservationData['status'] = $newStatus;
+        $session->set('current_reservation', $reservationData);
+        
+        return $this->json([
+            'success' => true,
+            'message' => 'Le statut de la réservation a été mis à jour dans la session.',
+            'status' => $newStatus
+        ]);
+    }
 } 

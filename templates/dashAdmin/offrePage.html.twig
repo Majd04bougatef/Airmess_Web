@@ -90,10 +90,12 @@
                       {% if offre.statusoff.value == 'En attente' %}
                         <form action="{{ path('app_offre_confirm', {'idO': offre.idO}) }}" method="post" style="display: inline-block;">
                           <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ offre.idO) }}">
+                          <input type="hidden" name="from" value="admin">
                           <button type="submit" class="btn btn-success btn-sm">Confirmer</button>
                         </form>
                         <form action="{{ path('app_offre_reject', {'idO': offre.idO}) }}" method="post" style="display: inline-block;">
                           <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ offre.idO) }}">
+                          <input type="hidden" name="from" value="admin">
                           <button type="submit" class="btn btn-danger btn-sm">Rejeter</button>
                         </form>
                       {% elseif offre.statusoff.value == 'Confirmé' %}

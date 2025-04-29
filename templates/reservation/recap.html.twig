@@ -3,12 +3,193 @@
 {% block title %}Récapitulatif de Réservation{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h2>Récapitulatif de votre réservation</h2>
-    <ul>
-        <li>Offre : {{ reservation.offre.place }}</li>
-        <li>Date de réservation : {{ reservation.dateRes|date('d/m/Y H:i') }}</li>
-    </ul>
-    <a href="{{ path('app_reservation_payment', {'idR': reservation.idR}) }}" class="btn btn-primary">Passer au paiement</a>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Titre principal -->
+            <h2 class="text-center mb-4">Paiement de votre réservation</h2>
+            
+            <!-- Indicateur d'étapes -->
+            <div class="stepper">
+                <div class="step completed">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Réservation</div>
+                </div>
+                <div class="step active">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Récap</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Paiement</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Confirmation</div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-gradient-primary text-white p-4">
+                    <h3 class="mb-0">Récapitulatif de votre réservation</h3>
+                    <p class="mb-0 opacity-8">Vérifiez les informations ci-dessous avant de procéder au paiement</p>
+                </div>
+                
+                <div class="card-body p-4">
+                    <!-- Messages flash -->
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    
+                    <!-- Détails de la réservation -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="payment-details rounded p-4 mb-4 bg-light">
+                                <h4 class="mb-3 border-bottom pb-3">Détails de l'offre</h4>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <img src="{{ 'http://localhost/imageOffre/' ~ (reservation.offre.imagePath ?: 'default-offer.jpg') }}" 
+                                             alt="Image de l'offre" class="img-fluid rounded mb-3" style="max-height: 150px; width: 100%; object-fit: cover;">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5 class="fw-bold mb-2">{{ reservation.offre.description }}</h5>
+                                        <div class="recap-item">
+                                            <span class="recap-label"><i class="bi bi-geo-alt text-primary me-2"></i>Lieu :</span>
+                                            <span class="recap-value">{{ reservation.offre.place }}</span>
+                                        </div>
+                                        <div class="recap-item">
+                                            <span class="recap-label"><i class="bi bi-calendar-event text-primary me-2"></i>Date de réservation :</span>
+                                            <span class="recap-value">{{ reservation.dateRes|date('d/m/Y') }}</span>
+                                        </div>
+                                        <div class="recap-item">
+                                            <span class="recap-label"><i class="bi bi-credit-card text-primary me-2"></i>Prix :</span>
+                                            <span class="recap-value fw-bold">{{ reservation.offre.priceAfter }} €</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <a href="{{ path('app_reservation_payment', {'idR': reservation.idR}) }}" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-credit-card me-2"></i>Procéder au paiement
+                                </a>
+                                <a href="{{ path('offreVoyageurs_page') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>Retour aux offres
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    /* Stepper Component */
+    .stepper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 0;
+        position: relative;
+    }
+    
+    /* Line that connects steps */
+    .stepper::before {
+        content: '';
+        position: absolute;
+        width: 80%;
+        height: 4px;
+        background-color: #e9ecef;
+        top: 18px;
+        left: 10%;
+        z-index: 0;
+    }
+    
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        flex: 1;
+        z-index: 1;
+    }
+    
+    .step-number {
+        width: 36px;
+        height: 36px;
+        background-color: #e9ecef;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        color: white;
+        position: relative;
+        z-index: 1;
+        border: 3px solid white;
+        transition: all 0.3s ease;
+    }
+    
+    /* Active and completed step styling */
+    .step.active .step-number {
+        background-color: #5e72e4;
+        transform: scale(1.1);
+        box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
+    }
+    
+    .step.completed .step-number {
+        background-color: #5e72e4;
+    }
+    
+    .step-text {
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #67748e;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .step.active .step-text {
+        color: #344767;
+    }
+    
+    .step.completed .step-text {
+        color: #344767;
+    }
+    
+    /* Recap specific styles */
+    .payment-details {
+        border: 1px solid #e9ecef;
+    }
+    
+    .recap-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed #e9ecef;
+    }
+    
+    .recap-label {
+        font-weight: 600;
+        color: #344767;
+    }
+    
+    .recap-value {
+        font-weight: 500;
+        color: #67748e;
+    }
+</style>
 {% endblock %}

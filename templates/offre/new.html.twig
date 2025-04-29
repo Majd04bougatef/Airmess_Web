@@ -1,9 +1,13 @@
 {% extends 'dashEntreprise/dashboardEntreprise.html.twig' %}
 
-{% block title %}Créer une Nouvelle Offre{% endblock %}
+{% block title %}Nouvelle Offre{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
+<!-- Bibliothèque Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<!-- Important: Préchargement de la bibliothèque JavaScript pour éviter les problèmes de chargement -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
   /* Alert styles */
   .alert {
@@ -44,6 +48,10 @@
   
   .card-media::before {
     background-color: #336D8B;
+  }
+  
+  .card-location::before {
+    background-color: #4CAF50;
   }
 
   .form-card-header {
@@ -94,6 +102,10 @@
   
   .card-media .form-card-icon {
     background-color: #336D8B;
+  }
+  
+  .card-location .form-card-icon {
+    background-color: #4CAF50;
   }
 
   .form-card-title {
@@ -369,24 +381,53 @@
   .date-control {
     height: 58px !important;
   }
+  
+  /* Map styles */
+  #map-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  #map {
+    height: 450px;
+    width: 100%;
+    z-index: 1;
+  }
+  
+  .leaflet-container {
+    z-index: 1;
+  }
+  
+  .map-instructions {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+  }
 </style>
 {% endblock %}
 
 {% block body %}
     {# Inclure les styles et scripts pour la validation des formulaires #}
     {% include 'form_error_styling.html.twig' %}
-
+    
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
-                <div class="content-card content-section active" id="offre-section">
+                <!-- Content Card -->
+                <div class="content-card">
                     <div class="form-header">
                         <h2 class="form-title">Créer une Nouvelle Offre</h2>
                         <p class="form-subtitle">Complétez les informations ci-dessous pour créer une nouvelle offre touristique.</p>
                     </div>
 
-                    {{ form_start(form, {'method': 'POST', 'attr': {'class': 'offre-form', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
-                        
+                    {{ form_start(form, {'method': 'POST', 'attr': {'class': 'offer-form', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+
                         <!-- Basic Info Card -->
                         <div class="form-card card-info">
                             <div class="form-card-header">
@@ -460,9 +501,16 @@
                                     {{ form_errors(form.description) }}
                                 </div>
                                 
-                                <div class="col-md-12 mb-3 form-group">
-                                    {{ form_label(form.aidesc, null, {'label_attr': {'class': 'form-label'}}) }}
-                                    {{ form_widget(form.aidesc, {'attr': {'class': 'form-control' ~ (form.aidesc.vars.valid ? '' : ' is-invalid'), 'rows': '4'}}) }}
+                                <div class="form-spacer"></div>
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        {{ form_label(form.aidesc, 'Description', {'label_attr': {'class': 'form-label me-2'}}) }}
+                                        <button type="button" id="generate-description-btn" style="background: linear-gradient(145deg, #FFD700, #FFC107); color: #000; border: none; border-radius: 5px; font-size: 12px; padding: 4px 10px; display: flex; align-items: center; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.3s;">
+                                            <i class="fas fa-lightbulb me-1" style="color: #FFF1B0;"></i> Generate with AI
+                                        </button>
+                                    </div>
+                                    {{ form_widget(form.aidesc, {'attr': {'class': 'form-control' ~ (form.aidesc.vars.valid ? '' : ' is-invalid'), 'rows': '4', 'style': 'resize: vertical;', 'id': 'offre_aidesc', 'placeholder': 'Enter la description'}}) }}
                                     <small class="form-text text-muted">
                                         <i class="bi bi-info-circle me-1"></i>
                                         {{ form_help(form.aidesc) }}
@@ -477,6 +525,24 @@
                             </div>
                         </div>
                         
+                        <!-- Location Card with Map -->
+                        <div class="form-card card-location">
+                            <div class="form-card-header">
+                                <i class="fas fa-map-marker-alt form-card-icon"></i>
+                                <h3 class="form-card-title">Localisation</h3>
+                            </div>
+                            <div class="form-card-body">
+                                <div id="map-container">
+                                    <div id="map"></div>
+                                </div>
+                                <p class="map-instructions">Cliquez sur la carte ou faites glisser le marqueur pour sélectionner l'emplacement de l'offre</p>
+                                {{ form_widget(form.latitude, {'attr': {'style': 'display: none', 'id': 'offre_latitude'}}) }}
+                                {{ form_errors(form.latitude) }}
+                                {{ form_widget(form.longitude, {'attr': {'style': 'display: none', 'id': 'offre_longitude'}}) }}
+                                {{ form_errors(form.longitude) }}
+                            </div>
+                        </div>
+                        
                         <!-- Media Card -->
                         <div class="form-card card-media">
                             <div class="form-card-header">
@@ -485,8 +551,7 @@
                             </div>
                             <div class="form-card-body">
                                 <div class="form-image-upload">
-                                    <h4>Télécharger une image pour votre offre</h4>
-                                    {{ form_label(form.imageFile) }}
+                                    <h4>Télécharger une image</h4>
                                     {{ form_widget(form.imageFile, {
                                         'attr': {
                                             'class': 'form-control-file',
@@ -498,30 +563,279 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        {% if form.statusoff is defined and is_granted('ROLE_ADMIN') %}
-                        <div class="form-card card-status">
-                            <div class="form-card-header">
-                                <i class="fas fa-flag form-card-icon"></i>
-                                <h3 class="form-card-title">Statut de l'offre</h3>
-                            </div>
-                            <div class="form-card-body">
-                                <div class="form-floating">
-                                    {{ form_widget(form.statusoff, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
-                                    {{ form_label(form.statusoff) }}
-                                    {{ form_errors(form.statusoff) }}
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
 
                         <div class="form-actions">
                             <a href="{{ path('offreEntreprise_page') }}" class="form-btn-outline">Annuler</a>
                             <button type="submit" class="form-btn">Créer l'offre</button>
                         </div>
+
                     {{ form_end(form) }}
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<script>
+console.clear();
+console.log("==================== DÉBOGAGE DE LA CARTE ====================");
+console.log("Vérification du chargement de la page...");
+
+// Fonction pour vérifier si Leaflet est chargé
+function isLeafletLoaded() {
+    return typeof L !== 'undefined';
+}
+
+// Fonction pour afficher un message d'erreur visible dans la page
+function showMapError(message) {
+    const mapEl = document.getElementById('map');
+    if (mapEl) {
+        mapEl.innerHTML = '<div style="padding: 20px; background-color: #f8d7da; color: #721c24; text-align: center;">' +
+            '<h3>Erreur de chargement de la carte</h3>' +
+            '<p>' + message + '</p>' +
+            '<p>Vérifiez votre connexion internet et rechargez la page.</p>' +
+            '</div>';
+    }
+    console.error("ERREUR DE CARTE:", message);
+}
+
+// Attendre que le DOM soit complètement chargé
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOMContentLoaded déclenché");
+    console.log("État de Leaflet:", typeof L !== 'undefined' ? "CHARGÉ ✓" : "NON CHARGÉ ✗");
+    
+    const mapContainer = document.getElementById('map-container');
+    const mapElement = document.getElementById('map');
+    
+    console.log("Conteneur de carte trouvé:", mapContainer ? "OUI ✓" : "NON ✗");
+    console.log("Élément map trouvé:", mapElement ? "OUI ✓" : "NON ✗");
+    
+    if (mapContainer) {
+        console.log("Styles du conteneur:", window.getComputedStyle(mapContainer).cssText);
+    }
+    
+    if (mapElement) {
+        console.log("Styles de la carte:", window.getComputedStyle(mapElement).cssText);
+    }
+});
+
+// Attendre que tout soit complètement chargé
+window.addEventListener('load', function() {
+    console.log("Page entièrement chargée, vérification de Leaflet...");
+    
+    // Vérifier si Leaflet est disponible
+    if (!isLeafletLoaded()) {
+        showMapError("La bibliothèque Leaflet n'est pas chargée correctement");
+        return;
+    }
+    
+    console.log("Leaflet trouvé, version:", L.version);
+    initMap();
+});
+
+function initMap() {
+    try {
+        console.log("Initialisation de la carte...");
+        
+        // Vérifier l'élément de la carte
+        const mapElement = document.getElementById('map');
+        if (!mapElement) {
+            showMapError("Élément '#map' introuvable dans la page");
+            return;
+        }
+        
+        // Dimensions
+        console.log("Dimensions du conteneur:", mapElement.offsetWidth, "x", mapElement.offsetHeight);
+        
+        // Supprimer toute carte existante
+        if (window.myMap) {
+            window.myMap.remove();
+            console.log("Carte précédente supprimée");
+        }
+        
+        // Coordonnées par défaut (centre de la France)
+        const defaultLat = 46.603354;
+        const defaultLng = 1.888334;
+        
+        // Récupérer les champs cachés
+        const latField = document.getElementById('offre_latitude');
+        const lngField = document.getElementById('offre_longitude');
+        
+        console.log("Champ latitude trouvé:", latField ? "OUI ✓" : "NON ✗");
+        console.log("Champ longitude trouvé:", lngField ? "OUI ✓" : "NON ✗");
+        
+        if (latField) console.log("Valeur latitude:", latField.value);
+        if (lngField) console.log("Valeur longitude:", lngField.value);
+        
+        // Utiliser les valeurs existantes ou les défauts
+        const initialLat = latField && latField.value ? parseFloat(latField.value) : defaultLat;
+        const initialLng = lngField && lngField.value ? parseFloat(lngField.value) : defaultLng;
+        
+        console.log("Coordonnées initiales:", initialLat, initialLng);
+        
+        // Forcer les dimensions de la carte
+        mapElement.style.height = '450px';
+        mapElement.style.width = '100%';
+        
+        // Créer la carte
+        console.log("Création de la carte avec centre:", initialLat, initialLng);
+        const map = L.map('map').setView([initialLat, initialLng], 6);
+        window.myMap = map; // Stocker dans une variable globale
+        
+        // Ajouter la couche OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // Ajouter un marqueur
+        const marker = L.marker([initialLat, initialLng], {
+            draggable: true
+        }).addTo(map);
+        
+        // Gérer le déplacement du marqueur
+        marker.on('dragend', function() {
+            const position = marker.getLatLng();
+            updateFields(position.lat, position.lng);
+        });
+        
+        // Gérer les clics sur la carte
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateFields(e.latlng.lat, e.latlng.lng);
+        });
+        
+        // Mettre à jour les champs cachés et le champ place
+        function updateFields(lat, lng) {
+            if (latField) latField.value = lat.toFixed(6);
+            if (lngField) lngField.value = lng.toFixed(6);
+            console.log("Coordonnées mises à jour:", lat.toFixed(6), lng.toFixed(6));
+            
+            // Récupérer le champ place
+            const placeField = document.querySelector('input[name$="[place]"]');
+            
+            // Géocodage inverse pour obtenir le nom du lieu
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Données de géocodage reçues:", data);
+                    
+                    if (data && data.display_name && placeField) {
+                        // Extraire le nom du lieu
+                        let placeName = '';
+                        
+                        // Construire une adresse plus lisible
+                        if (data.address) {
+                            const address = data.address;
+                            const parts = [];
+                            
+                            // Construire l'adresse avec les composants pertinents
+                            if (address.road) parts.push(address.road);
+                            if (address.house_number) parts.unshift(address.house_number);
+                            
+                            if (address.city || address.town || address.village) {
+                                parts.push(address.city || address.town || address.village);
+                            }
+                            
+                            if (address.postcode) parts.push(address.postcode);
+                            if (address.country) parts.push(address.country);
+                            
+                            placeName = parts.join(', ');
+                        } else {
+                            // Utiliser le nom complet si les détails d'adresse ne sont pas disponibles
+                            placeName = data.display_name;
+                        }
+                        
+                        // Mettre à jour le champ place
+                        placeField.value = placeName;
+                        
+                        // Déclencher l'événement input pour activer toute validation ou écouteurs d'événements
+                        const event = new Event('input', { bubbles: true });
+                        placeField.dispatchEvent(event);
+                        
+                        console.log("Champ place mis à jour avec:", placeName);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur lors du géocodage inverse:", error);
+                });
+        }
+        
+        // Forcer un redimensionnement pour éviter les problèmes d'affichage
+        setTimeout(function() {
+            map.invalidateSize();
+            console.log("Carte redimensionnée");
+        }, 500);
+        
+        console.log("Initialisation de la carte terminée avec succès");
+    } catch (error) {
+        showMapError("Erreur lors de l'initialisation: " + error.message);
+        console.error("Erreur détaillée:", error);
+    }
+}
+
+// Code pour générer automatiquement la description avec Gemini AI
+document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = document.getElementById('generate-description-btn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', function() {
+            // Afficher un loader dans le bouton
+            const originalBtnText = generateBtn.innerHTML;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération...';
+            generateBtn.disabled = true;
+            
+            // Récupérer les données du formulaire nécessaires pour l'IA
+            const place = document.querySelector('input[name$="[place]"]')?.value || '';
+            const startDate = document.querySelector('input[name$="[startDate]"]')?.value || '';
+            const endDate = document.querySelector('input[name$="[endDate]"]')?.value || '';
+            const priceInit = document.querySelector('input[name$="[priceInit]"]')?.value || '';
+            const priceAfter = document.querySelector('input[name$="[priceAfter]"]')?.value || '';
+            const description = document.querySelector('textarea[name$="[description]"]')?.value || '';
+            const aideDescField = document.getElementById('offre_aidesc');
+            
+            // Appeler l'API d'IA pour générer la description
+            fetch('/api/generate-description', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    place: place,
+                    startDate: startDate,
+                    endDate: endDate,
+                    priceInit: priceInit,
+                    priceAfter: priceAfter,
+                    description: description
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.description) {
+                    // Mettre à jour le champ avec la description générée
+                    if (aideDescField) {
+                        aideDescField.value = data.description;
+                        
+                        // Déclencher l'événement pour activer les validations
+                        const event = new Event('input', { bubbles: true });
+                        aideDescField.dispatchEvent(event);
+                    }
+                } else {
+                    alert('Erreur lors de la génération de la description: ' + (data.message || 'Erreur inconnue'));
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'appel à l\'API: ' + error.message);
+            })
+            .finally(() => {
+                // Restaurer le bouton
+                generateBtn.innerHTML = originalBtnText;
+                generateBtn.disabled = false;
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

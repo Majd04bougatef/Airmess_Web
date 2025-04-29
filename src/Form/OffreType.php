@@ -234,6 +234,22 @@ class OffreType extends AbstractType
                 'help' => 'Vous pouvez ajouter ici des informations complémentaires sur votre offre, comme les services inclus, les conditions particulières, etc.',
                 'error_bubbling' => false,
             ])
+            ->add('latitude', NumberType::class, [
+                'label' => 'Latitude',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+                'error_bubbling' => false,
+            ])
+            ->add('longitude', NumberType::class, [
+                'label' => 'Longitude',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+                'error_bubbling' => false,
+            ])
             ->add('statusoff', ChoiceType::class, [
                 'choices' => [
                     'En attente' => OffreStatus::EN_ATTENTE,
