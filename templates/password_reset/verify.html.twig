@@ -10,8 +10,8 @@
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
-            height: 100vh;
+            background: linear-gradient(to right, #a9cfff, #d0c7ff, #ffbde6);
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -20,148 +20,299 @@
         }
         .verification-container {
             background: white;
-            border-radius: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 500px;
-            overflow: hidden;
+            max-width: 450px;
+            padding: 2rem;
         }
-        .card-header {
-            background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
-            color: white;
+        .logo-container {
             text-align: center;
-            padding: 25px 20px;
-            border-radius: 25px 25px 0 0;
+            margin-bottom: 1.5rem;
         }
-        .card-header img {
-            width: 60px;
-            margin-bottom: 15px;
+        .logo-container img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 1rem;
         }
-        .card-body {
-            padding: 30px;
+        h2 {
+            color: #333;
+            font-size: 1.75rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 1.5rem;
         }
-        .verification-input input {
-            letter-spacing: 5px;
+        .code-input-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        .code-digit {
+            width: 45px;
+            height: 55px;
             font-size: 24px;
             text-align: center;
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid #ddd;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
+        .code-digit:focus {
+            border-color: #d0c7ff;
+            box-shadow: 0 0 0 3px rgba(208, 199, 255, 0.1);
+            outline: none;
+        }
+        .hidden-input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+        }
+        .btn-verify {
+            background: linear-gradient(to right, #a9cfff, #d0c7ff, #ffbde6);
             border: none;
             border-radius: 50px;
-            padding: 12px 15px;
+            padding: 12px 24px;
             font-weight: 500;
             width: 100%;
+            color: white;
+            transition: all 0.3s ease;
         }
-        .btn-primary:hover {
+        .btn-verify:hover {
             opacity: 0.9;
-            background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(208, 199, 255, 0.4);
         }
-        .text-danger {
-            color: #dc3545;
+        .timer {
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+            margin: 1rem 0;
         }
-        a {
-            color: #7589ff;
+        .links {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .links a {
+            color: #d0c7ff;
             text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
         }
-        a:hover {
+        .links a:hover {
+            color: #a9cfff;
             text-decoration: underline;
+        }
+        .email-sent {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+        .email-sent strong {
+            color: #333;
+            word-break: break-all;
+        }
+        .alert {
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
         }
     </style>
 </head>
 <body>
     <div class="verification-container">
-        <div class="card-header">
-            <img src="{{ asset('images/logo-airmess.png') }}" alt="Airmess Logo" class="mb-2">
-            <h2 class="mb-0">Vérification de code</h2>
+        <div class="logo-container">
+            <img src="{{ asset('images/logo-airmess.png') }}" alt="Airmess Logo">
+            <h2>Vérification de code</h2>
         </div>
         
-        <div class="card-body">
-            {% for flash_message in app.flashes('success') %}
-                <div class="alert alert-success">
-                    {{ flash_message }}
-                </div>
-            {% endfor %}
-            
-            {% for flash_message in app.flashes('error') %}
-                <div class="alert alert-danger">
-                    {{ flash_message }}
-                </div>
-            {% endfor %}
-            
-            {% if error %}
-                <div class="alert alert-danger">
-                    {{ error }}
-                </div>
-            {% endif %}
-            
-            <p class="text-center mb-4">
-                Un code de vérification a été envoyé à <strong>{{ email }}</strong>.<br>
-                Veuillez vérifier votre boîte de réception et entrer le code ci-dessous.
-            </p>
-            
-            <form action="{{ path('app_password_reset_verify') }}" method="post">
-                <div class="form-group verification-input mb-4">
-                    <label for="verification_code" class="form-label fw-bold">Code de vérification</label>
-                    <input type="text" id="verification_code" name="verification_code" class="form-control form-control-lg" maxlength="6" placeholder="123456" required autofocus>
-                </div>
-                
-                <div class="text-center mt-4">
-                    <p id="countdown-timer" class="mb-3">Ce code expire dans: <span id="timer">02:00</span></p>
-                    <button type="submit" class="btn btn-primary">
-                        Vérifier
-                    </button>
-                </div>
-            </form>
-            
-            <div class="text-center mt-4">
-                <p>Vous n'avez pas reçu de code? <a href="{{ path('app_password_reset_resend') }}">Renvoyer le code</a></p>
-                <p><a href="{{ path('app_password_reset_request') }}">Retour à la réinitialisation</a></p>
+        {% for flash_message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ flash_message }}
             </div>
+        {% endfor %}
+        
+        {% for flash_message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ flash_message }}
+            </div>
+        {% endfor %}
+        
+        {% if error %}
+            <div class="alert alert-danger">
+                {{ error }}
+            </div>
+        {% endif %}
+        
+        <div class="email-sent">
+            Un code de vérification a été envoyé à<br>
+            <strong>{{ email }}</strong>.<br>
+            Veuillez vérifier votre boîte de réception et entrer le code ci-dessous.
+        </div>
+        
+        <form action="{{ path('app_password_reset_verify') }}" method="post" id="verification-form">
+            <div class="code-input-container" id="code-inputs">
+                <input type="text" class="code-digit" maxlength="1" data-index="0" autocomplete="off">
+                <input type="text" class="code-digit" maxlength="1" data-index="1" autocomplete="off">
+                <input type="text" class="code-digit" maxlength="1" data-index="2" autocomplete="off">
+                <input type="text" class="code-digit" maxlength="1" data-index="3" autocomplete="off">
+                <input type="text" class="code-digit" maxlength="1" data-index="4" autocomplete="off">
+                <input type="text" class="code-digit" maxlength="1" data-index="5" autocomplete="off">
+            </div>
+            
+            <input type="text" id="verification_code" name="verification_code" class="hidden-input" maxlength="6" required>
+            
+            <div class="timer">
+                Ce code expire dans: <span id="timer">02:00</span>
+            </div>
+            
+            <button type="submit" class="btn btn-verify">
+                Vérifier
+            </button>
+        </form>
+        
+        <div class="links">
+            <p>Vous n'avez pas reçu de code? <a href="{{ path('app_password_reset_resend') }}">Renvoyer le code</a></p>
+            <p><a href="{{ path('app_password_reset_request') }}">Retour à la réinitialisation</a></p>
         </div>
     </div>
 
+    <!-- Only include necessary JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Timer functionality for verification code
-            let timeLeft = {{ remaining_seconds|default(120) }}; // Use remaining time from server or default to 2 minutes
-            const timerElement = document.getElementById('timer');
+        (function() {
+            'use strict';
             
-            function updateTimer() {
-                const minutes = Math.floor(timeLeft / 60);
-                let seconds = timeLeft % 60;
-                seconds = seconds < 10 ? '0' + seconds : seconds;
-                
-                timerElement.textContent = minutes + ':' + seconds;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    timerElement.textContent = "Expiré";
-                    document.getElementById('countdown-timer').classList.add('text-danger');
+            // Wait for DOM to be ready
+            function ready(fn) {
+                if (document.readyState !== 'loading') {
+                    fn();
+                } else {
+                    document.addEventListener('DOMContentLoaded', fn);
                 }
-                
-                timeLeft--;
             }
             
-            // Initialize and start the timer
-            updateTimer();
-            const timerInterval = setInterval(updateTimer, 1000);
-            
-            // Auto-submit when all digits are entered
-            const codeInput = document.getElementById('verification_code');
-            codeInput.addEventListener('input', function() {
-                // Only allow numbers
-                this.value = this.value.replace(/[^0-9]/g, '');
+            ready(function() {
+                // Timer functionality
+                const timerElement = document.getElementById('timer');
+                if (!timerElement) return;
                 
-                // Auto-submit when 6 digits are entered
-                if (this.value.length === 6) {
-                    this.form.submit();
+                let timeLeft = {{ remaining_seconds|default(120) }};
+                
+                function updateTimer() {
+                    if (!timerElement) return;
+                    
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+                    
+                    timerElement.textContent = minutes + ':' + formattedSeconds;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        timerElement.textContent = "Expiré";
+                        timerElement.style.color = "#dc3545";
+                        return;
+                    }
+                    
+                    timeLeft--;
                 }
+                
+                const timerInterval = setInterval(updateTimer, 1000);
+                updateTimer();
+                
+                // Verification code handling
+                const hiddenInput = document.getElementById('verification_code');
+                const form = document.getElementById('verification-form');
+                const codeInputs = document.querySelectorAll('.code-digit');
+                
+                if (!hiddenInput || !form || !codeInputs.length) return;
+                
+                // Pre-fill code digits if a value exists
+                if (hiddenInput.value) {
+                    const codeChars = hiddenInput.value.split('');
+                    codeChars.forEach((char, index) => {
+                        if (index < codeInputs.length) {
+                            codeInputs[index].value = char;
+                        }
+                    });
+                }
+                
+                // Update hidden input when code digits change
+                function updateHiddenInput() {
+                    let code = '';
+                    codeInputs.forEach(input => {
+                        code += input.value || '';
+                    });
+                    hiddenInput.value = code;
+                    
+                    // Auto-submit when complete
+                    if (code.length === 6) {
+                        form.submit();
+                    }
+                }
+                
+                // Handle digit input
+                codeInputs.forEach((input, index) => {
+                    // Focus handling
+                    input.addEventListener('keydown', function(e) {
+                        // Allow only number inputs and control keys
+                        if (
+                            !/^[0-9]$/.test(e.key) && 
+                            !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+                        ) {
+                            e.preventDefault();
+                        }
+                        
+                        // Handle backspace to go to previous input
+                        if (e.key === 'Backspace' && !this.value && index > 0) {
+                            codeInputs[index - 1].focus();
+                            codeInputs[index - 1].select();
+                        }
+                    });
+                    
+                    // Handle input changes
+                    input.addEventListener('input', function(e) {
+                        // Only allow numbers
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                        
+                        updateHiddenInput();
+                        
+                        // Move to next input on entry
+                        if (this.value && index < codeInputs.length - 1) {
+                            codeInputs[index + 1].focus();
+                        }
+                    });
+                    
+                    // Handle paste event
+                    input.addEventListener('paste', function(e) {
+                        e.preventDefault();
+                        
+                        // Get pasted content
+                        const paste = (e.clipboardData || window.clipboardData).getData('text');
+                        if (!paste) return;
+                        
+                        // Extract only digits
+                        const digits = paste.replace(/[^0-9]/g, '').slice(0, 6);
+                        
+                        // Fill inputs with pasted digits
+                        digits.split('').forEach((digit, idx) => {
+                            if (idx < codeInputs.length) {
+                                codeInputs[idx].value = digit;
+                            }
+                        });
+                        
+                        // Focus the next empty input or the last one
+                        const nextEmptyIndex = digits.length < codeInputs.length ? digits.length : codeInputs.length - 1;
+                        codeInputs[nextEmptyIndex].focus();
+                        
+                        updateHiddenInput();
+                    });
+                });
+                
+                // Focus first input on load
+                codeInputs[0].focus();
             });
-        });
+        })();
     </script>
 </body>
 </html> 

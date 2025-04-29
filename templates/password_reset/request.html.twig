@@ -1,49 +1,137 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Réinitialisation de mot de passe - Airmess{% endblock %}
-
-{% block body %}
-<div class="container mt-5">
-    <div class="card mx-auto" style="max-width: 500px; border-radius: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-        <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%); border-radius: 25px 25px 0 0;">
-            <img src="{{ asset('images/logo-airmess.png') }}" alt="Airmess Logo" class="mb-2" width="50">
-            <h2 class="text-white mb-0">Mot de passe oublié</h2>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mot de passe oublié - Airmess</title>
+    <link rel="icon" href="{{ asset('images/logo-airmess.png') }}" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #a9cfff, #d0c7ff, #ffbde6);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .reset-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            padding: 2rem;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .logo-container img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 1rem;
+        }
+        h2 {
+            color: #333;
+            font-size: 1.75rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .form-control {
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        .form-control:focus {
+            border-color: #d0c7ff;
+            box-shadow: 0 0 0 3px rgba(208, 199, 255, 0.1);
+            outline: none;
+        }
+        .btn-submit {
+            background: linear-gradient(to right, #a9cfff, #d0c7ff, #ffbde6);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-weight: 500;
+            width: 100%;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-submit:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(208, 199, 255, 0.4);
+        }
+        .links {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .links a {
+            color: #d0c7ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        .links a:hover {
+            color: #a9cfff;
+            text-decoration: underline;
+        }
+        .instructions {
+            text-align: center;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        .alert {
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="reset-container">
+        <div class="logo-container">
+            <img src="{{ asset('images/logo-airmess.png') }}" alt="Airmess Logo">
+            <h2>Mot de passe oublié</h2>
         </div>
         
-        <div class="card-body p-4">
-            {% for flash_message in app.flashes('success') %}
-                <div class="alert alert-success">
-                    {{ flash_message }}
-                </div>
-            {% endfor %}
-            
-            {% for flash_message in app.flashes('error') %}
-                <div class="alert alert-danger">
-                    {{ flash_message }}
-                </div>
-            {% endfor %}
-            
-            <p class="text-center mb-4">
-                Veuillez entrer votre adresse e-mail pour recevoir un code de réinitialisation.
-            </p>
-            
-            <form action="{{ path('app_password_reset_request') }}" method="post">
-                <div class="form-group">
-                    <label for="email" class="font-weight-bold">Adresse e-mail</label>
-                    <input type="email" id="email" name="email" class="form-control form-control-lg" required autofocus style="border-radius: 15px;">
-                </div>
-                
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-primary btn-block" style="background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%); border: none; border-radius: 50px; padding: 12px 15px;">
-                        Envoyer le code
-                    </button>
-                </div>
-            </form>
-            
-            <div class="text-center mt-3">
-                <p><a href="{{ path('login') }}">Retour à la connexion</a></p>
+        {% for flash_message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ flash_message }}
             </div>
+        {% endfor %}
+        
+        {% for flash_message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ flash_message }}
+            </div>
+        {% endfor %}
+        
+        <div class="instructions">
+            Veuillez entrer votre adresse e-mail pour recevoir un code de réinitialisation.
+        </div>
+        
+        <form action="{{ path('app_password_reset_request') }}" method="post">
+            <div class="mb-3">
+                <input type="email" id="email" name="email" class="form-control" 
+                       placeholder="Adresse e-mail" required autofocus>
+            </div>
+            
+            <button type="submit" class="btn btn-submit">
+                Envoyer le code
+            </button>
+        </form>
+        
+        <div class="links">
+            <p><a href="{{ path('login') }}">Retour à la connexion</a></p>
         </div>
     </div>
-</div>
-{% endblock %} 
+</body>
+</html> 

@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Test SMS - Airmess{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Test Twilio SMS Integration</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
+                        {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
+                        {% if error is defined %}
+                            <div class="alert alert-warning">
+                                <strong>Configuration Required:</strong> {{ error }}
+                                <hr>
+                                <p>Add the following to your <code>.env.local</code> file:</p>
+                                <pre class="bg-light p-3">
+TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_PHONE_NUMBER=your_twilio_phone_number</pre>
+                            </div>
+                        {% else %}
+                            <form action="{{ path('app_sms_send') }}" method="post">
+                                <div class="mb-3">
+                                    <label for="to" class="form-label">Recipient Phone Number</label>
+                                    <input type="text" class="form-control" id="to" name="to" 
+                                           placeholder="+1234567890" required>
+                                    <div class="form-text">Enter phone number in E.164 format (e.g., +1234567890)</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="message" class="form-label">Message</label>
+                                    <textarea class="form-control" id="message" name="message" rows="4" 
+                                              placeholder="Your SMS message here..." required></textarea>
+                                    <div class="form-text">
+                                        <span id="char-count">0</span>/1600 characters
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">Send SMS</button>
+                                    <a href="{{ path('app_sms_verify') }}" class="btn btn-outline-secondary">
+                                        Test Verification Code
+                                    </a>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer text-muted">
+                        <small>Note: Standard Twilio SMS rates apply.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageField = document.getElementById('message');
+            const charCount = document.getElementById('char-count');
+            
+            if (messageField && charCount) {
+                messageField.addEventListener('input', function() {
+                    charCount.textContent = this.value.length;
+                });
+            }
+        });
+    </script>
+{% endblock %} 

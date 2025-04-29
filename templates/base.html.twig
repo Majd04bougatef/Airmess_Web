@@ -1315,29 +1315,38 @@
     <!-- Scripts -->
     {% block javascripts %}
         <!-- Vendor JS Files -->
-        <script src="{{asset('vendor/aos/aos.js')}}"></script>
-        <script src="{{asset('vendor/glightbox/js/glightbox.min.js')}}"></script>
-        <script src="{{asset('vendor/swiper/swiper-bundle.min.js')}}"></script>
-        <script src="{{asset('vendor/purecounter/purecounter_vanilla.js')}}"></script>
-        
-        <!-- Main JS File -->
-        <script src="{{asset('js/main.js')}}"></script>
-        
-        <!-- Debug script -->
-        <script>
-            console.log('Scripts chargés dans le body');
-            // Vérifier si Bootstrap est disponible
-            if (typeof bootstrap !== 'undefined') {
-                console.log('Bootstrap est chargé');
-                // Initialiser les dropdowns
-                var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-                dropdownElementList.map(function (dropdownToggleEl) {
-                    return new bootstrap.Dropdown(dropdownToggleEl);
-                });
-            } else {
-                console.error('Bootstrap n\'est pas chargé');
-            }
-        </script>
+
+  <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+  <script src="{{asset('vendor/aos/aos.js')}}"></script>
+  <script src="{{asset('vendor/glightbox/js/glightbox.min.js')}}"></script>
+  <script src="{{asset('vendor/swiper/swiper-bundle.min.js')}}"></script>
+  <script src="{{asset('vendor/purecounter/purecounter_vanilla.js')}}"></script>
+
+  <!-- Initialize libraries before loading main.js -->
+  <script>
+    // Initialize libraries with default configurations if they exist
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize AOS if it exists
+      if (typeof AOS !== 'undefined') {
+        AOS.init();
+      }
+      
+      // Initialize GLightbox if it exists
+      if (typeof GLightbox !== 'undefined') {
+        GLightbox({
+          selector: '.glightbox'
+        });
+      }
+      
+      // Initialize PureCounter if it exists
+      if (typeof PureCounter !== 'undefined') {
+        new PureCounter();
+      }
+    });
+  </script>
+
+  <!-- Main JS File -->
+  <script src="{{asset('js/main.js')}}"></script>
     {% endblock %}
   </body>
 </html>

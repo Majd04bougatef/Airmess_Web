@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SMS Verification - Airmess{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">SMS Verification Test</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
+                        {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
+                        <p class="lead">Send a verification code to a phone number</p>
+
+                        <form action="{{ path('app_sms_send_verification') }}" method="post" class="mb-4">
+                            <div class="mb-3">
+                                <label for="to" class="form-label">Recipient Phone Number</label>
+                                <input type="text" class="form-control" id="to" name="to" 
+                                       placeholder="+1234567890" required>
+                                <div class="form-text">Enter phone number in E.164 format (e.g., +1234567890)</div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Send Verification Code</button>
+                            </div>
+                        </form>
+
+                        <!-- Verification Code Entry Form (In a real app, this would be a separate page) -->
+                        <div class="mt-5 pt-4 border-top">
+                            <h5>Verification Code Entry</h5>
+                            <p>Enter the 6-digit code sent to your phone:</p>
+                            
+                            <div class="verification-code-input mb-4">
+                                <div class="d-flex justify-content-center">
+                                    <input type="text" class="form-control text-center code-input" maxlength="1" data-code-index="0">
+                                    <input type="text" class="form-control text-center code-input" maxlength="1" data-code-index="1">
+                                    <input type="text" class="form-control text-center code-input" maxlength="1" data-code-index="2">
+                                    <input type="text" class="form-control text-center code-input" maxlength="1" data-code-index="3">
+                                    <input type="text" class="form-control text-center code-input" maxlength="1" data-code-index="4">
+                                    <input type="text" class="form-control text-center code-input" maxlength="1" data-code-index="5">
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button id="verify-btn" class="btn btn-success">Verify Code</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ path('app_sms_test') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Back to SMS Test
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .verification-code-input .code-input {
+            width: 50px;
+            height: 60px;
+            margin: 0 5px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeInputs = document.querySelectorAll('.code-input');
+            const verifyButton = document.getElementById('verify-btn');
+            
+            // Handle code input behavior (auto-focus next field)
+            codeInputs.forEach(input => {
+                input.addEventListener('keyup', function(e) {
+                    const currentIndex = parseInt(this.getAttribute('data-code-index'));
+                    
+                    // If a digit was entered
+                    if (/^[0-9]$/.test(e.key)) {
+                        // Focus next input
+                        if (currentIndex < 5) {
+                            codeInputs[currentIndex + 1].focus();
+                        }
+                    }
+                    // Handle backspace
+                    else if (e.key === 'Backspace') {
+                        if (currentIndex > 0 && this.value === '') {
+                            codeInputs[currentIndex - 1].focus();
+                        }
+                    }
+                });
+            });
+            
+            // Simple verification (demo only)
+            verifyButton.addEventListener('click', function() {
+                let code = '';
+                let isComplete = true;
+                
+                codeInputs.forEach(input => {
+                    if (!input.value) {
+                        isComplete = false;
+                    }
+                    code += input.value;
+                });
+                
+                if (!isComplete) {
+                    alert('Please enter the complete 6-digit code.');
+                    return;
+                }
+                
+                // In a real app, you would verify this code against what was stored
+                // This is just a demo
+                alert(`Code submitted: ${code}\n\nIn a real app, this would verify against the code sent via SMS.`);
+            });
+        });
+    </script>
+{% endblock %} 
