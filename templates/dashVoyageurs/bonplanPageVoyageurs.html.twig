@@ -601,6 +601,40 @@
     color: #344767;
     background-color: #f8f9fa;
   }
+
+  .weather-info {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    padding: 8px;
+  }
+  
+  .weather-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .temperature {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #344767;
+  }
+  
+  .weather-description {
+    font-size: 0.9rem;
+    color: #67748e;
+    margin-left: 8px;
+  }
+  
+  .weather-recommendation .badge,
+  .seasonal-badge .badge {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .weather-recommendation .badge i,
+  .seasonal-badge .badge i {
+    font-size: 0.9rem;
+  }
 </style>
 {% endblock %}
 
@@ -660,9 +694,6 @@
                     <h6>{% if app.request.query.get('action') == 'add' %}Ajouter un bon plan{% else %}Bons Plans{% endif %}</h6>
                     {% if app.request.query.get('action') != 'add' %}
                     <div class="d-flex align-items-center">
-                        <a href="{{ path('ai_assistant_page') }}" class="btn btn-info btn-sm me-2">
-                            <i class="fas fa-robot me-1"></i>Assistant AI
-                        </a>
                         <div class="custom-dropdown me-2" style="position: relative;">
                             <button type="button" class="btn btn-primary filter-dropdown" data-custom-toggle="dropdown">
                                 <i class="fas fa-filter"></i> Filtrer par avis
@@ -732,6 +763,18 @@
                                                     <p class="card-text small text-muted">
                                                         <i class="fas fa-map-marker-alt me-1"></i> {{ bonplan.localisation }}
                                                     </p>
+                                                    {% if weatherData[bonplan.idP] is not null %}
+                                                        <div class="weather-info mb-2">
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="http://openweathermap.org/img/wn/{{ weatherData[bonplan.idP].weather[0].icon }}@2x.png" 
+                                                                     alt="Météo" class="weather-icon me-2">
+                                                                <div>
+                                                                    <span class="temperature">{{ weatherData[bonplan.idP].main.temp|round }}°C</span>
+                                                                    <span class="weather-description">{{ weatherData[bonplan.idP].weather[0].description }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
                                                     <p class="card-text description-text">
                                                         {{ bonplan.description|slice(0, 100) }}{% if bonplan.description|length > 100 %}...{% endif %}
                                                     </p>
@@ -741,6 +784,38 @@
                                                         </div>
                                                         <span class="rating-text">{{ ratings[bonplan.idP] }} <small>({{ reviewsCount[bonplan.idP] }} avis)</small></span>
                                                     </div>
+                                                    {% if weatherRecommendations[bonplan.idP] != 'unknown' %}
+                                                        <div class="weather-recommendation mt-2">
+                                                            {% if weatherRecommendations[bonplan.idP] == 'good' %}
+                                                                <span class="badge bg-success">
+                                                                    <i class="fas fa-sun me-1"></i> Idéal pour cette activité
+                                                                </span>
+                                                            {% elseif weatherRecommendations[bonplan.idP] == 'cold' %}
+                                                                <span class="badge bg-info">
+                                                                    <i class="fas fa-snowflake me-1"></i> Temps froid
+                                                                </span>
+                                                            {% elseif weatherRecommendations[bonplan.idP] == 'hot' %}
+                                                                <span class="badge bg-warning">
+                                                                    <i class="fas fa-fire me-1"></i> Temps chaud
+                                                                </span>
+                                                            {% elseif weatherRecommendations[bonplan.idP] == 'rainy' %}
+                                                                <span class="badge bg-primary">
+                                                                    <i class="fas fa-cloud-rain me-1"></i> Pluvieux
+                                                                </span>
+                                                            {% elseif weatherRecommendations[bonplan.idP] == 'snowy' %}
+                                                                <span class="badge bg-secondary">
+                                                                    <i class="fas fa-snowflake me-1"></i> Neigeux
+                                                                </span>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if seasonalActivities[bonplan.idP] %}
+                                                        <div class="seasonal-badge mt-2">
+                                                            <span class="badge bg-success">
+                                                                <i class="fas fa-calendar-check me-1"></i> Activité de saison
+                                                            </span>
+                                                        </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             

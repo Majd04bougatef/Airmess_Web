@@ -1,9 +1,0 @@
-ai_assistant_page:
-    path: /ai-assistant
-    controller: App\Controller\AiAssistantController::index
-    methods: [GET]
-
-ai_assistant_chat:
-    path: /ai-assistant/chat
-    controller: App\Controller\AiAssistantController::chat
-    methods: [POST] 

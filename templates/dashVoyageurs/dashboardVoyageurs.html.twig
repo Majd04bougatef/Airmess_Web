@@ -586,7 +586,7 @@
           
           <div class="user-profile">
             <div class="user-info d-flex align-items-center">
-                <img src="{{ path('app_profile_image', {'filename': app.session.get('user_image') }) }}" 
+                <img src="{{ app.session.get('user_image') ? path('app_profile_image', {'filename': app.session.get('user_image')}) : path('app_profile_image') }}" 
                      alt="{{ app.session.get('user_name') }}" 
                      class="user-img" 
                      id="userDropdown" 
@@ -600,7 +600,7 @@
             <div class="dropdown-menu dropdown-menu-end shadow-sm" id="userMenu" style="min-width: 240px; padding: 0;">
               <div class="px-3 py-2 bg-light border-bottom">
                 <div class="d-flex align-items-center">
-                  <img src="{{ path('app_profile_image', {'filename': app.session.get('user_image') }) }}" 
+                  <img src="{{ app.session.get('user_image') ? path('app_profile_image', {'filename': app.session.get('user_image')}) : path('app_profile_image') }}" 
                        class="rounded-circle me-2" 
                        width="40" height="40"
                        alt="{{ app.session.get('user_name') }}"
