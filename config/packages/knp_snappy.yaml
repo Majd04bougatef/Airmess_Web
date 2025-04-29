@@ -1,0 +1,14 @@
+# Configuration désactivée temporairement en attendant l'installation du bundle
+# knp_snappy:
+#     pdf:
+#         enabled:    true
+#         binary:     '%env(WKHTMLTOPDF_PATH)%' # Path to wkhtmltopdf executable
+#         options:    
+#             no-outline: true
+#             page-size: A4
+#             encoding: UTF-8
+#             javascript-delay: 1000
+#     image:
+#         enabled:    true
+#         binary:     '%env(WKHTMLTOIMAGE_PATH)%' # Path to wkhtmltoimage executable
+#         options:    [] 

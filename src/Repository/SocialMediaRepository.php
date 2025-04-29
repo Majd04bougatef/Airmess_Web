@@ -100,4 +100,37 @@ class SocialMediaRepository extends ServiceEntityRepository
 
         return $qb;
     }
+
+    public function findFuturePublications(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.publicationDate > :now')
+            ->andWhere('s.status = :status')
+            ->setParameter('now', new \DateTime())
+            ->setParameter('status', 'pending')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countFuturePublications(): int
+    {
+        return $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->where('s.publicationDate > :now')
+            ->andWhere('s.status = :status')
+            ->setParameter('now', new \DateTime())
+            ->setParameter('status', 'pending')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countPublishedPublications(): int
+    {
+        return $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->where('s.status = :status')
+            ->setParameter('status', 'published')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

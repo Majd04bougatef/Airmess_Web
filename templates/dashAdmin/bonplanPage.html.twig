@@ -142,6 +142,19 @@
               <span class="text-sm text-secondary">({{ bonPlans|length }} au total)</span>
             {% endif %}
           </h6>
+          <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
+              <i class="fas fa-file-import"></i> Importer
+            </button>
+            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-file-export"></i> Exporter
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ path('admin_bonplan_export', {'format': 'csv'}) }}">CSV</a></li>
+              <li><a class="dropdown-item" href="{{ path('admin_bonplan_export', {'format': 'excel'}) }}">Excel</a></li>
+              <li><a class="dropdown-item" href="{{ path('admin_bonplan_export', {'format': 'pdf'}) }}">PDF</a></li>
+            </ul>
+          </div>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-0">
@@ -225,6 +238,33 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
         <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="importModalLabel">Importer des bons plans</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ path('admin_bonplan_import') }}" method="post" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="importFile" class="form-label">Fichier à importer (CSV ou Excel)</label>
+            <input type="file" class="form-control" id="importFile" name="file" accept=".csv,.xlsx,.xls" required>
+          </div>
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Le fichier doit contenir les colonnes suivantes : nomplace, localisation, description, typePlace
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Importer</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

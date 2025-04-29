@@ -61,6 +61,9 @@ class SocialMedia
     #[ORM\Column(type: "string", length: 500, nullable: true, options: ["default" => ""])]
     private ?string $imagemedia = "";
 
+    #[ORM\Column(length: 20)]
+    private ?string $status = 'pending';
+
     // Getters et Setters...
 
     public function getIdEB(): int
@@ -153,6 +156,17 @@ class SocialMedia
     public function setImagemedia(?string $imagemedia): self
     {
         $this->imagemedia = $imagemedia;
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
         return $this;
     }
 

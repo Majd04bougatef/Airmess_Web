@@ -286,8 +286,8 @@
         <p>Présentez ce QR code à la station pour récupérer vos vélos</p>
         
         <div class="button-group">
-            <a href="#" class="btnn btn-download" onclick="window.print()">
-                <i class="fas fa-download"></i> Télécharger le reçu
+            <a href="{{ path('app_reservation_transport_ticket', {'reference': reservation.reference}) }}" class="btnn btn-download">
+                <i class="fas fa-download"></i> Télécharger le ticket
             </a>
             <br>
             <a href="{{ path('app_reservation_transport_index') }}" class="btnn">

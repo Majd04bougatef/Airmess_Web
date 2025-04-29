@@ -1,0 +1,219 @@
+{% extends 'dashAdmin/dashboard.html.twig' %}
+
+{% block title %}Utilisateurs en ligne{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+  <div class="container-fluid py-1 px-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="{{ path('dashboard_page') }}">Dashboard</a></li>
+        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Utilisateurs en ligne</li>
+      </ol>
+      <h6 class="font-weight-bolder text-white mb-0">Utilisateurs en ligne</h6>
+    </nav>
+    <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+      <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+        <div class="input-group">
+          <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
+          <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid py-4">
+  <!-- Search and Filters -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h6>Recherche et filtres</h6>
+        </div>
+        <div class="card-body px-3 py-3">
+          <form id="filterForm" class="row g-3 align-items-center">
+            <div class="col-md-4">
+              <label for="searchTerm" class="form-label">Recherche</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" id="searchTerm" name="search" placeholder="Nom, prénom, email...">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="roleFilter" class="form-label">Rôle</label>
+              <select class="form-select" id="roleFilter" name="role">
+                <option value="">Tous les rôles</option>
+                <option value="Admin">Admin</option>
+                <option value="Voyageurs">Voyageurs</option>
+                <option value="Entreprise">Entreprise</option>
+              </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-filter me-2"></i> Filtrer
+              </button>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" id="resetFilters" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-undo me-2"></i> Réinitialiser
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+          <h6>Utilisateurs actuellement en ligne</h6>
+          <div>
+            <button type="button" id="refreshButton" class="btn btn-sm btn-info me-2">
+              <i class="fas fa-sync-alt me-1"></i> Actualiser
+            </button>
+            <span class="badge bg-gradient-info">
+              Dernière mise à jour: <span id="lastUpdateTime">{{ currentTime|date('H:i:s') }}</span>
+            </span>
+          </div>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div id="loadingIndicator" class="text-center py-3 d-none">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="text-sm mt-2">Chargement des données...</p>
+          </div>
+          <div class="table-responsive p-0">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Utilisateur</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Rôle</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dernière activité</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                  <th class="text-secondary opacity-7"></th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                {% include 'dashAdmin/_online_users_table_rows.html.twig' with {'onlineUsers': onlineUsers} %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-end">
+        <a href="{{ path('dashboard_page') }}" class="btn btn-primary">
+          <i class="fas fa-arrow-left me-2"></i> Retour au tableau de bord
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer pt-3 mt-4">
+    <div class="container-fluid">
+      <div class="row align-items-center justify-content-lg-between">
+        <div class="col-lg-6 mb-lg-0 mb-4">
+          <div class="copyright text-center text-sm text-muted text-lg-start">
+            © {{ "now"|date("Y") }} Airmess
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const filterForm = document.getElementById('filterForm');
+  const resetButton = document.getElementById('resetFilters');
+  const refreshButton = document.getElementById('refreshButton');
+  const searchInput = document.getElementById('searchInput');
+  const usersTableBody = document.getElementById('usersTableBody');
+  const loadingIndicator = document.getElementById('loadingIndicator');
+  const lastUpdateTime = document.getElementById('lastUpdateTime');
+  
+  // Search with input in navbar
+  searchInput.addEventListener('keyup', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('searchTerm').value = this.value;
+      filterForm.dispatchEvent(new Event('submit'));
+    }
+  });
+  
+  // Filter form submission
+  filterForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Quick search from navbar syncs with filter form
+    if (searchInput.value !== document.getElementById('searchTerm').value) {
+      searchInput.value = document.getElementById('searchTerm').value;
+    }
+    
+    performSearch();
+  });
+  
+  // Reset filters
+  resetButton.addEventListener('click', function() {
+    filterForm.reset();
+    searchInput.value = '';
+    performSearch();
+  });
+  
+  // Refresh button
+  refreshButton.addEventListener('click', function() {
+    performSearch();
+  });
+  
+  // Function to perform AJAX search
+  function performSearch() {
+    // Show loading indicator
+    loadingIndicator.classList.remove('d-none');
+    usersTableBody.classList.add('opacity-50');
+    
+    // Get form data
+    const formData = new FormData(filterForm);
+    
+    // Make AJAX request
+    fetch('{{ path('admin_online_users_search') }}', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Update table with new data
+        usersTableBody.innerHTML = data.html;
+        
+        // Update timestamp
+        const now = new Date();
+        lastUpdateTime.textContent = now.toTimeString().split(' ')[0];
+      } else {
+        console.error('Error fetching data:', data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    })
+    .finally(() => {
+      // Hide loading indicator
+      loadingIndicator.classList.add('d-none');
+      usersTableBody.classList.remove('opacity-50');
+    });
+  }
+  
+  // Auto-refresh every 60 seconds
+  setInterval(performSearch, 60000);
+});
+</script>
+{% endblock %} 

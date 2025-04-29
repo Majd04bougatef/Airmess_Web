@@ -53,7 +53,7 @@
                   </tr>
                 {% else %}
                   {% for station in stations %}
-                    <tr>
+                    <tr data-station-id="{{ station.idS }}">
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-center">
@@ -94,11 +94,72 @@
               </tbody>
             </table>
           </div>
+          {% if stations is not empty %}
+            <div class="d-flex justify-content-center mt-4">
+              <nav aria-label="Page navigation">
+                <ul class="pagination">
+                  {% if currentPage > 1 %}
+                    <li class="page-item">
+                      <a class="page-link" href="{{ path('station_page', {'page': currentPage - 1}) }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                  {% endif %}
+                  
+                  {% for page in 1..totalPages %}
+                    <li class="page-item {{ page == currentPage ? 'active' : '' }}">
+                      <a class="page-link" href="{{ path('station_page', {'page': page}) }}">{{ page }}</a>
+                    </li>
+                  {% endfor %}
+                  
+                  {% if currentPage < totalPages %}
+                    <li class="page-item">
+                      <a class="page-link" href="{{ path('station_page', {'page': currentPage + 1}) }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </nav>
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+.pagination {
+  margin: 0;
+}
+
+.page-item.active .page-link {
+  background-color: #5e72e4;
+  border-color: #5e72e4;
+}
+
+.page-link {
+  color: #5e72e4;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dee2e6;
+  margin: 0 2px;
+  border-radius: 4px;
+}
+
+.page-link:hover {
+  color: #324cdd;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+</style>
 
 {% block javascripts %}
 <script>
@@ -126,41 +187,58 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function approveStation(stationId) {
-  if (confirm('Êtes-vous sûr de vouloir approuver cette station ?')) {
-    // Send approval request to backend
-    fetch(`/admin/station/${stationId}/approve`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Remove the row from the table
-        const row = document.querySelector(`tr[data-station-id="${stationId}"]`);
-        if (row) {
-          row.remove();
-        }
-        // Show success message
-        alert('Station approuvée avec succès !');
-        // Reload the page to update the table
-        location.reload();
-      } else {
-        alert('Erreur lors de l\'approbation de la station');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Une erreur est survenue');
-    });
-  }
+    if (confirm('Êtes-vous sûr de vouloir approuver cette station ?')) {
+        fetch(`/admin/stations/${stationId}/approuver`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': '{{ csrf_token('approuver-station') }}'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                alert('Station approuvée avec succès');
+                // Remove the row from the table
+                const row = document.querySelector(`tr[data-station-id="${stationId}"]`);
+                if (row) {
+                    row.remove();
+                }
+                // Check if table is empty
+                const tbody = document.querySelector('#stationsTable tbody');
+                if (tbody && tbody.children.length === 0) {
+                    // Add empty message row
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = `
+                        <td colspan="7" class="text-center py-4">
+                            <p class="text-sm mb-0">Aucune station en attente d'approbation</p>
+                        </td>
+                    `;
+                    tbody.appendChild(emptyRow);
+                }
+            } else {
+                alert(data.message || 'Une erreur est survenue lors de l\'approbation');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur est survenue lors de l\'approbation');
+        });
+    }
 }
 
 function showStationDetails(stationId) {
   // Redirect to station details page
-  window.location.href = `/admin/station/${stationId}`;
+  window.location.href = `/admin/stations/${stationId}/details`;
 }
 </script>
 {% endblock %}
 {% endblock %}
+

@@ -14,6 +14,18 @@
   
   <!-- CSS Files -->
   <link id="pagestyle" href="{{asset('css/argon-dashboard.css')}}" rel="stylesheet" />
+
+  <!-- JavaScript Dependencies -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    console.log("Template parent chargé");
+    $(document).ready(function() {
+      console.log("jQuery est chargé");
+    });
+  </script>
+
+  {% block stylesheets %}
   <style>
     body {
       background-color: #edf2f9;
@@ -63,10 +75,13 @@
       margin: 0;
       padding: 0;
       flex-grow: 1;
+      gap: 0.5rem;
     }
 
     .nav-item {
-      margin: 0 0.5rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
     }
 
     .nav-link {
@@ -81,6 +96,8 @@
       transition: all 0.2s ease;
       border-bottom: 2px solid transparent;
       position: relative;
+      white-space: nowrap;
+      gap: 0.5rem;
     }
 
     .nav-link:hover {
@@ -103,6 +120,12 @@
       margin-right: 0.5rem;
       width: 1.25rem;
       height: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .nav-link-text {
+      flex: 1;
+      white-space: nowrap;
     }
 
     .nav-link-icon img {
@@ -381,11 +404,17 @@
       .nav-menu {
         flex-direction: column;
         width: 100%;
+        gap: 0.25rem;
       }
       
       .nav-item {
         width: 100%;
         margin: 0.25rem 0;
+      }
+      
+      .nav-link {
+        width: 100%;
+        justify-content: flex-start;
       }
       
       .navbar-collapse {
@@ -458,6 +487,7 @@
       }
     }
   </style>
+  {% endblock %}
 </head>
 
 <body>
@@ -476,6 +506,14 @@
         
         <div class="collapse navbar-collapse d-lg-flex" id="navbarNav">
           <ul class="nav-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ path('app_dashboard_voyageurs') }}" id="dashboard-button" data-section="dashboard-section">
+                <span class="nav-link-icon">
+                  <i class="fas fa-home"></i>
+                </span>
+                <span class="nav-link-text">Dashboard</span>
+              </a>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ path('userVoyageurs_page') }}" id="user-button" data-section="user-section">
                 <span class="nav-link-icon">
@@ -503,8 +541,15 @@
                 Réserver Vélo
               </a>
               <div class="nav-submenu">
-                <a class="nav-submenu-item" href="{{ path('app_reservation_transport_station') }}" id="reserver-button" data-section="station-section">Reserver</a>
-                <a class="nav-submenu-item" href="{{ path('app_reservation_transport_index') }}" id="reservations-button" data-section="reservations-section">Mes reservations</a>
+                <a class="nav-submenu-item" href="{{ path('app_reservation_transport_station') }}" id="reserver-button" data-section="station-section">
+                  <i class="fas fa-plus-circle me-2"></i>Reserver
+                </a>
+                <a class="nav-submenu-item" href="{{ path('app_reservation_transport_index') }}" id="reservations-button" data-section="reservations-section">
+                  <i class="fas fa-list-alt me-2"></i>Mes reservations
+                </a>
+                <a class="nav-submenu-item" href="{{ path('app_voyageurs_statistiques') }}">
+                  <i class="fas fa-chart-bar me-2"></i>Mes Statistiques
+                </a>
               </div>
             </li>
             <li class="nav-item nav-item-dropdown">
@@ -533,12 +578,11 @@
                 Social Media
               </a>
             </li>
-            
           </ul>
           
           <div class="user-profile">
             <div class="user-info d-flex align-items-center">
-                <img src="{{ path('app_profile_image', {'filename': app.session.get('user_image') }) }}" 
+                <img src="{{ app.session.get('user_image') ? path('app_profile_image', {'filename': app.session.get('user_image')}) : path('app_profile_image') }}" 
                      alt="{{ app.session.get('user_name') }}" 
                      class="user-img" 
                      id="userDropdown" 
@@ -552,7 +596,7 @@
             <div class="dropdown-menu dropdown-menu-end shadow-sm" id="userMenu" style="min-width: 240px; padding: 0;">
               <div class="px-3 py-2 bg-light border-bottom">
                 <div class="d-flex align-items-center">
-                  <img src="{{ path('app_profile_image', {'filename': app.session.get('user_image') }) }}" 
+                  <img src="{{ app.session.get('user_image') ? path('app_profile_image', {'filename': app.session.get('user_image')}) : path('app_profile_image') }}" 
                        class="rounded-circle me-2" 
                        width="40" height="40"
                        alt="{{ app.session.get('user_name') }}"
@@ -746,6 +790,12 @@
           });
         });
       }
+      
+      // Social button
+      document.getElementById("social-button").addEventListener("click", function() {
+          loadPage("{{ path('socialVoyageurs_page') }}");
+          setActiveButton(this);
+      });
     });
   </script>
   

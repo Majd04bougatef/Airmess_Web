@@ -1,0 +1,202 @@
+<?php
+
+namespace App\Service;
+
+use App\Entity\User;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
+
+class EmailService
+{
+    private $mailer;
+    private $fromEmail;
+    private $logger;
+
+    public function __construct(
+        MailerInterface $mailer, 
+        ?LoggerInterface $logger = null, 
+        string $fromEmail = 'oussemabelhajbb22@gmail.com'
+    ) {
+        $this->mailer = $mailer;
+        $this->fromEmail = $fromEmail;
+        $this->logger = $logger;
+    }
+
+    public function sendWelcomeEmail(User $user): bool
+    {
+        try {
+            // Log attempt
+            if ($this->logger) {
+                $this->logger->info('Attempting to send welcome email to: ' . $user->getEmail());
+            } else {
+                error_log('Attempting to send welcome email to: ' . $user->getEmail());
+            }
+
+            $email = (new Email())
+                ->from(new Address($this->fromEmail, 'Airmess'))
+                ->to($user->getEmail())
+                ->subject('Bienvenue sur Airmess')
+                ->html($this->getWelcomeEmailTemplate($user));
+
+            $this->mailer->send($email);
+            
+            // Log success
+            if ($this->logger) {
+                $this->logger->info('Successfully sent welcome email to: ' . $user->getEmail());
+            } else {
+                error_log('Successfully sent welcome email to: ' . $user->getEmail());
+            }
+            
+            return true;
+        } catch (\Exception $e) {
+            // Log error
+            $errorMsg = 'Failed to send welcome email to ' . $user->getEmail() . ': ' . $e->getMessage();
+            
+            if ($this->logger) {
+                $this->logger->error($errorMsg);
+            } else {
+                error_log($errorMsg);
+            }
+            
+            return false;
+        }
+    }
+
+    public function sendVerificationCode(string $emailAddress, string $code): bool
+    {
+        try {
+            // Log detailed attempt information
+            $logMessage = 'Attempting to send verification code to: ' . $emailAddress . ' with code: ' . $code;
+            if ($this->logger) {
+                $this->logger->info($logMessage);
+            } else {
+                error_log($logMessage);
+            }
+
+            // Ensure email address is properly formatted
+            if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
+                $errorMsg = 'Invalid email format: ' . $emailAddress;
+                if ($this->logger) {
+                    $this->logger->error($errorMsg);
+                } else {
+                    error_log($errorMsg);
+                }
+                return false;
+            }
+
+            // Create email message
+            try {
+                $emailContent = $this->getVerificationEmailTemplate($code);
+                
+                $emailMessage = (new Email())
+                    ->from(new Address($this->fromEmail, 'Airmess'))
+                    ->to($emailAddress)
+                    ->subject('Vérifiez votre adresse email - Airmess')
+                    ->html($emailContent);
+                
+                if ($this->logger) {
+                    $this->logger->debug('Email message created successfully');
+                } else {
+                    error_log('Email message created successfully');
+                }
+            } catch (\Exception $e) {
+                $errorMsg = 'Error creating email message: ' . $e->getMessage();
+                if ($this->logger) {
+                    $this->logger->error($errorMsg);
+                } else {
+                    error_log($errorMsg);
+                }
+                return false;
+            }
+
+            // Send email with detailed result logging
+            try {
+                // Try to send the email
+                $this->mailer->send($emailMessage);
+                
+                // Log success with detailed information
+                $successMsg = 'Successfully sent verification code to: ' . $emailAddress . ' with code: ' . $code;
+                if ($this->logger) {
+                    $this->logger->info($successMsg);
+                } else {
+                    error_log($successMsg);
+                }
+                
+                return true;
+            } catch (\Exception $e) {
+                // Log detailed error information from mailer
+                $errorMsg = 'Mailer error sending to ' . $emailAddress . ': ' . $e->getMessage();
+                $errorTrace = $e->getTraceAsString();
+                
+                if ($this->logger) {
+                    $this->logger->error($errorMsg);
+                    $this->logger->error('Error trace: ' . $errorTrace);
+                } else {
+                    error_log($errorMsg);
+                    error_log('Error trace: ' . $errorTrace);
+                }
+                
+                // FIXED: Return false to indicate failure
+                return false;
+            }
+        } catch (\Exception $e) {
+            // Log general error
+            $errorMsg = 'General error sending verification code to ' . $emailAddress . ': ' . $e->getMessage();
+            $errorTrace = $e->getTraceAsString();
+            
+            if ($this->logger) {
+                $this->logger->error($errorMsg);
+                $this->logger->error('Error trace: ' . $errorTrace);
+            } else {
+                error_log($errorMsg);
+                error_log('Error trace: ' . $errorTrace);
+            }
+            
+            return false;
+        }
+    }
+
+    public function sendResetPasswordCode(string $emailAddress, string $code): bool
+    {
+        try {
+            // Log attempt
+            if ($this->logger) {
+                $this->logger->info('Attempting to send password reset code to: ' . $emailAddress);
+            } else {
+                error_log('Attempting to send password reset code to: ' . $emailAddress);
+            }
+
+            $emailMessage = (new Email())
+                ->from(new Address($this->fromEmail, 'Airmess'))
+                ->to($emailAddress)
+                ->subject('Réinitialisation de votre mot de passe - Airmess')
+                ->html($this->getResetPasswordEmailTemplate($code));
+
+            $this->mailer->send($emailMessage);
+            
+            // Log success
+            if ($this->logger) {
+                $this->logger->info('Successfully sent password reset code to: ' . $emailAddress);
+            } else {
+                error_log('Successfully sent password reset code to: ' . $emailAddress);
+            }
+            
+            return true;
+        } catch (\Exception $e) {
+            // Log detailed error information
+            $errorMsg = 'Failed to send password reset code to ' . $emailAddress . ': ' . $e->getMessage();
+            $errorTrace = $e->getTraceAsString();
+            
+            if ($this->logger) {
+                $this->logger->error($errorMsg);
+                $this->logger->error('Error trace: ' . $errorTrace);
+            } else {
+                error_log($errorMsg);
+                error_log('Error trace: ' . $errorTrace);
+            }
+            
+            return false;
+        }
+    }

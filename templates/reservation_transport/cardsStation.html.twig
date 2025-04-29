@@ -156,6 +156,8 @@
         margin-bottom: 2rem;
         padding-bottom: 1rem;
         border-bottom: 1px solid #e9ecef;
+        position: relative;
+        padding-right: 180px;
     }
 
     .header-content {
@@ -279,11 +281,41 @@
             transform: scale(1);
         }
     }
+
+    .map-view-btn {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+    
+    .map-view-btn:hover {
+        background-color: #45a049;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .map-view-btn i {
+        font-size: 1.1em;
+    }
 </style>
 
 <div class="page-header">
     <div class="header-content">
         <h2 class="page-title">Stations disponibles</h2>
+        <a href="{{ path('app_stations_map') }}" class="btn btn-primary map-view-btn">
+            <i class="fas fa-map-marked-alt"></i>
+            Voir sur la carte
+        </a>
         <div class="filter-section">
             <div class="filter-title">
                 <i class="fas fa-filter"></i>

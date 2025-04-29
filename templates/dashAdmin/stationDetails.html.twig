@@ -1,0 +1,128 @@
+{% extends 'dashAdmin/dashboard.html.twig' %}
+
+{% block title %}Détails de la Station{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+  <div class="container-fluid py-1 px-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="{{ path('station_page') }}">Stations</a></li>
+        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Détails de la Station</li>
+      </ol>
+      <h6 class="font-weight-bolder text-white mb-0">Détails de la Station</h6>
+    </nav>
+  </div>
+</nav>
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6>Détails de la Station: {{ station.nom }}</h6>
+            <a href="{{ path('station_page') }}" class="btn btn-sm btn-primary">
+              <i class="fas fa-arrow-left me-1"></i> Retour
+            </a>
+          </div>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="row p-4">
+            <div class="col-md-6">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">Informations de Base</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p class="text-sm mb-1"><strong>Nom:</strong></p>
+                      <p class="text-sm mb-1"><strong>Capacité:</strong></p>
+                      <p class="text-sm mb-1"><strong>Vélos Disponibles:</strong></p>
+                      <p class="text-sm mb-1"><strong>Type de Vélo:</strong></p>
+                      <p class="text-sm mb-1"><strong>Prix par Heure:</strong></p>
+                      <p class="text-sm mb-1"><strong>Pays:</strong></p>
+                    </div>
+                    <div class="col-md-6">
+                      <p class="text-sm mb-1">{{ station.nom }}</p>
+                      <p class="text-sm mb-1">{{ station.capacite }}</p>
+                      <p class="text-sm mb-1">{{ station.nombreVelo }}</p>
+                      <p class="text-sm mb-1">{{ station.typeVelo }}</p>
+                      <p class="text-sm mb-1">{{ station.prixHeure }}€</p>
+                      <p class="text-sm mb-1">{{ station.pays }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">Localisation</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p class="text-sm mb-1"><strong>Latitude:</strong></p>
+                      <p class="text-sm mb-1"><strong>Longitude:</strong></p>
+                    </div>
+                    <div class="col-md-6">
+                      <p class="text-sm mb-1">{{ station.latitude }}</p>
+                      <p class="text-sm mb-1">{{ station.longitude }}</p>
+                    </div>
+                  </div>
+                  <div id="map" style="height: 300px; width: 100%; margin-top: 20px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row p-4">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">Informations du Propriétaire</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p class="text-sm mb-1"><strong>Nom:</strong></p>
+                      <p class="text-sm mb-1"><strong>Prénom:</strong></p>
+                      <p class="text-sm mb-1"><strong>Email:</strong></p>
+                    </div>
+                    <div class="col-md-6">
+                      <p class="text-sm mb-1">{{ station.user.name }}</p>
+                      <p class="text-sm mb-1">{{ station.user.prenom }}</p>
+                      <p class="text-sm mb-1">{{ station.user.email }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    var map = L.map('map').setView([{{ station.latitude }}, {{ station.longitude }}], 15);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Add marker for the station
+    L.marker([{{ station.latitude }}, {{ station.longitude }}])
+        .addTo(map)
+        .bindPopup('{{ station.nom }}')
+        .openPopup();
+});
+</script>
+{% endblock %}
+{% endblock %} 

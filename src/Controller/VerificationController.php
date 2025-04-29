@@ -11,21 +11,25 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class VerificationController extends AbstractController
 {
     private $verificationService;
     private $entityManager;
     private $emailService;
+    private $requestStack;
 
     public function __construct(
         VerificationService $verificationService,
         EntityManagerInterface $entityManager,
-        EmailService $emailService
+        EmailService $emailService,
+        RequestStack $requestStack
     ) {
         $this->verificationService = $verificationService;
         $this->entityManager = $entityManager;
         $this->emailService = $emailService;
+        $this->requestStack = $requestStack;
     }
 
     #[Route('/verify', name: 'app_verify')]
@@ -105,6 +109,47 @@ class VerificationController extends AbstractController
         }
         
         return $this->redirectToRoute('app_verify');
+    }
+
+    #[Route('/show-verification-code/{email}', name: 'app_show_verification_code')]
+    public function showVerificationCode(string $email): Response
+    {
+        // Security check - only show in dev environment
+        if ($_ENV['APP_ENV'] !== 'dev') {
+            throw $this->createNotFoundException('Not found');
+        }
+        
+        // Get the verification data from session
+        $verificationData = $this->requestStack->getSession()->get('verification_data');
+        
+        if (!$verificationData || $verificationData['email'] !== $email) {
+            // In development, when the session data is not found, generate a new code
+            // This helps with testing when session might have been lost or expired
+            $code = $this->verificationService->generateCode($email);
+            $verificationData = $this->requestStack->getSession()->get('verification_data');
+            
+            if (!$verificationData) {
+                return new Response('Failed to generate verification code for ' . $email);
+            }
+        }
+        
+        $timeLeft = max(0, $verificationData['expires_at'] - time());
+        
+        return new Response(
+            '<html><body>
+                <h1>Verification Code for ' . $email . '</h1>
+                <p>Code: <strong style="font-size: 24px;">' . $verificationData['code'] . '</strong></p>
+                <p>Time left: ' . $timeLeft . ' seconds</p>
+                <hr>
+                <p>This page is for testing purposes only.</p>
+                <form action="' . $this->generateUrl('app_verify') . '" method="post">
+                    <input type="hidden" name="verification_code" value="' . $verificationData['code'] . '">
+                    <button type="submit">Submit this code automatically</button>
+                </form>
+            </body></html>',
+            Response::HTTP_OK,
+            ['Content-Type' => 'text/html']
+        );
     }
 
     private function createUserFromSession(array $userData): User

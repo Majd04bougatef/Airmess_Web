@@ -17,12 +17,13 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Stripe\Stripe;
 use Stripe\Charge;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[Route('/reservation/transport')]
 final class ReservationTransportController extends AbstractController
 {
     #[Route(name: 'app_reservation_transport_index', methods: ['GET'])]
-    public function index(ReservationTransportRepository $reservationTransportRepository, SessionInterface $session, UserRepository $userRepository): Response
+    public function index(ReservationTransportRepository $reservationTransportRepository,SessionInterface $session,UserRepository $userRepository,StationRepository $stationRepository,EntityManagerInterface $entityManager,PaginatorInterface $paginator,Request $request): Response
     {
         if (!$session->has('user_id')) {
             return $this->redirectToRoute('app_login');
@@ -31,11 +32,34 @@ final class ReservationTransportController extends AbstractController
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
         
-      
-        $reservations = $reservationTransportRepository->findByUserId($user->getIdU());
+        $query = $reservationTransportRepository->createQueryBuilder('r')
+            ->andWhere('r.user = :userId')
+            ->setParameter('userId', $userId)
+            ->orderBy('r.dateRes', 'DESC')
+            ->getQuery();
+        
+        $reservations = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            20 
+        );
+        
+        $finishedReservations = $reservationTransportRepository->findFinishedReservations();
+
+        foreach ($finishedReservations as $reservation) {
+            $stationRepository->incrementNbVelosDispo($reservation->getStation()->getIdS(), $reservation->getNombreVelo());
+            
+            $reservation->setStatut('terminé');
+            $entityManager->persist($reservation);
+        }
+        
+        if (count($finishedReservations) > 0) {
+            $entityManager->flush();
+        }
 
         return $this->render('reservation_transport/index.html.twig', [
-            'reservation_transports' => $reservations,
+            'reservations' => $reservations,
+            'finished_reservations' => $finishedReservations,
         ]);
     }
 
@@ -593,12 +617,9 @@ final class ReservationTransportController extends AbstractController
         // Get the station owner
         $stationOwner = $reservation->getStation()->getUser();
         
-        // Get messages between the current user and the station owner
+        // Get messages for this specific reservation reference
         $messages = $entityManager->getRepository('App\Entity\Message')->findBy(
-            [
-                'sender' => [$currentUser->getIdU(), $stationOwner->getIdU()],
-                'receiver' => [$currentUser->getIdU(), $stationOwner->getIdU()]
-            ],
+            ['refRes' => $reservation->getReference()],
             ['dateM' => 'ASC']
         );
         
@@ -653,11 +674,83 @@ final class ReservationTransportController extends AbstractController
         $message->setSender($currentUser);
         $message->setReceiver($stationOwner);
         $message->setDateM(new \DateTime());
+        $message->setRefRes($reservation->getReference()); // Set the reservation reference
         
         // Save to database
         $entityManager->persist($message);
         $entityManager->flush();
         
         return $this->redirectToRoute('app_reservation_transport_chat', ['id' => $reservation->getId()]);
+    }
+
+    #[Route('/ticket/{reference}', name: 'app_reservation_transport_ticket', methods: ['GET'])]
+    public function generateTicket(string $reference, ReservationTransportRepository $reservationTransportRepository): Response
+    {
+        $reservation = $reservationTransportRepository->findOneBy(['reference' => $reference]);
+        
+        if (!$reservation) {
+            throw $this->createNotFoundException('Réservation non trouvée');
+        }
+
+        $html = $this->renderView('reservation_transport/ticket.html.twig', [
+            'reservation' => $reservation,
+        ]);
+
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A5', 'portrait');
+        $dompdf->render();
+
+        $response = new Response($dompdf->output());
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="ticket-' . $reservation->getReference() . '.pdf"');
+
+        return $response;
+    }
+
+    #[Route('/stations/map', name: 'app_stations_map')]
+    public function stationsMap(StationRepository $stationRepository): Response
+    {
+        try {
+            $stations = $stationRepository->findAll();
+            
+            // Transform stations to include only necessary data and validate coordinates
+            $stationsData = array_map(function($station) {
+                return [
+                    'idS' => $station->getIdS(),
+                    'nom' => $station->getNom(),
+                    'latitude' => (float)$station->getLatitude(),
+                    'longitude' => (float)$station->getLongitude(),
+                    'nombreVelo' => $station->getNombreVelo(),
+                    'capacite' => $station->getCapacite(),
+                    'prixHeure' => $station->getPrixHeure(),
+                    'typeVelo' => $station->getTypeVelo(),
+                    'rating' => $station->getRating() ?? 0,
+                    'numberRaters' => $station->getNumberRaters() ?? 0
+                ];
+            }, $stations);
+
+            // Filter out stations with invalid coordinates
+            $stationsData = array_filter($stationsData, function($station) {
+                return $station['latitude'] != 0 && $station['longitude'] != 0 
+                    && $station['latitude'] !== null && $station['longitude'] !== null;
+            });
+
+            // Debug log
+            error_log('Number of stations after filtering: ' . count($stationsData));
+            error_log('Stations data: ' . json_encode(array_values($stationsData)));
+
+            return $this->render('reservation_transport/stations_map.html.twig', [
+                'stations' => array_values($stationsData) // Reset array keys after filtering
+            ]);
+        } catch (\Exception $e) {
+            // Log the error
+            error_log('Error in stationsMap: ' . $e->getMessage());
+            
+            // Return empty stations array if there's an error
+            return $this->render('reservation_transport/stations_map.html.twig', [
+                'stations' => []
+            ]);
+        }
     }
 }
