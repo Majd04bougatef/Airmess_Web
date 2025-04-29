@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problème signalé pour votre station</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #4338ca;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+        h1 {
+            color: #4338ca;
+            margin-top: 0;
+        }
+        .details {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-left: 3px solid #4338ca;
+        }
+        .description {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Airmess - Problème Signalé dans l'approuve</h2>
+        </div>
+        <div class="content">
+            <h1>Problème avec votre station lors du approuve</h1>
+            
+            <p>Bonjour,</p>
+            
+            <p>Un administrateur a signalé un problème avec l'une de vos stations. Vous trouverez ci-dessous les détails du rapport.</p>
+            
+            <div class="details">
+                <h3>Détails de la station:</h3>
+                <p><strong>Nom:</strong> {{ station.nom }}</p>
+                <p><strong>ID:</strong> {{ station.idS }}</p>
+                <p><strong>Localisation:</strong> {{ station.latitude }}, {{ station.longitude }}</p>
+                <p><strong>Pays:</strong> {{ station.pays }}</p>
+                <p><strong>Capacité:</strong> {{ station.capacite }}</p>
+                <p><strong>Type de vélo:</strong> {{ station.typeVelo }}</p>
+                <p><strong>Date du rapport:</strong> {{ date|date('d/m/Y H:i') }}</p>
+            </div>
+            
+            <h3>Description du problème:</h3>
+            <div class="description">
+                {{ description|nl2br }}
+            </div>
+            
+            <p>Veuillez prendre les mesures nécessaires pour résoudre ce problème dès que possible. Si vous avez des questions, n'hésitez pas à contacter notre équipe d'assistance.</p>
+            
+            <p>Cordialement,<br>L'équipe Airmess</p>
+        </div>
+        <div class="footer">
+            <p>Ce message a été envoyé automatiquement. Merci de ne pas y répondre directement.</p>
+            <p>&copy; {{ "now"|date("Y") }} Airmess. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html> 
