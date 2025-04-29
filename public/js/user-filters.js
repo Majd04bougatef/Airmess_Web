@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const exportExcelButton = document.getElementById('exportExcelButton');
     const exportPdfButton = document.getElementById('exportPdfButton');
     
+    // Store current page for pagination
+    let currentPage = 1;
+    
     console.log('Filter elements found:', {
         roleFilters: roleFilterRadios.length,
         statusFilters: statusFilterRadios.length,
@@ -95,6 +98,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Apply filters function
     function applyFilters() {
         console.log('Applying filters');
+        // Reset to page 1 when filters change
+        currentPage = 1;
         loadPageWithFilters(1);
     }
     
@@ -124,13 +129,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadPageWithFilters(page) {
         console.log('Loading page with filters, page:', page);
         
+        // Update current page
+        currentPage = page || 1;
+        
         // Get filter values
         const roleFilter = document.querySelector('input[name="roleFilter"]:checked')?.value || '';
         const statusFilter = document.querySelector('input[name="statusFilter"]:checked')?.value || '';
         const searchText = (searchInput ? searchInput.value.trim() : '') || 
                          (tableSearchInput ? tableSearchInput.value.trim() : '');
         
-        console.log('Filter values:', { role: roleFilter, status: statusFilter, search: searchText });
+        console.log('Filter values:', { role: roleFilter, status: statusFilter, search: searchText, page: currentPage });
         
         // Create JSON data for the request
         const filterData = {
@@ -139,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 status: statusFilter,
                 search: searchText
             },
-            page: page
+            page: currentPage
         };
         
         fetchFilteredUsers(filterData);
@@ -200,6 +208,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (userCountDisplay && data.totalItems !== undefined) {
                 userCountDisplay.textContent = data.totalItems;
             }
+            
+            // Update pagination info if available
+            const paginationInfoElement = document.querySelector('.pagination-info');
+            if (paginationInfoElement && data.paginationInfo) {
+                paginationInfoElement.innerHTML = data.paginationInfo;
+            } else if (paginationInfoElement && data.totalItems) {
+                const currentPage = data.currentPage || 1;
+                const itemsPerPage = 10; // Default or get from response
+                const start = (currentPage - 1) * itemsPerPage + 1;
+                const end = Math.min(currentPage * itemsPerPage, data.totalItems);
+                paginationInfoElement.innerHTML = `Affichage de <span class="fw-bold">${end - start + 1}</span> sur <span class="fw-bold">${data.totalItems}</span> utilisateur(s)`;
+            }
         })
         .catch(error => {
             console.error('Error:', error);
@@ -244,13 +264,51 @@ document.addEventListener('DOMContentLoaded', function() {
         const searchText = (searchInput ? searchInput.value.trim() : '') || 
                          (tableSearchInput ? tableSearchInput.value.trim() : '');
         
-        // Set form values
+        // Set filter values in the form (these will be used if the user confirms in the modal)
         document.getElementById('roleFilterValue').value = roleFilter;
         document.getElementById('statusFilterValue').value = statusFilter;
         document.getElementById('searchFilterValue').value = searchText;
         
-        // Submit the form
-        document.getElementById('pdfExportForm').submit();
+        // Show the PDF export options modal instead of submitting directly
+        const pdfModal = new bootstrap.Modal(document.getElementById('pdfExportModal'));
+        pdfModal.show();
+    }
+    
+    // Initialize the PDF export confirmation button
+    const confirmPdfExportBtn = document.getElementById('confirmPdfExport');
+    if (confirmPdfExportBtn) {
+        confirmPdfExportBtn.addEventListener('click', function() {
+            // Transfer values from the modal form to the hidden form
+            document.getElementById('pdfTitleValue').value = document.getElementById('pdfTitle').value;
+            
+            // Get orientation
+            const orientation = document.querySelector('input[name="orientation"]:checked')?.value || 'landscape';
+            document.getElementById('pdfOrientationValue').value = orientation;
+            
+            // Get theme
+            const theme = document.querySelector('input[name="theme"]:checked')?.value || 'default';
+            document.getElementById('pdfThemeValue').value = theme;
+            
+            // Get checkbox values
+            document.getElementById('pdfShowTimestampValue').value = document.getElementById('showTimestamp').checked ? '1' : '0';
+            document.getElementById('pdfShowFiltersValue').value = document.getElementById('showFilters').checked ? '1' : '0';
+            
+            // Get column selection values
+            document.getElementById('pdfIncludeUserColumnValue').value = document.getElementById('includeUserColumn').checked ? '1' : '0';
+            document.getElementById('pdfIncludeRoleColumnValue').value = document.getElementById('includeRoleColumn').checked ? '1' : '0';
+            document.getElementById('pdfIncludeStatusColumnValue').value = document.getElementById('includeStatusColumn').checked ? '1' : '0';
+            document.getElementById('pdfIncludeDateColumnValue').value = document.getElementById('includeDateColumn').checked ? '1' : '0';
+            document.getElementById('pdfIncludePhoneColumnValue').value = document.getElementById('includePhoneColumn').checked ? '1' : '0';
+            
+            // Submit the form
+            document.getElementById('pdfExportForm').submit();
+            
+            // Close the modal
+            const pdfModal = bootstrap.Modal.getInstance(document.getElementById('pdfExportModal'));
+            if (pdfModal) {
+                pdfModal.hide();
+            }
+        });
     }
     
     // Attach pagination event listeners
@@ -261,6 +319,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const page = this.getAttribute('data-page');
                 if (page) {
                     loadPageWithFilters(parseInt(page));
+                    
+                    // Update active class on pagination
+                    document.querySelectorAll('.page-item').forEach(item => item.classList.remove('active'));
+                    this.parentNode.classList.add('active');
+                    
+                    // Scroll to top of the table
+                    document.querySelector('.card').scrollIntoView({behavior: 'smooth'});
                 }
             });
         });
