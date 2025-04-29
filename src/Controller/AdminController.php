@@ -28,6 +28,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Service\EmailService;
 
 
 class AdminController extends AbstractController
@@ -1037,7 +1038,8 @@ class AdminController extends AbstractController
     #[Route('/UserPage/activate/{id_U}', name: 'admin_user_activate', methods: ['POST'])]
     public function activateUser(
         User $user, 
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        EmailService $emailService
     ): Response
     {
         try {
@@ -1047,10 +1049,20 @@ class AdminController extends AbstractController
             // Save changes to database
             $entityManager->flush();
             
+            // Try to send reactivation email to the user
+            $emailSent = false;
+            try {
+                $emailSent = $emailService->sendReactivationEmail($user);
+            } catch (\Exception $e) {
+                // Log the email error but don't interrupt the activation process
+                error_log('Error sending reactivation email: ' . $e->getMessage());
+            }
+            
             return new JsonResponse([
                 'success' => true,
-                'message' => 'L\'utilisateur a été réactivé avec succès',
-                'userName' => $user->getPrenom() . ' ' . $user->getName()
+                'message' => 'L\'utilisateur a été réactivé avec succès' . ($emailSent ? ' et un email de notification a été envoyé' : ' mais l\'email n\'a pas pu être envoyé'),
+                'userName' => $user->getPrenom() . ' ' . $user->getName(),
+                'emailSent' => $emailSent
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([

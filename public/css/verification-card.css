@@ -1,0 +1,107 @@
+/*--------------------------------------------------------------
+# Verification Card Layout Styles
+--------------------------------------------------------------*/
+/* Ensure the body takes full height and center content for these pages */
+body.verification-page-layout {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa; /* Optional: light background */
+}
+
+.verification-page-layout .center-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; /* Use min-height for flexibility */
+    padding: 1rem; /* Add some padding */
+}
+
+/* Add styling for the card */
+.verification-page-layout .verification-card {
+    max-width: 500px;
+    width: 100%;
+    border: none; /* Remove default border */
+    border-radius: 0.75rem; /* Rounded corners */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Add shadow */
+    overflow: hidden; /* Ensure header radius is applied */
+    background-color: #ffffff; /* Default background */
+}
+
+/* Style for the gradient header */
+.verification-page-layout .gradient-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Your desired gradient */
+    color: white;
+    border-bottom: none; /* Remove border between header and body */
+    padding: 2rem 1.5rem; /* Adjust padding */
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+    text-align: center;
+}
+
+.verification-page-layout .gradient-card-header img {
+    margin-bottom: 1rem; /* Space below logo */
+}
+
+.verification-page-layout .gradient-card-header h1,
+.verification-page-layout .gradient-card-header h4 { /* Target h1 or h4 */
+    font-weight: 500; /* Adjust font weight */
+    color: white; /* Ensure text is white */
+    margin-bottom: 0;
+}
+
+.verification-page-layout .verification-card .card-body {
+    padding: 2rem 1.5rem; /* Adjust padding */
+}
+
+/* Add some basic styling for the form elements inside the card */
+.verification-page-layout .verification-card .form-control {
+    margin-bottom: 1rem; /* Add space between form fields */
+    padding: 0.75rem 1rem; /* Adjust input padding */
+    border-radius: 0.5rem; /* Rounded input fields */
+    border: 1px solid #ced4da; /* Add a default border */
+}
+
+/* Style labels if needed */
+.verification-page-layout .verification-card label {
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 500;
+}
+
+ /* Style for the primary button inside the card */
+.verification-page-layout .verification-card .btn-primary {
+     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Match header gradient */
+     border: none;
+     padding: 0.75rem 1.5rem;
+     border-radius: 0.5rem;
+     font-weight: 500;
+     width: 100%; /* Make button full width */
+     margin-top: 1rem; /* Add space above button */
+     color: white;
+     cursor: pointer;
+     transition: opacity 0.2s ease-in-out;
+}
+
+.verification-page-layout .verification-card .btn-primary:hover {
+    opacity: 0.9; /* Slight fade on hover */
+    color: white;
+}
+
+/* Style for link buttons inside the card */
+.verification-page-layout .verification-card .btn-link {
+    color: #6c757d; /* Standard link color */
+    text-decoration: none;
+}
+
+.verification-page-layout .verification-card .btn-link:hover {
+    text-decoration: underline;
+}
+
+/* Hide default header/footer when verification layout is active */
+/* Add this class to body tag in the specific twig template */
+body.verification-page-layout #header,
+body.verification-page-layout #footer,
+body.verification-page-layout .main { /* Hide default main if necessary */
+    display: none !important; /* Use important if necessary to override base styles */
+}
