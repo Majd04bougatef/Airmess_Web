@@ -84,3 +84,9 @@ services:
         arguments:
             $uploadsDirectory: '%uploads_directory%'
 
+    App\Service\TwilioService:
+        arguments:
+            $accountSid: '%env(default::TWILIO_ACCOUNT_SID)%'
+            $authToken: '%env(default::TWILIO_AUTH_TOKEN)%'
+            $fromNumber: '%env(default::TWILIO_PHONE_NUMBER)%'
+
