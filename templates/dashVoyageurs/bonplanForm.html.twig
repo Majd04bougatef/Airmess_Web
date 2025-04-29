@@ -51,6 +51,23 @@
               <small class="form-text text-muted">Format: latitude, longitude</small>
             </div>
           </div>
+          
+          <!-- Ajout de la section météo -->
+          <div class="weather-info mt-3" id="weatherInfo" style="display: none;">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Météo actuelle</h5>
+                <div class="d-flex align-items-center">
+                  <img src="" alt="Météo" id="weatherIcon" class="weather-icon me-2" style="width: 50px; height: 50px;">
+                  <div>
+                    <span class="temperature" id="temperature"></span>
+                    <span class="weather-description" id="weatherDescription"></span>
+                  </div>
+                </div>
+                <div class="weather-recommendation mt-2" id="weatherRecommendation"></div>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div class="form-spacer"></div>
@@ -309,6 +326,34 @@
     font-size: 0.875em;
     color: #6c757d;
   }
+
+  .weather-info {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    padding: 8px;
+  }
+  
+  .weather-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .temperature {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #344767;
+  }
+  
+  .weather-description {
+    font-size: 0.9rem;
+    color: #67748e;
+    margin-left: 8px;
+  }
+  
+  .weather-recommendation .badge {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
 </style>
 
 <!-- Ajout des CSS Leaflet -->
@@ -351,10 +396,79 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCoordinates(latlng);
   }
   
-  // Mettre à jour le champ de texte avec les coordonnées
+  // Fonction pour mettre à jour les coordonnées
   function updateCoordinates(latlng) {
     document.getElementById('localisation').value = latlng.lat.toFixed(6) + ', ' + latlng.lng.toFixed(6);
     validateField('localisation');
+    // Appeler la fonction pour mettre à jour la météo
+    updateWeather(latlng.lat, latlng.lng);
+  }
+  
+  // Fonction pour mettre à jour la météo
+  function updateWeather(lat, lon) {
+    fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+      .then(response => response.json())
+      .then(data => {
+        const weatherInfo = document.getElementById('weatherInfo');
+        const weatherIcon = document.getElementById('weatherIcon');
+        const temperature = document.getElementById('temperature');
+        const weatherDescription = document.getElementById('weatherDescription');
+        const weatherRecommendation = document.getElementById('weatherRecommendation');
+
+        try {
+          weatherInfo.style.display = 'block';
+          
+          // Vérifier si les données sont disponibles
+          if (data && data.weather && data.weather[0] && data.main) {
+            weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+            temperature.textContent = `${Math.round(data.main.temp)}°C`;
+            weatherDescription.textContent = data.weather[0].description;
+
+            // Ajouter la recommandation météo
+            let recommendationClass = '';
+            let recommendationText = '';
+            switch(data.recommendation) {
+              case 'good':
+                recommendationClass = 'bg-success';
+                recommendationText = 'Idéal pour cette activité';
+                break;
+              case 'cold':
+                recommendationClass = 'bg-info';
+                recommendationText = 'Temps froid';
+                break;
+              case 'hot':
+                recommendationClass = 'bg-warning';
+                recommendationText = 'Temps chaud';
+                break;
+              case 'rainy':
+                recommendationClass = 'bg-primary';
+                recommendationText = 'Pluvieux';
+                break;
+              case 'snowy':
+                recommendationClass = 'bg-secondary';
+                recommendationText = 'Neigeux';
+                break;
+              default:
+                recommendationClass = 'bg-secondary';
+                recommendationText = 'Information non disponible';
+            }
+            weatherRecommendation.innerHTML = `<span class="badge ${recommendationClass}"><i class="fas fa-info-circle me-1"></i> ${recommendationText}</span>`;
+          } else {
+            // Afficher un message par défaut si les données ne sont pas disponibles
+            weatherIcon.src = `https://openweathermap.org/img/wn/01d@2x.png`;
+            temperature.textContent = `20°C`;
+            weatherDescription.textContent = 'Données non disponibles';
+            weatherRecommendation.innerHTML = `<span class="badge bg-secondary"><i class="fas fa-info-circle me-1"></i> Information non disponible</span>`;
+          }
+        } catch (error) {
+          console.error('Erreur lors du traitement des données météo:', error);
+          weatherInfo.style.display = 'none';
+        }
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération de la météo:', error);
+        document.getElementById('weatherInfo').style.display = 'none';
+      });
   }
   
   // Ajouter un marqueur lorsqu'on clique sur la carte

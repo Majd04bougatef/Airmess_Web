@@ -25,8 +25,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Repository\ReservationRepository;
-use App\Repository\ReservationTransportRepository;
-use App\Repository\StationRepository;
+
+use App\Service\WeatherService;
 
 class VoyageursController extends AuthenticatedController
 {
@@ -97,8 +97,7 @@ class VoyageursController extends AuthenticatedController
     }
 
     #[Route('/BonplanVoyageursPage', name: 'bonplanVoyageurs_page')]
-
-    public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager)
+    public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager, WeatherService $weatherService)
     {
         // Récupérer tous les bons plans
         $bonplans = $bonPlanRepository->findAll();
@@ -107,6 +106,9 @@ class VoyageursController extends AuthenticatedController
         $ratings = [];
         $reviewsCount = [];
         $reviewsByBonPlan = [];
+        $weatherData = [];
+        $weatherRecommendations = [];
+        $seasonalActivities = [];
         
         foreach ($bonplans as $bonplan) {
             // Requête pour calculer la note moyenne
@@ -137,6 +139,19 @@ class VoyageursController extends AuthenticatedController
             ->setParameter('bonplanId', $bonplan->getIdP())
             ->getResult();
             
+            // Récupérer les données météo pour la localisation du bon plan
+            try {
+                $weather = $weatherService->getCurrentWeather($bonplan->getLocalisation());
+                $weatherData[$bonplan->getIdP()] = $weather;
+                $weatherRecommendations[$bonplan->getIdP()] = $weatherService->getWeatherRecommendation($weather);
+                $seasonalActivities[$bonplan->getIdP()] = $weatherService->isSeasonalActivity($bonplan->getTypePlace());
+            } catch (\Exception $e) {
+                // En cas d'erreur, on met des valeurs par défaut
+                $weatherData[$bonplan->getIdP()] = null;
+                $weatherRecommendations[$bonplan->getIdP()] = 'unknown';
+                $seasonalActivities[$bonplan->getIdP()] = false;
+            }
+            
             // Stocker les résultats
             $ratings[$bonplan->getIdP()] = $averageRating ? round($averageRating, 1) : 0;
             $reviewsCount[$bonplan->getIdP()] = $count;
@@ -148,7 +163,10 @@ class VoyageursController extends AuthenticatedController
             'bonplans' => $bonplans,
             'ratings' => $ratings,
             'reviewsCount' => $reviewsCount,
-            'reviewsByBonPlan' => $reviewsByBonPlan
+            'reviewsByBonPlan' => $reviewsByBonPlan,
+            'weatherData' => $weatherData,
+            'weatherRecommendations' => $weatherRecommendations,
+            'seasonalActivities' => $seasonalActivities
         ]);
     }
 
@@ -585,9 +603,17 @@ class VoyageursController extends AuthenticatedController
     }
 
     // Add this new method to serve user profile images
-    #[Route('/profile-image/{filename}', name: 'app_profile_image')]
-    public function serveProfileImage(string $filename): Response
+    #[Route('/profile-image/{filename}', name: 'app_profile_image', requirements: ['filename' => '.+'])]
+    public function serveProfileImage(?string $filename = null): Response
     {
+        // Si filename est null ou vide, utiliser l'image par défaut
+        if (!$filename) {
+            $defaultImagePath = $this->getParameter('kernel.project_dir') . '/public/images/user-avatar.svg';
+            if (file_exists($defaultImagePath)) {
+                return new BinaryFileResponse($defaultImagePath);
+            }
+        }
+
         // Check in public directory first (web accessible)
         $publicImagesDir = $this->getParameter('kernel.project_dir') . '/public/images_users';
         $filePath = $publicImagesDir . '/' . $filename;
@@ -598,20 +624,13 @@ class VoyageursController extends AuthenticatedController
             $filePath = $externalImagesDir . '/' . $filename;
         }
         
-        // If still not found, check in public/images directory for default images
+        // If still not found, return default image
         if (!file_exists($filePath)) {
-            $defaultImageDir = $this->getParameter('kernel.project_dir') . '/public/images';
-            $filePath = $defaultImageDir . '/user-avatar.svg';
-            
-            // If even the default image doesn't exist, try another default
-            if (!file_exists($filePath)) {
-                $filePath = $defaultImageDir . '/default.png';
-                
-                // If no defaults are found, throw 404
-                if (!file_exists($filePath)) {
-                    throw new NotFoundHttpException('Profile image not found');
-                }
+            $defaultImagePath = $this->getParameter('kernel.project_dir') . '/public/images/user-avatar.svg';
+            if (file_exists($defaultImagePath)) {
+                return new BinaryFileResponse($defaultImagePath);
             }
+            throw new NotFoundHttpException('Profile image not found');
         }
         
         // Create a response with appropriate headers
