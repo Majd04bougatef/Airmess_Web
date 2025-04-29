@@ -4,12 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-
     upload_directory: 'C:/xampp/htdocs/ImageSocialMedia'
     uploads_directory: 'C:/xampp/htdocs/ImageSocialMedia'
     user_images_directory: 'C:/xampp/htdocs/images_users'
     expense_images_directory: 'C:/xampp/htdocs/images_expenses'
-
 
 services:
     # default configuration for services in *this* file
@@ -42,6 +40,14 @@ services:
             $uploadsDirectory: '%uploads_directory%'
 
     App\Controller\AdminSocialMediaController:
+        arguments:
+            $uploadsDirectory: '%uploads_directory%'
+
+    App\Controller\ScheduledPostController:
+        arguments:
+            $uploadsDirectory: '%uploads_directory%'
+
+    App\Controller\AdminScheduledPostController:
         arguments:
             $uploadsDirectory: '%uploads_directory%'
 

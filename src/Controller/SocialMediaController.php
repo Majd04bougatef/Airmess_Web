@@ -761,4 +761,55 @@ class SocialMediaController extends AbstractController
             'preview' => $improvedContent
         ]);
     }
+
+    #[Route('/sort', name: 'social_media_sort', methods: ['GET'])]
+    public function sort(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $sortBy = $request->query->get('sort_by', 'publicationDate');
+        $direction = $request->query->get('direction', 'desc');
+
+        $queryBuilder = $entityManager->getRepository(SocialMedia::class)->createQueryBuilder('s')
+            ->leftJoin('s.user', 'u')
+            ->addSelect('u');
+
+        switch ($sortBy) {
+            case 'titre':
+                $queryBuilder->orderBy('s.titre', $direction);
+                break;
+            case 'contenu':
+                $queryBuilder->orderBy('s.contenu', $direction);
+                break;
+            case 'lieu':
+                $queryBuilder->orderBy('s.lieu', $direction);
+                break;
+            case 'publicationDate':
+                $queryBuilder->orderBy('s.publicationDate', $direction);
+                break;
+            case 'likee':
+                $queryBuilder->orderBy('s.likee', $direction);
+                break;
+            case 'dislike':
+                $queryBuilder->orderBy('s.dislike', $direction);
+                break;
+            case 'commentaires':
+                $queryBuilder->leftJoin('s.commentaires', 'c')
+                    ->groupBy('s.idEB')
+                    ->orderBy('COUNT(c)', $direction);
+                break;
+            default:
+                $queryBuilder->orderBy('s.publicationDate', 'desc');
+        }
+
+        $social_media = $queryBuilder->getQuery()->getResult();
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('social_media/_posts_list.html.twig', [
+                'social_media' => $social_media,
+            ]);
+        }
+
+        return $this->render('social_media/index.html.twig', [
+            'social_media' => $social_media,
+        ]);
+    }
 }

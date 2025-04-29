@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Watch Live Stream{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Live Stream</h3>
+                </div>
+                <div class="card-body">
+                    <video
+                        id="live-stream"
+                        class="video-js vjs-default-skin vjs-big-play-centered"
+                        controls
+                        preload="auto"
+                        width="100%"
+                        height="auto"
+                        data-setup='{}'
+                    >
+                        <source src="{{ stream_url }}" type="application/x-mpegURL" />
+                        <p class="vjs-no-js">
+                            To view this video please enable JavaScript, and consider upgrading to a
+                            web browser that supports HTML5 video
+                        </p>
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const player = videojs('live-stream');
+        });
+    </script>
+{% endblock %} 

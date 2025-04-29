@@ -1,0 +1,65 @@
+{% for post in social_media %}
+    <div class="post-card">
+        <div class="post-header">
+            <div class="user-info">
+                <img src="{{ asset('uploads/profile_pictures/' ~ post.user.profilePicture) }}" alt="Profile Picture" class="profile-picture">
+                <div>
+                    <h3>{{ post.user.nom }} {{ post.user.prenom }}</h3>
+                    <p class="post-date">{{ post.publicationDate|date('d/m/Y H:i') }}</p>
+                </div>
+            </div>
+            <div class="post-location">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ post.lieu }}
+            </div>
+        </div>
+        
+        <div class="post-content">
+            <h2>{{ post.titre }}</h2>
+            <p>{{ post.contenu }}</p>
+            {% if post.image %}
+                <img src="{{ asset('uploads/posts/' ~ post.image) }}" alt="Post Image" class="post-image">
+            {% endif %}
+        </div>
+        
+        <div class="post-actions">
+            <button class="like-btn" data-post-id="{{ post.idEB }}">
+                <i class="fas fa-thumbs-up"></i>
+                <span class="like-count">{{ post.likee }}</span>
+            </button>
+            <button class="dislike-btn" data-post-id="{{ post.idEB }}">
+                <i class="fas fa-thumbs-down"></i>
+                <span class="dislike-count">{{ post.dislike }}</span>
+            </button>
+            <button class="comment-btn" data-post-id="{{ post.idEB }}">
+                <i class="fas fa-comment"></i>
+                <span class="comment-count">{{ post.commentaires|length }}</span>
+            </button>
+        </div>
+        
+        <div class="comments-section" id="comments-{{ post.idEB }}" style="display: none;">
+            {% for comment in post.commentaires %}
+                <div class="comment">
+                    <div class="comment-user">
+                        <img src="{{ asset('uploads/profile_pictures/' ~ comment.user.profilePicture) }}" alt="Profile Picture" class="profile-picture">
+                        <div>
+                            <h4>{{ comment.user.nom }} {{ comment.user.prenom }}</h4>
+                            <p class="comment-date">{{ comment.dateCommentaire|date('d/m/Y H:i') }}</p>
+                        </div>
+                    </div>
+                    <p>{{ comment.contenu }}</p>
+                </div>
+            {% endfor %}
+            <div class="add-comment">
+                <textarea class="comment-input" placeholder="Add a comment..."></textarea>
+                <button class="submit-comment" data-post-id="{{ post.idEB }}">Comment</button>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <tr>
+        <td colspan="7" class="text-center py-4">
+            <p class="text-muted">Aucune publication trouvée</p>
+        </td>
+    </tr>
+{% endfor %} 
