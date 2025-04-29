@@ -235,6 +235,144 @@
     background-image: none;
     padding-right: 0.75rem;
 }
+
+/* Styles pour les estimations de réservation */
+.reservation-metric {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+.metric-label {
+    font-weight: 500;
+    color: #4285F4;
+}
+
+.metric-value {
+    font-weight: 600;
+    background-color: #E8F0FE;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Styles pour le dialogue de recommandation */
+.dialog {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dialog-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 80%;
+    max-width: 800px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.dialog-title {
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.recommendation-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.recommendation-section {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 15px;
+    border-left: 4px solid #4285F4;
+}
+
+.recommendation-section h4 {
+    margin-top: 0;
+    color: #4285F4;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.section-content {
+    line-height: 1.5;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.reservation-stats {
+    background-color: white;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+/* Style pour le bouton de recommandation dans l'en-tête */
+.header-recommendation-btn {
+    position: absolute;
+    right: 2rem;
+    top: 1rem;
+    background: linear-gradient(145deg, #4285F4, #0F9D58);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.header-recommendation-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.header-recommendation-btn i {
+    color: #FFBB00;
+    margin-right: 8px;
+}
+
+/* Position relative pour le conteneur principal */
+.content-card {
+    position: relative;
+}
 </style>
 {% endblock %}
 
@@ -277,11 +415,461 @@ function initFormMap() {
         document.getElementById('station_longitude').value = position.lng.toFixed(6);
     }
 }
+
+// Code pour obtenir des recommandations de Gemini
+document.addEventListener('DOMContentLoaded', function() {
+    const geminiBtn = document.getElementById('gemini-recommendation-btn');
+    const countryDialog = document.getElementById('country-dialog');
+    const analyzeCountryBtn = document.getElementById('analyze-country-btn');
+    const targetCountryInput = document.getElementById('target-country');
+    const geminiResult = document.getElementById('gemini-result');
+    const geminiContent = document.getElementById('gemini-content');
+    const geminiCountry = document.getElementById('gemini-country');
+    const printBtn = document.getElementById('print-recommendations');
+    const closeBtn = document.getElementById('close-recommendations');
+    const reservationSummary = document.getElementById('reservation-summary');
+    const reservationEstimate = document.getElementById('reservation-estimate');
+    
+    if (geminiBtn) {
+        // Afficher la boîte de dialogue du pays lorsqu'on clique sur le bouton
+        geminiBtn.addEventListener('click', function() {
+            countryDialog.style.display = 'block';
+            // Préremplir avec le pays déjà entré dans le formulaire
+            const paysInput = document.querySelector('input[name="station[pays]"]');
+            if (paysInput && paysInput.value) {
+                targetCountryInput.value = paysInput.value;
+            }
+        });
+    }
+    
+    if (analyzeCountryBtn) {
+        // Analyser le pays lorsqu'on clique sur le bouton d'analyse
+        analyzeCountryBtn.addEventListener('click', function() {
+            // Afficher un loader dans le bouton
+            const originalBtnText = analyzeCountryBtn.innerHTML;
+            analyzeCountryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse en cours...';
+            analyzeCountryBtn.disabled = true;
+            
+            // Récupérer les données du formulaire
+            const nom = document.querySelector('input[name="station[nom]"]')?.value || '';
+            const capacite = document.querySelector('input[name="station[capacite]"]')?.value || '';
+            const nombreVelo = document.querySelector('input[name="station[nombreVelo]"]')?.value || '';
+            const typeVelo = document.querySelector('input[name="station[typeVelo]"]')?.value || '';
+            const prixHeure = document.querySelector('input[name="station[prixHeure]"]')?.value || '';
+            const pays = targetCountryInput.value || document.querySelector('input[name="station[pays]"]')?.value || '';
+            const latitude = document.querySelector('input[name="station[latitude]"]')?.value || '';
+            const longitude = document.querySelector('input[name="station[longitude]"]')?.value || '';
+            
+            // Mettre à jour le champ pays du formulaire avec le pays cible
+            if (pays && document.querySelector('input[name="station[pays]"]')) {
+                document.querySelector('input[name="station[pays]"]').value = pays;
+            }
+            
+            // Appeler l'API pour obtenir des recommandations
+            fetch('/api/station-recommendation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nom: nom,
+                    capacite: capacite,
+                    nombreVelo: nombreVelo,
+                    typeVelo: typeVelo,
+                    prixHeure: prixHeure,
+                    pays: pays,
+                    latitude: latitude,
+                    longitude: longitude,
+                    analyse_pays: true // Flag pour indiquer qu'il s'agit d'une analyse de pays
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.recommendation) {
+                    // Afficher le pays dans le titre
+                    geminiCountry.textContent = pays;
+                    
+                    // Formater et afficher les recommandations
+                    const formattedText = data.recommendation
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Mettre en gras les titres
+                        .replace(/\n\n/g, '<div style="margin: 10px 0;"></div>') // Espacement entre paragraphes
+                        .replace(/\n/g, '<br>'); // Retours à la ligne
+                        
+                    geminiContent.innerHTML = formattedText;
+                    geminiResult.style.display = 'block';
+                    
+                    // Extraire l'estimation des réservations
+                    const estimationMatch = data.recommendation.match(/\*\*Estimation des réservations\*\*([\s\S]*?)(?=\n\n\*\*|\n\nFormat:|$)/i);
+                    if (estimationMatch && estimationMatch[1]) {
+                        const estimationText = estimationMatch[1].trim();
+                        // Chercher le format spécifique dans le texte d'estimation
+                        const reservationPattern = /(\d+(?:-\d+)?)\s*réservations\/jour\s*en\s*basse\s*saison,\s*(\d+(?:-\d+)?)\s*réservations\/jour\s*en\s*haute\s*saison/i;
+                        const reservationNumbers = estimationText.match(reservationPattern);
+                        
+                        if (reservationNumbers) {
+                            const basseSaison = reservationNumbers[1];
+                            const hauteSaison = reservationNumbers[2];
+                            
+                            reservationEstimate.innerHTML = `
+                                <div class="reservation-metric">
+                                    <span class="metric-label">Basse saison:</span>
+                                    <span class="metric-value">${basseSaison} réservations/jour</span>
+                                </div>
+                                <div class="reservation-metric">
+                                    <span class="metric-label">Haute saison:</span>
+                                    <span class="metric-value">${hauteSaison} réservations/jour</span>
+                                </div>
+                            `;
+                        } else {
+                            // Fallback au texte brut si le format attendu n'est pas trouvé
+                            reservationEstimate.innerHTML = estimationText.replace(/\n/g, '<br>');
+                        }
+                        
+                        reservationSummary.style.display = 'block';
+                    } else {
+                        reservationSummary.style.display = 'none';
+                    }
+                    
+                    // Masquer la boîte de dialogue du pays
+                    countryDialog.style.display = 'none';
+                } else {
+                    alert('Erreur lors de la génération des recommandations: ' + (data.message || 'Erreur inconnue'));
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'appel à l\'API: ' + error.message);
+            })
+            .finally(() => {
+                // Restaurer le bouton
+                analyzeCountryBtn.innerHTML = originalBtnText;
+                analyzeCountryBtn.disabled = false;
+            });
+        });
+    }
+    
+    // Permettre de valider en appuyant sur Entrée dans le champ de pays
+    if (targetCountryInput) {
+        targetCountryInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                analyzeCountryBtn.click();
+            }
+        });
+    }
+    
+    // Impression des recommandations
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write('<html><head><title>Recommandations pour une station en ' + geminiCountry.textContent + '</title>');
+            printWindow.document.write('<style>body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h1>Recommandations pour une station en ' + geminiCountry.textContent + '</h1>');
+            printWindow.document.write(geminiContent.innerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        });
+    }
+    
+    // Fermer les recommandations
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            geminiResult.style.display = 'none';
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const predictButton = document.getElementById('predict-button');
+    const recommendationDialog = document.getElementById('recommendationDialog');
+    const closeBtn = document.querySelector('.close-btn');
+    const closeDialog = document.getElementById('closeDialog');
+    const printBtn = document.getElementById('printRecommendation');
+    
+    // Sections de recommandation
+    const locationRecommendation = document.getElementById('locationRecommendation');
+    const bikeRecommendation = document.getElementById('bikeRecommendation');
+    const priceRecommendation = document.getElementById('priceRecommendation');
+    const capacityRecommendation = document.getElementById('capacityRecommendation');
+    const reservationEstimate = document.getElementById('reservationEstimate');
+    
+    if (predictButton) {
+        predictButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Récupérer les valeurs du formulaire
+            const paysValue = document.getElementById('station_pays').value;
+            const latitudeValue = document.getElementById('station_latitude').value;
+            const longitudeValue = document.getElementById('station_longitude').value;
+            
+            // Vérifier si les champs obligatoires sont remplis
+            if (!paysValue || !latitudeValue || !longitudeValue) {
+                alert('Veuillez saisir un pays et des coordonnées valides.');
+                return;
+            }
+            
+            // Afficher une animation de chargement
+            predictButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Analyse en cours...';
+            predictButton.disabled = true;
+            
+            // Préparer les données pour l'API
+            const requestData = {
+                pays: paysValue,
+                latitude: latitudeValue,
+                longitude: longitudeValue
+            };
+            
+            // Envoyer la requête à l'API
+            fetch('/api/predict-station', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Réinitialiser le bouton
+                predictButton.innerHTML = 'Obtenir des recommandations';
+                predictButton.disabled = false;
+                
+                // Traiter et afficher les résultats
+                if (data.success) {
+                    processRecommendations(data.result);
+                    recommendationDialog.style.display = 'block';
+                } else {
+                    alert('Erreur lors de l\'analyse: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                predictButton.innerHTML = 'Obtenir des recommandations';
+                predictButton.disabled = false;
+                alert('Une erreur est survenue lors de la communication avec le serveur.');
+            });
+        });
+    }
+    
+    // Fonction pour traiter les recommandations et les afficher dans le dialogue
+    function processRecommendations(recommendation) {
+        // Extraire les différentes parties de la recommandation
+        const sections = {
+            location: extractSection(recommendation, "Localisation recommandée"),
+            bikes: extractSection(recommendation, "Types de vélos recommandés"),
+            price: extractSection(recommendation, "Prix recommandé"),
+            capacity: extractSection(recommendation, "Capacité recommandée"),
+            reservations: extractSection(recommendation, "Estimation des réservations")
+        };
+        
+        // Afficher chaque section dans le dialogue
+        locationRecommendation.innerHTML = formatContent(sections.location);
+        bikeRecommendation.innerHTML = formatContent(sections.bikes);
+        priceRecommendation.innerHTML = formatContent(sections.price);
+        capacityRecommendation.innerHTML = formatContent(sections.capacity);
+        
+        // Traitement spécial pour les estimations de réservation
+        const reservationPattern = /(\d+(?:-\d+)?)\s*réservations\/jour\s*en\s*basse\s*saison,\s*(\d+(?:-\d+)?)\s*réservations\/jour\s*en\s*haute\s*saison/i;
+        const reservationMatch = sections.reservations.match(reservationPattern);
+        
+        if (reservationMatch) {
+            const lowSeason = reservationMatch[1];
+            const highSeason = reservationMatch[2];
+            
+            reservationEstimate.innerHTML = `
+                <div class="reservation-metrics">
+                    <div class="reservation-metric">
+                        <div class="metric-label">Basse saison</div>
+                        <div class="metric-value">${lowSeason} <small>réservations/jour</small></div>
+                    </div>
+                    <div class="reservation-metric">
+                        <div class="metric-label">Haute saison</div>
+                        <div class="metric-value">${highSeason} <small>réservations/jour</small></div>
+                    </div>
+                </div>
+            `;
+        } else {
+            reservationEstimate.innerHTML = formatContent(sections.reservations);
+        }
+        
+        // Remplir automatiquement le formulaire avec les valeurs recommandées
+        autoFillForm(sections);
+    }
+    
+    // Fonction pour extraire une section spécifique du texte de recommandation
+    function extractSection(text, sectionTitle) {
+        const pattern = new RegExp(`\\*\\*${sectionTitle}\\*\\*\\s*:?\\s*([^\\*]+)(?=\\*\\*|$)`, 'i');
+        const match = text.match(pattern);
+        return match ? match[1].trim() : '';
+    }
+    
+    // Fonction pour formater le contenu avec HTML
+    function formatContent(text) {
+        if (!text) return '<p class="text-muted">Information non disponible</p>';
+        
+        // Convertir les sauts de ligne en paragraphes
+        return text.split('\n')
+            .filter(line => line.trim() !== '')
+            .map(line => `<p>${line}</p>`)
+            .join('');
+    }
+    
+    // Fonction pour remplir automatiquement le formulaire
+    function autoFillForm(sections) {
+        // Extraire et remplir le type de vélo
+        const bikeTypeMatch = sections.bikes.match(/vélo\s+(électrique|de route|urbain)/i);
+        if (bikeTypeMatch && document.getElementById('station_typeVelo')) {
+            const bikeType = bikeTypeMatch[1].toLowerCase();
+            const bikeTypeSelect = document.getElementById('station_typeVelo');
+            
+            // Correspondance entre les termes dans la recommandation et les options du select
+            const bikeTypeMapping = {
+                'électrique': 'velo electrique',
+                'de route': 'velo de route',
+                'urbain': 'velo urbain'
+            };
+            
+            const mappedType = bikeTypeMapping[bikeType] || bikeType;
+            
+            for (let i = 0; i < bikeTypeSelect.options.length; i++) {
+                const optionText = bikeTypeSelect.options[i].text.toLowerCase();
+                if (optionText.includes(mappedType) || optionText === mappedType) {
+                    bikeTypeSelect.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+        
+        // Extraire et remplir le prix par heure
+        const priceMatch = sections.price.match(/(\d+(?:\.\d+)?)\s*€/);
+        if (priceMatch && document.getElementById('station_prixHeure')) {
+            document.getElementById('station_prixHeure').value = priceMatch[1];
+        }
+        
+        // Extraire et remplir la capacité
+        const capacityMatch = sections.capacity.match(/(\d+)\s*vélos/);
+        if (capacityMatch && document.getElementById('station_capacite')) {
+            document.getElementById('station_capacite').value = capacityMatch[1];
+        }
+    }
+    
+    // Gérer la fermeture du dialogue
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            recommendationDialog.style.display = 'none';
+        });
+    }
+    
+    if (closeDialog) {
+        closeDialog.addEventListener('click', function() {
+            recommendationDialog.style.display = 'none';
+        });
+    }
+    
+    // Fermer le dialogue si on clique en dehors
+    window.addEventListener('click', function(event) {
+        if (event.target === recommendationDialog) {
+            recommendationDialog.style.display = 'none';
+        }
+    });
+    
+    // Gérer l'impression
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            const dialogContent = document.querySelector('.dialog-content').cloneNode(true);
+            
+            // Supprimer les boutons
+            const actionsDiv = dialogContent.querySelector('.dialog-actions');
+            if (actionsDiv) actionsDiv.remove();
+            
+            // Supprimer le bouton de fermeture
+            const closeButton = dialogContent.querySelector('.close-btn');
+            if (closeButton) closeButton.remove();
+            
+            // Créer une fenêtre d'impression
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Recommandations de station</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h3 { color: #333; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+                        .recommendation-section { margin-bottom: 20px; padding: 15px; border-left: 4px solid #4285F4; background-color: #f9f9f9; }
+                        h4 { margin-top: 0; color: #4285F4; }
+                        .reservation-metrics { display: flex; gap: 20px; }
+                        .reservation-metric { flex: 1; padding: 10px; background-color: white; border-radius: 4px; text-align: center; }
+                        .metric-label { font-weight: bold; margin-bottom: 5px; }
+                        .metric-value { font-size: 24px; color: #4285F4; }
+                        @media print {
+                            body { margin: 0; }
+                            .recommendation-section { page-break-inside: avoid; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${dialogContent.outerHTML}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            
+            // Imprimer après un court délai pour permettre le chargement des styles
+            setTimeout(() => {
+                printWindow.print();
+                // Ne pas fermer la fenêtre après l'impression
+            }, 500);
+        });
+    }
+});
 </script>
 {% endblock %}
 
 {% block body %}
 <div class="content-card content-section active">
+    <!-- Bouton IA pour recommandation Gemini (déplacé en haut à droite) -->
+    <button type="button" id="gemini-recommendation-btn" class="header-recommendation-btn">
+        <i class="fas fa-lightbulb me-2"></i> Obtenir des recommandations avec Gemini AI
+    </button>
+    
+    <!-- Boîte de dialogue pour le pays -->
+    <div id="country-dialog" style="display: none; position: absolute; top: 4rem; right: 2rem; width: 350px; z-index: 100; padding: 15px; border-radius: 10px; background-color: #f0f8ff; border: 1px solid #c8e1ff; box-shadow: 0 6px 16px rgba(0,0,0,0.1);">
+        <h4 style="margin-top: 0; font-size: 16px; color: #4285F4;">Analyse de localisation optimale</h4>
+        <p style="font-size: 14px; color: #333;">Pour vous aider à choisir l'emplacement idéal de votre station, veuillez préciser le pays cible :</p>
+        
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <input type="text" id="target-country" class="form-control" style="flex: 1;" placeholder="Exemple: France, Tunisie, Maroc...">
+            <button type="button" id="analyze-country-btn" style="background: linear-gradient(145deg, #34A853, #0F9D58); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                Analyser
+            </button>
+        </div>
+    </div>
+    
+    <!-- Résultats de l'analyse -->
+    <div id="gemini-result" style="display: none; position: absolute; top: 4rem; right: 2rem; width: 400px; z-index: 100; padding: 15px; border-radius: 10px; background-color: #f8f9fa; border: 1px solid #ddd; box-shadow: 0 6px 16px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto;">
+        <h4 style="margin-top: 0; font-size: 16px; color: #4285F4;">Recommandations pour une station en <span id="gemini-country"></span></h4>
+        <div id="gemini-content" style="font-size: 14px; color: #333; line-height: 1.5;"></div>
+        
+        <div id="reservation-summary" style="margin-top: 15px; padding: 12px; border-radius: 8px; background-color: #F0F8FF; border-left: 4px solid #4285F4; display: none;">
+            <h5 style="margin-top: 0; margin-bottom: 8px; font-size: 14px; color: #4285F4;">
+                <i class="fas fa-chart-line me-2"></i> Estimation des réservations
+            </h5>
+            <div id="reservation-estimate" style="font-size: 13px;"></div>
+        </div>
+        
+        <!-- Bouton pour appliquer les recommandations -->
+        <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+            <button type="button" id="print-recommendations" style="background: #f1f3f4; color: #1a73e8; border: none; border-radius: 4px; padding: 5px 10px; font-size: 13px; margin-right: 10px;">
+                <i class="fas fa-print"></i> Imprimer
+            </button>
+            <button type="button" id="close-recommendations" style="background: #f1f3f4; color: #5f6368; border: none; border-radius: 4px; padding: 5px 10px; font-size: 13px;">
+                <i class="fas fa-times"></i> Fermer
+            </button>
+        </div>
+    </div>
+
     <div class="form-header">
         <h2 class="form-title">{{ button_label is defined ? 'Modifier' : 'Ajouter' }} une Station</h2>
         <p class="form-subtitle">Complétez les informations ci-dessous pour {{ button_label is defined ? 'modifier' : 'ajouter' }} une station.</p>
@@ -374,5 +962,44 @@ function initFormMap() {
     </div>
     
     {{ form_end(form) }}
+</div>
+
+<div id="recommendationDialog" class="dialog">
+    <div class="dialog-content">
+        <span class="close-btn">&times;</span>
+        <h3 class="dialog-title">Recommandations pour votre station</h3>
+        
+        <div class="recommendation-sections">
+            <div id="locationSection" class="recommendation-section">
+                <h4>Localisation recommandée</h4>
+                <div id="locationRecommendation" class="section-content"></div>
+            </div>
+            
+            <div id="bikeSection" class="recommendation-section">
+                <h4>Types de vélos recommandés</h4>
+                <div id="bikeRecommendation" class="section-content"></div>
+            </div>
+            
+            <div id="priceSection" class="recommendation-section">
+                <h4>Prix recommandé</h4>
+                <div id="priceRecommendation" class="section-content"></div>
+            </div>
+            
+            <div id="capacitySection" class="recommendation-section">
+                <h4>Capacité recommandée</h4>
+                <div id="capacityRecommendation" class="section-content"></div>
+            </div>
+            
+            <div id="reservationSummary" class="recommendation-section">
+                <h4>Estimation des réservations</h4>
+                <div id="reservationEstimate" class="section-content reservation-stats"></div>
+            </div>
+        </div>
+        
+        <div class="dialog-actions">
+            <button id="printRecommendation" class="btn btn-secondary">Imprimer</button>
+            <button id="closeDialog" class="btn btn-primary">Fermer</button>
+        </div>
+    </div>
 </div>
 {% endblock %}
