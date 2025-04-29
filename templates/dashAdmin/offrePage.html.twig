@@ -16,7 +16,7 @@
       <div class="ms-md-auto pe-md-3 d-flex align-items-center">
         <div class="input-group">
           <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-          <input type="text" class="form-control" placeholder="Type here...">
+          <input type="text" class="form-control" id="searchOffre" placeholder="Rechercher une offre...">
         </div>
       </div>
     </div>
@@ -29,7 +29,22 @@
       <div class="card mb-4">
         <div class="card-header pb-0 d-flex justify-content-between align-items-center">
           <h6>Gestion des Offres</h6>
-          <!-- Le bouton d'ajout d'offre a été supprimé -->
+          <!-- Ajout du bouton de filtrage -->
+          <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-filter me-2"></i>Filtrer par
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+              <li><a class="dropdown-item filter-option" data-filter="all" href="#">Toutes les offres</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item filter-option" data-filter="status-confirmed" href="#">Confirmées</a></li>
+              <li><a class="dropdown-item filter-option" data-filter="status-rejected" href="#">Rejetées</a></li>
+              <li><a class="dropdown-item filter-option" data-filter="status-pending" href="#">En attente</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item filter-option" data-filter="active" href="#">Offres actives</a></li>
+              <li><a class="dropdown-item filter-option" data-filter="expired" href="#">Offres expirées</a></li>
+            </ul>
+          </div>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-4">
@@ -49,9 +64,13 @@
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="offresTableBody">
                 {% for offre in offres %}
-                  <tr>
+                  <tr class="offre-row" 
+                      data-title="{{ offre.description|lower }}" 
+                      data-place="{{ offre.place|lower }}" 
+                      data-status="{{ offre.statusoff.value|lower }}"
+                      data-active="{{ offre.endDate > date() ? 'active' : 'expired' }}">
                     <td>
                       {% if offre.imagePath %}
                         <img src="{{ 'http://localhost/imageOffre/' ~ offre.imagePath }}" alt="Image de l'offre" class="img-fluid" style="max-width: 100px; max-height: 100px;">
@@ -112,11 +131,210 @@
                 {% endfor %}
               </tbody>
             </table>
+            
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center mt-4" id="pagination-container">
+              <nav aria-label="Navigation des offres">
+                <ul class="pagination" id="pagination-offres">
+                  <!-- Les boutons de pagination seront générés dynamiquement -->
+                </ul>
+              </nav>
+            </div>
+            
+            <!-- Informations sur la pagination -->
+            <div class="text-center mt-2">
+              <span class="text-xs text-secondary">
+                Affichage de <span id="start-index">1</span> à <span id="end-index">10</span> sur <span id="total-items">{{ offres|length }}</span> offres
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuration de la pagination
+    const itemsPerPage = 10;
+    let currentPage = 1;
+    let filteredRows = [];
+    
+    // Fonction de recherche
+    const searchOffre = document.getElementById('searchOffre');
+    if (searchOffre) {
+      searchOffre.addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        currentPage = 1;
+        filterAndDisplayOffers(searchValue);
+      });
+    }
+    
+    // Filtrage par statut ou type
+    const filterOptions = document.querySelectorAll('.filter-option');
+    filterOptions.forEach(option => {
+      option.addEventListener('click', function(e) {
+        e.preventDefault();
+        const filterValue = this.getAttribute('data-filter');
+        currentPage = 1;
+        applyFilter(filterValue);
+        
+        // Mise à jour du texte du bouton dropdown
+        document.getElementById('filterDropdown').innerHTML = '<i class="fas fa-filter me-2"></i>' + this.textContent;
+      });
+    });
+    
+    // Fonction pour filtrer les offres
+    function filterOffers(searchValue) {
+      const rows = document.querySelectorAll('.offre-row');
+      filteredRows = [];
+      
+      rows.forEach(row => {
+        const title = row.getAttribute('data-title');
+        const place = row.getAttribute('data-place');
+        const shouldShow = title.includes(searchValue) || place.includes(searchValue);
+        
+        if (shouldShow) {
+          filteredRows.push(row);
+        }
+        row.style.display = 'none';
+      });
+      
+      displayPageItems();
+      createPagination();
+    }
+    
+    // Fonction pour filtrer et afficher les offres
+    function filterAndDisplayOffers(searchValue) {
+      filterOffers(searchValue);
+      displayPageItems();
+      createPagination();
+    }
+    
+    // Fonction pour appliquer le filtre
+    function applyFilter(filterValue) {
+      const rows = document.querySelectorAll('.offre-row');
+      filteredRows = [];
+      
+      rows.forEach(row => {
+        let shouldShow = false;
+        
+        if (filterValue === 'all') {
+          shouldShow = true;
+        } else if (filterValue === 'status-confirmed') {
+          shouldShow = row.getAttribute('data-status') === 'confirmé';
+        } else if (filterValue === 'status-rejected') {
+          shouldShow = row.getAttribute('data-status') === 'rejeté';
+        } else if (filterValue === 'status-pending') {
+          shouldShow = row.getAttribute('data-status') === 'en attente';
+        } else if (filterValue === 'active' || filterValue === 'expired') {
+          shouldShow = row.getAttribute('data-active') === filterValue;
+        }
+        
+        if (shouldShow) {
+          filteredRows.push(row);
+        }
+        row.style.display = 'none';
+      });
+      
+      displayPageItems();
+      createPagination();
+    }
+    
+    // Fonction pour afficher les éléments de la page courante
+    function displayPageItems() {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
+      
+      // Mise à jour des informations de pagination
+      document.getElementById('start-index').textContent = filteredRows.length > 0 ? startIndex + 1 : 0;
+      document.getElementById('end-index').textContent = endIndex;
+      document.getElementById('total-items').textContent = filteredRows.length;
+      
+      // Afficher uniquement les éléments de la page courante
+      filteredRows.forEach((row, index) => {
+        if (index >= startIndex && index < endIndex) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+    
+    // Fonction pour créer la pagination
+    function createPagination() {
+      const paginationContainer = document.getElementById('pagination-offres');
+      paginationContainer.innerHTML = '';
+      
+      const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+      
+      // Bouton précédent
+      const prevBtn = document.createElement('li');
+      prevBtn.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+      prevBtn.innerHTML = '<a class="page-link" href="#" aria-label="Précédent"><span aria-hidden="true">&laquo;</span></a>';
+      prevBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+          currentPage--;
+          displayPageItems();
+          createPagination();
+        }
+      });
+      paginationContainer.appendChild(prevBtn);
+      
+      // Pages numérotées
+      const maxPageButtons = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+      let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+      
+      if (endPage - startPage + 1 < maxPageButtons && startPage > 1) {
+        startPage = Math.max(1, endPage - maxPageButtons + 1);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('li');
+        pageBtn.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        pageBtn.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        pageBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          currentPage = i;
+          displayPageItems();
+          createPagination();
+        });
+        paginationContainer.appendChild(pageBtn);
+      }
+      
+      // Bouton suivant
+      const nextBtn = document.createElement('li');
+      nextBtn.className = `page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`;
+      nextBtn.innerHTML = '<a class="page-link" href="#" aria-label="Suivant"><span aria-hidden="true">&raquo;</span></a>';
+      nextBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage < totalPages) {
+          currentPage++;
+          displayPageItems();
+          createPagination();
+        }
+      });
+      paginationContainer.appendChild(nextBtn);
+      
+      // Afficher ou masquer la pagination en fonction du nombre d'éléments
+      const paginationParent = document.getElementById('pagination-container');
+      paginationParent.style.display = totalPages <= 1 ? 'none' : 'flex';
+    }
+    
+    // Initialisation de la pagination
+    function initializePagination() {
+      const rows = document.querySelectorAll('.offre-row');
+      filteredRows = Array.from(rows);
+      displayPageItems();
+      createPagination();
+    }
+    
+    // Initialiser la pagination au chargement
+    initializePagination();
+  });
+</script>
 {% endblock %}
 

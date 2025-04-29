@@ -33,6 +33,11 @@
         background-color: #f8f9fa;
         padding: 1rem 1.5rem;
         border-bottom: 1px solid #eaecf0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
     
     .list-header h3 {
@@ -214,6 +219,91 @@
         transform: translateY(-2px);
     }
     
+    /* Styles pour la recherche et le filtrage */
+    .search-filter-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .search-box {
+        flex-grow: 1;
+        max-width: 500px;
+    }
+    
+    .filter-dropdown {
+        position: relative;
+    }
+    
+    .filter-dropdown .dropdown-menu {
+        min-width: 200px;
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination .page-link {
+        color: #5e72e4;
+        border-color: #dee2e6;
+        background-color: #fff;
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #5e72e4;
+        border-color: #5e72e4;
+        color: white;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #edf2ff;
+        border-color: #dee2e6;
+        color: #324cdd;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #95a5a6;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    
+    .pagination-info {
+        text-align: center;
+        margin-top: 0.75rem;
+        color: #8392ab;
+        font-size: 0.875rem;
+    }
+    
+    .no-results-found {
+        padding: 2rem;
+        text-align: center;
+        color: #67748e;
+    }
+    
+    .no-results-found i {
+        font-size: 2.5rem;
+        color: #cbd3e1;
+        margin-bottom: 1rem;
+    }
+    
+    .no-results-found h3 {
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+    
+    .no-results-found p {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
     @media (max-width: 992px) {
         .reservation-item {
             flex-direction: column;
@@ -236,6 +326,15 @@
             justify-content: flex-end;
             margin-top: 1rem;
         }
+        
+        .list-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .search-filter-container {
+            width: 100%;
+        }
     }
 </style>
 
@@ -245,72 +344,125 @@
         <p class="page-subtitle">Retrouvez toutes vos réservations de services et d'expériences</p>
     </div>
     
+    <!-- Ajout de la barre de recherche et du filtrage -->
+    <div class="search-filter-container">
+        <div class="search-box">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" id="searchReservation" class="form-control" placeholder="Rechercher une réservation...">
+            </div>
+        </div>
+        <div class="filter-dropdown">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter me-2"></i>Filtrer par
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item filter-option" data-filter="all" href="#">Toutes les réservations</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item filter-option" data-filter="date-recent" href="#">Plus récentes</a></li>
+                    <li><a class="dropdown-item filter-option" data-filter="date-old" href="#">Plus anciennes</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item filter-option" data-filter="price-low" href="#">Prix croissant</a></li>
+                    <li><a class="dropdown-item filter-option" data-filter="price-high" href="#">Prix décroissant</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
     {% if reservations is not empty %}
         <div class="reservations-list">
             <div class="list-header">
                 <h3>Liste de vos réservations</h3>
             </div>
             
-        {% for reservation in reservations %}
-                <div class="reservation-item">
-                    <img src="{{ 'http://localhost/imageOffre/' ~ (reservation.offre.imagePath ?: 'default-offer.jpg') }}" alt="Image de l'offre" class="reservation-img">
-                    
-                    <div class="reservation-info">
-                        <h4 class="reservation-destination">{{ reservation.offre.description }}</h4>
+            <div id="reservations-container">
+                {% for reservation in reservations %}
+                    <div class="reservation-item" 
+                         data-description="{{ reservation.offre.description|lower }}" 
+                         data-place="{{ reservation.offre.place|lower }}" 
+                         data-date="{{ reservation.dateRes ? reservation.dateRes|date('U') : '' }}"
+                         data-price="{{ reservation.offre.priceAfter }}">
+                        <img src="{{ 'http://localhost/imageOffre/' ~ (reservation.offre.imagePath ?: 'default-offer.jpg') }}" alt="Image de l'offre" class="reservation-img">
                         
-                        <div class="reservation-company">
-                            <i class="fas fa-map-marker-alt"></i> 
-                            <span>{{ reservation.offre.place }}</span>
+                        <div class="reservation-info">
+                            <h4 class="reservation-destination">{{ reservation.offre.description }}</h4>
+                            
+                            <div class="reservation-company">
+                                <i class="fas fa-map-marker-alt"></i> 
+                                <span>{{ reservation.offre.place }}</span>
+                            </div>
+                            
+                            <div class="reservation-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Réservé le: {{ reservation.dateRes|date('d/m/Y') }}</span>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Du: {{ reservation.offre.startDate|date('d/m/Y') }}</span>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <i class="fas fa-hourglass-end"></i>
+                                    <span>Au: {{ reservation.offre.endDate|date('d/m/Y') }}</span>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <i class="fas fa-hashtag"></i>
+                                    <span>Réf: {{ reservation.idR }}</span>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="reservation-details">
-                            <div class="detail-item">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span>Réservé le: {{ reservation.dateRes|date('d/m/Y') }}</span>
-                            </div>
-                            
-                            <div class="detail-item">
-                                <i class="fas fa-clock"></i>
-                                <span>Du: {{ reservation.offre.startDate|date('d/m/Y') }}</span>
-                            </div>
-                            
-                            <div class="detail-item">
-                                <i class="fas fa-hourglass-end"></i>
-                                <span>Au: {{ reservation.offre.endDate|date('d/m/Y') }}</span>
-                            </div>
-                            
-                            <div class="detail-item">
-                                <i class="fas fa-hashtag"></i>
-                                <span>Réf: {{ reservation.idR }}</span>
-                            </div>
+                        <div class="reservation-price">
+                            {{ reservation.offre.priceAfter }} €
+                        </div>
+                        
+                        <div class="reservation-actions">
+                            <a href="{{ path('app_reservation_show', {'idR': reservation.idR}) }}" class="btn-action btn-view">
+                                <i class="fas fa-eye"></i>
+                                Voir
+                            </a>
+                            <a href="{{ path('app_reservation_edit', {'idR': reservation.idR}) }}" class="btn-action btn-edit">
+                                <i class="fas fa-edit"></i>
+                                Modifier
+                            </a>
+                            <form method="post" action="{{ path('app_reservation_delete', {'idR': reservation.idR}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.idR) }}">
+                                <button type="submit" class="btn-action btn-cancel">
+                                    <i class="fas fa-times"></i>
+                                    Annuler
+                                </button>
+                            </form>
                         </div>
                     </div>
-                    
-                    <div class="reservation-price">
-                        {{ reservation.offre.priceAfter }} €
-                    </div>
-                    
-                    <div class="reservation-actions">
-                        <a href="{{ path('app_reservation_show', {'idR': reservation.idR}) }}" class="btn-action btn-view">
-                            <i class="fas fa-eye"></i>
-                            Voir
-                        </a>
-                        <a href="{{ path('app_reservation_edit', {'idR': reservation.idR}) }}" class="btn-action btn-edit">
-                            <i class="fas fa-edit"></i>
-                            Modifier
-                        </a>
-                        <form method="post" action="{{ path('app_reservation_delete', {'idR': reservation.idR}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation?');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.idR) }}">
-                            <button type="submit" class="btn-action btn-cancel">
-                                <i class="fas fa-times"></i>
-                                Annuler
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
+            
+            <!-- Élément pour afficher quand aucun résultat n'est trouvé après filtrage -->
+            <div id="no-results-found" class="no-results-found" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>Aucune réservation trouvée</h3>
+                <p>Aucune réservation ne correspond à vos critères de recherche. Essayez avec d'autres termes ou filtres.</p>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination-container" id="pagination-container">
+                <nav aria-label="Navigation des réservations">
+                    <ul class="pagination" id="pagination">
+                        <!-- Les boutons de pagination seront générés dynamiquement -->
+                    </ul>
+                </nav>
+            </div>
+            
+            <!-- Informations sur la pagination -->
+            <div class="pagination-info" id="pagination-info">
+                <span>Affichage de <span id="start-index">1</span> à <span id="end-index">5</span> sur <span id="total-items">{{ reservations|length }}</span> réservations</span>
+            </div>
         </div>
-        {% else %}
+    {% else %}
         <div class="empty-state">
             <i class="fas fa-receipt"></i>
             <h3>Aucune réservation trouvée</h3>
@@ -329,4 +481,214 @@
         </a>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuration de la pagination
+        const itemsPerPage = 5; // Afficher 5 réservations par page
+        let currentPage = 1;
+        let filteredItems = [];
+        
+        // Récupérer toutes les réservations
+        const allReservations = document.querySelectorAll('.reservation-item');
+        const noResultsElement = document.getElementById('no-results-found');
+        const reservationsContainer = document.getElementById('reservations-container');
+        
+        // Fonction de recherche
+        const searchInput = document.getElementById('searchReservation');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchValue = this.value.toLowerCase();
+                currentPage = 1;
+                filterReservations(searchValue);
+            });
+        }
+        
+        // Fonction pour filtrer les réservations
+        function filterReservations(searchValue) {
+            if (!searchValue.trim()) {
+                // Si la recherche est vide, afficher toutes les réservations
+                filteredItems = Array.from(allReservations);
+            } else {
+                // Filtrer les réservations selon le terme de recherche
+                filteredItems = Array.from(allReservations).filter(item => {
+                    const description = item.getAttribute('data-description');
+                    const place = item.getAttribute('data-place');
+                    return description.includes(searchValue) || place.includes(searchValue);
+                });
+            }
+            
+            updateDisplay();
+        }
+        
+        // Fonction pour trier et filtrer les réservations
+        function sortReservations(filterValue) {
+            const items = Array.from(allReservations);
+            
+            // Appliquer les filtres
+            if (filterValue === 'date-recent') {
+                items.sort((a, b) => {
+                    const dateA = parseInt(a.getAttribute('data-date'));
+                    const dateB = parseInt(b.getAttribute('data-date'));
+                    return dateB - dateA; // Plus récentes d'abord
+                });
+            } else if (filterValue === 'date-old') {
+                items.sort((a, b) => {
+                    const dateA = parseInt(a.getAttribute('data-date'));
+                    const dateB = parseInt(b.getAttribute('data-date'));
+                    return dateA - dateB; // Plus anciennes d'abord
+                });
+            } else if (filterValue === 'price-low') {
+                items.sort((a, b) => {
+                    const priceA = parseFloat(a.getAttribute('data-price'));
+                    const priceB = parseFloat(b.getAttribute('data-price'));
+                    return priceA - priceB; // Prix croissant
+                });
+            } else if (filterValue === 'price-high') {
+                items.sort((a, b) => {
+                    const priceA = parseFloat(a.getAttribute('data-price'));
+                    const priceB = parseFloat(b.getAttribute('data-price'));
+                    return priceB - priceA; // Prix décroissant
+                });
+            }
+            
+            return items;
+        }
+        
+        // Filtrage par type
+        const filterOptions = document.querySelectorAll('.filter-option');
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const filterValue = this.getAttribute('data-filter');
+                currentPage = 1;
+                
+                if (filterValue === 'all') {
+                    filteredItems = Array.from(allReservations);
+                } else {
+                    filteredItems = sortReservations(filterValue);
+                }
+                
+                // Mise à jour du texte du bouton dropdown
+                document.getElementById('filterDropdown').innerHTML = '<i class="fas fa-filter me-2"></i>' + this.textContent;
+                
+                updateDisplay();
+            });
+        });
+        
+        // Fonction pour mettre à jour l'affichage
+        function updateDisplay() {
+            displayPageItems();
+            createPagination();
+            updateNoResultsMessage();
+        }
+        
+        // Fonction pour afficher un message lorsqu'aucune réservation n'est trouvée
+        function updateNoResultsMessage() {
+            if (filteredItems.length === 0) {
+                noResultsElement.style.display = 'block';
+                document.getElementById('pagination-container').style.display = 'none';
+                document.getElementById('pagination-info').style.display = 'none';
+            } else {
+                noResultsElement.style.display = 'none';
+            }
+        }
+        
+        // Fonction pour afficher les éléments de la page courante
+        function displayPageItems() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredItems.length);
+            
+            // Masquer toutes les réservations
+            allReservations.forEach(item => {
+                item.style.display = 'none';
+            });
+            
+            // Afficher uniquement les éléments de la page courante
+            filteredItems.slice(startIndex, endIndex).forEach(item => {
+                item.style.display = 'flex';
+            });
+            
+            // Mise à jour des informations de pagination
+            document.getElementById('start-index').textContent = filteredItems.length > 0 ? startIndex + 1 : 0;
+            document.getElementById('end-index').textContent = endIndex;
+            document.getElementById('total-items').textContent = filteredItems.length;
+            
+            // Masquer/afficher la section de pagination
+            const paginationContainer = document.getElementById('pagination-container');
+            const paginationInfo = document.getElementById('pagination-info');
+            
+            if (filteredItems.length <= itemsPerPage) {
+                paginationContainer.style.display = 'none';
+                paginationInfo.style.display = filteredItems.length > 0 ? 'block' : 'none';
+            } else {
+                paginationContainer.style.display = 'flex';
+                paginationInfo.style.display = 'block';
+            }
+        }
+        
+        // Fonction pour créer la pagination
+        function createPagination() {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+            
+            const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+            
+            // Bouton précédent
+            const prevBtn = document.createElement('li');
+            prevBtn.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevBtn.innerHTML = '<a class="page-link" href="#" aria-label="Précédent"><span aria-hidden="true">&laquo;</span></a>';
+            prevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayPageItems();
+                    createPagination();
+                }
+            });
+            paginationContainer.appendChild(prevBtn);
+            
+            // Pages numérotées
+            const maxPageButtons = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+            
+            if (endPage - startPage + 1 < maxPageButtons && startPage > 1) {
+                startPage = Math.max(1, endPage - maxPageButtons + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('li');
+                pageBtn.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                pageBtn.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                pageBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentPage = i;
+                    displayPageItems();
+                    createPagination();
+                });
+                paginationContainer.appendChild(pageBtn);
+            }
+            
+            // Bouton suivant
+            const nextBtn = document.createElement('li');
+            nextBtn.className = `page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`;
+            nextBtn.innerHTML = '<a class="page-link" href="#" aria-label="Suivant"><span aria-hidden="true">&raquo;</span></a>';
+            nextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayPageItems();
+                    createPagination();
+                }
+            });
+            paginationContainer.appendChild(nextBtn);
+        }
+        
+        // Initialisation
+        filteredItems = Array.from(allReservations);
+        displayPageItems();
+        createPagination();
+    });
+</script>
 {% endblock %}
