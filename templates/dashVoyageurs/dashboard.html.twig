@@ -2,6 +2,31 @@
 
 {% block title %}Tableau de Bord Voyageur{% endblock %}
 
+{% block javascripts_head %}
+    {{ parent() }}
+    <!-- Chargement de jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Chargement de Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script d'initialisation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM chargé dans dashboard');
+            if (typeof jQuery !== 'undefined') {
+                console.log('jQuery est chargé dans dashboard');
+                // Initialiser les composants Bootstrap
+                var dropdowns = document.querySelectorAll('.dropdown-toggle');
+                dropdowns.forEach(function(dropdown) {
+                    new bootstrap.Dropdown(dropdown);
+                });
+                console.log('Dropdowns initialisés');
+            } else {
+                console.error('jQuery non chargé dans dashboard');
+            }
+        });
+    </script>
+{% endblock %}
+
 {% block body %}
 <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
   <div class="container-fluid py-1 px-3">

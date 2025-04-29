@@ -10,6 +10,8 @@ parameters:
     expense_images_directory: 'C:/xampp/htdocs/images_expenses'
     bonplan_uploads_directory: 'C:/xampp/htdocs/images_bonplans'
     images_directory: '%kernel.project_dir%/public/images'
+    mux.token_id: '%env(MUX_TOKEN_ID)%'
+    mux.token_secret: '%env(MUX_TOKEN_SECRET)%'
 
 
     # ReCaptcha keys - removed
@@ -83,4 +85,9 @@ services:
     App\Controller\AdminScheduledPostController:
         arguments:
             $uploadsDirectory: '%uploads_directory%'
+
+    App\Service\MuxService:
+        arguments:
+            $muxTokenId: '%mux.token_id%'
+            $muxTokenSecret: '%mux.token_secret%'
 

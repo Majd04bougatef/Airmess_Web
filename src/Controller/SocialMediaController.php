@@ -25,6 +25,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use LogicException;
 use App\Service\ForbiddenWordsChecker;
 use App\Service\GeminiService;
+use App\Service\MuxService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 #[Route('/social/media')]
@@ -34,16 +36,34 @@ class SocialMediaController extends AbstractController
     private const COMMENTS_PER_PAGE = 5;
     private const DEFAULT_USER_ID = 1;
 
+    private EntityManagerInterface $entityManager;
+    private UserRepository $userRepository;
+    private SluggerInterface $slugger;
+    private PaginatorInterface $paginator;
+    private MuxService $muxService;
+    private string $uploadsDirectory;
+    private ForbiddenWordsChecker $forbiddenWordsChecker;
+    private GeminiService $geminiService;
+
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private UserRepository $userRepository,
-        private SluggerInterface $slugger,
-        private PaginatorInterface $paginator,
-        private string $uploadsDirectory = 'C:/xampp/htdocs/ImageSocialMedia',
-        private \App\Service\ForbiddenWordsChecker $forbiddenWordsChecker,
-        private \App\Service\GeminiService $geminiService
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository,
+        SluggerInterface $slugger,
+        PaginatorInterface $paginator,
+        MuxService $muxService,
+        string $uploadsDirectory = 'C:/xampp/htdocs/ImageSocialMedia',
+        ForbiddenWordsChecker $forbiddenWordsChecker,
+        GeminiService $geminiService
     ) {
-        // Vérifier que le répertoire d'upload existe et est accessible
+        $this->entityManager = $entityManager;
+        $this->userRepository = $userRepository;
+        $this->slugger = $slugger;
+        $this->paginator = $paginator;
+        $this->muxService = $muxService;
+        $this->uploadsDirectory = $uploadsDirectory;
+        $this->forbiddenWordsChecker = $forbiddenWordsChecker;
+        $this->geminiService = $geminiService;
+
         if (!file_exists($this->uploadsDirectory)) {
             mkdir($this->uploadsDirectory, 0777, true);
         }
@@ -811,5 +831,116 @@ class SocialMediaController extends AbstractController
         return $this->render('social_media/index.html.twig', [
             'social_media' => $social_media,
         ]);
+    }
+
+    #[Route('/live', name: 'app_social_media_live', methods: ['GET'])]
+    public function live(Request $request): Response
+    {
+        $session = $request->getSession();
+        if (!$session->has('user_id')) {
+            $this->addFlash('error', 'Vous devez être connecté pour démarrer un live.');
+            return $this->redirectToRoute('login');
+        }
+
+        return $this->render('social_media/live.html.twig');
+    }
+
+    #[Route('/live/create', name: 'app_social_media_live_create', methods: ['POST'])]
+    public function createLiveStream(Request $request): JsonResponse
+    {
+        try {
+            // Debug: Vérifier si les clés Mux sont disponibles
+            $muxTokenId = $this->getParameter('mux.token_id');
+            $muxTokenSecret = $this->getParameter('mux.token_secret');
+            
+            if (empty($muxTokenId) || empty($muxTokenSecret)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Configuration Mux manquante. Veuillez vérifier vos variables d\'environnement.'
+                ], 500);
+            }
+
+            $title = $request->request->get('title');
+            if (empty($title)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Le titre est requis'
+                ], 400);
+            }
+
+            try {
+                $streamData = $this->muxService->createLiveStream($title);
+                
+                return $this->json([
+                    'success' => true,
+                    'stream_key' => $streamData['data']['stream_key'],
+                    'playback_id' => $streamData['data']['playback_ids'][0]['id'],
+                    'stream_id' => $streamData['data']['id']
+                ]);
+            } catch (\Exception $e) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Erreur Mux: ' . $e->getMessage()
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur lors de la création du stream: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    #[Route('/live/{streamId}/status', name: 'app_social_media_live_status', methods: ['GET'])]
+    public function getLiveStreamStatus(string $streamId): JsonResponse
+    {
+        try {
+            // Debug: Vérifier si les clés Mux sont disponibles
+            $muxTokenId = $this->getParameter('mux.token_id');
+            $muxTokenSecret = $this->getParameter('mux.token_secret');
+            
+            if (empty($muxTokenId) || empty($muxTokenSecret)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Configuration Mux manquante pour la vérification du statut.'
+                ], 500);
+            }
+
+            $streamData = $this->muxService->getLiveStream($streamId);
+            
+            if (!isset($streamData['data']) || !isset($streamData['data']['status'])) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Réponse Mux invalide',
+                    'debug' => $streamData
+                ], 500);
+            }
+
+            return $this->json([
+                'success' => true,
+                'status' => $streamData['data']['status'],
+                'active' => $streamData['data']['active'] ?? false
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur lors de la vérification du statut: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    }
+
+    #[Route('/live/{streamId}', name: 'app_social_media_live_end', methods: ['DELETE'])]
+    public function endLiveStream(string $streamId): JsonResponse
+    {
+        try {
+            $this->muxService->deleteLiveStream($streamId);
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

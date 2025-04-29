@@ -559,14 +559,28 @@
                 <span>Offres</span>
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path('socialVoyageurs_page') }}" id="social-button" data-section="social-section">
+
+
+ <li class="nav-item nav-item-dropdown">
+              <a class="nav-link" href="#" id="velo-button">
                 <span class="nav-link-icon">
-                  <img src="{{ asset('images/social-icon.png') }}" alt="Social" onerror="this.src='{{ asset('images/social-icon.svg') }}'; this.onerror='';">
+                  <img src="{{ asset('images/station-icon.png') }}" alt="Bike" onerror="this.src='{{ asset('images/station-icon.svg') }}'; this.onerror='';">
                 </span>
                 Social Media
               </a>
+              <div class="nav-submenu">
+                <a class="nav-submenu-item" href="{{ path('socialVoyageurs_page') }}" id="reserver-button" data-section="station-section">
+                  <i class="fas fa-plus-circle me-2"></i>Publication
+                </a>
+                <a class="nav-submenu-item" href="{{ path('app_social_media_new') }}" id="reservations-button" data-section="reservations-section">
+                  <i class="fas fa-list-alt me-2"></i> Nouvelle publication
+                </a>
+                <a class="nav-submenu-item" href="{{ path('app_social_media_live') }}">
+                  <i class="fas fa-chart-bar me-2"></i>Démarrer un live
+                </a>
+              </div>
             </li>
+
           </ul>
           
           <div class="user-profile">

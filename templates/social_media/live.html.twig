@@ -1,0 +1,527 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Live Stream{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .live-container {
+        padding: 2rem;
+    }
+    
+    .stream-preview {
+        background: #000;
+        width: 100%;
+        aspect-ratio: 16/9;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stream-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+        color: white;
+        z-index: 10;
+    }
+    
+    .stream-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .live-indicator {
+        background: #f00;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-weight: bold;
+        display: none;
+    }
+    
+    .live-indicator.active {
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+    
+    .stream-time {
+        font-family: monospace;
+        font-size: 1.2rem;
+    }
+    
+    .stream-viewers {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .preview-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #000;
+    }
+    
+    #localVideo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .camera-placeholder {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+    }
+    
+    .stream-controls {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .stream-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #344767;
+    }
+    
+    .control-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .btn-stream {
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .btn-start {
+        background: #2ecc71;
+        color: white;
+        border: none;
+    }
+    
+    .btn-start:hover {
+        background: #27ae60;
+        transform: translateY(-2px);
+    }
+    
+    .btn-stop {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        display: none;
+    }
+    
+    .btn-stop:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+
+    .camera-controls {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 1rem;
+        z-index: 10;
+    }
+
+    .camera-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        padding: 0.5rem;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .camera-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .camera-btn.active {
+        background: #f00;
+    }
+
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+    
+    .stream-settings {
+        margin-top: 2rem;
+    }
+    
+    .settings-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #344767;
+    }
+    
+    .settings-form {
+        display: grid;
+        gap: 1rem;
+        max-width: 500px;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #344767;
+    }
+    
+    .form-control {
+        padding: 0.75rem;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #5e72e4;
+        box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.1);
+    }
+    
+    .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        display: none;
+    }
+    
+    .alert-danger {
+        background-color: #fee2e2;
+        border: 1px solid #ef4444;
+        color: #dc2626;
+    }
+    
+    .alert-success {
+        background-color: #dcfce7;
+        border: 1px solid #22c55e;
+        color: #16a34a;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="live-container">
+                        <h2 class="stream-title">Live Stream</h2>
+                        
+                        <div class="alert" role="alert"></div>
+                        
+                        <div class="stream-preview">
+                            <div class="stream-overlay">
+                                <div class="stream-info">
+                                    <span class="live-indicator">LIVE</span>
+                                    <span class="stream-time">00:00:00</span>
+                                </div>
+                                <div class="stream-viewers">
+                                    <i class="fas fa-eye"></i>
+                                    <span class="viewers-count">0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="preview-container">
+                                <video id="localVideo" autoplay muted playsinline></video>
+                                <div class="camera-placeholder">
+                                    <i class="fas fa-video fa-3x mb-3"></i>
+                                    <h3>Caméra non activée</h3>
+                                    <p>Cliquez sur le bouton démarrer pour activer votre caméra</p>
+                                </div>
+                                <div class="camera-controls">
+                                    <button class="camera-btn" id="toggleVideo" title="Activer/Désactiver la caméra">
+                                        <i class="fas fa-video"></i>
+                                    </button>
+                                    <button class="camera-btn" id="toggleAudio" title="Activer/Désactiver le micro">
+                                        <i class="fas fa-microphone"></i>
+                                    </button>
+                                    <button class="camera-btn" id="switchCamera" title="Changer de caméra">
+                                        <i class="fas fa-sync"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stream-controls">
+                            <div class="settings-form mb-4">
+                                <div class="form-group">
+                                    <label for="stream-title" class="form-label">Titre du stream</label>
+                                    <input type="text" id="stream-title" class="form-control" placeholder="Mon super stream">
+                                </div>
+                            </div>
+
+                            <div class="control-buttons">
+                                <button type="button" id="start-stream" class="btn btn-stream btn-start">
+                                    <i class="fas fa-video"></i>
+                                    Démarrer le stream
+                                </button>
+                                <button type="button" id="stop-stream" class="btn btn-stream btn-stop">
+                                    <i class="fas fa-stop-circle"></i>
+                                    Arrêter le stream
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mux/mux-player"></script>
+<script>
+let mediaStream = null;
+let streamStartTime = null;
+let timeUpdateInterval = null;
+
+async function initializeCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: true, 
+            audio: true 
+        });
+        
+        const videoElement = document.getElementById('localVideo');
+        videoElement.srcObject = stream;
+        mediaStream = stream;
+        
+        // Cacher le placeholder et montrer la vidéo
+        document.querySelector('.camera-placeholder').style.display = 'none';
+        videoElement.style.display = 'block';
+        
+        // Activer les contrôles de la caméra
+        initializeCameraControls();
+        
+        return true;
+    } catch (error) {
+        console.error('Erreur lors de l\'accès à la caméra:', error);
+        showAlert('Impossible d\'accéder à la caméra. Veuillez vérifier vos permissions.', 'danger');
+        return false;
+    }
+}
+
+function initializeCameraControls() {
+    const toggleVideo = document.getElementById('toggleVideo');
+    const toggleAudio = document.getElementById('toggleAudio');
+    const switchCamera = document.getElementById('switchCamera');
+    
+    toggleVideo.addEventListener('click', () => {
+        if (mediaStream) {
+            const videoTrack = mediaStream.getVideoTracks()[0];
+            videoTrack.enabled = !videoTrack.enabled;
+            toggleVideo.classList.toggle('active');
+            toggleVideo.querySelector('i').className = videoTrack.enabled ? 'fas fa-video' : 'fas fa-video-slash';
+        }
+    });
+    
+    toggleAudio.addEventListener('click', () => {
+        if (mediaStream) {
+            const audioTrack = mediaStream.getAudioTracks()[0];
+            audioTrack.enabled = !audioTrack.enabled;
+            toggleAudio.classList.toggle('active');
+            toggleAudio.querySelector('i').className = audioTrack.enabled ? 'fas fa-microphone' : 'fas fa-microphone-slash';
+        }
+    });
+    
+    switchCamera.addEventListener('click', async () => {
+        try {
+            // Arrêter tous les tracks actuels
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Obtenir la liste des caméras
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            
+            if (videoDevices.length > 1) {
+                // Trouver la prochaine caméra à utiliser
+                const currentDevice = mediaStream.getVideoTracks()[0].getSettings().deviceId;
+                const currentIndex = videoDevices.findIndex(device => device.deviceId === currentDevice);
+                const nextIndex = (currentIndex + 1) % videoDevices.length;
+                
+                // Démarrer la nouvelle caméra
+                const newStream = await navigator.mediaDevices.getUserMedia({
+                    video: { deviceId: { exact: videoDevices[nextIndex].deviceId } },
+                    audio: true
+                });
+                
+                document.getElementById('localVideo').srcObject = newStream;
+                mediaStream = newStream;
+            }
+        } catch (error) {
+            console.error('Erreur lors du changement de caméra:', error);
+            showAlert('Impossible de changer de caméra.', 'danger');
+        }
+    });
+}
+
+function updateStreamTime() {
+    if (!streamStartTime) return;
+    
+    const now = new Date();
+    const diff = now - streamStartTime;
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+    
+    const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    document.querySelector('.stream-time').textContent = timeString;
+}
+
+function showAlert(message, type = 'danger') {
+    const alert = document.querySelector('.alert');
+    alert.textContent = message;
+    alert.className = `alert alert-${type}`;
+    alert.style.display = 'block';
+    
+    setTimeout(() => {
+        alert.style.display = 'none';
+    }, 5000);
+}
+
+async function startStream(event) {
+    event.preventDefault();
+    
+    const title = document.getElementById('stream-title').value.trim();
+    if (!title) {
+        showAlert('Veuillez entrer un titre pour votre stream');
+        return;
+    }
+    
+    // Initialiser la caméra si ce n'est pas déjà fait
+    if (!mediaStream) {
+        const cameraInitialized = await initializeCamera();
+        if (!cameraInitialized) return;
+    }
+    
+    try {
+        const startButton = document.getElementById('start-stream');
+        const stopButton = document.getElementById('stop-stream');
+        
+        startButton.disabled = true;
+        startButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création du stream...';
+        
+        const response = await fetch('{{ path('app_social_media_live_create') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({ 'title': title })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Démarrer le compteur de temps
+            streamStartTime = new Date();
+            if (timeUpdateInterval) clearInterval(timeUpdateInterval);
+            timeUpdateInterval = setInterval(updateStreamTime, 1000);
+            
+            // Afficher l'indicateur LIVE
+            document.querySelector('.live-indicator').classList.add('active');
+            
+            // Masquer/Afficher les boutons
+            startButton.style.display = 'none';
+            stopButton.style.display = 'flex';
+            
+            showAlert('Stream démarré avec succès !', 'success');
+        } else {
+            throw new Error(data.error || 'Erreur lors de la création du stream');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert(error.message);
+        document.getElementById('start-stream').disabled = false;
+        document.getElementById('start-stream').innerHTML = '<i class="fas fa-video"></i> Démarrer le stream';
+    }
+}
+
+async function stopStream() {
+    try {
+        // Arrêter la caméra
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+        
+        // Réinitialiser l'interface
+        document.querySelector('.live-indicator').classList.remove('active');
+        document.getElementById('start-stream').style.display = 'flex';
+        document.getElementById('stop-stream').style.display = 'none';
+        document.querySelector('.camera-placeholder').style.display = 'block';
+        document.getElementById('localVideo').style.display = 'none';
+        
+        // Arrêter le compteur de temps
+        if (timeUpdateInterval) {
+            clearInterval(timeUpdateInterval);
+            timeUpdateInterval = null;
+        }
+        document.querySelector('.stream-time').textContent = '00:00:00';
+        
+        showAlert('Stream arrêté avec succès !', 'success');
+    } catch (error) {
+        console.error('Erreur lors de l\'arrêt du stream:', error);
+        showAlert(error.message);
+    }
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('start-stream').addEventListener('click', startStream);
+    document.getElementById('stop-stream').addEventListener('click', stopStream);
+});
+</script>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{% endblock %} 
