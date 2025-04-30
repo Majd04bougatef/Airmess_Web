@@ -1,0 +1,466 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Assistant AI - Airmess Dashboard{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .chat-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .chat-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+        background: #f8f9fa;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .chat-box {
+        height: 400px;
+        overflow-y: auto;
+        padding: 1.5rem;
+        background-color: #fff;
+    }
+
+    .message {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 10px;
+        white-space: pre-wrap;
+    }
+
+    .message.ai {
+        background-color: #e3f2fd;
+        margin-right: 20%;
+    }
+
+    .message.user {
+        background-color: #f8f9fa;
+        margin-left: 20%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .message.error {
+        background-color: #ffebee;
+        margin: 1rem 10%;
+        border: 1px solid #ffcdd2;
+    }
+
+    .preferences-section {
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+        background: #fff;
+    }
+
+    .preference-tag {
+        display: inline-block;
+        background: #f8f9fa;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        margin: 0.25rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .preference-tag:hover {
+        background: #e3f2fd;
+        transform: translateY(-1px);
+    }
+
+    .input-section {
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 0 0 15px 15px;
+    }
+
+    .back-button {
+        margin-bottom: 1rem;
+    }
+
+    #loading {
+        display: none;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .debug-info {
+        font-family: monospace;
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+        padding: 0.5rem;
+        background: #f8f9fa;
+        border-radius: 5px;
+        overflow: auto;
+        max-height: 150px;
+    }
+
+    .btn-outline-primary {
+        border-color: #5e72e4;
+        color: #5e72e4;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #5e72e4;
+        color: white;
+    }
+
+    .input-group {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .input-group input {
+        border: none;
+        padding: 0.75rem 1rem;
+    }
+
+    .input-group input:focus {
+        box-shadow: none;
+    }
+
+    .input-group button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+    }
+    
+    .type-filters {
+        margin: 1rem 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .type-pill {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #e9ecef;
+        user-select: none;
+    }
+    
+    .type-pill:hover {
+        background-color: #e9ecef;
+    }
+    
+    .type-pill.active {
+        background-color: #5e72e4;
+        color: white;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <a href="{{ path('bonplanVoyageurs_page') }}" class="btn btn-secondary back-button">
+                <i class="fas fa-arrow-left"></i> Retour aux bons plans
+            </a>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h4 class="mb-0"><i class="fas fa-robot me-2"></i>Assistant AI pour Bons Plans</h4>
+                </div>
+
+                <div class="preferences-section">
+                    <h6 class="mb-3">Types de lieux</h6>
+                    <div class="type-filters" id="typeFilters">
+                        <!-- Les types seront ajoutés ici par JavaScript -->
+                    </div>
+
+                    <h6 class="mb-3 mt-4">Vos préférences</h6>
+                    <div id="preferenceTags" class="mb-2">
+                        <!-- Les tags de préférence s'afficheront ici -->
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="preferenceInput" class="form-control" placeholder="Ajouter une préférence..." />
+                        <button class="btn btn-outline-primary" id="addPreferenceBtn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-box" id="chatBox">
+                    <div class="message ai">
+                        Bonjour ! Je suis votre assistant AI pour les bons plans. Comment puis-je vous aider aujourd'hui ?
+                    </div>
+                </div>
+
+                <div id="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <div class="input-group">
+                        <input type="text" id="locationInput" class="form-control" placeholder="Entrez une ville ou un lieu..." />
+                        <button class="btn btn-primary" id="searchBtn">
+                            <i class="fas fa-search me-2"></i> Rechercher
+                        </button>
+                    </div>
+                    <div id="debugInfo" class="debug-info mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded: Initialisation de l\'assistant...');
+    
+    // Définir et créer les types de lieux
+    const typesList = [
+        {id: 'cafe', label: 'Cafés'},
+        {id: 'restaurant', label: 'Restaurants'},
+        {id: 'musee', label: 'Musées'},
+        {id: 'parc', label: 'Parcs'},
+        {id: 'monument', label: 'Monuments'},
+        {id: 'shopping', label: 'Shopping'},
+        {id: 'plage', label: 'Plages'},
+        {id: 'activite', label: 'Activités'}
+    ];
+    
+    // Sélection des éléments DOM
+    const chatBox = document.getElementById('chatBox');
+    const loading = document.getElementById('loading');
+    const locationInput = document.getElementById('locationInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const preferenceInput = document.getElementById('preferenceInput');
+    const addPreferenceBtn = document.getElementById('addPreferenceBtn');
+    const preferenceTags = document.getElementById('preferenceTags');
+    const typeFilters = document.getElementById('typeFilters');
+    const debugInfo = document.getElementById('debugInfo');
+    
+    // Variables pour les données
+    let preferences = [];
+    let selectedTypes = [];
+    
+    // Fonction pour afficher les informations de débogage
+    function showDebugInfo(info) {
+        console.log('Debug:', info);
+        let debugHtml = '';
+        
+        if (typeof info === 'object') {
+            for (const [key, value] of Object.entries(info)) {
+                debugHtml += `<strong>${key}:</strong> ${JSON.stringify(value)}<br>`;
+            }
+        } else {
+            debugHtml += info;
+        }
+        
+        debugInfo.innerHTML = debugHtml;
+    }
+    
+    // Création des pills pour les types
+    function createTypePills() {
+        typeFilters.innerHTML = '';
+        
+        typesList.forEach(type => {
+            const pill = document.createElement('div');
+            pill.className = 'type-pill';
+            pill.dataset.type = type.id;
+            pill.textContent = type.label;
+            
+            // Vérifier si ce type est sélectionné
+            if (selectedTypes.includes(type.id)) {
+                pill.classList.add('active');
+            }
+            
+            // Ajouter l'événement de clic
+            pill.addEventListener('click', function() {
+                toggleType(type.id, pill);
+            });
+            
+            typeFilters.appendChild(pill);
+        });
+        
+        console.log('Types de lieux créés:', typeFilters.childElementCount);
+    }
+    
+    // Sélectionner/désélectionner un type
+    function toggleType(typeId, pillElement) {
+        const isActive = pillElement.classList.contains('active');
+        
+        console.log('Toggle type:', typeId, 'isActive:', isActive);
+        
+        if (isActive) {
+            // Désélectionner
+            pillElement.classList.remove('active');
+            selectedTypes = selectedTypes.filter(t => t !== typeId);
+        } else {
+            // Sélectionner
+            pillElement.classList.add('active');
+            if (!selectedTypes.includes(typeId)) {
+                selectedTypes.push(typeId);
+            }
+        }
+        
+        console.log('Types sélectionnés:', selectedTypes);
+        showDebugInfo({
+            action: 'sélection type',
+            type: typeId,
+            types_selectionnes: selectedTypes
+        });
+    }
+    
+    // Ajouter une préférence
+    function addPreference() {
+        const preference = preferenceInput.value.trim();
+        console.log('Ajout de préférence:', preference);
+        
+        if (preference && !preferences.includes(preference)) {
+            preferences.push(preference);
+            updatePreferenceTags();
+            preferenceInput.value = '';
+        }
+    }
+    
+    // Mettre à jour l'affichage des préférences
+    function updatePreferenceTags() {
+        preferenceTags.innerHTML = '';
+        
+        preferences.forEach(pref => {
+            const tag = document.createElement('span');
+            tag.className = 'preference-tag';
+            tag.textContent = pref;
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'btn-close btn-close-sm ms-2';
+            closeBtn.setAttribute('aria-label', 'Supprimer');
+            closeBtn.addEventListener('click', function() {
+                preferences = preferences.filter(p => p !== pref);
+                updatePreferenceTags();
+            });
+            
+            tag.appendChild(closeBtn);
+            preferenceTags.appendChild(tag);
+        });
+        
+        console.log('Préférences mises à jour:', preferences);
+    }
+    
+    // Ajouter un message à la boîte de dialogue
+    function appendMessage(message, isAi = false, isError = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isAi ? 'ai' : 'user'} ${isError ? 'error' : ''}`;
+        messageDiv.textContent = message;
+        
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    
+    // Rechercher des suggestions
+    async function getSuggestions() {
+        const location = locationInput.value.trim();
+        console.log('Recherche de suggestions pour:', location);
+        
+        if (!location) {
+            appendMessage('Veuillez entrer un lieu pour la recherche.', false, true);
+            return;
+        }
+        
+        loading.style.display = 'block';
+        appendMessage(`Recherche de suggestions pour ${location}...`, false);
+        
+        const requestData = {
+            location: location,
+            preferences: preferences,
+            types: selectedTypes
+        };
+        
+        showDebugInfo({
+            action: 'recherche',
+            données: requestData
+        });
+        
+        try {
+            const response = await fetch('{{ path('api_assistant_suggestions') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('Réponse reçue:', data);
+            
+            if (data.error) {
+                appendMessage(data.error, false, true);
+            } else if (data.suggestions) {
+                appendMessage(data.suggestions, true);
+            } else {
+                appendMessage("Désolé, je n'ai pas trouvé de suggestions pour le moment.", true);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la requête:', error);
+            appendMessage(`Une erreur est survenue: ${error.message}`, false, true);
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+    
+    // Initialisation: Créer les pills de type
+    createTypePills();
+    
+    // Événements
+    addPreferenceBtn.addEventListener('click', addPreference);
+    
+    preferenceInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addPreference();
+        }
+    });
+    
+    searchBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        getSuggestions();
+    });
+    
+    locationInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            getSuggestions();
+        }
+    });
+    
+    // Test du système
+    console.log('Vérification éléments:', 
+        '\n- chatBox:', !!chatBox,
+        '\n- locationInput:', !!locationInput,
+        '\n- searchBtn:', !!searchBtn,
+        '\n- typeFilters:', !!typeFilters
+    );
+    
+    // Afficher état initial
+    showDebugInfo({
+        status: 'Prêt',
+        apiUrl: '{{ path('api_assistant_suggestions') }}'
+    });
+    
+    console.log('Assistant initialisé');
+});
+</script>
+{% endblock %} 

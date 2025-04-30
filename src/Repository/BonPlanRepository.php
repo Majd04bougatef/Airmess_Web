@@ -130,4 +130,24 @@ class BonPlanRepository extends ServiceEntityRepository
                 : 0
         ];
     }
+
+    public function findByLocationAndPreferences(string $location): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->where('LOWER(b.localisation) LIKE LOWER(:location)')
+            ->setParameter('location', '%' . strtolower($location) . '%');
+
+        // Optimiser la recherche par localisation
+        $qb->orWhere('LOWER(b.nomplace) LIKE LOWER(:location_name)')
+           ->setParameter('location_name', '%' . strtolower($location) . '%');
+
+        // Ajouter des critères de tri pertinents
+        $qb->orderBy('b.dateCreation', 'DESC')
+           ->addOrderBy('b.note', 'DESC');
+
+        // Limiter les résultats pour de meilleures performances
+        $qb->setMaxResults(50);
+
+        return $qb->getQuery()->getResult();
+    }
 }

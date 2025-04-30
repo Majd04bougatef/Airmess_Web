@@ -635,58 +635,103 @@
   .seasonal-badge .badge i {
     font-size: 0.9rem;
   }
-</style>
-{% endblock %}
 
-{% block javascripts %}
-{{ parent() }}
-<script type="text/javascript">
-    console.log("Début du script de la page des bons plans");
-    
-    // Attendre que le document soit prêt
-    $(function() {
-        console.log("Document prêt - Initialisation des événements");
-        
-        // Gestionnaire pour le bouton de filtrage
-        var $filterButton = $('.filter-dropdown');
-        var $dropdownMenu = $('.dropdown-menu');
-        
-        console.log("Bouton de filtrage trouvé:", $filterButton.length > 0);
-        console.log("Menu déroulant trouvé:", $dropdownMenu.length > 0);
-        
-        $filterButton.on('click', function(e) {
-            console.log("Clic sur le bouton de filtrage");
-            e.preventDefault();
-            e.stopPropagation();
-            $dropdownMenu.toggle();
-        });
-        
-        // Gestionnaire pour les options de filtrage
-        $('.filter-option').on('click', function(e) {
-            var filter = $(this).data('filter');
-            console.log("Option sélectionnée:", filter);
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Mise à jour du texte du bouton
-            $filterButton.html('<i class="fas fa-filter"></i> ' + $(this).text().trim());
-            
-            // Fermeture du menu
-            $dropdownMenu.hide();
-        });
-        
-        // Fermer le menu si on clique ailleurs
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('.dropdown').length) {
-                $dropdownMenu.hide();
-            }
-        });
-    });
-</script>
+  /* Styles pour l'assistant AI */
+  .ai-assistant-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #5e72e4;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+    transition: all 0.3s ease;
+  }
+
+  .ai-assistant-button i {
+    font-size: 24px;
+  }
+
+  .ai-assistant-button:hover {
+    transform: scale(1.1);
+    background-color: #4454c3;
+  }
+
+  #aiAssistantModal .modal-dialog {
+    position: fixed;
+    right: 30px;
+    bottom: 100px;
+    width: 400px;
+    margin: 0;
+  }
+
+  #aiAssistantModal .modal-content {
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 576px) {
+    #aiAssistantModal .modal-dialog {
+      width: 90%;
+      right: 5%;
+      bottom: 80px;
+    }
+  }
+
+  .modal-dialog-right {
+    position: fixed;
+    right: 30px;
+    bottom: 100px;
+    width: 400px;
+    margin: 0;
+  }
+
+  @media (max-width: 576px) {
+    .modal-dialog-right {
+      width: 90%;
+      right: 5%;
+      bottom: 80px;
+    }
+  }
+
+  .ai-chat-box {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    background-color: #fff;
+  }
+
+  .message {
+    margin-bottom: 10px;
+  }
+
+  .message.ai {
+    background-color: #e3f2fd;
+  }
+
+  .message.user {
+    background-color: #f8f9fa;
+  }
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="container-fluid py-4">
+    <!-- Remplacer le bouton modal par un lien vers une nouvelle page -->
+    <a href="{{ path('ai_assistant_page') }}" class="ai-assistant-button" title="Assistant AI">
+        <i class="fas fa-robot"></i>
+    </a>
+
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
@@ -716,6 +761,9 @@
                                 </a>
                             </div>
                         </div>
+                        <a href="{{ path('bonplan_calendar') }}" class="btn btn-info btn-sm me-2">
+                            <i class="fas fa-calendar-alt me-1"></i>Mon Calendrier
+                        </a>
                         <a href="{{ path('bonplanVoyageurs_page') }}?action=add" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus me-1"></i>Ajouter un bon plan
                         </a>
@@ -1106,8 +1154,8 @@
                                     </div>
                                     
                                     <div class="mb-3">
-                                        <label class="form-label small">Commentaire</label>
-                                        <textarea name="comment" class="form-control form-control-sm comment-input" rows="3" required></textarea>
+                                        <label for="comment" class="form-label">Commentaire</label>
+                                        <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
                                     </div>
                                     
                                     <div class="d-flex justify-content-between">
@@ -1264,3 +1312,47 @@ if (document.readyState === 'loading') {
 }
 </script>
 {% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Document prêt - Initialisation des événements");
+    
+    // Gestionnaire pour le bouton de filtrage
+    var $filterButton = $('.filter-dropdown');
+    var $dropdownMenu = $('.dropdown-menu');
+    
+    console.log("Bouton de filtrage trouvé:", $filterButton.length > 0);
+    console.log("Menu déroulant trouvé:", $dropdownMenu.length > 0);
+    
+    $filterButton.on('click', function(e) {
+        console.log("Clic sur le bouton de filtrage");
+        e.preventDefault();
+        e.stopPropagation();
+        $dropdownMenu.toggle();
+    });
+    
+    // Gestionnaire pour les options de filtrage
+    $('.filter-option').on('click', function(e) {
+        var filter = $(this).data('filter');
+        console.log("Option sélectionnée:", filter);
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Mise à jour du texte du bouton
+        $filterButton.html('<i class="fas fa-filter"></i> ' + $(this).text().trim());
+        
+        // Fermeture du menu
+        $dropdownMenu.hide();
+    });
+    
+    // Fermer le menu si on clique ailleurs
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.dropdown').length) {
+            $dropdownMenu.hide();
+        }
+    });
+});
+</script>
+{% endblock javascripts %}

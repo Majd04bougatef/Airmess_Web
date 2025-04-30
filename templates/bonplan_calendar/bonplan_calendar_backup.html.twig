@@ -1,0 +1,719 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Calendrier Personnel - Bons Plans{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+  /* Styles pour le calendrier */
+  .calendar-container {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .calendar-month {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #344767;
+  }
+  
+  .calendar-navigation {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .calendar-nav-btn {
+    background-color: #f8f9fa;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .calendar-nav-btn:hover {
+    background-color: #e9ecef;
+  }
+  
+  .calendar-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 3px;
+  }
+  
+  .calendar-table th {
+    text-align: center;
+    padding: 10px;
+    font-weight: 600;
+    color: #344767;
+    font-size: 0.9rem;
+  }
+  
+  .calendar-table td {
+    text-align: center;
+    vertical-align: top;
+    height: 100px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 8px;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  
+  .calendar-table td:hover {
+    background-color: #e9ecef;
+  }
+  
+  .calendar-day {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .calendar-day.today {
+    color: #fff;
+    background-color: #5e72e4;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .calendar-events {
+    margin-top: 25px;
+    font-size: 0.8rem;
+    text-align: left;
+    overflow: hidden;
+  }
+  
+  .calendar-event {
+    background-color: #5e72e4;
+    color: #fff;
+    padding: 3px 5px;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .calendar-event:hover {
+    background-color: #4f46e5;
+  }
+  
+  .calendar-inactive {
+    opacity: 0.5;
+    background-color: #f1f1f1;
+  }
+  
+  /* Styles pour le formulaire d'ajout d'événement */
+  .event-form {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+  }
+  
+  .event-form h4 {
+    margin-bottom: 20px;
+    color: #344767;
+    font-weight: 600;
+  }
+  
+  .event-form .form-label {
+    color: #344767;
+    font-weight: 500;
+  }
+  
+  .event-form .form-control {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid #d2d6da;
+  }
+  
+  .event-form .form-control:focus {
+    border-color: #5e72e4;
+    box-shadow: 0 0 0 2px rgba(94, 114, 228, 0.1);
+  }
+  
+  .event-form .btn-primary {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .event-form .btn-primary:hover {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Mon Calendrier de Bons Plans</h6>
+                    <a href="{{ path('bonplanVoyageurs_page') }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Retour aux Bons Plans
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <!-- Calendrier -->
+                            <div class="calendar-container">
+                                <div class="calendar-header">
+                                    <div class="calendar-month">
+                                        <span id="calendarMonthYear"></span>
+                                    </div>
+                                    <div class="calendar-navigation">
+                                        <button class="calendar-nav-btn" id="prevMonth">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <button class="calendar-nav-btn" id="currentMonth">
+                                            <i class="fas fa-calendar-day"></i>
+                                        </button>
+                                        <button class="calendar-nav-btn" id="nextMonth">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <table class="calendar-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Lun</th>
+                                            <th>Mar</th>
+                                            <th>Mer</th>
+                                            <th>Jeu</th>
+                                            <th>Ven</th>
+                                            <th>Sam</th>
+                                            <th>Dim</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="calendarBody">
+                                        <!-- Le calendrier sera généré dynamiquement par JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <!-- Formulaire d'ajout d'événement -->
+                            <div class="event-form">
+                                <h4>Ajouter une note</h4>
+                                <form id="eventForm">
+                                    <div class="mb-3">
+                                        <label for="eventTitle" class="form-label">Titre</label>
+                                        <input type="text" class="form-control" id="eventTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="eventDate" class="form-label">Date</label>
+                                        <input type="date" class="form-control" id="eventDate" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="eventDescription" class="form-label">Description</label>
+                                        <textarea class="form-control" id="eventDescription" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="eventColor" class="form-label">Couleur</label>
+                                        <select class="form-control" id="eventColor">
+                                            <option value="#5e72e4">Bleu</option>
+                                            <option value="#f5365c">Rouge</option>
+                                            <option value="#2dce89">Vert</option>
+                                            <option value="#fb6340">Orange</option>
+                                            <option value="#11cdef">Cyan</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus me-1"></i>Ajouter
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour voir/modifier/supprimer un événement -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Détails de l'événement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEventForm">
+                    <input type="hidden" id="editEventId">
+                    <div class="mb-3">
+                        <label for="editEventTitle" class="form-label">Titre</label>
+                        <input type="text" class="form-control" id="editEventTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventDate" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="editEventDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editEventDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventColor" class="form-label">Couleur</label>
+                        <select class="form-control" id="editEventColor">
+                            <option value="#5e72e4">Bleu</option>
+                            <option value="#f5365c">Rouge</option>
+                            <option value="#2dce89">Vert</option>
+                            <option value="#fb6340">Orange</option>
+                            <option value="#11cdef">Cyan</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="deleteEventBtn">
+                    <i class="fas fa-trash me-1"></i>Supprimer
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Fermer
+                </button>
+                <button type="button" class="btn btn-primary" id="updateEventBtn">
+                    <i class="fas fa-save me-1"></i>Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Stockage local des événements
+        let events = JSON.parse(localStorage.getItem('bonplan_calendar_events') || '[]');
+        
+        // Date actuelle
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        
+        // Génération initiale du calendrier
+        generateCalendar(currentMonth, currentYear);
+        updateCalendarEvents();
+        
+        // Gestion de la navigation du calendrier
+        document.getElementById('prevMonth').addEventListener('click', function() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(currentMonth, currentYear);
+            updateCalendarEvents();
+        });
+        
+        document.getElementById('nextMonth').addEventListener('click', function() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(currentMonth, currentYear);
+            updateCalendarEvents();
+        });
+        
+        document.getElementById('currentMonth').addEventListener('click', function() {
+            const today = new Date();
+            currentMonth = today.getMonth();
+            currentYear = today.getFullYear();
+            generateCalendar(currentMonth, currentYear);
+            updateCalendarEvents();
+        });
+        
+        // Gestion du formulaire d'ajout d'événement
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('eventTitle').value;
+            const date = document.getElementById('eventDate').value;
+            const description = document.getElementById('eventDescription').value;
+            const color = document.getElementById('eventColor').value;
+            
+            const newEvent = {
+                id: Date.now().toString(), // ID unique basé sur le timestamp
+                title: title,
+                date: date,
+                description: description,
+                color: color
+            };
+            
+            events.push(newEvent);
+            saveEvents();
+            updateCalendarEvents();
+            
+            // Réinitialiser le formulaire
+            document.getElementById('eventForm').reset();
+        });
+        
+        // Gestion des événements du calendrier
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('calendar-event')) {
+                const eventId = e.target.dataset.eventId;
+                const event = events.find(evt => evt.id === eventId);
+                
+                if (event) {
+                    document.getElementById('editEventId').value = event.id;
+                    document.getElementById('editEventTitle').value = event.title;
+                    document.getElementById('editEventDate').value = event.date;
+                    document.getElementById('editEventDescription').value = event.description || '';
+                    document.getElementById('editEventColor').value = event.color;
+                    
+                    // Afficher la modal
+                    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+                    eventModal.show();
+                }
+            }
+        });
+        
+        // Gestion de la mise à jour d'un événement
+        document.getElementById('updateEventBtn').addEventListener('click', function() {
+            const eventId = document.getElementById('editEventId').value;
+            const event = events.find(evt => evt.id === eventId);
+            
+            if (event) {
+                event.title = document.getElementById('editEventTitle').value;
+                event.date = document.getElementById('editEventDate').value;
+                event.description = document.getElementById('editEventDescription').value;
+                event.color = document.getElementById('editEventColor').value;
+                
+                saveEvents();
+                updateCalendarEvents();
+                
+                // Fermer la modal
+                const eventModalEl = document.getElementById('eventModal');
+                const eventModal = bootstrap.Modal.getInstance(eventModalEl);
+                eventModal.hide();
+            }
+        });
+        
+        // Gestion de la suppression d'un événement
+        document.getElementById('deleteEventBtn').addEventListener('click', function() {
+            const eventId = document.getElementById('editEventId').value;
+            events = events.filter(evt => evt.id !== eventId);
+            
+            saveEvents();
+            updateCalendarEvents();
+            
+            // Fermer la modal
+            const eventModalEl = document.getElementById('eventModal');
+            const eventModal = bootstrap.Modal.getInstance(eventModalEl);
+            eventModal.hide();
+        });
+        
+        // Fonction pour générer le calendrier
+        function generateCalendar(month, year) {
+            const calendarBody = document.getElementById('calendarBody');
+            const calendarMonthYear = document.getElementById('calendarMonthYear');
+            
+            // Mise à jour du titre du mois
+            const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                               'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            calendarMonthYear.textContent = `${monthNames[month]} ${year}`;
+            
+            // Vider le calendrier
+            calendarBody.innerHTML = '';
+            
+            // Trouver le premier jour du mois
+            const firstDay = new Date(year, month, 1).getDay();
+            const firstDayIndex = firstDay === 0 ? 6 : firstDay - 1; // Convertir de dimanche (0) à lundi (0)
+            
+            // Trouver le nombre de jours dans le mois
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Trouver le nombre de jours dans le mois précédent
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            let date = 1;
+            let nextMonthDate = 1;
+            
+            // Créer les lignes du calendrier
+            for (let i = 0; i < 6; i++) {
+                // Si tous les jours du mois sont affichés, sortir de la boucle
+                if (date > daysInMonth) break;
+                
+                const row = document.createElement('tr');
+                
+                // Créer les cellules de chaque ligne
+                for (let j = 0; j < 7; j++) {
+                    const cell = document.createElement('td');
+                    
+                    if (i === 0 && j < firstDayIndex) {
+                        // Jours du mois précédent
+                        const prevMonthDay = daysInPrevMonth - (firstDayIndex - j - 1);
+                        cell.innerHTML = `<div class="calendar-day calendar-inactive">${prevMonthDay}</div>
+                                         <div class="calendar-events" data-date="${year}-${month === 0 ? 12 : month}-${prevMonthDay}"></div>`;
+                        cell.classList.add('calendar-inactive');
+                    } else if (date > daysInMonth) {
+                        // Jours du mois suivant
+                        cell.innerHTML = `<div class="calendar-day calendar-inactive">${nextMonthDate}</div>
+                                         <div class="calendar-events" data-date="${year}-${month === 11 ? 1 : month + 2}-${nextMonthDate}"></div>`;
+                        cell.classList.add('calendar-inactive');
+                        nextMonthDate++;
+                    } else {
+                        // Jours du mois actuel
+                        const formattedDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
+                        const today = new Date();
+                        const isToday = date === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                        
+                        cell.innerHTML = `<div class="calendar-day${isToday ? ' today' : ''}">${date}</div>
+                                         <div class="calendar-events" data-date="${formattedDate}"></div>`;
+                        
+                        // Ajouter un attribut data pour faciliter l'ajout d'événements
+                        cell.dataset.date = formattedDate;
+                        
+                        // Rendre la cellule cliquable pour ajouter un événement
+                        cell.addEventListener('click', function(e) {
+                            if (!e.target.classList.contains('calendar-event')) {
+                                document.getElementById('eventDate').value = formattedDate;
+                            }
+                        });
+                        
+                        date++;
+                    }
+                    
+                    row.appendChild(cell);
+                }
+                
+                calendarBody.appendChild(row);
+            }
+        }
+        
+        // Fonction pour mettre à jour les événements sur le calendrier
+        function updateCalendarEvents() {
+            // Supprimer tous les événements du calendrier
+            document.querySelectorAll('.calendar-event').forEach(el => el.remove());
+            
+            // Ajouter les événements au calendrier
+            events.forEach(event => {
+                const eventDate = event.date;
+                const eventContainer = document.querySelector(`.calendar-events[data-date="${eventDate}"]`);
+                
+                if (eventContainer) {
+                    const eventEl = document.createElement('div');
+                    eventEl.classList.add('calendar-event');
+                    eventEl.textContent = event.title;
+                    eventEl.dataset.eventId = event.id;
+                    eventEl.style.backgroundColor = event.color;
+                    eventContainer.appendChild(eventEl);
+                }
+            });
+        }
+        
+        // Fonction pour sauvegarder les événements dans localStorage
+        function saveEvents() {
+            localStorage.setItem('bonplan_calendar_events', JSON.stringify(events));
+        }
+    });
+
+    function forceRefresh() {
+        console.log("=== FORÇAGE MANUEL DU RAFRAÎCHISSEMENT ===");
+        try {
+            const events = JSON.parse(localStorage.getItem('bonplan_calendar_events') || '[]');
+            console.log(`Récupération de ${events.length} événements`);
+            
+            document.querySelectorAll('.calendar-event').forEach(el => el.remove());
+            
+            let added = 0;
+            events.forEach(event => {
+                const container = document.querySelector(`.calendar-events[data-date="${event.date}"]`);
+                if (container) {
+                    const el = document.createElement('div');
+                    el.classList.add('calendar-event');
+                    el.textContent = event.title;
+                    el.dataset.eventId = event.id;
+                    el.style.backgroundColor = event.color;
+                    container.appendChild(el);
+                    added++;
+                }
+            });
+            
+            console.log(`${added}/${events.length} événements ajoutés`);
+            if (added > 0) alert(`${added} notes ajoutées avec succès!`);
+            return true;
+        } catch(e) {
+            console.error("Erreur:", e);
+            return false;
+        }
+    }
+    forceRefresh();
+
+    function regenererCalendrier() {
+        console.log("=== RÉGÉNÉRATION DU CALENDRIER ===");
+        
+        // Créer un événement de test pour aujourd'hui
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${y}-${m}-${d}`;
+        
+        // Créer l'événement
+        const newEvent = {
+            id: "test-" + Date.now(),
+            title: "Note de test " + new Date().toLocaleTimeString(),
+            date: formattedDate,
+            description: "Événement de test créé automatiquement",
+            color: "#f5365c"
+        };
+        
+        // Sauvegarder dans localStorage
+        localStorage.setItem('bonplan_calendar_events', JSON.stringify([newEvent]));
+        console.log("Événement de test créé pour aujourd'hui:", formattedDate);
+        
+        // Forcer le rechargement de la page
+        console.log("Rechargement de la page dans 2 secondes...");
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+    }
+
+    regenererCalendrier();
+
+    function reconstruireCalendrier() {
+        console.log("=== RECONSTRUCTION COMPLÈTE DU CALENDRIER ===");
+        
+        // Vérifier si des événements existent
+        const events = JSON.parse(localStorage.getItem('bonplan_calendar_events') || '[]');
+        console.log(`${events.length} événements trouvés dans localStorage`);
+        
+        // Reconstruire le corps du calendrier
+        const calendarBody = document.getElementById('calendarBody');
+        if (!calendarBody) {
+            console.error("Element #calendarBody non trouvé!");
+            return false;
+        }
+        
+        // Date actuelle
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth();
+        
+        // Mettre à jour l'en-tête du mois
+        const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                           'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        document.getElementById('calendarMonthYear').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        
+        // Vider le calendrier
+        calendarBody.innerHTML = '';
+        
+        // Premier jour du mois (0=Dimanche, 1=Lundi, etc.)
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const firstDayIndex = firstDay === 0 ? 6 : firstDay - 1; // Convertir pour commencer par lundi
+        
+        // Nombre de jours dans ce mois
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        
+        // Remplir le calendrier
+        let date = 1;
+        for (let i = 0; i < 6; i++) {
+            // Arrêter si on a dépassé le nombre de jours du mois
+            if (date > daysInMonth) break;
+            
+            const row = document.createElement('tr');
+            
+            for (let j = 0; j < 7; j++) {
+                const cell = document.createElement('td');
+                
+                if (i === 0 && j < firstDayIndex) {
+                    // Jours du mois précédent
+                    cell.innerHTML = '<div class="calendar-day calendar-inactive"></div><div class="calendar-events"></div>';
+                    cell.classList.add('calendar-inactive');
+                } else if (date > daysInMonth) {
+                    // Jours du mois suivant
+                    cell.innerHTML = '<div class="calendar-day calendar-inactive"></div><div class="calendar-events"></div>';
+                    cell.classList.add('calendar-inactive');
+                } else {
+                    // Jours du mois actuel - CORRECTION DU FORMAT DE DATE
+                    const formattedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                    const isToday = date === today.getDate() && currentMonth === today.getMonth();
+                    
+                    cell.innerHTML = `<div class="calendar-day${isToday ? ' today' : ''}">${date}</div>
+                                     <div class="calendar-events" data-date="${formattedDate}"></div>`;
+                    
+                    date++;
+                }
+                
+                row.appendChild(cell);
+            }
+            
+            calendarBody.appendChild(row);
+        }
+        
+        // Maintenant, ajouter les événements
+        let ajoutés = 0;
+        events.forEach(event => {
+            const container = document.querySelector(`.calendar-events[data-date="${event.date}"]`);
+            if (container) {
+                const el = document.createElement('div');
+                el.classList.add('calendar-event');
+                el.textContent = event.title;
+                el.dataset.eventId = event.id;
+                el.style.backgroundColor = event.color || '#5e72e4';
+                container.appendChild(el);
+                ajoutés++;
+            } else {
+                console.log(`Conteneur non trouvé pour la date: ${event.date}`);
+            }
+        });
+        
+        console.log(`${ajoutés}/${events.length} événements ajoutés au calendrier`);
+        
+        // Vérification finale
+        setTimeout(() => {
+            const containers = document.querySelectorAll('.calendar-events');
+            console.log(`${containers.length} conteneurs de dates après reconstruction`);
+            if (containers.length === 0) {
+                alert("ERREUR: Impossible de reconstruire le calendrier!");
+            } else if (ajoutés > 0) {
+                alert(`Calendrier reconstruit avec succès! ${ajoutés} notes ajoutées.`);
+            } else if (events.length > 0) {
+                alert("Calendrier reconstruit, mais aucun événement n'a pu être affiché.");
+            } else {
+                alert("Calendrier reconstruit. Aucun événement à afficher.");
+            }
+        }, 500);
+        
+        return true;
+    }
+
+    reconstruireCalendrier();
+</script>
+{% endblock %} 

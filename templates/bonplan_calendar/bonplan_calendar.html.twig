@@ -1,0 +1,444 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Calendrier Personnel - Bons Plans{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+  /* Styles pour le calendrier */
+  .calendar-container {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .calendar-month {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #344767;
+  }
+  
+  .calendar-navigation {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .calendar-nav-btn {
+    background-color: #f8f9fa;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .calendar-nav-btn:hover {
+    background-color: #e9ecef;
+  }
+  
+  .calendar-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 3px;
+  }
+  
+  .calendar-table th {
+    text-align: center;
+    padding: 10px;
+    font-weight: 600;
+    color: #344767;
+    font-size: 0.9rem;
+  }
+  
+  .calendar-table td {
+    text-align: center;
+    vertical-align: top;
+    height: 100px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 8px;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  
+  .calendar-table td:hover {
+    background-color: #e9ecef;
+  }
+  
+  .calendar-day {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .calendar-day.today {
+    color: #fff;
+    background-color: #5e72e4;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .calendar-events {
+    margin-top: 25px;
+    font-size: 0.8rem;
+    text-align: left;
+    overflow: hidden;
+  }
+  
+  .calendar-event {
+    background-color: #5e72e4;
+    color: #fff;
+    padding: 3px 5px;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .calendar-event:hover {
+    background-color: #4f46e5;
+  }
+  
+  .calendar-inactive {
+    opacity: 0.5;
+    background-color: #f1f1f1;
+  }
+  
+  /* Styles pour le formulaire d'ajout d'événement */
+  .event-form {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+  }
+  
+  .event-form h4 {
+    margin-bottom: 20px;
+    color: #344767;
+    font-weight: 600;
+  }
+  
+  .event-form .form-label {
+    color: #344767;
+    font-weight: 500;
+  }
+  
+  .event-form .form-control {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid #d2d6da;
+  }
+  
+  .event-form .form-control:focus {
+    border-color: #5e72e4;
+    box-shadow: 0 0 0 2px rgba(94, 114, 228, 0.1);
+  }
+  
+  .event-form .btn-primary {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .event-form .btn-primary:hover {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Mon Calendrier de Bons Plans</h6>
+                    <div>
+                        <button type="button" id="debugBtn" class="btn btn-warning btn-sm me-2">
+                            <i class="fas fa-bug me-1"></i>Debug
+                        </button>
+                        <a href="{{ path('bonplanVoyageurs_page') }}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i>Retour aux Bons Plans
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="calendarMainContainer">
+                        <!-- Le contenu du calendrier sera généré dynamiquement par rebuild-calendar.js -->
+                        <div class="col-lg-8">
+                            <div class="calendar-container">
+                                <button id="repairBtn" class="btn btn-danger w-100 mb-3">
+                                    🔧 RÉPARER LE CALENDRIER
+                                </button>
+                                <div class="calendar-header">
+                                    <div class="calendar-month">
+                                        <span id="calendarMonthYear">Mois Année</span>
+                                    </div>
+                                    <div class="calendar-navigation">
+                                        <button class="calendar-nav-btn" id="prevMonth">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <button class="calendar-nav-btn" id="currentMonth">
+                                            <i class="fas fa-calendar-day"></i>
+                                        </button>
+                                        <button class="calendar-nav-btn" id="nextMonth">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <table class="calendar-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Lun</th>
+                                            <th>Mar</th>
+                                            <th>Mer</th>
+                                            <th>Jeu</th>
+                                            <th>Ven</th>
+                                            <th>Sam</th>
+                                            <th>Dim</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="calendarBody">
+                                        <!-- Le calendrier sera généré dynamiquement par JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="event-form">
+                                <h4>Ajouter une note</h4>
+                                <form id="eventForm">
+                                    <div class="mb-3">
+                                        <label for="eventTitle" class="form-label">Titre</label>
+                                        <input type="text" class="form-control" id="eventTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="eventDate" class="form-label">Date</label>
+                                        <input type="date" class="form-control" id="eventDate" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="eventDescription" class="form-label">Description</label>
+                                        <textarea class="form-control" id="eventDescription" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="eventColor" class="form-label">Couleur</label>
+                                        <select class="form-control" id="eventColor">
+                                            <option value="#5e72e4">Bleu</option>
+                                            <option value="#f5365c">Rouge</option>
+                                            <option value="#2dce89">Vert</option>
+                                            <option value="#fb6340">Orange</option>
+                                            <option value="#11cdef">Cyan</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus me-1"></i>Ajouter
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour voir/modifier/supprimer un événement -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Détails de l'événement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEventForm">
+                    <input type="hidden" id="editEventId">
+                    <div class="mb-3">
+                        <label for="editEventTitle" class="form-label">Titre</label>
+                        <input type="text" class="form-control" id="editEventTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventDate" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="editEventDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editEventDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventColor" class="form-label">Couleur</label>
+                        <select class="form-control" id="editEventColor">
+                            <option value="#5e72e4">Bleu</option>
+                            <option value="#f5365c">Rouge</option>
+                            <option value="#2dce89">Vert</option>
+                            <option value="#fb6340">Orange</option>
+                            <option value="#11cdef">Cyan</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="deleteEventBtn">
+                    <i class="fas fa-trash me-1"></i>Supprimer
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Fermer
+                </button>
+                <button type="button" class="btn btn-primary" id="updateEventBtn">
+                    <i class="fas fa-save me-1"></i>Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+<!-- Assurez-vous que le bootstrap JS est chargé pour les modals -->
+<script src="{{ asset('js/core/bootstrap.bundle.min.js') }}"></script>
+
+<!-- Script principal du calendrier -->
+<script src="{{ asset('js/rebuild-calendar.js') }}"></script>
+
+<!-- Script de diagnostic et réparation -->
+<script src="{{ asset('js/diagnostic-calendar.js') }}"></script>
+
+<!-- Script direct d'urgence -->
+<script>
+    // Fonction d'urgence pour afficher les événements
+    document.addEventListener('DOMContentLoaded', function() {
+        // Attendre que le calendrier soit chargé
+        setTimeout(function() {
+            const repairBtn = document.getElementById('repairBtn');
+            if (repairBtn) {
+                repairBtn.addEventListener('click', forceDisplayAllEvents);
+            }
+            
+            // Vérification automatique
+            setTimeout(checkEventsDisplayed, 2000);
+        }, 1000);
+        
+        function checkEventsDisplayed() {
+            const events = JSON.parse(localStorage.getItem('bonplan_calendar_events') || '[]');
+            const displayed = document.querySelectorAll('.calendar-event');
+            
+            console.log(`Vérification: ${events.length} événements dans localStorage, ${displayed.length} affichés`);
+            
+            if (events.length > 0 && displayed.length === 0) {
+                console.warn("PROBLÈME DÉTECTÉ: événements non affichés");
+                
+                if (confirm("Des événements sont stockés mais ne sont pas affichés. Voulez-vous tenter une réparation?")) {
+                    forceDisplayAllEvents();
+                }
+            }
+        }
+        
+        function forceDisplayAllEvents() {
+            const events = JSON.parse(localStorage.getItem('bonplan_calendar_events') || '[]');
+            let displayed = 0;
+            
+            if (events.length === 0) {
+                alert("Aucun événement à afficher. Ajoutez d'abord une note.");
+                return;
+            }
+            
+            // Vérifier si les événements sont pour le mois actuel
+            const currentDate = new Date();
+            let needsNavigation = false;
+            let targetMonth = currentDate.getMonth();
+            let targetYear = currentDate.getFullYear();
+            
+            // Trouver le mois avec le plus d'événements
+            const monthCounts = {};
+            events.forEach(event => {
+                const parts = event.date.split('-');
+                const monthYear = `${parts[0]}-${parts[1]}`;
+                monthCounts[monthYear] = (monthCounts[monthYear] || 0) + 1;
+            });
+            
+            // Trouver le mois avec le plus d'événements
+            let maxCount = 0;
+            let maxMonthYear = '';
+            
+            Object.keys(monthCounts).forEach(monthYear => {
+                if (monthCounts[monthYear] > maxCount) {
+                    maxCount = monthCounts[monthYear];
+                    maxMonthYear = monthYear;
+                }
+            });
+            
+            // Naviguer vers ce mois
+            if (maxMonthYear) {
+                const parts = maxMonthYear.split('-');
+                targetYear = parseInt(parts[0]);
+                targetMonth = parseInt(parts[1]) - 1;
+                
+                if (targetMonth !== currentDate.getMonth() || 
+                    targetYear !== currentDate.getFullYear()) {
+                    needsNavigation = true;
+                }
+            }
+            
+            if (needsNavigation && window.currentMonth !== undefined) {
+                window.currentMonth = targetMonth;
+                window.currentYear = targetYear;
+                
+                if (typeof window.generateCalendar === 'function') {
+                    window.generateCalendar();
+                    alert(`Navigation vers ${targetMonth + 1}/${targetYear} où il y a ${maxCount} événements`);
+                    return;
+                }
+            }
+            
+            // Supprimer les événements existants
+            document.querySelectorAll('.calendar-event').forEach(el => el.remove());
+            
+            // Ajouter les événements
+            events.forEach(event => {
+                const container = document.querySelector(`.calendar-events[data-date="${event.date}"]`);
+                
+                if (container) {
+                    const el = document.createElement('div');
+                    el.classList.add('calendar-event');
+                    el.textContent = event.title;
+                    el.dataset.eventId = event.id;
+                    el.style.backgroundColor = event.color || '#5e72e4';
+                    container.appendChild(el);
+                    displayed++;
+                }
+            });
+            
+            alert(`Réparation terminée: ${displayed}/${events.length} notes affichées.`);
+        }
+    });
+</script>
+{% endblock %} 

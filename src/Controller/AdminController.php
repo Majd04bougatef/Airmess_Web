@@ -530,31 +530,42 @@ class AdminController extends AbstractController
     }
 
     #[Route('/BonplanPage', name: 'bonplan_page')]
-
     public function bonplanPage(Request $request, BonPlanRepository $bonPlanRepository): Response
     {
         $searchTerm = $request->query->get('search', '');
+        $type = $request->query->get('type');
+        $sort = $request->query->get('sort', 'recent');
         
-        // Si un terme de recherche est fourni, filtrer les résultats
+        // Construire la requête en fonction des filtres
+        $queryBuilder = $bonPlanRepository->createQueryBuilder('b');
+        
+        // Appliquer les filtres
         if (!empty($searchTerm)) {
-            // Essayer de récupérer une méthode de recherche du repository
-            if (method_exists($bonPlanRepository, 'searchBonPlans')) {
-                $bonPlans = $bonPlanRepository->searchBonPlans($searchTerm);
-            } else {
-                // Fallback: recherche basique si la méthode n'existe pas
-                $bonPlans = $bonPlanRepository->findBy([
-                    'nomplace' => '%' . $searchTerm . '%'
-                ]);
-                
-                // Si aucun résultat, récupérer tous
-                if (empty($bonPlans)) {
-                    $bonPlans = $bonPlanRepository->findAll();
-                }
-            }
-        } else {
-            // Sinon, récupérer tous les bon plans
-            $bonPlans = $bonPlanRepository->findAll();
+            $queryBuilder->andWhere('b.nomplace LIKE :search OR b.description LIKE :search OR b.localisation LIKE :search')
+                        ->setParameter('search', '%' . $searchTerm . '%');
         }
+        
+        if ($type) {
+            $queryBuilder->andWhere('b.typePlace = :type')
+                        ->setParameter('type', $type);
+        }
+        
+        // Appliquer le tri
+        switch ($sort) {
+            case 'name_asc':
+                $queryBuilder->orderBy('b.nomplace', 'ASC');
+                break;
+            case 'name_desc':
+                $queryBuilder->orderBy('b.nomplace', 'DESC');
+                break;
+            case 'recent':
+            default:
+                $queryBuilder->orderBy('b.idP', 'DESC');
+                break;
+        }
+        
+        // Exécuter la requête
+        $bonPlans = $queryBuilder->getQuery()->getResult();
         
         // Récupérer les statistiques
         $statsByType = $bonPlanRepository->getStatsByType();
@@ -564,6 +575,8 @@ class AdminController extends AbstractController
         return $this->render('dashAdmin/bonplanPage.html.twig', [
             'bonPlans' => $bonPlans,
             'searchTerm' => $searchTerm,
+            'type' => $type,
+            'sort' => $sort,
             'statsByType' => $statsByType,
             'generalStats' => $generalStats
         ]);
