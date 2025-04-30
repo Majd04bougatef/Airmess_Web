@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Assistant AI - Airmess{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .assistant-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+        .suggestions-container {
+            margin-top: 2rem;
+        }
+        .suggestion-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .preferences-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .preference-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="assistant-container">
+        <h1 class="mb-4">Assistant AI Airmess</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <form id="assistantForm" method="POST">
+                    <div class="form-group">
+                        <label for="location">Où souhaitez-vous aller ?</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Vos préférences :</label>
+                        <div class="preferences-container">
+                            <div class="preference-checkbox">
+                                <input type="checkbox" id="restaurant" name="preferences[]" value="restaurant">
+                                <label for="restaurant">Restaurants</label>
+                            </div>
+                            <div class="preference-checkbox">
+                                <input type="checkbox" id="culture" name="preferences[]" value="culture">
+                                <label for="culture">Culture</label>
+                            </div>
+                            <div class="preference-checkbox">
+                                <input type="checkbox" id="sport" name="preferences[]" value="sport">
+                                <label for="sport">Sport</label>
+                            </div>
+                            <div class="preference-checkbox">
+                                <input type="checkbox" id="nature" name="preferences[]" value="nature">
+                                <label for="nature">Nature</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Obtenir des suggestions</button>
+                </form>
+
+                <div id="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+
+                <div id="suggestions" class="suggestions-container"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('assistantForm');
+            const loadingElement = document.getElementById('loading');
+            const suggestionsContainer = document.getElementById('suggestions');
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const location = document.getElementById('location').value;
+                const preferences = Array.from(document.querySelectorAll('input[name="preferences[]"]:checked'))
+                    .map(checkbox => checkbox.value);
+                
+                loadingElement.style.display = 'block';
+                suggestionsContainer.innerHTML = '';
+                
+                try {
+                    const response = await fetch('{{ path('api_assistant_suggestions') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ location, preferences })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!data.suggestions || data.suggestions.length === 0) {
+                        suggestionsContainer.innerHTML = '<div class="alert alert-info">Aucune suggestion trouvée pour cette localisation.</div>';
+                    } else {
+                        data.suggestions.forEach(suggestion => {
+                            const card = document.createElement('div');
+                            card.className = 'suggestion-card';
+                            card.innerHTML = `
+                                <h5>${suggestion.title}</h5>
+                                <p><strong>Localisation:</strong> ${suggestion.location}</p>
+                                <p>${suggestion.description}</p>
+                                <a href="${suggestion.link}" class="btn btn-sm btn-primary">Voir plus</a>
+                            `;
+                            suggestionsContainer.appendChild(card);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    suggestionsContainer.innerHTML = 
+                        '<div class="alert alert-danger">Une erreur est survenue lors de la récupération des suggestions.</div>';
+                } finally {
+                    loadingElement.style.display = 'none';
+                }
+            });
+        });
+    </script>
+{% endblock %} 

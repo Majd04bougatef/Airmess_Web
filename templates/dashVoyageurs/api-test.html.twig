@@ -1,0 +1,154 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Test API Assistant - Airmess Dashboard{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Test API Assistant</h4>
+                </div>
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label for="locationTest">Localisation</label>
+                        <input type="text" id="locationTest" class="form-control" value="Paris" />
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label>Préférences</label>
+                        <div class="d-flex gap-2 mb-2">
+                            <button class="btn btn-sm btn-outline-primary add-pref" data-pref="restaurant">Restaurant</button>
+                            <button class="btn btn-sm btn-outline-primary add-pref" data-pref="café">Café</button>
+                            <button class="btn btn-sm btn-outline-primary add-pref" data-pref="culture">Culture</button>
+                        </div>
+                        <div id="prefList" class="d-flex gap-2 flex-wrap">
+                            <!-- Liste des préférences -->
+                        </div>
+                    </div>
+                    
+                    <button id="testApiBtn" class="btn btn-primary">Tester l'API</button>
+                    
+                    <div class="mt-4">
+                        <h5>Requête</h5>
+                        <pre id="requestData" class="p-3 bg-light rounded">...</pre>
+                        
+                        <h5>Réponse</h5>
+                        <pre id="responseData" class="p-3 bg-light rounded">En attente...</pre>
+                        
+                        <h5>Console</h5>
+                        <div id="consoleLog" class="p-3 bg-light rounded" style="max-height: 200px; overflow: auto;">
+                            <!-- Messages de console -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+$(document).ready(function() {
+    let preferences = [];
+    
+    // Journalisation personnalisée
+    function log(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        let className = 'text-info';
+        
+        if (type === 'error') className = 'text-danger';
+        if (type === 'success') className = 'text-success';
+        
+        $('#consoleLog').append(`<div class="${className}"><strong>${timestamp}</strong>: ${message}</div>`);
+    }
+    
+    // Initialisation
+    log('Page de test initialisée');
+    log('jQuery version: ' + $.fn.jquery);
+    
+    // Fonctions
+    function updatePrefList() {
+        $('#prefList').empty();
+        preferences.forEach(pref => {
+            $('#prefList').append(`
+                <span class="badge bg-primary p-2">
+                    ${pref}
+                    <button class="btn-close btn-close-white ms-1" data-pref="${pref}"></button>
+                </span>
+            `);
+        });
+        
+        // Mise à jour des données de requête
+        updateRequestData();
+    }
+    
+    function updateRequestData() {
+        const requestData = {
+            location: $('#locationTest').val(),
+            preferences: preferences
+        };
+        
+        $('#requestData').text(JSON.stringify(requestData, null, 2));
+    }
+    
+    // Gestionnaires d'événements
+    $('.add-pref').on('click', function() {
+        const pref = $(this).data('pref');
+        if (!preferences.includes(pref)) {
+            preferences.push(pref);
+            updatePrefList();
+            log(`Préférence ajoutée: ${pref}`);
+        }
+    });
+    
+    $(document).on('click', '.btn-close', function() {
+        const pref = $(this).data('pref');
+        preferences = preferences.filter(p => p !== pref);
+        updatePrefList();
+        log(`Préférence supprimée: ${pref}`);
+    });
+    
+    $('#locationTest').on('input', function() {
+        updateRequestData();
+    });
+    
+    $('#testApiBtn').on('click', function() {
+        const requestData = {
+            location: $('#locationTest').val(),
+            preferences: preferences
+        };
+        
+        log('Envoi de la requête...');
+        
+        $.ajax({
+            url: '{{ path('api_assistant_suggestions') }}',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(requestData),
+            dataType: 'json',
+            beforeSend: function(xhr) {
+                log('Headers de requête:', 'info');
+                log(`Content-Type: ${xhr.getRequestHeader('Content-Type')}`, 'info');
+            }
+        })
+        .done(function(response) {
+            log('Réponse reçue avec succès', 'success');
+            $('#responseData').text(JSON.stringify(response, null, 2));
+        })
+        .fail(function(xhr, status, error) {
+            log(`Erreur: ${status} - ${error}`, 'error');
+            log(`Statut: ${xhr.status}`, 'error');
+            log(`Réponse: ${xhr.responseText}`, 'error');
+            $('#responseData').text(`Erreur ${xhr.status}: ${error}\n\n${xhr.responseText}`);
+        });
+    });
+    
+    // Initialisation de l'affichage
+    updateRequestData();
+});
+</script>
+{% endblock %} 

@@ -31,6 +31,82 @@
 <!-- End Navbar -->
 <div class="container-fluid py-4">
 
+  <!-- Filtres par type -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body p-3">
+          <h6 class="mb-3">Filtrer par type</h6>
+          <div class="d-flex flex-wrap gap-2">
+            <a href="{{ path('bonplan_page') }}" class="btn {{ type is null ? 'btn-primary' : 'btn-outline-primary' }} btn-sm">
+              Tous les types
+            </a>
+            {% for typeKey, typeCount in statsByType %}
+              <a href="{{ path('bonplan_page', {'type': typeKey}) }}" class="btn {{ type == typeKey ? 'btn-primary' : 'btn-outline-primary' }} btn-sm">
+                {{ typeKey }} ({{ typeCount }})
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres avancés -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header pb-0 p-3">
+          <div class="d-flex justify-content-between">
+            <h6 class="mb-0">Filtres avancés</h6>
+            <button type="button" class="btn btn-link text-primary mb-0" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false">
+              <i class="fas fa-filter"></i> Afficher/Masquer
+            </button>
+          </div>
+        </div>
+        <div class="collapse" id="filterCollapse">
+          <div class="card-body p-3">
+            <form action="{{ path('bonplan_page') }}" method="get" id="advanced-filter-form">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="search" class="form-control-label">Recherche</label>
+                    <input type="text" class="form-control" id="search" name="search" value="{{ searchTerm }}">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="filter-type" class="form-control-label">Type de lieu</label>
+                    <select class="form-control" id="filter-type" name="type">
+                      <option value="">Tous les types</option>
+                      {% for typeKey, typeCount in statsByType %}
+                        <option value="{{ typeKey }}" {{ type == typeKey ? 'selected' : '' }}>{{ typeKey }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="sort" class="form-control-label">Trier par</label>
+                    <select class="form-control" id="sort" name="sort">
+                      <option value="recent" {{ sort == 'recent' ? 'selected' : '' }}>Plus récent</option>
+                      <option value="name_asc" {{ sort == 'name_asc' ? 'selected' : '' }}>Nom (A-Z)</option>
+                      <option value="name_desc" {{ sort == 'name_desc' ? 'selected' : '' }}>Nom (Z-A)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end mt-3">
+                <a href="{{ path('bonplan_page') }}" class="btn btn-sm btn-outline-secondary me-2">Réinitialiser</a>
+                <button type="submit" class="btn btn-sm btn-primary">Appliquer les filtres</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Statistiques -->
   <div class="row mb-4">
     <!-- Statistiques générales -->

@@ -28,6 +28,7 @@ use App\Repository\ReservationRepository;
 use App\Repository\ReservationTransportRepository;
 use App\Repository\StationRepository;
 use App\Service\WeatherService;
+use Psr\Log\LoggerInterface;
 
 class VoyageursController extends AuthenticatedController
 {
@@ -169,6 +170,14 @@ class VoyageursController extends AuthenticatedController
             'weatherRecommendations' => $weatherRecommendations,
             'seasonalActivities' => $seasonalActivities
         ]);
+    }
+
+    #[Route('/BonplanCalendar', name: 'bonplan_calendar')]
+    public function bonplanCalendar(): Response
+    {
+        // Cette fonctionnalité est purement frontend (stockage local)
+        // et n'utilise pas la base de données
+        return $this->render('bonplan_calendar/bonplan_calendar.html.twig');
     }
 
     #[Route('/OffreVoyageursPage', name: 'offreVoyageurs_page')]
@@ -782,6 +791,171 @@ class VoyageursController extends AuthenticatedController
             'topStations' => $topStations,
             'monthlyStats' => $monthlyStats
         ]);
+    }
+
+    #[Route('/voyageurs/ai-assistant', name: 'ai_assistant_page')]
+    public function aiAssistantPage(): Response
+    {
+        return $this->render('dashVoyageurs/aiAssistant.html.twig');
+    }
+
+    #[Route('/voyageurs/api-test', name: 'api_test_page')]
+    public function apiTestPage(): Response
+    {
+        return $this->render('dashVoyageurs/api-test.html.twig');
+    }
+
+    #[Route('/api/assistant/suggestions', name: 'api_assistant_suggestions', methods: ['POST'])]
+    public function getAiSuggestions(Request $request, BonPlanRepository $bonPlanRepository, LoggerInterface $logger = null): JsonResponse
+    {
+        try {
+            // Activer CORS
+            $response = new JsonResponse();
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'POST');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type');
+            
+            // Log des informations de requête
+            if ($logger) {
+                $logger->info('API Assistant: Requête reçue', [
+                    'content_type' => $request->headers->get('Content-Type'),
+                    'client_ip' => $request->getClientIp(),
+                    'method' => $request->getMethod()
+                ]);
+            }
+            
+            // Vérifier le Content-Type
+            if (!$request->headers->has('Content-Type') || $request->headers->get('Content-Type') !== 'application/json') {
+                if ($logger) {
+                    $logger->warning('API Assistant: Content-Type invalide', [
+                        'received' => $request->headers->get('Content-Type') 
+                    ]);
+                }
+                return $response->setData([
+                    'error' => 'Content-Type doit être application/json',
+                    'received' => $request->headers->get('Content-Type')
+                ]);
+            }
+            
+            // Récupérer et parser le contenu
+            $content = $request->getContent();
+            if (empty($content)) {
+                if ($logger) {
+                    $logger->warning('API Assistant: Corps de requête vide');
+                }
+                return $response->setData([
+                    'error' => 'Le corps de la requête est vide'
+                ]);
+            }
+            
+            $data = json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                if ($logger) {
+                    $logger->error('API Assistant: Erreur de décodage JSON', [
+                        'error' => json_last_error_msg()
+                    ]);
+                }
+                return $response->setData([
+                    'error' => 'JSON invalide: ' . json_last_error_msg()
+                ]);
+            }
+            
+            $location = $data['location'] ?? '';
+            $preferences = $data['preferences'] ?? [];
+            
+            if ($logger) {
+                $logger->info('API Assistant: Paramètres', [
+                    'location' => $location,
+                    'preferences' => $preferences
+                ]);
+            }
+            
+            if (empty($location)) {
+                return $response->setData([
+                    'error' => 'La localisation est requise'
+                ]);
+            }
+            
+            // Rechercher les bons plans correspondants
+            try {
+                $bonplans = $bonPlanRepository->findByLocationAndPreferences($location);
+                
+                if ($logger) {
+                    $logger->info('API Assistant: Résultats', [
+                        'count' => count($bonplans)
+                    ]);
+                }
+            } catch (\Exception $e) {
+                if ($logger) {
+                    $logger->error('API Assistant: Erreur lors de la recherche', [
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                return $response->setData([
+                    'error' => 'Erreur de base de données: ' . $e->getMessage()
+                ]);
+            }
+
+            // Formater les suggestions
+            $suggestions = [];
+            foreach ($bonplans as $bonplan) {
+                $suggestions[] = [
+                    'name' => $bonplan->getNomplace(),
+                    'type' => $bonplan->getTypePlace(),
+                    'location' => $bonplan->getLocalisation(),
+                    'description' => $bonplan->getDescription()
+                ];
+            }
+
+            // Si aucun bon plan n'est trouvé
+            if (empty($suggestions)) {
+                $noResultsMsg = "Je n'ai pas trouvé de bons plans correspondant à vos critères dans $location. " .
+                               "Voici quelques suggestions générales pour cette zone...";
+                
+                if ($logger) {
+                    $logger->info('API Assistant: Aucun résultat');
+                }
+                
+                return $response->setData([
+                    'suggestions' => $noResultsMsg
+                ]);
+            }
+
+            // Formater la réponse
+            $responseText = "Voici les bons plans que j'ai trouvés à $location :\n\n";
+            foreach ($suggestions as $suggestion) {
+                $responseText .= "🏠 {$suggestion['name']}\n";
+                $responseText .= "📍 {$suggestion['location']}\n";
+                $responseText .= "🏷️ {$suggestion['type']}\n";
+                $responseText .= "ℹ️ {$suggestion['description']}\n\n";
+            }
+
+            return $response->setData([
+                'suggestions' => $responseText
+            ]);
+            
+        } catch (\Exception $e) {
+            if ($logger) {
+                $logger->error('API Assistant: Exception non gérée', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+            
+            return new JsonResponse([
+                'error' => 'Erreur serveur: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    #[Route('/api/assistant/suggestions', name: 'api_assistant_suggestions_preflight', methods: ['OPTIONS'])]
+    public function handleCorsPreflightRequest(): Response
+    {
+        $response = new Response();
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        $response->headers->set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type');
+        return $response;
     }
 }
 

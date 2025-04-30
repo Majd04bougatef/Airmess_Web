@@ -1,0 +1,162 @@
+<style>
+    .ai-chat-box {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: white;
+        min-height: 200px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .message {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+    .message.user {
+        background-color: #f8f9fa;
+    }
+    
+    .message.ai {
+        background-color: #e3f2fd;
+    }
+    
+    .ai-input-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .ai-input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .preferences-container {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background-color: white;
+        border-radius: 8px;
+    }
+    
+    .preference-tag {
+        display: inline-block;
+        background-color: #e9ecef;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        margin: 0.25rem;
+    }
+</style>
+
+<div class="ai-assistant-container p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="m-0">Assistant AI pour Bons Plans</h4>
+        <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('aiAssistantModal').classList.remove('show')">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="ai-chat-box" id="chatBox">
+        <div class="message ai">
+            Bonjour ! Je suis votre assistant AI pour les bons plans. Comment puis-je vous aider aujourd'hui ?
+        </div>
+    </div>
+
+    <div class="preferences-container">
+        <h6 class="mb-3">Préférences</h6>
+        <div id="preferenceTags" class="mb-2">
+            <!-- Les tags de préférence s'afficheront ici -->
+        </div>
+        <div class="input-group">
+            <input type="text" id="preferenceInput" class="form-control" placeholder="Ajouter une préférence..." />
+            <button onclick="addPreference()" class="btn btn-outline-primary">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="ai-input-container">
+        <input type="text" id="locationInput" class="form-control" placeholder="Entrez une ville ou un lieu..." />
+        <button onclick="getSuggestions()" class="btn btn-primary">
+            <i class="fas fa-search me-1"></i> Rechercher
+        </button>
+    </div>
+</div>
+
+<script>
+let preferences = [];
+
+function addPreference() {
+    const input = document.getElementById('preferenceInput');
+    const preference = input.value.trim();
+    
+    if (preference && !preferences.includes(preference)) {
+        preferences.push(preference);
+        updatePreferenceTags();
+        input.value = '';
+    }
+}
+
+function removePreference(preference) {
+    preferences = preferences.filter(p => p !== preference);
+    updatePreferenceTags();
+}
+
+function updatePreferenceTags() {
+    const container = document.getElementById('preferenceTags');
+    container.innerHTML = preferences.map(pref => 
+        `<span class="preference-tag">
+            ${pref}
+            <button onclick="removePreference('${pref}')" class="btn btn-sm btn-link p-0 ms-1">×</button>
+        </span>`
+    ).join('');
+}
+
+function appendMessage(message, isAi = false) {
+    const chatBox = document.getElementById('chatBox');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isAi ? 'ai' : 'user'}`;
+    messageDiv.textContent = message;
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function getSuggestions() {
+    const location = document.getElementById('locationInput').value.trim();
+    
+    if (!location) {
+        alert('Veuillez entrer un lieu');
+        return;
+    }
+
+    appendMessage(`Recherche de suggestions pour ${location}...`);
+
+    try {
+        const response = await fetch('/api/assistant/suggestions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                location: location,
+                preferences: preferences
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.error) {
+            appendMessage(`Erreur: ${data.error}`, true);
+        } else {
+            appendMessage(data.suggestions, true);
+        }
+    } catch (error) {
+        appendMessage(`Une erreur est survenue: ${error.message}`, true);
+    }
+}
+</script> 
