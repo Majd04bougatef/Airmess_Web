@@ -103,6 +103,39 @@
     margin-right: 0.35rem;
     opacity: 0.5;
   }
+  
+  /* Ajout de styles pour les filtres actifs */
+  .filter-badge {
+    background-color: #eee;
+    color: #555;
+    border-radius: 30px;
+    padding: 0.35rem 0.75rem;
+    margin-right: 0.5rem;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s ease;
+  }
+  
+  .filter-badge:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .filter-badge i.remove {
+    margin-left: 0.5rem;
+    cursor: pointer;
+    opacity: 0.5;
+  }
+  
+  .filter-badge i.remove:hover {
+    opacity: 1;
+  }
+  
+  .filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
 </style>
 {% endblock %}
 
@@ -278,22 +311,35 @@
               <div class="form-group mb-0 me-2">
                 <div class="input-group">
                   <span class="input-group-text"><i class="fas fa-search"></i></span>
-                  <input class="form-control" id="searchReservation" type="text" placeholder="Rechercher...">
+                  <input class="form-control" id="searchReservation" type="text" placeholder="Rechercher un client, une offre...">
                 </div>
               </div>
-              <div class="btn-group">
-                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="dropdown">
+                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="filterDropdown">
                   <i class="fas fa-filter me-2"></i>Filtrer
                 </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Toutes les réservations</a></li>
-                  <li><a class="dropdown-item" href="#">Cette semaine</a></li>
-                  <li><a class="dropdown-item" href="#">Ce mois-ci</a></li>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><h6 class="dropdown-header">Période</h6></li>
+                  <li><a class="dropdown-item filter-time" data-time="all" href="#">Toutes les réservations</a></li>
+                  <li><a class="dropdown-item filter-time" data-time="today" href="#">Aujourd'hui</a></li>
+                  <li><a class="dropdown-item filter-time" data-time="week" href="#">Cette semaine</a></li>
+                  <li><a class="dropdown-item filter-time" data-time="month" href="#">Ce mois-ci</a></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="#">Par offre</a></li>
+                  <li><h6 class="dropdown-header">Par offre</h6></li>
+                  {% set uniqueOffres = [] %}
+                  {% for reservation in reservations %}
+                    {% if reservation.offre and reservation.offre.idO not in uniqueOffres %}
+                      {% set uniqueOffres = uniqueOffres|merge([reservation.offre.idO]) %}
+                      <li><a class="dropdown-item filter-offer" data-offer-id="{{ reservation.offre.idO }}" href="#">{{ reservation.offre.description|length > 25 ? reservation.offre.description|slice(0, 25) ~ '...' : reservation.offre.description }}</a></li>
+                    {% endif %}
+                  {% endfor %}
                 </ul>
               </div>
             </div>
+          </div>
+          <!-- Filtres actifs -->
+          <div class="filters-container mt-2" id="activeFilters">
+            <!-- Les filtres actifs apparaîtront ici -->
           </div>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
@@ -308,9 +354,14 @@
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prix</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="reservationsTableBody">
                   {% for reservation in reservations %}
-                    <tr>
+                    <tr class="reservation-row" 
+                        data-client="{{ reservation.user ? reservation.user.prenom|lower ~ ' ' ~ reservation.user.email|lower : '' }}"
+                        data-offer="{{ reservation.offre ? reservation.offre.description|lower : '' }}"
+                        data-offer-id="{{ reservation.offre ? reservation.offre.idO : '' }}"
+                        data-date="{{ reservation.dateRes ? reservation.dateRes|date('Y-m-d') : '' }}"
+                        data-timestamp="{{ reservation.dateRes ? reservation.dateRes|date('U') : '' }}">
                       <td>
                         <div class="d-flex px-3 py-2">
                           <div class="avatar-sm bg-gradient-primary me-3">
@@ -367,6 +418,22 @@
                   {% endfor %}
                 </tbody>
               </table>
+              
+              <!-- Pagination -->
+              <div class="d-flex justify-content-center mt-4" id="pagination-container">
+                <nav aria-label="Navigation des réservations">
+                  <ul class="pagination" id="pagination-reservations">
+                    <!-- Les boutons de pagination seront générés dynamiquement -->
+                  </ul>
+                </nav>
+              </div>
+              
+              <!-- Informations sur la pagination -->
+              <div class="text-center mt-2">
+                <span class="text-xs text-secondary">
+                  Affichage de <span id="start-index">1</span> à <span id="end-index">10</span> sur <span id="total-items">{{ reservations|length }}</span> réservations
+                </span>
+              </div>
             </div>
           {% else %}
             <div class="empty-state">
@@ -385,21 +452,263 @@
 </div>
 
 <script>
-  // Recherche dynamique dans le tableau
   document.addEventListener('DOMContentLoaded', function() {
+    // Configuration de la pagination
+    const itemsPerPage = 10;
+    let currentPage = 1;
+    let filteredRows = [];
+    
+    // Variables pour suivre les filtres actifs
+    let activeFilters = {
+      search: '',
+      time: 'all',
+      offerId: null
+    };
+    
+    // Fonction pour mettre à jour l'affichage des filtres actifs
+    const updateActiveFiltersDisplay = () => {
+      const container = document.getElementById('activeFilters');
+      container.innerHTML = '';
+      
+      if (activeFilters.search) {
+        const searchBadge = document.createElement('div');
+        searchBadge.className = 'filter-badge';
+        searchBadge.innerHTML = `<i class="fas fa-search me-1"></i> ${activeFilters.search} <i class="fas fa-times remove" data-filter-type="search"></i>`;
+        container.appendChild(searchBadge);
+      }
+      
+      if (activeFilters.time && activeFilters.time !== 'all') {
+        const timeBadge = document.createElement('div');
+        timeBadge.className = 'filter-badge';
+        let timeText = '';
+        switch(activeFilters.time) {
+          case 'today': timeText = "Aujourd'hui"; break;
+          case 'week': timeText = "Cette semaine"; break;
+          case 'month': timeText = "Ce mois-ci"; break;
+        }
+        timeBadge.innerHTML = `<i class="fas fa-calendar-alt me-1"></i> ${timeText} <i class="fas fa-times remove" data-filter-type="time"></i>`;
+        container.appendChild(timeBadge);
+      }
+      
+      if (activeFilters.offerId) {
+        const offerElement = document.querySelector(`.filter-offer[data-offer-id="${activeFilters.offerId}"]`);
+        if (offerElement) {
+          const offerBadge = document.createElement('div');
+          offerBadge.className = 'filter-badge';
+          offerBadge.innerHTML = `<i class="fas fa-tag me-1"></i> ${offerElement.textContent} <i class="fas fa-times remove" data-filter-type="offerId"></i>`;
+          container.appendChild(offerBadge);
+        }
+      }
+      
+      // Ajouter des écouteurs d'événements pour les boutons de suppression de filtres
+      const removeButtons = document.querySelectorAll('.filter-badge .remove');
+      removeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const filterType = this.getAttribute('data-filter-type');
+          activeFilters[filterType] = filterType === 'time' ? 'all' : null;
+          currentPage = 1;
+          applyFilters();
+          displayPageItems();
+          createPagination();
+          updateActiveFiltersDisplay();
+        });
+      });
+    };
+    
+    // Fonction pour déterminer si une date est dans la période spécifiée
+    const isDateInPeriod = (timestamp, period) => {
+      if (!timestamp || period === 'all') return true;
+      
+      const now = new Date();
+      const date = new Date(parseInt(timestamp) * 1000);
+      
+      if (period === 'today') {
+        return date.setHours(0, 0, 0, 0) === now.setHours(0, 0, 0, 0);
+      } else if (period === 'week') {
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        return date >= startOfWeek;
+      } else if (period === 'month') {
+        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+      }
+      
+      return true;
+    };
+    
+    // Fonction pour filtrer les réservations
+    const filterReservations = () => {
+      const rows = document.querySelectorAll('.reservation-row');
+      filteredRows = [];
+      
+      rows.forEach(row => {
+        const clientText = row.getAttribute('data-client');
+        const offerText = row.getAttribute('data-offer');
+        const offerId = row.getAttribute('data-offer-id');
+        const timestamp = row.getAttribute('data-timestamp');
+        
+        // Vérifier la recherche
+        const matchesSearch = !activeFilters.search || 
+                             clientText.includes(activeFilters.search.toLowerCase()) || 
+                             offerText.includes(activeFilters.search.toLowerCase());
+        
+        // Vérifier le filtre de temps
+        const matchesTime = isDateInPeriod(timestamp, activeFilters.time);
+        
+        // Vérifier le filtre d'offre
+        const matchesOffer = !activeFilters.offerId || offerId === activeFilters.offerId;
+        
+        // Ajouter à la liste filtrée si tous les filtres correspondent
+        if (matchesSearch && matchesTime && matchesOffer) {
+          filteredRows.push(row);
+        }
+        
+        // Masquer toutes les lignes pour commencer
+        row.style.display = 'none';
+      });
+      
+      // Mettre à jour les indicateurs de pagination
+      const totalItems = document.getElementById('total-items');
+      if (totalItems) {
+        totalItems.textContent = filteredRows.length;
+      }
+    };
+    
+    // Fonction pour appliquer tous les filtres
+    const applyFilters = () => {
+      filterReservations();
+      displayPageItems();
+      createPagination();
+    };
+    
+    // Fonction pour afficher les éléments de la page courante
+    const displayPageItems = () => {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
+      
+      // Mise à jour des informations de pagination
+      document.getElementById('start-index').textContent = filteredRows.length > 0 ? startIndex + 1 : 0;
+      document.getElementById('end-index').textContent = endIndex;
+      
+      // Afficher uniquement les éléments de la page courante
+      filteredRows.forEach((row, index) => {
+        if (index >= startIndex && index < endIndex) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    };
+    
+    // Fonction pour créer la pagination
+    const createPagination = () => {
+      const paginationContainer = document.getElementById('pagination-reservations');
+      paginationContainer.innerHTML = '';
+      
+      const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+      
+      // Bouton précédent
+      const prevBtn = document.createElement('li');
+      prevBtn.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+      prevBtn.innerHTML = '<a class="page-link" href="#" aria-label="Précédent"><span aria-hidden="true">&laquo;</span></a>';
+      prevBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+          currentPage--;
+          displayPageItems();
+          createPagination();
+        }
+      });
+      paginationContainer.appendChild(prevBtn);
+      
+      // Pages numérotées
+      const maxPageButtons = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+      let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+      
+      if (endPage - startPage + 1 < maxPageButtons && startPage > 1) {
+        startPage = Math.max(1, endPage - maxPageButtons + 1);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('li');
+        pageBtn.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        pageBtn.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        pageBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          currentPage = i;
+          displayPageItems();
+          createPagination();
+        });
+        paginationContainer.appendChild(pageBtn);
+      }
+      
+      // Bouton suivant
+      const nextBtn = document.createElement('li');
+      nextBtn.className = `page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`;
+      nextBtn.innerHTML = '<a class="page-link" href="#" aria-label="Suivant"><span aria-hidden="true">&raquo;</span></a>';
+      nextBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage < totalPages) {
+          currentPage++;
+          displayPageItems();
+          createPagination();
+        }
+      });
+      paginationContainer.appendChild(nextBtn);
+      
+      // Afficher ou masquer la pagination en fonction du nombre d'éléments
+      const paginationParent = document.getElementById('pagination-container');
+      paginationParent.style.display = totalPages <= 1 ? 'none' : 'flex';
+    };
+    
+    // Recherche
     const searchInput = document.getElementById('searchReservation');
     if (searchInput) {
       searchInput.addEventListener('keyup', function() {
-        const searchValue = this.value.toLowerCase();
-        const table = document.querySelector('.table-responsive table');
-        const rows = table.querySelectorAll('tbody tr');
-        
-        rows.forEach(row => {
-          const text = row.textContent.toLowerCase();
-          row.style.display = text.includes(searchValue) ? '' : 'none';
-        });
+        activeFilters.search = this.value.trim();
+        currentPage = 1;
+        applyFilters();
+        updateActiveFiltersDisplay();
       });
     }
+    
+    // Filtrage par période
+    const timeFilters = document.querySelectorAll('.filter-time');
+    timeFilters.forEach(filter => {
+      filter.addEventListener('click', function(e) {
+        e.preventDefault();
+        activeFilters.time = this.getAttribute('data-time');
+        currentPage = 1;
+        document.getElementById('filterDropdown').innerHTML = '<i class="fas fa-filter me-2"></i>' + this.textContent;
+        applyFilters();
+        updateActiveFiltersDisplay();
+      });
+    });
+    
+    // Filtrage par offre
+    const offerFilters = document.querySelectorAll('.filter-offer');
+    offerFilters.forEach(filter => {
+      filter.addEventListener('click', function(e) {
+        e.preventDefault();
+        activeFilters.offerId = this.getAttribute('data-offer-id');
+        currentPage = 1;
+        document.getElementById('filterDropdown').innerHTML = '<i class="fas fa-filter me-2"></i>' + this.textContent;
+        applyFilters();
+        updateActiveFiltersDisplay();
+      });
+    });
+    
+    // Initialisation
+    function initializeReservations() {
+      const rows = document.querySelectorAll('.reservation-row');
+      filteredRows = Array.from(rows);
+      displayPageItems();
+      createPagination();
+    }
+    
+    // Initialiser la pagination au chargement
+    initializeReservations();
   });
 </script>
 {% endblock %} 
