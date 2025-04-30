@@ -124,8 +124,21 @@ class UserRepository extends ServiceEntityRepository
         }
         
         if (!empty($filters['status'])) {
-            $query->andWhere('u.statut = :status')
-                ->setParameter('status', $filters['status']);
+            switch ($filters['status']) {
+                case 'online':
+                    $query->andWhere('u.isOnline = 1');
+                    break;
+                case 'active':
+                case 'actif':
+                    $query->andWhere('u.statut = :activeStatus')
+                        ->setParameter('activeStatus', 'actif');
+                    break;
+                case 'inactive':
+                case 'inactif':
+                    $query->andWhere('u.statut = :inactiveStatus')
+                        ->setParameter('inactiveStatus', 'inactif');
+                    break;
+            }
         }
         
         if (!empty($filters['search'])) {
@@ -156,8 +169,21 @@ class UserRepository extends ServiceEntityRepository
         }
         
         if (!empty($filters['status'])) {
-            $countQuery->andWhere('u.statut = :status')
-                ->setParameter('status', $filters['status']);
+            switch ($filters['status']) {
+                case 'online':
+                    $countQuery->andWhere('u.isOnline = 1');
+                    break;
+                case 'active':
+                case 'actif':
+                    $countQuery->andWhere('u.statut = :activeStatus')
+                        ->setParameter('activeStatus', 'actif');
+                    break;
+                case 'inactive':
+                case 'inactif':
+                    $countQuery->andWhere('u.statut = :inactiveStatus')
+                        ->setParameter('inactiveStatus', 'inactif');
+                    break;
+            }
         }
         
         if (!empty($filters['search'])) {
@@ -192,8 +218,21 @@ class UserRepository extends ServiceEntityRepository
         
         // Apply status filter
         if (!empty($filters['status'])) {
-            $qb->andWhere('u.statut = :status')
-               ->setParameter('status', $filters['status']);
+            switch ($filters['status']) {
+                case 'online':
+                    $qb->andWhere('u.isOnline = 1');
+                    break;
+                case 'active':
+                case 'actif':
+                    $qb->andWhere('u.statut = :activeStatus')
+                        ->setParameter('activeStatus', 'actif');
+                    break;
+                case 'inactive':
+                case 'inactif':
+                    $qb->andWhere('u.statut = :inactiveStatus')
+                        ->setParameter('inactiveStatus', 'inactif');
+                    break;
+            }
         }
         
         // Apply search filter

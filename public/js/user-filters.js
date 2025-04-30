@@ -248,122 +248,109 @@ document.addEventListener('DOMContentLoaded', function() {
                          (tableSearchInput ? tableSearchInput.value.trim() : '');
         
         // Set form values
-        document.getElementById('excelRoleFilterValue').value = roleFilter;
-        document.getElementById('excelStatusFilterValue').value = statusFilter;
-        document.getElementById('excelSearchFilterValue').value = searchText;
+        if (document.getElementById('excelRoleFilterValue')) {
+            document.getElementById('excelRoleFilterValue').value = roleFilter;
+        }
+        
+        if (document.getElementById('excelStatusFilterValue')) {
+            document.getElementById('excelStatusFilterValue').value = statusFilter;
+        }
+        
+        if (document.getElementById('excelSearchFilterValue')) {
+            document.getElementById('excelSearchFilterValue').value = searchText;
+        }
         
         // Submit the form
-        document.getElementById('excelExportForm').submit();
+        if (document.getElementById('exportExcelForm')) {
+            document.getElementById('exportExcelForm').submit();
+        }
     }
     
     // Export to PDF function
     function exportToPdf() {
-        // Get current filter values
+        // Get filter values
         const roleFilter = document.querySelector('input[name="roleFilter"]:checked')?.value || '';
         const statusFilter = document.querySelector('input[name="statusFilter"]:checked')?.value || '';
         const searchText = (searchInput ? searchInput.value.trim() : '') || 
-                         (tableSearchInput ? tableSearchInput.value.trim() : '');
+                          (tableSearchInput ? tableSearchInput.value.trim() : '');
         
-        // Set filter values in the form (these will be used if the user confirms in the modal)
-        document.getElementById('roleFilterValue').value = roleFilter;
-        document.getElementById('statusFilterValue').value = statusFilter;
-        document.getElementById('searchFilterValue').value = searchText;
+        // Set form values
+        if (document.getElementById('roleFilterValue')) {
+            document.getElementById('roleFilterValue').value = roleFilter;
+        }
         
-        // Show the PDF export options modal instead of submitting directly
-        const pdfModal = new bootstrap.Modal(document.getElementById('pdfExportModal'));
-        pdfModal.show();
-    }
-    
-    // Initialize the PDF export confirmation button
-    const confirmPdfExportBtn = document.getElementById('confirmPdfExport');
-    if (confirmPdfExportBtn) {
-        confirmPdfExportBtn.addEventListener('click', function() {
-            // Transfer values from the modal form to the hidden form
-            document.getElementById('pdfTitleValue').value = document.getElementById('pdfTitle').value;
-            
-            // Get orientation
-            const orientation = document.querySelector('input[name="orientation"]:checked')?.value || 'landscape';
-            document.getElementById('pdfOrientationValue').value = orientation;
-            
-            // Get theme
-            const theme = document.querySelector('input[name="theme"]:checked')?.value || 'default';
-            document.getElementById('pdfThemeValue').value = theme;
-            
-            // Get checkbox values
-            document.getElementById('pdfShowTimestampValue').value = document.getElementById('showTimestamp').checked ? '1' : '0';
+        if (document.getElementById('statusFilterValue')) {
+            document.getElementById('statusFilterValue').value = statusFilter;
+        }
+        
+        if (document.getElementById('searchFilterValue')) {
+            document.getElementById('searchFilterValue').value = searchText;
+        }
+        
+        // Check if showing filters checkbox is checked
+        if (document.getElementById('showFilters') && document.getElementById('pdfShowFiltersValue')) {
             document.getElementById('pdfShowFiltersValue').value = document.getElementById('showFilters').checked ? '1' : '0';
-            
-            // Get column selection values
-            document.getElementById('pdfIncludeUserColumnValue').value = document.getElementById('includeUserColumn').checked ? '1' : '0';
-            document.getElementById('pdfIncludeRoleColumnValue').value = document.getElementById('includeRoleColumn').checked ? '1' : '0';
-            document.getElementById('pdfIncludeStatusColumnValue').value = document.getElementById('includeStatusColumn').checked ? '1' : '0';
-            document.getElementById('pdfIncludeDateColumnValue').value = document.getElementById('includeDateColumn').checked ? '1' : '0';
-            document.getElementById('pdfIncludePhoneColumnValue').value = document.getElementById('includePhoneColumn').checked ? '1' : '0';
-            
-            // Submit the form
-            document.getElementById('pdfExportForm').submit();
-            
-            // Close the modal
-            const pdfModal = bootstrap.Modal.getInstance(document.getElementById('pdfExportModal'));
-            if (pdfModal) {
-                pdfModal.hide();
-            }
-        });
+        }
+        
+        // Submit the form
+        if (document.getElementById('exportPdfForm')) {
+            document.getElementById('exportPdfForm').submit();
+        }
     }
     
-    // Attach pagination event listeners
+    // Attach event listeners to pagination links
     function attachPaginationEventListeners() {
         document.querySelectorAll('.page-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                const page = this.getAttribute('data-page');
-                if (page) {
-                    loadPageWithFilters(parseInt(page));
-                    
-                    // Update active class on pagination
-                    document.querySelectorAll('.page-item').forEach(item => item.classList.remove('active'));
-                    this.parentNode.classList.add('active');
-                    
-                    // Scroll to top of the table
-                    document.querySelector('.card').scrollIntoView({behavior: 'smooth'});
+                
+                // Don't do anything if this is the current page or disabled link
+                if (this.parentElement.classList.contains('active') || 
+                    this.parentElement.classList.contains('disabled')) {
+                    return;
                 }
+                
+                // Extract page number from href
+                const href = this.getAttribute('href');
+                let page = 1;
+                
+                if (href) {
+                    const match = href.match(/page=(\d+)/);
+                    if (match && match[1]) {
+                        page = parseInt(match[1]);
+                    }
+                }
+                
+                loadPageWithFilters(page);
             });
         });
     }
     
-    // Attach event listeners to edit and delete buttons in table rows
+    // Attach event listeners to action buttons (only edit button remains)
     function attachButtonEventListeners() {
-        // For edit buttons (modal triggers)
-        document.querySelectorAll('.btn-outline-primary[data-bs-toggle="modal"]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const modalId = this.getAttribute('data-bs-target');
-                // Ensure modal is initialized
-                const modalElement = document.querySelector(modalId);
-                if (modalElement && typeof bootstrap !== 'undefined') {
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                }
+        // Add event listeners to edit buttons
+        document.querySelectorAll('.btn-edit-user').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const userId = this.getAttribute('data-user-id');
+                console.log('Edit user clicked, ID:', userId);
+                // Any additional functionality for the edit button
             });
-        });
-        
-        // For delete buttons
-        document.querySelectorAll('.btn-outline-danger').forEach(btn => {
-            // Button already has onclick attribute, so no need to add event listener
         });
     }
     
-    // Debounce function to limit how often a function can be called
+    // Debounce function to limit search input event firing
     function debounce(func, delay) {
-        let timeoutId;
-        return function (...args) {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                func.apply(this, args);
-            }, delay);
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), delay);
         };
     }
     
-    // Initialize
-    attachPaginationEventListeners();
-    attachButtonEventListeners();
+    // Initial load
+    if (userTableBody) {
+        loadPageWithFilters(1);
+    }
 }); 
