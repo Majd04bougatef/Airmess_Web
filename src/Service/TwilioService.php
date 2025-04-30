@@ -25,17 +25,37 @@ class TwilioService
      */
     public function sendSms(string $to, string $message): array
     {
+        // Log the input phone number
+        error_log('TwilioService: Attempting to send SMS to: ' . $to);
+        
         // Validate phone number format (E.164 format +1234567890)
         if (!preg_match('/^\+[1-9]\d{1,14}$/', $to)) {
-            return [
-                'success' => false,
-                'error' => 'Invalid phone number format. Must be in E.164 format (e.g., +1234567890)'
-            ];
+            error_log('TwilioService: Invalid phone number format: ' . $to);
+            
+            // Try to fix common Tunisian phone number format issues
+            $cleanNumber = preg_replace('/[^0-9]/', '', $to);
+            
+            // Handle Tunisian numbers (which should be 8 digits with +216 country code)
+            if (strlen($cleanNumber) == 8) {
+                $to = '+216' . $cleanNumber;
+                error_log('TwilioService: Fixed Tunisian number to: ' . $to);
+            } else if (strlen($cleanNumber) == 11 && substr($cleanNumber, 0, 3) == '216') {
+                $to = '+' . $cleanNumber;
+                error_log('TwilioService: Added + prefix to: ' . $to);
+            } else {
+                return [
+                    'success' => false,
+                    'error' => 'Invalid phone number format. Must be in E.164 format (e.g., +216XXXXXXXX for Tunisia)'
+                ];
+            }
         }
 
         try {
             // Twilio API endpoint for sending SMS
             $url = "https://api.twilio.com/2010-04-01/Accounts/{$this->accountSid}/Messages.json";
+            
+            // Log the API request details (omitting sensitive info)
+            error_log('TwilioService: Sending request to Twilio API with number: ' . $to);
             
             // Set up CURL request
             $ch = curl_init();
@@ -59,6 +79,7 @@ class TwilioService
             
             // Check for CURL errors
             if ($error) {
+                error_log('TwilioService: CURL Error: ' . $error);
                 return [
                     'success' => false,
                     'error' => "CURL Error: $error",
@@ -68,14 +89,19 @@ class TwilioService
             // Parse the JSON response
             $content = json_decode($response, true);
             
+            // Log the response status
+            error_log('TwilioService: Response HTTP code: ' . $httpCode);
+            
             // Check for HTTP errors
             if ($httpCode >= 200 && $httpCode < 300) {
+                error_log('TwilioService: SMS sent successfully to: ' . $to);
                 return [
                     'success' => true,
                     'message_sid' => $content['sid'] ?? null,
                     'status' => $content['status'] ?? null,
                 ];
             } else {
+                error_log('TwilioService: Error response: ' . ($content['message'] ?? 'Unknown error'));
                 return [
                     'success' => false,
                     'error' => $content['message'] ?? 'Unknown error',
@@ -83,6 +109,7 @@ class TwilioService
                 ];
             }
         } catch (\Exception $e) {
+            error_log('TwilioService: Exception: ' . $e->getMessage());
             return [
                 'success' => false,
                 'error' => 'An error occurred: ' . $e->getMessage(),
