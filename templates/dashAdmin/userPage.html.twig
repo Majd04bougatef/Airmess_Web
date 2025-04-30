@@ -360,6 +360,7 @@
           <div class="modal-body">
             <p>Êtes-vous sûr de vouloir désactiver cet utilisateur ?</p>
             <p class="mb-0"><small class="text-muted">L'utilisateur ne pourra plus se connecter à son compte, mais ses données seront conservées dans le système.</small></p>
+            <p class="mt-2"><small class="text-muted">Un SMS de notification sera envoyé à l'utilisateur s'il a un numéro de téléphone enregistré.</small></p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -406,13 +407,60 @@
           // Hide the modal
           modal.hide();
           
-          // Show success message
-          showAlert('success', 'Utilisateur désactivé avec succès');
+          // Show success message with SMS status if available
+          let successMessage = 'Utilisateur désactivé avec succès';
+          
+          // User SMS notification status
+          if (data.smsStatus) {
+            if (data.smsStatus === 'envoyé') {
+              successMessage += `
+                <div class="mt-2">
+                  <span class="badge bg-success">
+                    <i class="fas fa-sms me-1"></i> SMS de notification envoyé avec succès
+                  </span>
+                </div>`;
+            } else if (data.smsStatus.includes('échec')) {
+              successMessage += `
+                <div class="mt-2">
+                  <span class="badge bg-warning text-dark">
+                    <i class="fas fa-exclamation-triangle me-1"></i> SMS non envoyé: ${data.smsStatus}
+                  </span>
+                </div>`;
+            } else {
+              successMessage += `
+                <div class="mt-2">
+                  <span class="badge bg-secondary">
+                    <i class="fas fa-info-circle me-1"></i> ${data.smsStatus}
+                  </span>
+                </div>`;
+            }
+          }
+          
+          // Admin notification status
+          if (data.adminSmsStatus) {
+            if (data.adminSmsStatus === 'envoyé') {
+              successMessage += `
+                <div class="mt-1">
+                  <span class="badge bg-info">
+                    <i class="fas fa-bell me-1"></i> Notification admin envoyée
+                  </span>
+                </div>`;
+            } else {
+              successMessage += `
+                <div class="mt-1">
+                  <span class="badge bg-secondary">
+                    <i class="fas fa-bell-slash me-1"></i> Notification admin non envoyée
+                  </span>
+                </div>`;
+            }
+          }
+          
+          showAlert('success', successMessage);
           
           // Reload the table after a short delay
           setTimeout(() => {
             window.location.reload();
-          }, 1000);
+          }, 2000); // Increased to 2 seconds to give user time to read SMS status
         } else {
           throw new Error(data.message || 'Une erreur est survenue');
         }
@@ -547,11 +595,24 @@
     const alertContainer = document.createElement('div');
     alertContainer.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-4 shadow-lg`;
     alertContainer.style.zIndex = '9999';
-    alertContainer.style.minWidth = '300px';
+    alertContainer.style.minWidth = '350px';
+    alertContainer.style.maxWidth = '600px';
+    
+    // Use prefix icon based on alert type
+    const iconClass = type === 'success' ? 'fa-check-circle' : 
+                     type === 'warning' ? 'fa-exclamation-triangle' : 
+                     type === 'danger' ? 'fa-exclamation-circle' : 'fa-info-circle';
+    
     alertContainer.innerHTML = `
-      ${type === 'success' ? '<i class="fas fa-check-circle me-2"></i>' : '<i class="fas fa-exclamation-circle me-2"></i>'}
-      ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <div class="d-flex align-items-start">
+        <div class="me-3">
+          <i class="fas ${iconClass} fa-lg"></i>
+        </div>
+        <div class="flex-grow-1">
+          ${message}
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
     `;
     
     document.body.appendChild(alertContainer);

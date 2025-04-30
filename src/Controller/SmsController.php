@@ -97,4 +97,25 @@ class SmsController extends AbstractController
 
         return $this->redirectToRoute('app_sms_verify');
     }
+
+    #[Route('/admin/sms/test-deactivation', name: 'app_sms_test_deactivation')]
+    public function testDeactivationSms(): Response
+    {
+        // Test sending SMS to the admin number
+        $adminNumber = '+21620981776';
+        $adminMessage = "AIRMESS ADMIN NOTIFICATION: Un compte utilisateur test a été désactivé - Test Utilisateur (ID: 123, Email: test@example.com)";
+        
+        $adminResult = $this->twilioService->sendSms($adminNumber, $adminMessage);
+        
+        if ($adminResult['success']) {
+            $this->addFlash('success', 'SMS de notification admin envoyé avec succès! SID: ' . ($adminResult['message_sid'] ?? 'N/A'));
+        } else {
+            $this->addFlash('error', 'Échec de l\'envoi du SMS admin: ' . ($adminResult['error'] ?? 'Erreur inconnue'));
+        }
+        
+        return $this->render('sms/test.html.twig', [
+            'message' => 'Test de notification de désactivation de compte',
+            'adminResult' => $adminResult
+        ]);
+    }
 } 
