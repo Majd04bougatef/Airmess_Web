@@ -869,7 +869,15 @@ class SocialMediaController extends AbstractController
                 ], 500);
             }
 
-            $title = $request->request->get('title');
+            // Récupérer le titre soit du JSON soit des données de formulaire
+            $content = $request->getContent();
+            if (!empty($content) && $request->headers->get('Content-Type') === 'application/json') {
+                $data = json_decode($content, true);
+                $title = $data['title'] ?? null;
+            } else {
+                $title = $request->request->get('title');
+            }
+
             if (empty($title)) {
                 return $this->json([
                     'success' => false,
@@ -879,6 +887,10 @@ class SocialMediaController extends AbstractController
 
             try {
                 $streamData = $this->muxService->createLiveStream($title);
+                
+                if (!isset($streamData['data'])) {
+                    throw new \Exception('Réponse Mux invalide: données manquantes');
+                }
                 
                 return $this->json([
                     'success' => true,
