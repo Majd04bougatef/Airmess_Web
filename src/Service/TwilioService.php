@@ -10,10 +10,10 @@ class TwilioService
 
     public function __construct(string $accountSid = null, string $authToken = null, string $fromNumber = null)
     {
-        // Use the provided Twilio credentials
-        $this->accountSid = $accountSid ?? $_ENV['TWILIO_ACCOUNT_SID'] ?? 'ACdad3c4bd21811b3fc1e1f6508c9b6025';
-        $this->authToken = $authToken ?? $_ENV['TWILIO_AUTH_TOKEN'] ?? '66b251e37ab9363ef1fac0b02c6422e7';
-        $this->fromNumber = $fromNumber ?? $_ENV['TWILIO_PHONE_NUMBER'] ?? '+19133983562';
+        // Use hardcoded credentials for reliability
+        $this->accountSid = 'ACdad3c4bd21811b3fc1e1f6508c9b6025';
+        $this->authToken = '66b251e37ab9363ef1fac0b02c6422e7';
+        $this->fromNumber = '+19133983562';
     }
 
     /**

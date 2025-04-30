@@ -758,51 +758,151 @@
       });
     }
   });
+
+  // SMS form submission handler
+  $(document).ready(function() {
+    $('#admin-sms-form').on('submit', function(e) {
+      e.preventDefault();
+      
+      const message = $('#admin-sms-message').val().trim();
+      if (!message) {
+        $('#sms-result').html(`
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle mr-2"></i>Veuillez saisir un message
+          </div>
+        `).show();
+        return;
+      }
+      
+      // Show loading state
+      $('#sms-result').html(`
+        <div class="alert alert-info">
+          <i class="fas fa-spinner fa-spin mr-2"></i>Envoi du message en cours...
+        </div>
+      `).show();
+      
+      // Send the message via AJAX
+      $.ajax({
+        url: '{{ path('admin_send_custom_sms') }}',
+        type: 'POST',
+        data: {
+          message: message
+        },
+        success: function(response) {
+          if (response.success) {
+            $('#sms-result').html(`
+              <div class="alert alert-success">
+                <i class="fas fa-check-circle mr-2"></i>${response.message}
+              </div>
+            `).show();
+            $('#admin-sms-message').val(''); // Clear the textarea
+          } else {
+            $('#sms-result').html(`
+              <div class="alert alert-danger">
+                <i class="fas fa-times-circle mr-2"></i>${response.message || 'Erreur lors de l\'envoi du message'}
+              </div>
+            `).show();
+          }
+        },
+        error: function(xhr) {
+          let errorMsg = 'Erreur lors de l\'envoi du message';
+          try {
+            const response = JSON.parse(xhr.responseText);
+            errorMsg = response.message || errorMsg;
+          } catch (e) {}
+          
+          $('#sms-result').html(`
+            <div class="alert alert-danger">
+              <i class="fas fa-times-circle mr-2"></i>${errorMsg}
+            </div>
+          `).show();
+        }
+      });
+    });
+  });
 </script>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-  <!-- Breadcrumb & Search -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
-          <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="{{ path('dashboard_page') }}">Dashboard</a></li>
-          <li class="breadcrumb-item text-sm text-white active" aria-current="page">Gestion des Utilisateurs</li>
-        </ol>
-      </nav>
-      <h2 class="font-weight-bolder text-white mb-0">Gestion des Utilisateurs</h2>
-    </div>
-    <div class="input-group" style="width: 300px;">
-      <span class="input-group-text"><i class="fas fa-search"></i></span>
-      <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un utilisateur...">
-    </div>
-  </div>
-
-  <!-- User Table Card -->
-  <div class="card shadow mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center py-3">
-      <div>
-        <h6 class="mb-0 font-weight-bold">
-          <i class="fas fa-users me-2"></i> Liste des utilisateurs
-          <span class="badge bg-primary ms-2 user-counter">{{ totalUsers ?? users|length }}</span>
-        </h6>
-      </div>
-      <div class="d-flex">
-        <div class="input-group me-2" style="width: 250px;">
-          <span class="input-group-text"><i class="fas fa-search"></i></span>
-          <input type="text" id="tableSearchInput" class="form-control" placeholder="Rechercher...">
+<div class="container-fluid">
+  <h1 class="h3 mb-4 text-gray-800">Gestion des Utilisateurs</h1>
+  
+  <div class="row">
+    <!-- User Stats Cards -->
+    <div class="col-lg-8">
+      <div class="row">
+        <!-- Offline/Online Users Card -->
+        <div class="col-xl-6 col-md-6 mb-4">
+          <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                    Statut des Utilisateurs</div>
+                  <div class="row no-gutters align-items-center">
+                    <div class="col-auto">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ onlineUsersCount }} / {{ totalUsers }}</div>
+                    </div>
+                    <div class="col">
+                      <div class="progress progress-sm mr-2">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (onlineUsersCount / totalUsers) * 100 }}%" aria-valuenow="{{ onlineUsersCount }}" aria-valuemin="0" aria-valuemax="{{ totalUsers }}"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-2">
+                    <span class="badge bg-success text-white rounded-pill">
+                      <i class="fas fa-circle text-white-50 mr-1"></i>En ligne: {{ onlineUsersCount }}
+                    </span>
+                    <span class="badge bg-danger text-white rounded-pill">
+                      <i class="fas fa-circle text-white-50 mr-1"></i>Hors ligne: {{ totalUsers - onlineUsersCount }}
+                    </span>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <i class="fas fa-users fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <button class="btn btn-sm btn-outline-success me-2" id="exportExcelButton">
-          <i class="fas fa-file-excel me-1"></i> CSV
-        </button>
-        <button class="btn btn-sm btn-outline-danger" id="exportPdfButton" data-bs-toggle="modal" data-bs-target="#pdfExportModal">
-          <i class="fas fa-file-pdf me-1"></i> PDF Personnalisé
-        </button>
+
+        <!-- User Roles Card -->
+        <div class="col-xl-6 col-md-6 mb-4">
+          <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                    Rôles des Utilisateurs</div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalUsers }} Utilisateurs</div>
+                  <div class="mt-2">
+                    <span class="badge bg-primary text-white rounded-pill">
+                      <i class="fas fa-user-shield text-white-50 mr-1"></i>Admin: {{ usersByRole.Admin }}
+                    </span>
+                    <span class="badge bg-info text-white rounded-pill">
+                      <i class="fas fa-user-tie text-white-50 mr-1"></i>Entreprise: {{ usersByRole.Entreprise }}
+                    </span>
+                    <span class="badge bg-warning text-white rounded-pill">
+                      <i class="fas fa-user text-white-50 mr-1"></i>Voyageurs: {{ usersByRole.Voyageurs }}
+                    </span>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <i class="fas fa-user-tag fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     
+    
+    </div>
+  </div>
+  
+  <!-- Filter Section -->
+  <div class="card shadow mb-4">
     <!-- Filter Controls -->
     <div class="card-header bg-light py-2">
       <div class="row g-2">
@@ -871,7 +971,9 @@
         </button>
       </div>
     </div>
-    
+  </div>
+  
+  <div class="card shadow mb-4">
     <!-- Users Table -->
     <div class="card-body p-0">
       <div class="table-responsive">
