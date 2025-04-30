@@ -186,23 +186,43 @@ class VoyageursController extends AuthenticatedController
     #[Route('/SocialVoyageursPage', name: 'socialVoyageurs_page')]
     public function socialVoyageursPage(Request $request, SocialMediaRepository $socialMediaRepository, PaginatorInterface $paginator)
     {
-        // Récupérer toutes les publications
-        $query = $socialMediaRepository->createQueryBuilder('s')
+        // Récupérer le paramètre de tri
+        $sortBy = $request->query->get('sort', 'date_desc');
+        
+        // Créer le QueryBuilder de base
+        $queryBuilder = $socialMediaRepository->createQueryBuilder('s')
             ->leftJoin('s.user', 'u')
-            ->select('s', 'u')
-            ->orderBy('s.publicationDate', 'DESC')
-            ->getQuery();
+            ->select('s', 'u');
+            
+        // Appliquer le tri en fonction du paramètre
+        switch ($sortBy) {
+            case 'date_asc':
+                $queryBuilder->orderBy('s.publicationDate', 'ASC');
+                break;
+            case 'date_desc':
+                $queryBuilder->orderBy('s.publicationDate', 'DESC');
+                break;
+            case 'likes':
+                $queryBuilder->orderBy('s.likee', 'DESC');
+                break;
+            case 'location':
+                $queryBuilder->orderBy('s.lieu', 'ASC');
+                break;
+            default:
+                $queryBuilder->orderBy('s.publicationDate', 'DESC');
+        }
             
         // Paginer les résultats
         $pagination = $paginator->paginate(
-            $query,
+            $queryBuilder,
             $request->query->getInt('page', 1), // Numéro de page, 1 par défaut
             6 // Nombre d'éléments par page
         );
             
-        // Passer les publications paginées à la vue
+        // Passer les publications paginées et le tri actuel à la vue
         return $this->render('dashVoyageurs/socialPageVoyageurs.html.twig', [
-            'publications' => $pagination
+            'publications' => $pagination,
+            'currentSort' => $sortBy
         ]);
     }
     

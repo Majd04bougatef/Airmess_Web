@@ -438,7 +438,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #ff4444;
+            background:rgb(228, 114, 213);
             color: white;
             padding: 15px 30px;
             font-weight: bold;
@@ -448,6 +448,101 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             letter-spacing: 2px;
         }
+        
+        /* Styles améliorés pour le tri */
+        .sort-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            position: relative;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .sort-container:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .sort-select {
+            appearance: none;
+            padding: 8px 35px 8px 12px;
+            font-size: 0.9rem;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            background-color: #fff;
+            color: #344767;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23344767' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .sort-select:hover {
+            border-color: #5e72e4;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: #5e72e4;
+            box-shadow: 0 0 0 2px rgba(94,114,228,0.1);
+        }
+
+        .sort-label {
+            font-weight: 500;
+            color: #344767;
+            margin-right: 12px;
+            font-size: 0.9rem;
+        }
+
+        /* Animation pour le changement de tri */
+        .publication-item {
+            transition: all 0.3s ease;
+        }
+
+        .publication-item.fade-out {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .publication-item.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Indicateur de tri actif */
+        .sort-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #344767;
+            margin-left: 10px;
+        }
+
+        .sort-indicator i {
+            margin-right: 5px;
+            font-size: 0.7rem;
+        }
+
+        /* Animation du bouton refresh */
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        #refreshBtn i {
+            transition: transform 0.3s ease;
+        }
+
+        #refreshBtn:hover i {
+            animation: rotate 1s linear infinite;
+        }
     </style>
 {% endblock %}
 
@@ -455,146 +550,92 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const backToTopBtn = document.querySelector('.back-to-top');
-            const loadingSpinner = document.querySelector('.loading-spinner');
-            const overlay = document.querySelector('.overlay');
+            // Éléments du DOM
+            const sortSelect = document.getElementById('sortSelect');
             const refreshBtn = document.getElementById('refreshBtn');
+            const sortIndicator = document.getElementById('sortIndicator');
+            const sortLabel = document.getElementById('sortLabel');
+            const publicationItems = document.querySelectorAll('.publication-item');
             
-            // Animation d'apparition des images au chargement
-            const cardImages = document.querySelectorAll('.card-img-top');
-            cardImages.forEach(img => {
-                // Appliquer un effet initial de zoom réduit
-                img.style.transform = 'scale(0.95)';
-                img.style.opacity = '0.9';
-                
-                // Attendre que l'image soit chargée
-                img.onload = function() {
-                    // Transition vers l'échelle normale
-                    setTimeout(() => {
-                        img.style.transform = 'scale(1)';
-                        img.style.opacity = '1';
-                    }, 100 + Math.random() * 300);
-                };
-                
-                // Si l'image est déjà chargée
-                if (img.complete) {
-                    setTimeout(() => {
-                        img.style.transform = 'scale(1)';
-                        img.style.opacity = '1';
-                    }, 100 + Math.random() * 300);
+            // Charger la préférence de tri sauvegardée
+            const savedSort = localStorage.getItem('preferredSort');
+            if (savedSort && sortSelect.querySelector(`option[value="${savedSort}"]`)) {
+                sortSelect.value = savedSort;
+            }
+            
+            // Mettre à jour l'indicateur de tri
+            function updateSortIndicator(value) {
+                const icon = sortIndicator.querySelector('i');
+                icon.className = 'fas ' + getSortIcon(value);
+                sortLabel.textContent = sortSelect.options[sortSelect.selectedIndex].text;
+            }
+            
+            // Obtenir l'icône appropriée pour le type de tri
+            function getSortIcon(sortValue) {
+                switch(sortValue) {
+                    case 'date_desc':
+                    case 'date_asc':
+                        return 'fa-calendar-alt';
+                    case 'likes':
+                        return 'fa-heart';
+                    case 'location':
+                        return 'fa-map-marker-alt';
+                    default:
+                        return 'fa-sort';
                 }
-            });
+            }
             
-            // Refresh button event
+            // Animation des publications lors du changement de tri
+            function animatePublications() {
+                publicationItems.forEach(item => {
+                    item.classList.add('fade-out');
+                });
+                
+                setTimeout(() => {
+                    publicationItems.forEach(item => {
+                        item.classList.remove('fade-out');
+                        item.classList.add('fade-in');
+                    });
+                }, 300);
+            }
+            
+            // Gestion du tri
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    // Sauvegarder la préférence
+                    localStorage.setItem('preferredSort', this.value);
+                    
+                    // Animer les publications
+                    animatePublications();
+                    
+                    // Mettre à jour l'indicateur
+                    updateSortIndicator(this.value);
+                    
+                    // Créer l'URL avec le nouveau paramètre de tri
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('sort', this.value);
+                    
+                    // Rediriger après un court délai pour voir l'animation
+                    setTimeout(() => {
+                        window.location.href = currentUrl.toString();
+                    }, 300);
+                });
+            }
+            
+            // Animation du bouton rafraîchir
             if (refreshBtn) {
                 refreshBtn.addEventListener('click', function() {
                     const icon = this.querySelector('i');
-                    icon.classList.add('fa-spin');
-                    showLoading();
-                    
+                    icon.style.animation = 'rotate 1s linear infinite';
                     setTimeout(() => {
                         location.reload();
-                    }, 500);
+                    }, 300);
                 });
             }
             
-            // Show/hide back to top button
-            window.addEventListener('scroll', function() {
-                if (window.pageYOffset > 300) {
-                    backToTopBtn.classList.add('show');
-                } else {
-                    backToTopBtn.classList.remove('show');
-                }
-            });
-            
-            // Scroll to top when button is clicked
-            backToTopBtn.addEventListener('click', function() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-            
-            // Show loading spinner
-            function showLoading() {
-                loadingSpinner.style.display = 'block';
-                overlay.style.display = 'block';
-                setTimeout(() => {
-                    loadingSpinner.style.display = 'none';
-                    overlay.style.display = 'none';
-                }, 500); // Short timeout for smoother transitions
-            }
-            
-            // Appliquer des délais d'animation à toutes les cartes
-            const cards = document.querySelectorAll('.publication-item');
-            cards.forEach((card, index) => {
-                const cardElement = card.querySelector('.publication-card');
-                if (cardElement) {
-                    // Réinitialiser l'animation
-                    cardElement.style.animation = 'none';
-                    
-                    // Appliquer une nouvelle animation avec délai progressif
-                    setTimeout(() => {
-                        cardElement.style.animation = 'fadeIn 0.6s ease-out';
-                        cardElement.style.animationDelay = (index % 6) * 0.1 + 's';
-                        cardElement.style.animationFillMode = 'both';
-                    }, 50);
-                }
-            });
-            
-            // Ajouter des événements aux boutons de tri
-            const sortButtons = document.querySelectorAll('.dropdown-item');
-            if (sortButtons.length > 0) {
-                sortButtons.forEach(button => {
-                    button.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const sortType = this.textContent.trim();
-                        const sortDropdown = document.getElementById('sortDropdown');
-                        
-                        if (sortDropdown) {
-                            sortDropdown.textContent = sortType;
-                        }
-                        
-                        // Animation pendant le tri
-                        showLoading();
-                        
-                        // Simulation de tri (à remplacer par une vraie logique de tri)
-                        setTimeout(() => {
-                            // Ici, vous pourriez réorganiser les cartes
-                            console.log(`Tri par: ${sortType}`);
-                        }, 500);
-                    });
-                });
-            }
-            
-            // Animation pour la pagination
-            const paginationLinks = document.querySelectorAll('.pagination .page-link');
-            if (paginationLinks.length > 0) {
-                paginationLinks.forEach(link => {
-                    if (!link.parentElement.classList.contains('disabled') && !link.parentElement.classList.contains('active')) {
-                        link.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            const href = this.getAttribute('href');
-                            
-                            // Montrer l'animation de chargement
-                            showLoading();
-                            
-                            // Animation de sortie pour les publications
-                            const publicationCards = document.querySelectorAll('.publication-card');
-                            publicationCards.forEach((card, index) => {
-                                setTimeout(() => {
-                                    card.style.opacity = '0';
-                                    card.style.transform = 'translateY(20px)';
-                                }, index * 30);
-                            });
-                            
-                            // Naviguer vers la nouvelle page après l'animation
-                            setTimeout(() => {
-                                window.location.href = href;
-                            }, 400);
-                        });
-                    }
-                });
+            // Initialiser l'indicateur de tri au chargement
+            if (sortSelect && sortIndicator) {
+                updateSortIndicator(sortSelect.value);
             }
         });
     </script>
@@ -618,13 +659,40 @@
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6 class="section-heading">Réseaux Sociaux</h6>
-                    <div class="d-flex">
-                        <button id="refreshBtn" class="btn btn-outline-info btn-sm me-2">
-                            <i class="fas fa-sync-alt me-1"></i> Actualiser
-                        </button>
-                        <a href="{{ path('app_social_media_new') }}" class="btn btn-primary btn-sm me-2">
-                            <i class="fas fa-plus me-1 animated-icon"></i> Ajouter une publication
-                        </a>
+                    <div class="d-flex align-items-center">
+                        <div class="sort-container me-3">
+                            <label class="sort-label" for="sortSelect">
+                                <i class="fas fa-sort me-1"></i>Trier par
+                            </label>
+                            <select class="sort-select" id="sortSelect" name="sort">
+                                <option value="date_desc" {% if currentSort == 'date_desc' %}selected{% endif %}>Plus récent d'abord</option>
+                                <option value="date_asc" {% if currentSort == 'date_asc' %}selected{% endif %}>Plus ancien d'abord</option>
+                                <option value="likes" {% if currentSort == 'likes' %}selected{% endif %}>Popularité</option>
+                                <option value="location" {% if currentSort == 'location' %}selected{% endif %}>Par lieu</option>
+                            </select>
+                            <span class="sort-indicator" id="sortIndicator">
+                                <i class="fas {% if currentSort starts with 'date' %}fa-calendar-alt{% elseif currentSort == 'likes' %}fa-heart{% else %}fa-map-marker-alt{% endif %}"></i>
+                                <span id="sortLabel">
+                                    {% if currentSort == 'date_desc' %}
+                                        Plus récent
+                                    {% elseif currentSort == 'date_asc' %}
+                                        Plus ancien
+                                    {% elseif currentSort == 'likes' %}
+                                        Popularité
+                                    {% else %}
+                                        Par lieu
+                                    {% endif %}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="d-flex">
+                            <button id="refreshBtn" class="btn btn-outline-info btn-sm me-2" title="Actualiser la liste">
+                                <i class="fas fa-sync-alt me-1"></i> Actualiser
+                            </button>
+                            <a href="{{ path('app_social_media_new') }}" class="btn btn-primary btn-sm" title="Créer une nouvelle publication">
+                                <i class="fas fa-plus me-1 animated-icon"></i> Ajouter
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -654,16 +722,6 @@
                                         <p class="m-0 publications-count">
                                             <i class="fas fa-list-ul me-1"></i> {{ publications.totalItemCount }} publication{% if publications.totalItemCount > 1 %}s{% endif %} trouvée{% if publications.totalItemCount > 1 %}s{% endif %}
                                         </p>
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fas fa-sort me-1"></i> Trier par
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="sortDropdown">
-                                                <li><a class="dropdown-item" href="#"><i class="fas fa-calendar-alt me-2"></i>Plus récents</a></li>
-                                                <li><a class="dropdown-item" href="#"><i class="fas fa-calendar me-2"></i>Plus anciens</a></li>
-                                                <li><a class="dropdown-item" href="#"><i class="fas fa-sort-alpha-down me-2"></i>Alphabétique</a></li>
-                                            </ul>
-                                        </div>
                                     </div>
                                 </div>
                                 
@@ -698,9 +756,7 @@
                                                 <span class="date-info">
                                                     <i class="far fa-calendar-alt me-1"></i> 
                                                     {{ publication.publicationDate|date("d/m/Y") }}
-                                                    {% if publication.publicationDate > date() %}
-                                                        <span class="badge bg-warning ms-2">À venir</span>
-                                                    {% endif %}
+                                                   
                                                 </span>
                                                 {% if publication.publicationDate <= date() %}
                                                     <a href="{{ path('app_social_media_show', {'idEB': publication.idEB}) }}" class="btn btn-sm btn-outline-primary">
