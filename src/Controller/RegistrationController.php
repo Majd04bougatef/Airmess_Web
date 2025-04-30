@@ -45,6 +45,22 @@ class RegistrationController extends AbstractController
             try {
                 $this->log('Registration process started');
                 
+                // Verify hCaptcha response
+                $hcaptchaResponse = $request->request->get('h-captcha-response');
+                if (!$hcaptchaResponse) {
+                    $this->addFlash('error', 'Erreur de validation: Veuillez confirmer que vous n\'êtes pas un robot');
+                    return $this->redirectToRoute('app_signup');
+                }
+                
+                // Verify with hCaptcha API
+                $hcaptchaSecret = $this->getParameter('hcaptcha_secret_key') ?? '0x0000000000000000000000000000000000000000';
+                $hcaptchaVerification = $this->verifyHcaptcha($hcaptchaResponse, $hcaptchaSecret);
+                
+                if (!$hcaptchaVerification) {
+                    $this->addFlash('error', 'Échec de la vérification hCaptcha. Veuillez réessayer.');
+                    return $this->redirectToRoute('app_signup');
+                }
+                
                 // Get the user role
                 $userRole = $request->request->get('roleUser');
                 $this->log('User role: ' . $userRole);
@@ -162,6 +178,34 @@ class RegistrationController extends AbstractController
         
         // If not a POST request, redirect to signup page
         return $this->redirectToRoute('app_signup');
+    }
+    
+    /**
+     * Helper method to verify hCaptcha response
+     */
+    private function verifyHcaptcha(string $response, string $secret): bool
+    {
+        $url = 'https://hcaptcha.com/siteverify';
+        $data = [
+            'secret' => $secret,
+            'response' => $response
+        ];
+        
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query($data)
+            ]
+        ];
+        
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        $resultJson = json_decode($result);
+        
+        $this->log('hCaptcha verification result: ' . ($resultJson->success ? 'success' : 'failure'));
+        
+        return isset($resultJson->success) && $resultJson->success === true;
     }
     
     /**

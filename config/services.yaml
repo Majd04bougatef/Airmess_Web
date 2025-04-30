@@ -21,6 +21,11 @@ parameters:
     # Replace these with your actual reCAPTCHA keys from https://www.google.com/recaptcha/admin
     # recaptcha_site_key: '%env(RECAPTCHA_SITE_KEY)%'
     # recaptcha_secret_key: '%env(RECAPTCHA_SECRET_KEY)%'
+    
+    # hCaptcha keys (using test site key and secret)
+    # You should replace these with your actual keys from https://dashboard.hcaptcha.com/
+    hcaptcha_site_key: '10000000-ffff-ffff-ffff-000000000001'  # Test site key
+    hcaptcha_secret_key: '0x0000000000000000000000000000000000000000'  # Test secret key
 
 
 services:

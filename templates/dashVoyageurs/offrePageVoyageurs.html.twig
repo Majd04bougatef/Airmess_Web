@@ -2,6 +2,429 @@
 
 {% block title %}Offres Disponibles{% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .offer-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem 0;
+    }
+
+    .offer-card {
+        position: relative;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .offer-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(94, 114, 228, 0.15);
+    }
+
+    .offer-image {
+        height: 160px;
+        width: 100%;
+        object-fit: cover;
+        background-color: #f0f7ff;
+    }
+
+    .offer-content {
+        padding: 1.25rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .offer-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+
+    .offer-detail {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: #67748e;
+    }
+
+    .offer-detail i {
+        margin-right: 10px;
+        color: #5e72e4;
+    }
+
+    .offer-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #eaecf0;
+        margin-top: auto;
+    }
+
+    .offer-price {
+        font-weight: 600;
+        color: #344767;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .price-initial {
+        text-decoration: line-through;
+        color: #8392ab;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 2px;
+    }
+    
+    .price-after {
+        color: #2dce89;
+        font-weight: 700;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .price-after i {
+        margin-right: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .discount-badge {
+        background-color: #f5365c;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.2rem 0.5rem;
+        border-radius: 20px;
+        margin-left: 8px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-view,
+    .btn-reserve {
+        background-color: #5e72e4;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 7px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-view:hover,
+    .btn-reserve:hover {
+        background-color: #324cdd;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
+    }
+
+    .btn-view i,
+    .btn-reserve i {
+        margin-right: 8px;
+    }
+
+    .btn-reserve {
+        margin-left: 0.5rem;
+    }
+    
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-mes-reservations {
+        background-color: #5e72e4;
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 7px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+    }
+    
+    .btn-mes-reservations:hover {
+        background-color: #324cdd;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(94, 114, 228, 0.3);
+    }
+    
+    .btn-mes-reservations i {
+        margin-right: 8px;
+    }
+
+    .places-number {
+        font-weight: 600;
+    }
+
+    .places-zero {
+        color: #f5365c;
+        font-weight: 700;
+    }
+
+    .places-low {
+        color: #2dce89;
+        font-weight: 700;
+    }
+
+    .places-available {
+        color: #2dce89;
+        font-weight: 700;
+    }
+
+    .btn-reserve:hover {
+        background-color: #2c3e50;
+    }
+
+    .btn-disabled {
+        background-color: #95a5a6 !important;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .btn-reserve i {
+        margin-right: 8px;
+    }
+    
+    /* Styles pour la recherche et le filtrage */
+    .search-filter-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .search-box {
+        flex-grow: 1;
+        max-width: 500px;
+    }
+    
+    .filter-dropdown {
+        position: relative;
+    }
+    
+    .filter-dropdown .dropdown-menu {
+        min-width: 200px;
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination .page-link {
+        color: #5e72e4;
+        border-color: #dee2e6;
+        background-color: #fff;
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #5e72e4;
+        border-color: #5e72e4;
+        color: white;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #edf2ff;
+        border-color: #dee2e6;
+        color: #324cdd;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #95a5a6;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    
+    .pagination-info {
+        text-align: center;
+        margin-top: 0.75rem;
+        color: #8392ab;
+        font-size: 0.875rem;
+    }
+    
+    .no-results {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        width: 100%;
+        grid-column: 1 / -1;
+    }
+    
+    .no-results i {
+        font-size: 3rem;
+        color: #8392ab;
+        margin-bottom: 1rem;
+    }
+    
+    .no-results h4 {
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+    
+    .no-results p {
+        color: #67748e;
+        text-align: center;
+        max-width: 400px;
+        margin-bottom: 0;
+    }
+
+    /* Styles pour les offres archivées */
+    .archived-offer {
+        position: relative;
+        opacity: 0.75;
+        filter: grayscale(70%);
+        background-color: #f8f9fa !important;
+        box-shadow: 0 3px 10px rgba(149, 157, 165, 0.1) !important;
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+    
+    .archived-offer:hover {
+        transform: none !important;
+        box-shadow: 0 3px 10px rgba(149, 157, 165, 0.1) !important;
+    }
+    
+    .archived-offer::before {
+        content: "COMPLETED";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        font-size: 3rem;
+        font-weight: 700;
+        color: rgba(200, 200, 200, 0.3);
+        white-space: nowrap;
+        z-index: 10;
+        pointer-events: none;
+        border: 8px solid rgba(200, 200, 200, 0.2);
+        padding: 0.5rem 5rem;
+        border-radius: 6px;
+    }
+    
+    .archived-offer .offer-image {
+        filter: grayscale(100%) contrast(0.8);
+    }
+    
+    .archived-offer .offer-content {
+        color: #888 !important;
+    }
+    
+    .archived-offer .offer-title {
+        color: #777 !important;
+    }
+    
+    .archived-offer .offer-detail {
+        color: #999 !important;
+    }
+    
+    .archived-offer .offer-detail i {
+        color: #aaa !important;
+    }
+    
+    .archived-offer .offer-footer {
+        background-color: #eee !important;
+        border-top: 1px solid #ddd !important;
+    }
+    
+    .archived-offer .price-after {
+        color: #888 !important;
+    }
+    
+    .archived-section-header {
+        grid-column: 1 / -1;
+        text-align: center;
+        margin: 30px 0 20px 0;
+        padding-top: 30px;
+        border-top: 1px solid #e0e0e0;
+        position: relative;
+    }
+    
+    .archived-section-header::before {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: 50%;
+        width: 100px;
+        height: 2px;
+        background-color: #aaa;
+        transform: translateX(-50%);
+    }
+    
+    .archived-section-header h4 {
+        color: #777;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+        display: inline-block;
+        background-color: white;
+        padding: 0 15px;
+        position: relative;
+        top: -12px;
+    }
+    
+    .archive-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(245, 54, 92, 0.9);
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.3rem 0.6rem;
+        border-radius: 20px;
+        z-index: 20;
+    }
+    
+    .archive-disabled-btn {
+        background-color: #d1d1d1 !important;
+        color: #777 !important;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 7px;
+        font-weight: 600;
+        cursor: not-allowed;
+        opacity: 0.8;
+        display: flex;
+        align-items: center;
+    }
+    
+    .archive-disabled-btn i {
+        margin-right: 8px;
+        color: #777 !important;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
 <style>
     .offer-container {
@@ -204,6 +627,98 @@
     .btn-reserve i {
         margin-right: 8px;
     }
+    
+    /* Styles pour la recherche et le filtrage */
+    .search-filter-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .search-box {
+        flex-grow: 1;
+        max-width: 500px;
+    }
+    
+    .filter-dropdown {
+        position: relative;
+    }
+    
+    .filter-dropdown .dropdown-menu {
+        min-width: 200px;
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination .page-link {
+        color: #5e72e4;
+        border-color: #dee2e6;
+        background-color: #fff;
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #5e72e4;
+        border-color: #5e72e4;
+        color: white;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #edf2ff;
+        border-color: #dee2e6;
+        color: #324cdd;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #95a5a6;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    
+    .pagination-info {
+        text-align: center;
+        margin-top: 0.75rem;
+        color: #8392ab;
+        font-size: 0.875rem;
+    }
+    
+    .no-results {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        width: 100%;
+        grid-column: 1 / -1;
+    }
+    
+    .no-results i {
+        font-size: 3rem;
+        color: #8392ab;
+        margin-bottom: 1rem;
+    }
+    
+    .no-results h4 {
+        color: #344767;
+        margin-bottom: 0.5rem;
+    }
+    
+    .no-results p {
+        color: #67748e;
+        text-align: center;
+        max-width: 400px;
+        margin-bottom: 0;
+    }
 </style>
 
 <div class="container-fluid py-4">
@@ -214,9 +729,44 @@
             Mes Réservations
         </a>
     </div>
-    <div class="offer-container">
+    
+    <!-- Ajout de la barre de recherche et du filtrage -->
+    <div class="search-filter-container">
+        <div class="search-box">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" id="searchOffre" class="form-control" placeholder="Rechercher par titre, lieu...">
+            </div>
+        </div>
+        <div class="filter-dropdown">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter me-2"></i>Filtrer par
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item filter-option" data-filter="all" href="#">Toutes les offres</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item filter-option" data-filter="price-low" href="#">Prix croissant</a></li>
+                    <li><a class="dropdown-item filter-option" data-filter="price-high" href="#">Prix décroissant</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item filter-option" data-filter="available" href="#">Places disponibles</a></li>
+                    <li><a class="dropdown-item filter-option" data-filter="limited" href="#">Places limitées (< 5)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div id="offer-container" class="offer-container">
+        <!-- Offres actives d'abord -->
         {% for offre in offres %}
-            <div class="offer-card">
+            {% set isExpired = (offre.endDate and offre.endDate < date('now')) or offre.numberLimit <= 0 %}
+            {% if not isExpired %}
+            <div class="offer-card" 
+                 data-title="{{ offre.description|lower }}" 
+                 data-location="{{ offre.place|lower }}" 
+                 data-price="{{ offre.priceAfter }}"
+                 data-places="{{ offre.numberLimit }}"
+                 data-expired="0">
                 <img src="{{ 'http://localhost/imageOffre/' ~ (offre.imagePath ?: 'default-offer.jpg') }}" alt="Image de l'offre" class="offer-image">
                 <div class="offer-content">
                     <h3 class="offer-title">{{ offre.description }}</h3>
@@ -236,7 +786,7 @@
                         <i class="fas fa-user-friends"></i>
                         <span>
                             Places disponibles : 
-                            <span class="places-number {% if offre.numberLimit <= 0 %}places-zero{% elseif offre.numberLimit < 5 %}places-low{% else %}places-available{% endif %}">
+                            <span class="places-number places-available">
                                 {{ offre.numberLimit }}
                             </span>
                         </span>
@@ -258,23 +808,378 @@
                             <i class="fas fa-info-circle"></i>
                             Détails
                         </a>
-                        {% if offre.numberLimit > 0 %}
-                            <a href="{{ path('app_reservation_new', {'idO': offre.idO}) }}" class="btn-reserve">
-                                <i class="fas fa-shopping-cart"></i>
-                                Réserver
-                            </a>
-                        {% else %}
-                            <button disabled class="btn-reserve btn-disabled">
-                                <i class="fas fa-shopping-cart"></i>
-                                Complet
-                            </button>
-                        {% endif %}
+                        <a href="{{ path('app_reservation_new', {'idO': offre.idO}) }}" class="btn-reserve">
+                            <i class="fas fa-shopping-cart"></i>
+                            Réserver
+                        </a>
                     </div>
                 </div>
             </div>
-        {% else %}
-            <p class="text-center w-100">Aucune offre disponible pour le moment.</p>
+            {% endif %}
         {% endfor %}
+        
+        <!-- Séparateur visuel si des offres expirées sont présentes -->
+        {% set hasExpiredOffers = false %}
+        {% for offre in offres %}
+            {% if (offre.endDate and offre.endDate < date('now')) or offre.numberLimit <= 0 %}
+                {% set hasExpiredOffers = true %}
+            {% endif %}
+        {% endfor %}
+        
+        {% if hasExpiredOffers %}
+        <div class="archived-section-header">
+            <h4>Offres expirées</h4>
+        </div>
+        {% endif %}
+        
+        <!-- Offres expirées ensuite -->
+        {% for offre in offres %}
+            {% set isExpired = (offre.endDate and offre.endDate < date('now')) or offre.numberLimit <= 0 %}
+            {% if isExpired %}
+            <div class="offer-card archived-offer" 
+                 data-title="{{ offre.description|lower }}" 
+                 data-location="{{ offre.place|lower }}" 
+                 data-price="{{ offre.priceAfter }}"
+                 data-places="{{ offre.numberLimit }}"
+                 data-expired="1">
+                <img src="{{ 'http://localhost/imageOffre/' ~ (offre.imagePath ?: 'default-offer.jpg') }}" alt="Image de l'offre" class="offer-image">
+                <div class="archive-badge">
+                    {% if offre.endDate and offre.endDate < date('now') %}
+                        TERMINÉ
+                    {% else %}
+                        COMPLET
+                    {% endif %}
+                </div>
+                <div class="offer-content">
+                    <h3 class="offer-title">{{ offre.description }}</h3>
+                    <div class="offer-detail">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ offre.place }}</span>
+                    </div>
+                    <div class="offer-detail">
+                        <i class="fas fa-clock"></i>
+                        <span>Disponible du {{ offre.startDate ? offre.startDate|date('d/m/Y') : 'N/A' }}</span>
+                    </div>
+                    <div class="offer-detail">
+                        <i class="fas fa-hourglass-end"></i>
+                        <span>Jusqu'au {{ offre.endDate ? offre.endDate|date('d/m/Y') : 'N/A' }}</span>
+                    </div>
+                    <div class="offer-detail">
+                        <i class="fas fa-user-friends"></i>
+                        <span>
+                            Places disponibles : 
+                            <span class="places-number places-zero">
+                                {{ offre.numberLimit }}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="offer-footer">
+                    <div class="offer-price">
+                        <div class="price-initial">{{ offre.priceInit }}€</div>
+                        <div class="price-after">
+                            <i class="fas fa-tag"></i>
+                            {{ offre.priceAfter }}€
+                            <span class="discount-badge">
+                                -{{ ((offre.priceInit - offre.priceAfter) / offre.priceInit * 100)|round }}%
+                            </span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button disabled class="archive-disabled-btn">
+                            <i class="fas fa-info-circle"></i>
+                            Détails
+                        </button>
+                        <button disabled class="archive-disabled-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            Complet
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+        
+        {% if offres|length == 0 %}
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h4>Aucune offre disponible</h4>
+                <p>Aucune offre n'est disponible pour le moment. Veuillez réessayer ultérieurement.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Pagination -->
+    <div class="pagination-container" id="pagination-container">
+        <nav aria-label="Navigation des offres">
+            <ul class="pagination" id="pagination">
+                <!-- Les boutons de pagination seront générés dynamiquement -->
+            </ul>
+        </nav>
+    </div>
+    
+    <!-- Informations sur la pagination -->
+    <div class="pagination-info">
+        <span>Affichage de <span id="start-index">1</span> à <span id="end-index">9</span> sur <span id="total-items">{{ offres|length }}</span> offres</span>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuration de la pagination
+        const itemsPerPage = 9; // Afficher 9 offres par page (3x3 grid)
+        let currentPage = 1;
+        let filteredOffers = [];
+        
+        // Récupérer toutes les offres
+        const allOffers = document.querySelectorAll('.offer-card');
+        
+        // Fonction de recherche
+        const searchInput = document.getElementById('searchOffre');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchValue = this.value.toLowerCase();
+                currentPage = 1;
+                filterOffers(searchValue);
+            });
+        }
+        
+        // Fonction pour trier et filtrer les offres
+        function sortOffers(filterValue) {
+            const offers = Array.from(allOffers);
+            
+            // Appliquer les filtres
+            if (filterValue === 'price-low') {
+                offers.sort((a, b) => {
+                    const priceA = parseFloat(a.getAttribute('data-price'));
+                    const priceB = parseFloat(b.getAttribute('data-price'));
+                    return priceA - priceB;
+                });
+            } else if (filterValue === 'price-high') {
+                offers.sort((a, b) => {
+                    const priceA = parseFloat(a.getAttribute('data-price'));
+                    const priceB = parseFloat(b.getAttribute('data-price'));
+                    return priceB - priceA;
+                });
+            } else if (filterValue === 'available') {
+                offers.sort((a, b) => {
+                    const placesA = parseInt(a.getAttribute('data-places'));
+                    const placesB = parseInt(b.getAttribute('data-places'));
+                    return placesB - placesA;
+                });
+            } else if (filterValue === 'limited') {
+                // Filtrer pour montrer seulement les offres avec moins de 5 places
+                return offers.filter(offer => {
+                    const places = parseInt(offer.getAttribute('data-places'));
+                    return places > 0 && places < 5;
+                });
+            }
+            
+            return offers;
+        }
+        
+        // Filtrage par statut ou type
+        const filterOptions = document.querySelectorAll('.filter-option');
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const filterValue = this.getAttribute('data-filter');
+                currentPage = 1;
+                
+                if (filterValue === 'all') {
+                    filteredOffers = Array.from(allOffers);
+                } else {
+                    filteredOffers = sortOffers(filterValue);
+                }
+                
+                // Mise à jour du texte du bouton dropdown
+                document.getElementById('filterDropdown').innerHTML = '<i class="fas fa-filter me-2"></i>' + this.textContent;
+                
+                displayPageItems();
+                createPagination();
+                updateNoResultsMessage();
+            });
+        });
+        
+        // Fonction pour filtrer les offres
+        function filterOffers(searchValue) {
+            if (!searchValue.trim()) {
+                // Si la recherche est vide, afficher toutes les offres
+                filteredOffers = Array.from(allOffers);
+            } else {
+                // Filtrer les offres selon le terme de recherche
+                filteredOffers = Array.from(allOffers).filter(offer => {
+                    const title = offer.getAttribute('data-title');
+                    const location = offer.getAttribute('data-location');
+                    return title.includes(searchValue) || location.includes(searchValue);
+                });
+            }
+            
+            displayPageItems();
+            createPagination();
+            updateNoResultsMessage();
+        }
+        
+        // Fonction pour afficher un message lorsqu'aucune offre n'est trouvée
+        function updateNoResultsMessage() {
+            const container = document.getElementById('offer-container');
+            const existingNoResults = container.querySelector('.no-results');
+            
+            if (filteredOffers.length === 0) {
+                if (!existingNoResults) {
+                    // Si aucun message n'existe, en créer un
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-results';
+                    noResults.innerHTML = `
+                        <i class="fas fa-search"></i>
+                        <h4>Aucune offre trouvée</h4>
+                        <p>Aucune offre ne correspond à vos critères. Essayez de modifier votre recherche ou vos filtres.</p>
+                    `;
+                    container.appendChild(noResults);
+                }
+            } else if (existingNoResults) {
+                // Supprimer le message s'il existe et qu'il y a des résultats
+                existingNoResults.remove();
+            }
+        }
+        
+        // Fonction pour afficher les éléments de la page courante
+        function displayPageItems() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredOffers.length);
+            
+            // Masquer toutes les offres
+            allOffers.forEach(offer => {
+                offer.style.display = 'none';
+            });
+            
+            // Afficher uniquement les éléments de la page courante
+            filteredOffers.slice(startIndex, endIndex).forEach(offer => {
+                offer.style.display = '';
+            });
+            
+            // Mise à jour des informations de pagination
+            document.getElementById('start-index').textContent = filteredOffers.length > 0 ? startIndex + 1 : 0;
+            document.getElementById('end-index').textContent = endIndex;
+            document.getElementById('total-items').textContent = filteredOffers.length;
+            
+            // Masquer/afficher la section de pagination
+            const paginationContainer = document.getElementById('pagination-container');
+            const paginationInfo = document.querySelector('.pagination-info');
+            
+            if (filteredOffers.length <= itemsPerPage) {
+                paginationContainer.style.display = 'none';
+                paginationInfo.style.display = 'none';
+            } else {
+                paginationContainer.style.display = 'flex';
+                paginationInfo.style.display = 'block';
+            }
+        }
+        
+        // Fonction pour créer la pagination
+        function createPagination() {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+            
+            const totalPages = Math.ceil(filteredOffers.length / itemsPerPage);
+            
+            // Bouton précédent
+            const prevBtn = document.createElement('li');
+            prevBtn.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevBtn.innerHTML = '<a class="page-link" href="#" aria-label="Précédent"><span aria-hidden="true">&laquo;</span></a>';
+            prevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayPageItems();
+                    createPagination();
+                }
+            });
+            paginationContainer.appendChild(prevBtn);
+            
+            // Pages numérotées
+            const maxPageButtons = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+            
+            if (endPage - startPage + 1 < maxPageButtons && startPage > 1) {
+                startPage = Math.max(1, endPage - maxPageButtons + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('li');
+                pageBtn.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                pageBtn.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                pageBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentPage = i;
+                    displayPageItems();
+                    createPagination();
+                });
+                paginationContainer.appendChild(pageBtn);
+            }
+            
+            // Bouton suivant
+            const nextBtn = document.createElement('li');
+            nextBtn.className = `page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`;
+            nextBtn.innerHTML = '<a class="page-link" href="#" aria-label="Suivant"><span aria-hidden="true">&raquo;</span></a>';
+            nextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayPageItems();
+                    createPagination();
+                }
+            });
+            paginationContainer.appendChild(nextBtn);
+        }
+        
+        // Initialisation
+        filteredOffers = Array.from(allOffers);
+        
+        // Trier les offres pour afficher les offres expirées à la fin
+        function sortByExpiration() {
+            // On fait une copie triée de filteredOffers
+            return filteredOffers.sort((a, b) => {
+                const isExpiredA = a.getAttribute('data-expired') === '1';
+                const isExpiredB = b.getAttribute('data-expired') === '1';
+                
+                // Si A est expiré et B ne l'est pas, A vient après B
+                if (isExpiredA && !isExpiredB) return 1;
+                // Si B est expiré et A ne l'est pas, B vient après A
+                if (!isExpiredA && isExpiredB) return -1;
+                
+                // Si les deux ont le même statut d'expiration, maintenir l'ordre par défaut
+                return 0;
+            });
+        }
+        
+        // Applique le tri par expiration pour toutes les méthodes de filtrage
+        const originalFilterOffers = filterOffers;
+        filterOffers = function(searchValue) {
+            // Appliquer d'abord le filtrage de recherche d'origine
+            originalFilterOffers.call(this, searchValue);
+            
+            // Puis appliquer le tri par expiration
+            filteredOffers = sortByExpiration();
+        };
+        
+        const originalSortOffers = sortOffers;
+        sortOffers = function(filterValue) {
+            // Appliquer d'abord le tri d'origine
+            const result = originalSortOffers.call(this, filterValue);
+            
+            // Puis ordonner selon l'expiration
+            filteredOffers = result.slice(); // Créer une copie
+            filteredOffers = sortByExpiration();
+            
+            return filteredOffers;
+        };
+        
+        // Forcer le tri initial des offres et les afficher
+        filteredOffers = sortByExpiration();
+        displayPageItems();
+        createPagination();
+    });
+</script>
 {% endblock %}

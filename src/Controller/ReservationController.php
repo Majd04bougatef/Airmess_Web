@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Stripe\Stripe;
 use Stripe\Charge;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 #[Route('/reservation')]
 class ReservationController extends AbstractController
@@ -234,7 +236,7 @@ class ReservationController extends AbstractController
     }
 
     #[Route('/process-payment/{idR}', name: 'app_reservation_process_payment', methods: ['POST'])]
-    public function processPayment(Request $request, Reservation $reservation, EntityManagerInterface $entityManager, OffreRepository $offreRepository, SessionInterface $session, UserRepository $userRepository): Response
+    public function processPayment(Request $request, Reservation $reservation, EntityManagerInterface $entityManager, OffreRepository $offreRepository, SessionInterface $session, UserRepository $userRepository, \App\Service\ReservationEmailService $emailService): Response
     {
         // Vérifier si l'utilisateur est connecté
         if (!$session->has('user_id')) {
@@ -292,6 +294,14 @@ class ReservationController extends AbstractController
             $currentReservation['status'] = 'confirmed';
             $session->set('current_reservation', $currentReservation);
 
+            // Envoyer l'email de confirmation avec le nouveau service
+            $emailSent = $emailService->sendConfirmationEmail($user, $reservation, $reference);
+            
+            if (!$emailSent) {
+                // Ajouter un message flash pour informer que l'email n'a pas pu être envoyé
+                $this->addFlash('warning', 'Votre paiement a été validé, mais nous n\'avons pas pu vous envoyer l\'email de confirmation. Veuillez vérifier vos réservations dans votre espace client.');
+            }
+
             // Redirect to the confirmation page
             return $this->redirectToRoute('app_reservation_confirmation', ['idR' => $reservation->getIdR()]);
         } catch (\Stripe\Exception\CardException $e) {
@@ -335,5 +345,43 @@ class ReservationController extends AbstractController
         return $this->render('reservation/confirmation.html.twig', [
             'reservation' => $reservation,
         ]);
+    }
+    
+    #[Route('/receipt/{idR}', name: 'app_reservation_receipt', methods: ['GET'])]
+    public function generateReceipt(Reservation $reservation): Response
+    {
+        if (!$reservation) {
+            throw $this->createNotFoundException('La réservation demandée n\'existe pas');
+        }
+        
+        // Générer le HTML pour le reçu
+        $html = $this->renderView('reservation/receipt.html.twig', [
+            'reservation' => $reservation,
+            'date' => new \DateTime()
+        ]);
+        
+        // Configurer Dompdf
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        
+        // Créer une instance de Dompdf
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        
+        // Préparer la réponse
+        $filename = 'receipt_' . $reservation->getIdR() . '.pdf';
+        
+        return new Response(
+            $dompdf->output(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+            ]
+        );
     }
 }

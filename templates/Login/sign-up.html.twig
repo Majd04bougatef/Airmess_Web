@@ -8,6 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- Add hCaptcha API script -->
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 <style>
         body {
             background: linear-gradient(135deg, #7589ff 0%, #ff9db4 100%);
@@ -338,6 +340,13 @@
                                     <input type="hidden" name="statut" value="active">
                                     <input type="hidden" name="diamond" value="0">
                                     <input type="hidden" name="deleteFlag" value="0">
+                                    
+                                    <!-- Add hCaptcha widget -->
+                                    <div class="form-group text-center my-3">
+                                        <div class="h-captcha" data-sitekey="10000000-ffff-ffff-ffff-000000000001" data-theme="light"></div>
+                                        <div id="hcaptcha-error-v" class="field-error"></div>
+                                    </div>
+                                    
                                     <button type="submit" class="btn-register" id="voyageur-submit">S'enregistrer</button>
                                 </div>
                             </div>
@@ -390,6 +399,13 @@
                                     <input type="hidden" name="statut" value="active">
                                     <input type="hidden" name="diamond" value="0">
                                     <input type="hidden" name="deleteFlag" value="0">
+                                    
+                                    <!-- Add hCaptcha widget -->
+                                    <div class="form-group text-center my-3">
+                                        <div class="h-captcha" data-sitekey="10000000-ffff-ffff-ffff-000000000001" data-theme="light"></div>
+                                        <div id="hcaptcha-error-e" class="field-error"></div>
+                                    </div>
+                                    
                                     <button type="submit" class="btn-register" id="entreprise-submit">S'enregistrer</button>
                                 </div>
                             </div>
@@ -740,6 +756,65 @@
                 
                 const confirmField = $(this).find('input[name="password_confirm"]');
                 isValid = validatePasswordConfirm(confirmField, passwordField) && isValid;
+                
+                // Validate hCaptcha
+                const hcaptchaResponse = document.querySelector('#entreprise .h-captcha textarea[name="h-captcha-response"]');
+                if (!hcaptchaResponse || !hcaptchaResponse.value) {
+                    $('#hcaptcha-error-e').text('Veuillez confirmer que vous n\'êtes pas un robot').show();
+                    isValid = false;
+                } else {
+                    $('#hcaptcha-error-e').hide();
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+            
+            // Add validation for voyageur form
+            $('#form-voyageur').submit(function(e) {
+                let isValid = true;
+                
+                // Validate name
+                const nameField = $(this).find('input[name="name"]');
+                isValid = validateName(nameField) && isValid;
+                
+                // Validate prenom
+                const prenomField = $(this).find('input[name="prenom"]');
+                isValid = validatePrenom(prenomField) && isValid;
+                
+                // Validate email
+                const emailField = $(this).find('input[name="email"]');
+                isValid = validateEmail(emailField) && isValid;
+                
+                // Validate phone
+                const phoneField = $(this).find('input[name="phoneNumber"]');
+                isValid = validatePhone(phoneField) && isValid;
+                
+                // Validate password
+                const passwordField = $(this).find('input[name="password"]');
+                isValid = validatePassword(passwordField) && isValid;
+                
+                // Validate password confirmation
+                const confirmField = $(this).find('input[name="password_confirm"]');
+                isValid = validatePasswordConfirm(confirmField, passwordField) && isValid;
+                
+                // Validate date of birth
+                const dateField = $(this).find('input[name="dateNaiss"]');
+                isValid = validateDate(dateField) && isValid;
+                
+                // Validate photo
+                const photoField = $(this).find('input[type="file"]');
+                isValid = validatePhoto(photoField) && isValid;
+                
+                // Validate hCaptcha
+                const hcaptchaResponse = document.querySelector('#voyageur .h-captcha textarea[name="h-captcha-response"]');
+                if (!hcaptchaResponse || !hcaptchaResponse.value) {
+                    $('#hcaptcha-error-v').text('Veuillez confirmer que vous n\'êtes pas un robot').show();
+                    isValid = false;
+                } else {
+                    $('#hcaptcha-error-v').hide();
+                }
                 
                 if (!isValid) {
                     e.preventDefault();

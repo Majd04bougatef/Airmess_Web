@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use App\Service\EmailService;
+use App\Service\TwilioService;
 
 
 class AdminController extends AbstractController
@@ -461,7 +462,8 @@ class AdminController extends AbstractController
     #[Route('/UserPage/delete/{id_U}', name: 'admin_user_delete', methods: ['POST'])]
     public function deleteUser(
         User $user, 
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        TwilioService $twilioService
     ): Response
     {
         try {
@@ -472,15 +474,70 @@ class AdminController extends AbstractController
             // Save changes to database
             $entityManager->flush();
             
+            // Send SMS notification if the user has a phone number
+            $smsStatus = 'non envoyé';
+            if ($user->getPhoneNumber()) {
+                $phoneNumber = $user->getPhoneNumber();
+                
+                // Remove any spaces, dashes, or other non-numeric characters
+                $phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
+                
+                // Format for Tunisian phone numbers (Ooredoo, Orange, Telecom)
+                // Tunisian numbers are 8 digits, and country code is +216
+                
+                // If the number starts with 0, remove it (common phone number entry format)
+                if (str_starts_with($phoneNumber, '0')) {
+                    $phoneNumber = substr($phoneNumber, 1);
+                }
+                
+                // If number already has country code (starts with 216), add + sign
+                if (str_starts_with($phoneNumber, '216')) {
+                    $phoneNumber = '+' . $phoneNumber;
+                }
+                // If number is just the 8 digits without country code, add +216
+                else if (strlen($phoneNumber) == 8) {
+                    $phoneNumber = '+216' . $phoneNumber;
+                }
+                // Any other format, just add + to ensure E.164 format
+                else if (!str_starts_with($phoneNumber, '+')) {
+                    $phoneNumber = '+' . $phoneNumber;
+                }
+                
+                // Log the phone number format
+                error_log('Sending SMS to number: ' . $phoneNumber);
+                
+                $message = "Cher(e) " . $user->getPrenom() . ", votre compte Airmess a été désactivé par un administrateur. Veuillez contacter le support pour plus d'informations.";
+                $result = $twilioService->sendSms($phoneNumber, $message);
+                
+                if ($result['success']) {
+                    $smsStatus = 'envoyé';
+                } else {
+                    $smsStatus = 'échec: ' . ($result['error'] ?? 'erreur inconnue');
+                }
+            }
+            
+            // Send notification to admin monitoring number
+            $adminNumber = '+21620981776';
+            $adminMessage = "AIRMESS ADMIN NOTIFICATION: Un compte utilisateur a été désactivé - " . 
+                            $user->getPrenom() . " " . $user->getName() . 
+                            " (ID: " . $user->getIdU() . ", Email: " . $user->getEmail() . ")";
+            
+            $adminSmsResult = $twilioService->sendSms($adminNumber, $adminMessage);
+            $adminSmsStatus = $adminSmsResult['success'] ? 'envoyé' : 'échec';
+            
+            error_log("Admin notification SMS: " . $adminSmsStatus);
+            
             return new JsonResponse([
                 'success' => true,
-                'message' => 'L\'utilisateur a été supprimé avec succès',
-                'userName' => $user->getPrenom() . ' ' . $user->getName()
+                'message' => 'L\'utilisateur a été désactivé avec succès. SMS ' . $smsStatus,
+                'userName' => $user->getPrenom() . ' ' . $user->getName(),
+                'smsStatus' => $smsStatus,
+                'adminSmsStatus' => $adminSmsStatus
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => false,
-                'message' => 'Erreur lors de la suppression: ' . $e->getMessage()
+                'message' => 'Erreur lors de la désactivation: ' . $e->getMessage()
             ], 500);
         }
     }
