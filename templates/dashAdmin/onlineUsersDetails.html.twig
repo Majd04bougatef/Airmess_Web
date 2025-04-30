@@ -16,7 +16,7 @@
       <div class="ms-md-auto pe-md-3 d-flex align-items-center">
         <div class="input-group">
           <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-          <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
+          <input type="text" id="searchInput" class="form-control" placeholder="Rechercher..." autocomplete="off">
         </div>
       </div>
     </div>
@@ -69,7 +69,7 @@
     <div class="col-12">
       <div class="card mb-4">
         <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-          <h6>Utilisateurs actuellement en ligne</h6>
+          <h6>Utilisateurs actuellement en ligne <span class="badge bg-primary users-count">{{ onlineUsers|length }}</span></h6>
           <div>
             <button type="button" id="refreshButton" class="btn btn-sm btn-info me-2">
               <i class="fas fa-sync-alt me-1"></i> Actualiser
@@ -136,15 +136,39 @@ document.addEventListener('DOMContentLoaded', function() {
   const resetButton = document.getElementById('resetFilters');
   const refreshButton = document.getElementById('refreshButton');
   const searchInput = document.getElementById('searchInput');
+  const searchTerm = document.getElementById('searchTerm');
+  const roleFilter = document.getElementById('roleFilter');
   const usersTableBody = document.getElementById('usersTableBody');
   const loadingIndicator = document.getElementById('loadingIndicator');
   const lastUpdateTime = document.getElementById('lastUpdateTime');
   
-  // Search with input in navbar
+  searchInput.addEventListener('input', function() {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      searchTerm.value = this.value;
+      performSearch();
+    }, 300); // Debounce to prevent too many requests
+  });
+  
+  // Real-time search as you type in filter form
+  searchTerm.addEventListener('input', function() {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      searchInput.value = this.value;
+      performSearch();
+    }, 300); // Debounce to prevent too many requests
+  });
+  
+  // Real-time filter as role changes
+  roleFilter.addEventListener('change', function() {
+    performSearch();
+  });
+  
+  // Search with input in navbar (Enter key)
   searchInput.addEventListener('keyup', function(e) {
     if (e.key === 'Enter') {
-      document.getElementById('searchTerm').value = this.value;
-      filterForm.dispatchEvent(new Event('submit'));
+      searchTerm.value = this.value;
+      performSearch();
     }
   });
   
@@ -153,8 +177,8 @@ document.addEventListener('DOMContentLoaded', function() {
     e.preventDefault();
     
     // Quick search from navbar syncs with filter form
-    if (searchInput.value !== document.getElementById('searchTerm').value) {
-      searchInput.value = document.getElementById('searchTerm').value;
+    if (searchInput.value !== searchTerm.value) {
+      searchInput.value = searchTerm.value;
     }
     
     performSearch();
@@ -198,6 +222,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update timestamp
         const now = new Date();
         lastUpdateTime.textContent = now.toTimeString().split(' ')[0];
+        
+        // Update count display if it exists
+        const countElement = document.querySelector('.users-count');
+        if (countElement && data.count !== undefined) {
+          countElement.textContent = data.count;
+        }
       } else {
         console.error('Error fetching data:', data.message);
       }
@@ -212,8 +242,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Auto-refresh every 60 seconds
-  setInterval(performSearch, 60000);
+  // Auto-refresh every 30 seconds
+  setInterval(performSearch, 30000);
+  
+  // Initial search to ensure data is fresh
+  performSearch();
 });
 </script>
 {% endblock %} 
