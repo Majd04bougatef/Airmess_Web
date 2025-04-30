@@ -141,9 +141,8 @@ class BonPlanRepository extends ServiceEntityRepository
         $qb->orWhere('LOWER(b.nomplace) LIKE LOWER(:location_name)')
            ->setParameter('location_name', '%' . strtolower($location) . '%');
 
-        // Ajouter des critères de tri pertinents
-        $qb->orderBy('b.dateCreation', 'DESC')
-           ->addOrderBy('b.note', 'DESC');
+        // Tri par ID (identifiant unique) au lieu de dateCreation et note
+        $qb->orderBy('b.idP', 'DESC');
 
         // Limiter les résultats pour de meilleures performances
         $qb->setMaxResults(50);

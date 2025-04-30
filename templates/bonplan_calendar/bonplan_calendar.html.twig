@@ -180,9 +180,6 @@
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6>Mon Calendrier de Bons Plans</h6>
                     <div>
-                        <button type="button" id="debugBtn" class="btn btn-warning btn-sm me-2">
-                            <i class="fas fa-bug me-1"></i>Debug
-                        </button>
                         <a href="{{ path('bonplanVoyageurs_page') }}" class="btn btn-secondary btn-sm">
                             <i class="fas fa-arrow-left me-1"></i>Retour aux Bons Plans
                         </a>
@@ -193,9 +190,6 @@
                         <!-- Le contenu du calendrier sera généré dynamiquement par rebuild-calendar.js -->
                         <div class="col-lg-8">
                             <div class="calendar-container">
-                                <button id="repairBtn" class="btn btn-danger w-100 mb-3">
-                                    🔧 RÉPARER LE CALENDRIER
-                                </button>
                                 <div class="calendar-header">
                                     <div class="calendar-month">
                                         <span id="calendarMonthYear">Mois Année</span>
@@ -318,21 +312,11 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block javascripts %}
-{{ parent() }}
-
-<!-- Assurez-vous que le bootstrap JS est chargé pour les modals -->
+<!-- JavaScript du calendrier -->
 <script src="{{ asset('js/core/bootstrap.bundle.min.js') }}"></script>
-
-<!-- Script principal du calendrier -->
 <script src="{{ asset('js/rebuild-calendar.js') }}"></script>
-
-<!-- Script de diagnostic et réparation -->
 <script src="{{ asset('js/diagnostic-calendar.js') }}"></script>
-
-<!-- Script direct d'urgence -->
 <script>
     // Fonction d'urgence pour afficher les événements
     document.addEventListener('DOMContentLoaded', function() {
@@ -408,17 +392,23 @@
                 }
             }
             
-            if (needsNavigation && window.currentMonth !== undefined) {
-                window.currentMonth = targetMonth;
-                window.currentYear = targetYear;
-                
-                if (typeof window.generateCalendar === 'function') {
-                    window.generateCalendar();
-                    alert(`Navigation vers ${targetMonth + 1}/${targetYear} où il y a ${maxCount} événements`);
-                    return;
+            // Si on doit changer de mois et que les variables globales existent
+            if (needsNavigation) {
+                // Mettre à jour directement les variables globales du calendrier
+                if (typeof window.currentMonth !== 'undefined') {
+                    window.currentMonth = targetMonth;
+                    window.currentYear = targetYear;
+                    
+                    // Essayer différentes façons de déclencher une mise à jour
+                    if (typeof window.generateCalendar === 'function') {
+                        window.generateCalendar();
+                        alert(`Navigation vers ${targetMonth + 1}/${targetYear} où il y a ${maxCount} événements`);
+                        return;
+                    }
                 }
             }
             
+            // Méthode alternative si la navigation échoue
             // Supprimer les événements existants
             document.querySelectorAll('.calendar-event').forEach(el => el.remove());
             
@@ -437,8 +427,21 @@
                 }
             });
             
-            alert(`Réparation terminée: ${displayed}/${events.length} notes affichées.`);
+            const result = `Réparation terminée: ${displayed}/${events.length} notes affichées.`;
+            alert(result);
+            console.log(result);
+            
+            // Si aucun événement n'a pu être affiché, suggérer une réinitialisation
+            if (displayed === 0 && events.length > 0) {
+                if (confirm("Aucun événement n'a pu être affiché. Voulez-vous recharger la page?")) {
+                    location.reload();
+                }
+            }
         }
     });
 </script>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
 {% endblock %} 

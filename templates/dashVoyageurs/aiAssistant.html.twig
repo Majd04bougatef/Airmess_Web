@@ -50,6 +50,31 @@
         margin: 1rem 10%;
         border: 1px solid #ffcdd2;
     }
+    
+    /* Styles pour le formatage des réponses AI */
+    .message.ai h3 {
+        font-size: 18px;
+        margin-top: 15px;
+        margin-bottom: 8px;
+        color: #1a73e8;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 5px;
+    }
+    
+    .message.ai strong {
+        color: #333;
+    }
+    
+    .message.ai em {
+        font-style: italic;
+        color: #555;
+    }
+    
+    .message.ai br {
+        display: block;
+        margin: 5px 0;
+        content: "";
+    }
 
     .preferences-section {
         padding: 1.5rem;
@@ -86,18 +111,6 @@
         display: none;
         text-align: center;
         padding: 1rem;
-    }
-
-    .debug-info {
-        font-family: monospace;
-        font-size: 12px;
-        color: #666;
-        margin-top: 5px;
-        padding: 0.5rem;
-        background: #f8f9fa;
-        border-radius: 5px;
-        overflow: auto;
-        max-height: 150px;
     }
 
     .btn-outline-primary {
@@ -174,27 +187,9 @@
                     <h4 class="mb-0"><i class="fas fa-robot me-2"></i>Assistant AI pour Bons Plans</h4>
                 </div>
 
-                <div class="preferences-section">
-                    <h6 class="mb-3">Types de lieux</h6>
-                    <div class="type-filters" id="typeFilters">
-                        <!-- Les types seront ajoutés ici par JavaScript -->
-                    </div>
-
-                    <h6 class="mb-3 mt-4">Vos préférences</h6>
-                    <div id="preferenceTags" class="mb-2">
-                        <!-- Les tags de préférence s'afficheront ici -->
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="preferenceInput" class="form-control" placeholder="Ajouter une préférence..." />
-                        <button class="btn btn-outline-primary" id="addPreferenceBtn">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-
                 <div class="chat-box" id="chatBox">
                     <div class="message ai">
-                        Bonjour ! Je suis votre assistant AI pour les bons plans. Comment puis-je vous aider aujourd'hui ?
+                        Bonjour ! Je suis votre assistant AI pour les bons plans. Saisissez simplement un lieu, et je vous proposerai des suggestions !
                     </div>
                 </div>
 
@@ -211,159 +206,68 @@
                             <i class="fas fa-search me-2"></i> Rechercher
                         </button>
                     </div>
-                    <div id="debugInfo" class="debug-info mt-2"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block javascripts %}
-{{ parent() }}
+<!-- JavaScript de l'assistant IA -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded: Initialisation de l\'assistant...');
-    
-    // Définir et créer les types de lieux
-    const typesList = [
-        {id: 'cafe', label: 'Cafés'},
-        {id: 'restaurant', label: 'Restaurants'},
-        {id: 'musee', label: 'Musées'},
-        {id: 'parc', label: 'Parcs'},
-        {id: 'monument', label: 'Monuments'},
-        {id: 'shopping', label: 'Shopping'},
-        {id: 'plage', label: 'Plages'},
-        {id: 'activite', label: 'Activités'}
-    ];
     
     // Sélection des éléments DOM
     const chatBox = document.getElementById('chatBox');
     const loading = document.getElementById('loading');
     const locationInput = document.getElementById('locationInput');
     const searchBtn = document.getElementById('searchBtn');
-    const preferenceInput = document.getElementById('preferenceInput');
-    const addPreferenceBtn = document.getElementById('addPreferenceBtn');
-    const preferenceTags = document.getElementById('preferenceTags');
-    const typeFilters = document.getElementById('typeFilters');
-    const debugInfo = document.getElementById('debugInfo');
-    
-    // Variables pour les données
-    let preferences = [];
-    let selectedTypes = [];
     
     // Fonction pour afficher les informations de débogage
     function showDebugInfo(info) {
         console.log('Debug:', info);
-        let debugHtml = '';
-        
-        if (typeof info === 'object') {
-            for (const [key, value] of Object.entries(info)) {
-                debugHtml += `<strong>${key}:</strong> ${JSON.stringify(value)}<br>`;
-            }
-        } else {
-            debugHtml += info;
-        }
-        
-        debugInfo.innerHTML = debugHtml;
-    }
-    
-    // Création des pills pour les types
-    function createTypePills() {
-        typeFilters.innerHTML = '';
-        
-        typesList.forEach(type => {
-            const pill = document.createElement('div');
-            pill.className = 'type-pill';
-            pill.dataset.type = type.id;
-            pill.textContent = type.label;
-            
-            // Vérifier si ce type est sélectionné
-            if (selectedTypes.includes(type.id)) {
-                pill.classList.add('active');
-            }
-            
-            // Ajouter l'événement de clic
-            pill.addEventListener('click', function() {
-                toggleType(type.id, pill);
-            });
-            
-            typeFilters.appendChild(pill);
-        });
-        
-        console.log('Types de lieux créés:', typeFilters.childElementCount);
-    }
-    
-    // Sélectionner/désélectionner un type
-    function toggleType(typeId, pillElement) {
-        const isActive = pillElement.classList.contains('active');
-        
-        console.log('Toggle type:', typeId, 'isActive:', isActive);
-        
-        if (isActive) {
-            // Désélectionner
-            pillElement.classList.remove('active');
-            selectedTypes = selectedTypes.filter(t => t !== typeId);
-        } else {
-            // Sélectionner
-            pillElement.classList.add('active');
-            if (!selectedTypes.includes(typeId)) {
-                selectedTypes.push(typeId);
-            }
-        }
-        
-        console.log('Types sélectionnés:', selectedTypes);
-        showDebugInfo({
-            action: 'sélection type',
-            type: typeId,
-            types_selectionnes: selectedTypes
-        });
-    }
-    
-    // Ajouter une préférence
-    function addPreference() {
-        const preference = preferenceInput.value.trim();
-        console.log('Ajout de préférence:', preference);
-        
-        if (preference && !preferences.includes(preference)) {
-            preferences.push(preference);
-            updatePreferenceTags();
-            preferenceInput.value = '';
-        }
-    }
-    
-    // Mettre à jour l'affichage des préférences
-    function updatePreferenceTags() {
-        preferenceTags.innerHTML = '';
-        
-        preferences.forEach(pref => {
-            const tag = document.createElement('span');
-            tag.className = 'preference-tag';
-            tag.textContent = pref;
-            
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'btn-close btn-close-sm ms-2';
-            closeBtn.setAttribute('aria-label', 'Supprimer');
-            closeBtn.addEventListener('click', function() {
-                preferences = preferences.filter(p => p !== pref);
-                updatePreferenceTags();
-            });
-            
-            tag.appendChild(closeBtn);
-            preferenceTags.appendChild(tag);
-        });
-        
-        console.log('Préférences mises à jour:', preferences);
+        // Ne plus afficher les informations de débogage dans l'interface
     }
     
     // Ajouter un message à la boîte de dialogue
     function appendMessage(message, isAi = false, isError = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isAi ? 'ai' : 'user'} ${isError ? 'error' : ''}`;
-        messageDiv.textContent = message;
+        
+        // Si c'est un message AI, traiter le formatage Markdown
+        if (isAi && !isError) {
+            // Convertir le markdown simple en HTML
+            let formattedMessage = message
+                // Préserver les emojis
+                .replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '<span class="emoji">$1</span>')
+                // Titres
+                .replace(/## (.*)/g, '<h3>$1</h3>')
+                // Gras
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Italique
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // Listes à puces
+                .replace(/- (.*)/g, '<li>$1</li>')
+                // Sauts de ligne
+                .replace(/\n/g, '<br>');
+            
+            // Nettoyer et envelopper les listes
+            formattedMessage = formattedMessage.replace(/<li>(.*?)<\/li>/g, function(match) {
+                return '<ul>' + match + '</ul>';
+            }).replace(/<\/ul><ul>/g, '');
+            
+            messageDiv.innerHTML = formattedMessage;
+        } else {
+            messageDiv.textContent = message;
+        }
         
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
+        
+        // Log la réponse pour debug
+        if (isAi) {
+            console.log("Réponse AI brute:", message);
+        }
     }
     
     // Rechercher des suggestions
@@ -381,11 +285,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const requestData = {
             location: location,
-            preferences: preferences,
-            types: selectedTypes
+            preferences: [],
+            types: []
         };
         
-        showDebugInfo({
+        // Log uniquement dans la console, pas d'affichage visuel
+        console.log('Recherche:', {
             action: 'recherche',
             données: requestData
         });
@@ -421,19 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Initialisation: Créer les pills de type
-    createTypePills();
-    
     // Événements
-    addPreferenceBtn.addEventListener('click', addPreference);
-    
-    preferenceInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addPreference();
-        }
-    });
-    
     searchBtn.addEventListener('click', function(e) {
         e.preventDefault();
         getSuggestions();
@@ -450,12 +343,11 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Vérification éléments:', 
         '\n- chatBox:', !!chatBox,
         '\n- locationInput:', !!locationInput,
-        '\n- searchBtn:', !!searchBtn,
-        '\n- typeFilters:', !!typeFilters
+        '\n- searchBtn:', !!searchBtn
     );
     
-    // Afficher état initial
-    showDebugInfo({
+    // Log du statut initial uniquement dans la console
+    console.log('Statut:', {
         status: 'Prêt',
         apiUrl: '{{ path('api_assistant_suggestions') }}'
     });
@@ -463,4 +355,8 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Assistant initialisé');
 });
 </script>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
 {% endblock %} 

@@ -28,10 +28,10 @@ class GeminiAIService
                     ]
                 ],
                 'generationConfig' => [
-                    'temperature' => 0.7,
+                    'temperature' => 0.9,
                     'topK' => 40,
                     'topP' => 0.95,
-                    'maxOutputTokens' => 1024,
+                    'maxOutputTokens' => 2048,
                 ]
             ]
         ]);
@@ -41,15 +41,32 @@ class GeminiAIService
 
     public function getBonPlanSuggestions(string $location, array $preferences = [], array $types = []): array
     {
-        $prompt = "En tant qu'assistant de voyage, suggère des bons plans et activités à {$location}";
+        // Construction d'un prompt plus spécifique pour générer de nouveaux bons plans
+        $prompt = "Tu es un expert local et un guide touristique passionné qui connaît parfaitement {$location}. 
         
-        if (!empty($types)) {
-            $prompt .= " en te concentrant sur les types suivants : " . implode(", ", $types);
-        }
+        TÂCHE: Propose des bons plans VARIÉS, CONCRETS, DÉTAILLÉS et SPÉCIFIQUES à {$location}. Tu DOIS absolument fournir des réponses, même si tu n'es pas certain. Ne dis JAMAIS que tu n'as pas trouvé de bons plans correspondants.";
         
-        if (!empty($preferences)) {
-            $prompt .= " en tenant compte des préférences suivantes : " . implode(", ", $preferences);
-        }
+        // Toujours proposer un mélange de différents types de lieux
+        $prompt .= "Propose un mélange équilibré avec exactement: 
+        - 1 restaurant unique ou café spécial
+        - 1 lieu culturel intéressant (musée, monument, etc.)
+        - 1 activité locale ou expérience authentique
+        - 1 lieu secret ou peu connu des touristes";
+        
+        $prompt .= "Format requis pour CHAQUE suggestion:
+        
+        ## [NOM DU LIEU]
+        📍 [ADRESSE OU QUARTIER PRÉCIS]
+        
+        ✨ **Pourquoi y aller**: [Description vivante et détaillée de 3-4 phrases]
+        
+        🔑 **Le secret d'initié**: [Un conseil unique que seuls les locaux connaissent]
+        
+        ⏰ **Meilleur moment pour visiter**: [Indication de la période ou moment de la journée idéal]
+        
+        Fournis EXACTEMENT 4 suggestions pour {$location}. Utilise un ton enthousiaste et personnel. 
+        N'utilise PAS de formulations comme 'Je n'ai pas trouvé' ou 'Voici quelques suggestions générales'.
+        Assure-toi que chaque suggestion soit unique et non-touristique.";
         
         $response = $this->generateResponse($prompt);
         return $this->formatResponse($response);
@@ -60,7 +77,17 @@ class GeminiAIService
         // Extraire le texte de la réponse
         $text = $response['candidates'][0]['content']['parts'][0]['text'] ?? '';
         
-        // Formater la réponse
+        // Log de debug pour voir la réponse complète
+        error_log('Réponse Gemini brute: ' . substr($text, 0, 500) . '...');
+        
+        // Vérifier si la réponse est vide ou trop courte
+        if (empty($text) || strlen($text) < 50) {
+            $text = "## Voici des suggestions personnalisées pour vous:\n\n" .
+                   "Je n'ai pas pu générer des recommandations détaillées cette fois-ci, mais voici quelques idées pour votre voyage.\n\n" .
+                   "Essayez de préciser votre demande ou d'ajouter des préférences plus spécifiques.";
+        }
+        
+        // Renvoyer la réponse complète de l'IA sans modification
         return [
             'suggestions' => $text,
             'status' => 'success'

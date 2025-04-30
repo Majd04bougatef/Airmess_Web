@@ -30,6 +30,8 @@ class AiAssistantController extends AbstractController
         }
 
         try {
+            // Utiliser uniquement Gemini AI pour générer des NOUVEAUX bons plans,
+            // sans consulter la base de données existante
             $suggestions = $this->geminiService->getBonPlanSuggestions($location, $preferences, $types);
             return new JsonResponse($suggestions);
         } catch (\Exception $e) {
