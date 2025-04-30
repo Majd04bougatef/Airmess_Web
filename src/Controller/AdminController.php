@@ -1318,6 +1318,73 @@ class AdminController extends AbstractController
             'reservation' => $reservation
         ]);
     }
+
+    /**
+     * Send a custom SMS message to the admin monitoring number
+     */
+    #[Route('/admin/send-custom-sms', name: 'admin_send_custom_sms', methods: ['POST'])]
+    public function sendCustomAdminSms(
+        Request $request, 
+        TwilioService $twilioService,
+        SessionInterface $session
+    ): JsonResponse
+    {
+        try {
+            // Check if user is logged in with admin role
+            if (!$session->has('user_id') || $session->get('user_role') !== 'Admin') {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Vous n\'avez pas les autorisations nécessaires'
+                ], 403);
+            }
+            
+            // Get message from request
+            $message = $request->request->get('message');
+            if (empty($message)) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Le message ne peut pas être vide'
+                ], 400);
+            }
+            
+            // Add sender information to message
+            $adminUser = $session->get('user_name') ?? 'Admin';
+            $messageWithSender = "[Message de {$adminUser}] " . $message;
+            
+            // Admin monitoring phone number
+            $adminNumber = '+21620981776';
+            
+            // Send the SMS
+            $result = $twilioService->sendSms($adminNumber, $messageWithSender);
+            
+            if ($result['success']) {
+                // Log success
+                error_log("Admin SMS sent successfully from {$adminUser}");
+                
+                return new JsonResponse([
+                    'success' => true,
+                    'message' => 'Message envoyé avec succès',
+                    'sid' => $result['message_sid'] ?? null
+                ]);
+            } else {
+                // Log error
+                error_log("Admin SMS failed: " . ($result['error'] ?? 'Unknown error'));
+                
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'envoi du SMS: ' . ($result['error'] ?? 'Erreur inconnue')
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            // Log exception
+            error_log("Exception in sendCustomAdminSms: " . $e->getMessage());
+            
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Une erreur est survenue: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
 
 ?>
