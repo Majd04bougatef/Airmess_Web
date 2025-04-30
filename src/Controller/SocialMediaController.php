@@ -1057,4 +1057,76 @@ class SocialMediaController extends AbstractController
         
         return sprintf('%s://%s/ws/chat/%s', $protocol, $host, $streamId);
     }
+
+    #[Route('/sort-realtime', name: 'social_media_sort_realtime', methods: ['GET'])]
+    public function sortRealtime(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $sortBy = $request->query->get('sort_by', 'publicationDate');
+        $direction = $request->query->get('direction', 'desc');
+
+        $queryBuilder = $entityManager->getRepository(SocialMedia::class)->createQueryBuilder('s')
+            ->leftJoin('s.user', 'u')
+            ->addSelect('u');
+
+        switch ($sortBy) {
+            case 'titre':
+                $queryBuilder->orderBy('s.titre', $direction);
+                break;
+            case 'contenu':
+                $queryBuilder->orderBy('s.contenu', $direction);
+                break;
+            case 'lieu':
+                $queryBuilder->orderBy('s.lieu', $direction);
+                break;
+            case 'publicationDate':
+                $queryBuilder->orderBy('s.publicationDate', $direction);
+                break;
+            case 'likee':
+                $queryBuilder->orderBy('s.likee', $direction);
+                break;
+            case 'dislike':
+                $queryBuilder->orderBy('s.dislike', $direction);
+                break;
+            case 'commentaires':
+                $queryBuilder->leftJoin('s.commentaires', 'c')
+                    ->groupBy('s.idEB')
+                    ->orderBy('COUNT(c)', $direction);
+                break;
+            default:
+                $queryBuilder->orderBy('s.publicationDate', 'desc');
+        }
+
+        $social_media = $queryBuilder->getQuery()->getResult();
+
+        $data = array_map(function($post) {
+            return [
+                'id' => $post->getIdEB(),
+                'titre' => $post->getTitre(),
+                'contenu' => $post->getContenu(),
+                'lieu' => $post->getLieu(),
+                'publicationDate' => $post->getPublicationDate()->format('Y-m-d H:i:s'),
+                'likee' => $post->getLikee(),
+                'dislike' => $post->getDislike(),
+                'imagemedia' => $post->getImagemedia(),
+                'user' => [
+                    'nom' => $post->getUser() ? $post->getUser()->getName() : null,
+                    'prenom' => $post->getUser() ? $post->getUser()->getPrenom() : null,
+                    'imagesU' => $post->getUser() ? $post->getUser()->getImagesU() : null,
+                ],
+                'commentaires' => array_map(function($comment) {
+                    return [
+                        'contenu' => $comment->getContenu(),
+                        'dateCommentaire' => $comment->getDateCommentaire()->format('Y-m-d H:i:s'),
+                        'user' => [
+                            'nom' => $comment->getUser()->getNom(),
+                            'prenom' => $comment->getUser()->getPrenom(),
+                            'profilePicture' => $comment->getUser()->getProfilePicture()
+                        ]
+                    ];
+                }, $post->getCommentaires()->toArray())
+            ];
+        }, $social_media);
+
+        return new JsonResponse($data);
+    }
 }

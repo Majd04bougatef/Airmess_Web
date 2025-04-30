@@ -167,6 +167,64 @@
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
+
+        .sort-controls {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sort-controls select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 1rem;
+            background-color: white;
+        }
+
+        .sort-controls label {
+            margin-right: 0.5rem;
+            font-weight: 500;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .interaction-stats {
+            display: flex;
+            gap: 1rem;
+            color: #666;
+        }
+
+        .interaction-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .location-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 1rem;
+        }
     </style>
 {% endblock %}
 
@@ -212,62 +270,31 @@
         </div>
     {% endif %}
 
-    <!-- Grille de publications -->
-    <div class="row g-4">
-        {% if pagination.items is empty %}
-            <div class="col-12">
-                <div class="no-results">
-                    <i class="fas fa-newspaper fa-3x mb-3 text-muted"></i>
-                    <h4>Aucune publication trouvée</h4>
-                    <p class="text-muted">Essayez de modifier votre recherche ou créez une nouvelle publication.</p>
-                    <a href="{{ path('app_social_media_new') }}" class="btn btn-primary mt-2">
-                        <i class="fas fa-plus me-1"></i> Créer une publication
-                    </a>
-                </div>
+    <div class="sort-controls">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <label for="sort-select">Trier par:</label>
+                <select id="sort-select" class="form-select d-inline-block w-auto">
+                    <option value="publicationDate">Date de publication</option>
+                    <option value="titre">Titre</option>
+                    <option value="lieu">Lieu</option>
+                    <option value="likee">Likes</option>
+                    <option value="commentaires">Commentaires</option>
+                </select>
             </div>
-        {% else %}
-            {% for social_media in pagination %}
-                <div class="col-lg-4 col-md-6">
-                    <div class="publication-card card h-100">
-                        <div class="card-img-container">
-                            {% if social_media.imagemedia %}
-                                <img src="http://localhost/ImageSocialMedia/{{ social_media.imagemedia }}" 
-                                     class="card-img-top" 
-                                     alt="{{ social_media.titre }}"
-                                     onerror="this.onerror=null; this.src='{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}'; this.alt='Image non disponible';">
-                            {% else %}
-                                <img src="{{ asset('img/carousel-' ~ ((loop.index % 3) + 1) ~ '.jpg') }}" class="card-img-top" alt="Publication image">
-                            {% endif %}
-                        </div>
-                        <div class="card-body">
-                            <span class="author-info">
-                                <i class="fas fa-user me-1"></i> {{ social_media.user.name }} {{ social_media.user.prenom }}
-                            </span>
-                            <span class="location-badge">
-                                <i class="fas fa-map-marker-alt"></i> {{ social_media.lieu }}
-                            </span>
-                            <h5 class="card-title">{{ social_media.titre }}</h5>
-                            <p class="card-text">{{ social_media.contenu }}</p>
-                            
-                            <div class="interaction-icons">
-                                <span class="badge badge-like">
-                                    <i class="fas fa-thumbs-up me-1"></i> {{ social_media.likee }}
-                                </span>
-                                <span class="badge badge-dislike">
-                                    <i class="fas fa-thumbs-down me-1"></i> {{ social_media.dislike }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="card-footer d-flex justify-content-between align-items-center">
-                            <span class="date-info"><i class="far fa-calendar-alt me-1"></i> {{ social_media.publicationDate|date("d/m/Y") }}</span>
-                            <a href="{{ path('app_social_media_show', {'idEB': social_media.idEB}) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-eye me-1"></i> Voir
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        {% endif %}
+            <div class="col-md-6">
+                <label for="direction-select">Ordre:</label>
+                <select id="direction-select" class="form-select d-inline-block w-auto">
+                    <option value="desc">Décroissant</option>
+                    <option value="asc">Croissant</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grille de publications -->
+    <div id="posts-container" class="row g-4">
+        <!-- Le contenu sera chargé dynamiquement par JavaScript -->
     </div>
 
     <!-- Pagination -->
@@ -278,30 +305,91 @@
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const sortSelect = document.getElementById('sort-select');
             const directionSelect = document.getElementById('direction-select');
             const postsContainer = document.getElementById('posts-container');
 
-            function handleSort() {
+            function createPostElement(post) {
+                const postDate = new Date(post.publicationDate);
+                const formattedDate = postDate.toLocaleDateString('fr-FR');
+                
+                return `
+                    <div class="col-lg-4 col-md-6">
+                        <div class="publication-card card h-100">
+                            <div class="card-img-container">
+                                ${post.imagemedia 
+                                    ? `<img src="http://localhost/ImageSocialMedia/${post.imagemedia}" 
+                                         class="card-img-top" 
+                                         alt="${post.titre}"
+                                         onerror="this.onerror=null; this.src='/img/carousel-1.jpg'; this.alt='Image non disponible';">`
+                                    : `<img src="/img/carousel-1.jpg" class="card-img-top" alt="Publication image">`
+                                }
+                            </div>
+                            <div class="card-body">
+                                <div class="user-info mb-3">
+                                    <img src="${post.user.imagesU ? '/uploads/profile_pictures/' + post.user.imagesU : '/img/avatar-1.webp'}" 
+                                         class="user-avatar" 
+                                         alt="User Avatar">
+                                    <div>
+                                        <h6 class="mb-0">${post.user.prenom} ${post.user.nom}</h6>
+                                        <small class="text-muted">${formattedDate}</small>
+                                    </div>
+                                </div>
+                                <h5 class="card-title">${post.titre}</h5>
+                                <p class="card-text">${post.contenu}</p>
+                                <div class="location-badge">
+                                    <i class="fas fa-map-marker-alt"></i> ${post.lieu}
+                                </div>
+                                <div class="interaction-stats mt-3">
+                                    <span><i class="fas fa-heart"></i> ${post.likee}</span>
+                                    <span><i class="fas fa-comment"></i> ${post.commentaires.length}</span>
+                                    <span><i class="fas fa-thumbs-down"></i> ${post.dislike}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function updatePosts() {
                 const sortBy = sortSelect.value;
                 const direction = directionSelect.value;
 
-                fetch(`/social_media/sort?sort_by=${sortBy}&direction=${direction}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    postsContainer.innerHTML = html;
-                })
-                .catch(error => console.error('Error:', error));
+                fetch(`/social_media/sort-realtime?sort_by=${sortBy}&direction=${direction}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length === 0) {
+                            postsContainer.innerHTML = `
+                                <div class="col-12">
+                                    <div class="no-results">
+                                        <i class="fas fa-newspaper fa-3x mb-3 text-muted"></i>
+                                        <h4>Aucune publication trouvée</h4>
+                                        <p class="text-muted">Essayez de modifier votre recherche ou créez une nouvelle publication.</p>
+                                        <a href="/social_media/new" class="btn btn-primary mt-2">
+                                            <i class="fas fa-plus me-1"></i> Créer une publication
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            postsContainer.innerHTML = data.map(post => createPostElement(post)).join('');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
             }
 
-            sortSelect.addEventListener('change', handleSort);
-            directionSelect.addEventListener('change', handleSort);
+            // Mettre à jour lors du changement de tri
+            sortSelect.addEventListener('change', updatePosts);
+            directionSelect.addEventListener('change', updatePosts);
+
+            // Mettre à jour automatiquement toutes les 30 secondes
+            setInterval(updatePosts, 30000);
+
+            // Première mise à jour
+            updatePosts();
         });
     </script>
 {% endblock %}
