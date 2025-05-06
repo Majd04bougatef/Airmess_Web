@@ -22,7 +22,7 @@
         "mpdf/mpdf": "^6.1",
         "openai-php/client": "^0.10.3",
         "phpdocumentor/reflection-docblock": "^5.6",
-        "phpoffice/phpspreadsheet": "^4.2",
+        "phpoffice/phpspreadsheet": "*",
         "phpstan/phpdoc-parser": "^2.1",
         "stripe/stripe-php": "^17.1",
         "symfony/asset": "6.4.*",

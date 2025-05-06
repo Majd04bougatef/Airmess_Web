@@ -99,10 +99,31 @@ class VoyageursController extends AuthenticatedController
     }
 
     #[Route('/BonplanVoyageursPage', name: 'bonplanVoyageurs_page')]
-    public function bonplanVoyageursPage(BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager, WeatherService $weatherService)
+    public function bonplanVoyageursPage(Request $request, BonPlanRepository $bonPlanRepository, EntityManagerInterface $entityManager, WeatherService $weatherService, PaginatorInterface $paginator)
     {
-        // Récupérer tous les bons plans
-        $bonplans = $bonPlanRepository->findAll();
+        // Récupérer le paramètre de tri
+        $sortBy = $request->query->get('sort', 'idP');
+        $sortDirection = $request->query->get('direction', 'desc');
+        
+        // Récupérer tous les bons plans en utilisant le paginator
+        $bonplansQuery = $bonPlanRepository->createQueryBuilder('b');
+        
+        // Filtrer par type
+        $typeFilter = $request->query->get('type');
+        if ($typeFilter) {
+            $bonplansQuery->andWhere('b.typePlace = :type')
+                          ->setParameter('type', $typeFilter);
+        }
+        
+        // Ajouter le tri
+        $bonplansQuery->orderBy('b.'.$sortBy, $sortDirection)
+                      ->getQuery();
+            
+        $pagination = $paginator->paginate(
+            $bonplansQuery,
+            $request->query->getInt('page', 1), // Numéro de page, 1 par défaut
+            6 // Nombre d'éléments par page (6 bons plans par page)
+        );
         
         // Récupérer les notes moyennes pour chaque bon plan
         $ratings = [];
@@ -112,7 +133,7 @@ class VoyageursController extends AuthenticatedController
         $weatherRecommendations = [];
         $seasonalActivities = [];
         
-        foreach ($bonplans as $bonplan) {
+        foreach ($pagination->getItems() as $bonplan) {
             // Requête pour calculer la note moyenne
             $averageRating = $entityManager->createQuery(
                 'SELECT AVG(r.rating) as average
@@ -160,15 +181,19 @@ class VoyageursController extends AuthenticatedController
             $reviewsByBonPlan[$bonplan->getIdP()] = $reviews;
         }
         
-        // Passer les bons plans et les notes moyennes à la vue
+        // Passer les bons plans paginés et les notes moyennes à la vue
         return $this->render('dashVoyageurs/bonplanPageVoyageurs.html.twig', [
-            'bonplans' => $bonplans,
+            'bonplans' => $pagination->getItems(),
+            'pagination' => $pagination,
             'ratings' => $ratings,
             'reviewsCount' => $reviewsCount,
             'reviewsByBonPlan' => $reviewsByBonPlan,
             'weatherData' => $weatherData,
             'weatherRecommendations' => $weatherRecommendations,
-            'seasonalActivities' => $seasonalActivities
+            'seasonalActivities' => $seasonalActivities,
+            'currentType' => $typeFilter,
+            'currentSort' => $sortBy,
+            'currentDirection' => $sortDirection
         ]);
     }
 
