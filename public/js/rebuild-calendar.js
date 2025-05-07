@@ -24,6 +24,9 @@
             console.log(`Événements chargés: ${window.calendarEvents.length}`);
             if (window.calendarEvents.length > 0) {
                 console.log("Premier événement:", window.calendarEvents[0]);
+                
+                // Essayer de naviguer vers le mois avec le plus d'événements
+                navigateToMonthWithMostEvents();
             }
             
             // Vérifier si les éléments du calendrier existent
@@ -97,7 +100,17 @@
                     window.calendarEvents.push(newEvent);
                     saveEvents();
                     
-                    // Explicitement générer le calendrier et afficher les événements
+                    // Naviguer vers le mois de l'événement ajouté
+                    const eventDate = new Date(date);
+                    if (eventDate.getMonth() !== window.currentMonth || 
+                        eventDate.getFullYear() !== window.currentYear) {
+                        // Si l'événement est dans un autre mois, naviguer vers ce mois
+                        window.currentMonth = eventDate.getMonth();
+                        window.currentYear = eventDate.getFullYear();
+                        console.log(`Navigation vers le mois de l'événement: ${window.currentMonth + 1}/${window.currentYear}`);
+                    }
+                    
+                    // Générer le calendrier pour afficher l'événement
                     generateCalendar();
                     
                     // Réinitialiser le formulaire
@@ -364,9 +377,15 @@
             // Récupérer les événements stockés (mise à jour de la liste)
             window.calendarEvents = JSON.parse(localStorage.getItem('bonplan_calendar_events') || '[]');
             
+            if (window.calendarEvents.length === 0) {
+                console.log("Aucun événement à afficher");
+                return;
+            }
+            
             // Ajouter les événements au calendrier
             let eventsDisplayed = 0;
             let eventsForCurrentMonth = 0;
+            let eventsMissingContainers = 0;
             
             // Mois et année actuels au format YYYY-MM
             const currentMonthStr = `${window.currentYear}-${String(window.currentMonth + 1).padStart(2, '0')}`;
@@ -397,11 +416,34 @@
                     container.appendChild(eventEl);
                     eventsDisplayed++;
                 } else {
+                    eventsMissingContainers++;
                     console.warn(`Aucun conteneur trouvé pour l'événement du ${event.date}: "${event.title}"`);
+                    
+                    // Si on a des événements non affichés pour ce mois, c'est un problème à signaler
+                    if (event.date.startsWith(currentMonthStr)) {
+                        console.error(`ERREUR: Événement du mois actuel sans conteneur: ${event.date}`);
+                    }
                 }
             });
             
             console.log(`${eventsDisplayed}/${window.calendarEvents.length} événements affichés (${eventsForCurrentMonth} pour le mois en cours)`);
+            
+            // Avertir si des événements pour le mois actuel n'ont pas été affichés
+            if (eventsForCurrentMonth > eventsDisplayed) {
+                console.error(`ATTENTION: ${eventsForCurrentMonth - eventsDisplayed} événements du mois actuel n'ont pas été affichés`);
+            }
+            
+            // Si aucun événement affiché mais qu'il y en a dans localStorage, essayer de réparer
+            if (eventsDisplayed === 0 && window.calendarEvents.length > 0) {
+                console.warn("Aucun événement affiché alors qu'il y en a dans localStorage");
+                
+                // Si le navigateur prend en charge les notifications
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("Problème de calendrier", {
+                        body: `${window.calendarEvents.length} notes existent mais ne sont pas affichées. Cliquez sur 'RÉPARER LE CALENDRIER'`
+                    });
+                }
+            }
         } catch (error) {
             console.error("Erreur lors de l'affichage des événements:", error);
         }
@@ -422,6 +464,49 @@
             }
         } catch (error) {
             console.error("Erreur lors de la sauvegarde des événements:", error);
+        }
+    }
+
+    // Nouvelle fonction pour naviguer vers le mois avec le plus d'événements
+    function navigateToMonthWithMostEvents() {
+        if (!window.calendarEvents || window.calendarEvents.length === 0) {
+            return; // Pas d'événements à traiter
+        }
+        
+        // Compteur d'événements par mois
+        const monthCounts = {};
+        
+        // Compter les événements par mois (format YYYY-MM)
+        window.calendarEvents.forEach(event => {
+            // Extraire l'année et le mois de la date (format YYYY-MM-DD)
+            const yearMonth = event.date.substring(0, 7); // YYYY-MM
+            monthCounts[yearMonth] = (monthCounts[yearMonth] || 0) + 1;
+        });
+        
+        // Trouver le mois avec le plus d'événements
+        let maxMonth = '';
+        let maxCount = 0;
+        
+        for (const yearMonth in monthCounts) {
+            if (monthCounts[yearMonth] > maxCount) {
+                maxCount = monthCounts[yearMonth];
+                maxMonth = yearMonth;
+            }
+        }
+        
+        if (maxMonth) {
+            // Extraire l'année et le mois du format YYYY-MM
+            const year = parseInt(maxMonth.substring(0, 4));
+            const month = parseInt(maxMonth.substring(5, 7)) - 1; // Mois JavaScript: 0-11
+            
+            // Si c'est un mois différent du mois actuel, y naviguer
+            if (year !== window.currentYear || month !== window.currentMonth) {
+                console.log(`Navigation vers le mois avec le plus d'événements: ${month + 1}/${year} (${maxCount} événements)`);
+                window.currentMonth = month;
+                window.currentYear = year;
+                
+                // Remarque: generateCalendar sera appelé juste après, pas besoin de l'appeler ici
+            }
         }
     }
 })(); 
