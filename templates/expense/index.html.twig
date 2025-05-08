@@ -6,7 +6,19 @@
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Expense Management</h1>
-            <a href="{{ path('app_expense_new') }}{% if in_voyageurs_dashboard is defined and in_voyageurs_dashboard %}?dashboard=voyageurs{% endif %}" class="btn btn-primary">Create new</a>
+            <div>
+                {% if app.session.get('user_role') == 'Admin' or app.session.get('user_role') == 'ROLE_ADMIN' %}
+                    <div class="btn-group me-2">
+                        <a href="{{ path('user_export', {'format': 'pdf'}) }}" class="btn btn-sm btn-danger">
+                            <i class="fas fa-file-pdf"></i> Export Users PDF
+                        </a>
+                        <a href="{{ path('user_export', {'format': 'xlsx'}) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-file-excel"></i> Export Users Excel
+                        </a>
+                    </div>
+                {% endif %}
+                <a href="{{ path('app_expense_new') }}{% if in_voyageurs_dashboard is defined and in_voyageurs_dashboard %}?dashboard=voyageurs{% endif %}" class="btn btn-primary">Create new</a>
+            </div>
         </div>
         
         {% for label, messages in app.flashes %}

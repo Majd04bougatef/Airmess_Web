@@ -722,6 +722,31 @@
   .message.user {
     background-color: #f8f9fa;
   }
+
+  /* Styles for active dropdown item */
+  .custom-dropdown-menu .dropdown-item.active {
+    background-color: #5e72e4;
+    color: white;
+  }
+  
+  .custom-dropdown-menu .dropdown-item.active i {
+    color: white;
+  }
+  
+  .custom-dropdown-menu .dropdown-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .custom-dropdown-menu .dropdown-item.active:hover {
+    background-color: #4e63d7;
+  }
+  
+  .custom-dropdown-menu .dropdown-header {
+    font-weight: 600;
+    color: #344767;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
 </style>
 {% endblock %}
 
@@ -741,9 +766,10 @@
                     <div class="d-flex align-items-center">
                         <div class="custom-dropdown me-2" style="position: relative;">
                             <button type="button" class="btn btn-primary filter-dropdown" data-custom-toggle="dropdown">
-                                <i class="fas fa-filter"></i> Filtrer par avis
+                                <i class="fas fa-filter"></i> Filtrer et trier
                             </button>
                             <div class="custom-dropdown-menu" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1000; min-width: 200px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-top: 0.5rem;">
+                                <div class="dropdown-header">Filtrer par avis</div>
                                 <a class="dropdown-item filter-option" href="#" data-filter="all">
                                     <i class="fas fa-list me-2"></i>Tous les bons plans
                                 </a>
@@ -758,6 +784,38 @@
                                 </a>
                                 <a class="dropdown-item filter-option" href="#" data-filter="most-reviewed">
                                     <i class="fas fa-comments me-2"></i>Plus d'avis
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-header">Filtrer par type</div>
+                                <a class="dropdown-item {% if currentType is defined and currentType == 'resto' %}active{% endif %}" href="{{ path('bonplanVoyageurs_page', {'type': 'resto'}) }}">
+                                    <i class="fas fa-utensils me-2"></i>Restaurants
+                                </a>
+                                <a class="dropdown-item {% if currentType is defined and currentType == 'cafe' %}active{% endif %}" href="{{ path('bonplanVoyageurs_page', {'type': 'cafe'}) }}">
+                                    <i class="fas fa-coffee me-2"></i>Cafés
+                                </a>
+                                <a class="dropdown-item {% if currentType is defined and currentType == 'coworkingspace' %}active{% endif %}" href="{{ path('bonplanVoyageurs_page', {'type': 'coworkingspace'}) }}">
+                                    <i class="fas fa-laptop me-2"></i>Espaces de coworking
+                                </a>
+                                <a class="dropdown-item {% if currentType is not defined or currentType is null %}active{% endif %}" href="{{ path('bonplanVoyageurs_page') }}">
+                                    <i class="fas fa-times me-2"></i>Effacer le filtre
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-header">Trier par</div>
+                                <a class="dropdown-item {% if currentSort == 'idP' and currentDirection == 'desc' %}active{% endif %}" 
+                                   href="{{ path('bonplanVoyageurs_page', {'sort': 'idP', 'direction': 'desc'} | merge(currentType is defined and currentType ? {'type': currentType} : {})) }}">
+                                    <i class="fas fa-sort-amount-down me-2"></i>Plus récents
+                                </a>
+                                <a class="dropdown-item {% if currentSort == 'idP' and currentDirection == 'asc' %}active{% endif %}" 
+                                   href="{{ path('bonplanVoyageurs_page', {'sort': 'idP', 'direction': 'asc'} | merge(currentType is defined and currentType ? {'type': currentType} : {})) }}">
+                                    <i class="fas fa-sort-amount-up me-2"></i>Plus anciens
+                                </a>
+                                <a class="dropdown-item {% if currentSort == 'nomplace' and currentDirection == 'asc' %}active{% endif %}" 
+                                   href="{{ path('bonplanVoyageurs_page', {'sort': 'nomplace', 'direction': 'asc'} | merge(currentType is defined and currentType ? {'type': currentType} : {})) }}">
+                                    <i class="fas fa-sort-alpha-down me-2"></i>Nom (A-Z)
+                                </a>
+                                <a class="dropdown-item {% if currentSort == 'nomplace' and currentDirection == 'desc' %}active{% endif %}" 
+                                   href="{{ path('bonplanVoyageurs_page', {'sort': 'nomplace', 'direction': 'desc'} | merge(currentType is defined and currentType ? {'type': currentType} : {})) }}">
+                                    <i class="fas fa-sort-alpha-up me-2"></i>Nom (Z-A)
                                 </a>
                             </div>
                         </div>
@@ -979,6 +1037,25 @@
                                 </div>
                             {% endif %}
                         </div>
+                        
+                        <!-- Pagination controls -->
+                        {% if pagination is defined %}
+                        <div class="d-flex justify-content-center mt-4">
+                            <div class="pagination">
+                                {% set paginationParams = {} %}
+                                {% if currentType is defined and currentType %}
+                                    {% set paginationParams = paginationParams|merge({'type': currentType}) %}
+                                {% endif %}
+                                {% if currentSort is defined and currentSort %}
+                                    {% set paginationParams = paginationParams|merge({'sort': currentSort}) %}
+                                {% endif %}
+                                {% if currentDirection is defined and currentDirection %}
+                                    {% set paginationParams = paginationParams|merge({'direction': currentDirection}) %}
+                                {% endif %}
+                                {{ knp_pagination_render(pagination, null, {'queryParams': paginationParams}) }}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                     {% endif %}
                 </div>
@@ -1234,7 +1311,14 @@ function initializeDropdown() {
             dropdownMenu.style.display = isVisible ? 'none' : 'block';
         });
         
-        // Gestionnaire pour les options
+        // Fermer le menu quand on clique ailleurs
+        document.addEventListener('click', function(e) {
+            if (!filterBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+        
+        // Gestionnaire pour les options de filtre (les options avec data-filter)
         var options = dropdownMenu.querySelectorAll('.filter-option');
         options.forEach(function(option) {
             option.addEventListener('click', function(e) {
@@ -1293,13 +1377,6 @@ function initializeDropdown() {
                 // Fermer le menu
                 dropdownMenu.style.display = 'none';
             });
-        });
-        
-        // Fermer le menu en cliquant ailleurs
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.custom-dropdown')) {
-                dropdownMenu.style.display = 'none';
-            }
         });
     }
 }

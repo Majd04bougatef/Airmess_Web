@@ -252,11 +252,11 @@ final class BonPlanController extends AbstractController
             $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
         }
         
-        $response = new StreamedResponse(
-            function () use ($writer) {
-                $writer->save('php://output');
-            }
-        );
+        $tempFile = tempnam(sys_get_temp_dir(), 'export_');
+        $writer->save($tempFile);
+        
+        $response = new Response(file_get_contents($tempFile));
+        unlink($tempFile); // Remove temp file
         
         $response->headers->set('Content-Type', $contentType);
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
@@ -266,47 +266,47 @@ final class BonPlanController extends AbstractController
     
     private function exportPDF(array $bonPlans): Response
     {
-        // Créer un nouveau document PDF en mode paysage
+        // Create a new TCPDF instance
         $pdf = new TCPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
         
-        // Définir les informations du document
-        $pdf->SetCreator(PDF_CREATOR);
+        // Set document information
+        $pdf->SetCreator('Airmess Admin');
         $pdf->SetAuthor('Airmess Admin');
         $pdf->SetTitle('Liste des Bons Plans');
         
-        // Supprimer les en-têtes et pieds de page par défaut
+        // Remove default headers and footers
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
         
-        // Définir les marges (gauche, haut, droite)
+        // Set margins (left, top, right)
         $pdf->SetMargins(15, 15, 15);
         
-        // Définir la police par défaut
+        // Set default font
         $pdf->SetFont('helvetica', '', 11);
         
-        // Ajouter une page
+        // Add a page
         $pdf->AddPage();
         
-        // Logo et titre
+        // Logo and title
         $pdf->SetFont('helvetica', 'B', 24);
-        $pdf->SetTextColor(44, 62, 80); // Bleu foncé
+        $pdf->SetTextColor(44, 62, 80); // Dark blue
         $pdf->Cell(0, 15, 'Liste des Bons Plans', 0, 1, 'C');
         $pdf->Ln(10);
         
-        // Date d'export
+        // Export date
         $pdf->SetFont('helvetica', '', 10);
-        $pdf->SetTextColor(127, 140, 141); // Gris
+        $pdf->SetTextColor(127, 140, 141); // Gray
         $pdf->Cell(0, 10, 'Exporté le ' . date('d/m/Y à H:i'), 0, 1, 'R');
         $pdf->Ln(5);
         
-        // En-têtes de colonnes avec des largeurs optimisées
+        // Column headers with optimized widths
         $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->SetFillColor(52, 73, 94); // Bleu-gris foncé
-        $pdf->SetTextColor(255, 255, 255); // Blanc
+        $pdf->SetFillColor(52, 73, 94); // Dark blue-gray
+        $pdf->SetTextColor(255, 255, 255); // White
         
-        // Définir les largeurs des colonnes
-        $colWidth1 = 60; // Nom du lieu
-        $colWidth2 = 70; // Localisation
+        // Define column widths
+        $colWidth1 = 60; // Name of place
+        $colWidth2 = 70; // Location
         $colWidth3 = 100; // Description
         $colWidth4 = 35; // Type
         
@@ -315,46 +315,40 @@ final class BonPlanController extends AbstractController
         $pdf->Cell($colWidth3, 10, 'Description', 1, 0, 'C', true);
         $pdf->Cell($colWidth4, 10, 'Type', 1, 1, 'C', true);
         
-        // Données
+        // Data
         $pdf->SetFont('helvetica', '', 10);
-        $pdf->SetTextColor(44, 62, 80); // Bleu foncé pour le texte
+        $pdf->SetTextColor(44, 62, 80); // Dark blue for text
         
-        // Couleurs alternées pour les lignes
+        // Alternating row colors
         $fillColors = [
-            [247, 249, 249], // Gris très clair
-            [255, 255, 255]  // Blanc
+            [247, 249, 249], // Very light gray
+            [255, 255, 255]  // White
         ];
         
         $row = 0;
         foreach ($bonPlans as $bonPlan) {
-            // Hauteur de ligne automatique
+            // Automatic row height
             $rowColor = $fillColors[$row % 2];
             $pdf->SetFillColor($rowColor[0], $rowColor[1], $rowColor[2]);
             
-            // Calculer la hauteur nécessaire pour le texte
+            // Truncate description if too long
             $description = $bonPlan->getDescription();
             if (strlen($description) > 100) {
                 $description = substr($description, 0, 97) . '...';
             }
             
-            $height = max(
-                $pdf->getStringHeight($colWidth1, $bonPlan->getNomplace()),
-                $pdf->getStringHeight($colWidth2, $bonPlan->getLocalisation()),
-                $pdf->getStringHeight($colWidth3, $description),
-                $pdf->getStringHeight($colWidth4, $bonPlan->getTypePlace())
-            );
+            // Calculate necessary height for text (simplified version)
+            $height = 8; // Minimum height
             
-            $height = max($height, 8); // Hauteur minimum
-            
-            // Écrire les cellules avec MultiCell
+            // Current position
             $startY = $pdf->GetY();
             $currentX = $pdf->GetX();
             
-            // Nom du lieu
+            // Name of place
             $pdf->MultiCell($colWidth1, $height, $bonPlan->getNomplace(), 1, 'L', true, 0, $currentX);
             $currentX += $colWidth1;
             
-            // Localisation
+            // Location
             $pdf->MultiCell($colWidth2, $height, $bonPlan->getLocalisation(), 1, 'L', true, 0, $currentX);
             $currentX += $colWidth2;
             
@@ -367,11 +361,11 @@ final class BonPlanController extends AbstractController
             
             $row++;
             
-            // Vérifier si on a besoin d'une nouvelle page
+            // Check if we need a new page
             if ($pdf->GetY() > $pdf->getPageHeight() - 20) {
                 $pdf->AddPage();
                 
-                // Répéter les en-têtes
+                // Repeat headers
                 $pdf->SetFont('helvetica', 'B', 11);
                 $pdf->SetFillColor(52, 73, 94);
                 $pdf->SetTextColor(255, 255, 255);
@@ -385,15 +379,18 @@ final class BonPlanController extends AbstractController
             }
         }
         
-        // Ajouter le nombre total en bas de page
+        // Add total count at bottom of page
         $pdf->Ln(10);
         $pdf->SetFont('helvetica', 'I', 10);
         $pdf->SetTextColor(127, 140, 141);
         $pdf->Cell(0, 10, 'Total : ' . count($bonPlans) . ' bon(s) plan(s)', 0, 1, 'R');
         
-        // Générer le PDF
+        // Generate PDF output
+        $pdfContent = $pdf->Output('bons_plans_' . date('Y-m-d_H-i-s') . '.pdf', 'S');
+        
+        // Create response
         $response = new Response(
-            $pdf->Output('bons_plans_' . date('Y-m-d_H-i-s') . '.pdf', 'S'),
+            $pdfContent,
             Response::HTTP_OK,
             [
                 'Content-Type' => 'application/pdf',
