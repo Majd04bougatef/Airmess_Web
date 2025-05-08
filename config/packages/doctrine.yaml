@@ -1,14 +1,8 @@
 doctrine:
     dbal:
-        # url: '%env(resolve:DATABASE_URL)%'
-        # Use explicit connection parameters instead of environment variable
-        host: 'localhost'
-        port: 3306
-        dbname: 'airmess'
-        user: 'root'
-        password: ''
+        url: '%env(resolve:DATABASE_URL)%'
         driver: 'pdo_mysql'
-        server_version: '5.7' # Adjust to your MySQL version
+        server_version: '5.7'
         charset: utf8mb4
         default_table_options:
             charset: utf8mb4
@@ -17,10 +11,6 @@ doctrine:
             enum: string
         types:
             enum: Doctrine\DBAL\Types\StringType
-
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '16'
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
