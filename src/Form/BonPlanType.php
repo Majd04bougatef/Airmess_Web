@@ -35,7 +35,32 @@ class BonPlanType extends AbstractType
                     ])
                 ],
             ])
-            
+            ->add('hasVRContent', \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class, [
+                'label' => 'Activer l\'expérience VR',
+                'required' => false,
+            ])
+            ->add('vr360ImagePath', FileType::class, [
+                'label' => 'Image 360° (pour VR)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'mimeTypes' => ['image/jpg', 'image/png', 'image/webp'],
+                        'mimeTypesMessage' => 'Merci d\'uploader une image 360° valide (JPG, PNG, WEBP)',
+                    ])
+                ],
+            ])
+            ->add('vrModelPath', FileType::class, [
+                'label' => 'Modèle 3D (pour VR, format GLTF/GLB)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'mimeTypes' => ['model/gltf-binary', 'model/gltf+json', 'application/octet-stream'],
+                        'mimeTypesMessage' => 'Merci d\'uploader un modèle 3D valide (GLTF/GLB)',
+                    ])
+                ],
+            ])
         ;
     }
 

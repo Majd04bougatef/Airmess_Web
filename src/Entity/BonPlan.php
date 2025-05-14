@@ -56,6 +56,15 @@ class BonPlan
     #[ORM\Column(name: 'imageBP', type: 'string', length: 500, nullable: true)]
     private ?string $imageBP = null;
 
+    #[ORM\Column(name: 'hasVRContent', type: 'boolean', options: ['default' => false])]
+    private bool $hasVRContent = false;
+
+    #[ORM\Column(name: 'vrModelPath', type: 'string', length: 500, nullable: true)]
+    private ?string $vrModelPath = null;
+    
+    #[ORM\Column(name: 'vr360ImagePath', type: 'string', length: 500, nullable: true)]
+    private ?string $vr360ImagePath = null;
+
     #[ORM\OneToMany(mappedBy: 'bonPlan', targetEntity: ReviewBonPlan::class, cascade: ['persist', 'remove'])]
     private Collection $reviews;
 
@@ -138,6 +147,39 @@ class BonPlan
     public function setImageBP(?string $imageBP): self
     {
         $this->imageBP = $imageBP;
+        return $this;
+    }
+
+    public function hasVRContent(): bool
+    {
+        return $this->hasVRContent;
+    }
+
+    public function setHasVRContent(bool $hasVRContent): self
+    {
+        $this->hasVRContent = $hasVRContent;
+        return $this;
+    }
+
+    public function getVrModelPath(): ?string
+    {
+        return $this->vrModelPath;
+    }
+
+    public function setVrModelPath(?string $vrModelPath): self
+    {
+        $this->vrModelPath = $vrModelPath;
+        return $this;
+    }
+
+    public function getVr360ImagePath(): ?string
+    {
+        return $this->vr360ImagePath;
+    }
+
+    public function setVr360ImagePath(?string $vr360ImagePath): self
+    {
+        $this->vr360ImagePath = $vr360ImagePath;
         return $this;
     }
 

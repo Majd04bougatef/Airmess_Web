@@ -85,7 +85,7 @@ class GoogleController extends AbstractController
                 if ($existingUser->getRoleUser() === 'Admin') {
                     return $this->redirectToRoute('app_dash');
                 } elseif ($existingUser->getRoleUser() === 'Voyageurs') {
-                    return $this->redirectToRoute('app_dashVoyageurs');
+                    return $this->redirectToRoute('app_dashboard_voyageurs');
                 } else {
                     return $this->redirectToRoute('app_dashEntreprise');
                 }
@@ -130,7 +130,7 @@ class GoogleController extends AbstractController
                 $this->addFlash('success', 'Bienvenue ' . $newUser->getName() . '! Votre compte Voyageur a été créé avec Google.');
                 
                 // Redirect to voyageur home since that's the default role
-                return $this->redirectToRoute('app_dashVoyageurs');
+                return $this->redirectToRoute('app_dashboard_voyageurs');
             }
             
         } catch (\Exception $e) {

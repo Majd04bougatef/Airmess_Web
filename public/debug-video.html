@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Vidéo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f4f8;
+        }
+        h1 {
+            color: #344767;
+        }
+        .debug-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .video-test {
+            margin-top: 30px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #5e72e4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #log {
+            margin-top: 20px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Débogage de la vidéo</h1>
+    
+    <div class="debug-container">
+        <h2>Informations du serveur</h2>
+        <p>Chemin de la vidéo: <code>/assets/video/bike_tutorial.mp4</code></p>
+        <button id="check-file">Vérifier si le fichier existe</button>
+        <pre id="file-info">Cliquez sur le bouton pour vérifier...</pre>
+    </div>
+    
+    <div class="video-test">
+        <h2>Test de lecture vidéo</h2>
+        <video id="test-video" style="width: 100%; max-width: 600px; display: block; margin: 0 auto;" controls>
+            <source src="/assets/video/bike_tutorial.mp4" type="video/mp4">
+            Votre navigateur ne prend pas en charge les vidéos HTML5.
+        </video>
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="play-btn">Lecture</button>
+            <button id="pause-btn">Pause</button>
+            <button id="reload-btn">Recharger</button>
+        </div>
+    </div>
+    
+    <div class="debug-container">
+        <h2>Journal de débogage</h2>
+        <div id="log"></div>
+    </div>
+    
+    <script>
+        // Fonction pour ajouter une entrée au journal
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logContainer.prepend(entry);
+        }
+        
+        // Élément vidéo
+        const video = document.getElementById('test-video');
+        
+        // Gestion des événements vidéo
+        video.addEventListener('loadeddata', function() {
+            log('Vidéo chargée avec succès', 'success');
+        });
+        
+        video.addEventListener('error', function(e) {
+            log(`Erreur de chargement de la vidéo: ${e.target.error?.message || 'Erreur inconnue'}`, 'error');
+        });
+        
+        video.addEventListener('play', function() {
+            log('Lecture de la vidéo démarrée');
+        });
+        
+        video.addEventListener('pause', function() {
+            log('Vidéo mise en pause');
+        });
+        
+        video.addEventListener('ended', function() {
+            log('Vidéo terminée');
+        });
+        
+        // Boutons de contrôle
+        document.getElementById('play-btn').addEventListener('click', function() {
+            video.play();
+        });
+        
+        document.getElementById('pause-btn').addEventListener('click', function() {
+            video.pause();
+        });
+        
+        document.getElementById('reload-btn').addEventListener('click', function() {
+            video.load();
+            log('Vidéo rechargée');
+        });
+        
+        // Vérifier si le fichier existe
+        document.getElementById('check-file').addEventListener('click', function() {
+            const fileInfo = document.getElementById('file-info');
+            fileInfo.textContent = 'Vérification en cours...';
+            
+            fetch('/assets/video/bike_tutorial.mp4', { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        fileInfo.textContent = `Fichier trouvé!\nTaille: ${response.headers.get('content-length')} octets\nType: ${response.headers.get('content-type')}`;
+                        log('Fichier vidéo trouvé sur le serveur', 'success');
+                    } else {
+                        fileInfo.textContent = `Erreur: Fichier non trouvé (${response.status})`;
+                        log(`Fichier non trouvé: code d'erreur ${response.status}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    fileInfo.textContent = `Erreur lors de la vérification: ${error.message}`;
+                    log(`Erreur de vérification: ${error.message}`, 'error');
+                });
+        });
+        
+        // Log initial
+        log('Page de débogage chargée');
+    </script>
+</body>
+</html> 

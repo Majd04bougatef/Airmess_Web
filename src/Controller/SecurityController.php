@@ -38,7 +38,7 @@ class SecurityController extends AbstractController
             } elseif ($userRole === 'Entreprise') {
                 return $this->redirectToRoute('app_dashEntreprise');
             } else {
-                return $this->redirectToRoute('app_dashVoyageurs');
+                return $this->redirectToRoute('app_dashboard_voyageurs');
             }
         }
         
@@ -91,7 +91,7 @@ class SecurityController extends AbstractController
                         return $this->redirectToRoute('app_dashEntreprise');
                     } else {
                         // Default to voyageur dashboard
-                        return $this->redirectToRoute('app_dashVoyageurs');
+                        return $this->redirectToRoute('app_dashboard_voyageurs');
                     }
                 } else {
                     // Wrong password
@@ -196,7 +196,8 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('login');
         }
         
-        return $this->render('dashVoyageurs/dashboardVoyageurs.html.twig');
+        // Redirect to the dashboard voyageurs page
+        return $this->redirectToRoute('app_dashboard_voyageurs');
     }
     
     #[Route('/logout', name: 'app_logout')]

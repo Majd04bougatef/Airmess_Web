@@ -414,6 +414,35 @@
     {% endfor %}
 </div>
 
+{# Ajout de la box vidéo en bas à droite #}
+<div id="video-tutorial-box" style="position: fixed; bottom: 20px; right: 20px; width: 300px; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f0f4f8; border-bottom: 1px solid #e0e0e0;">
+        <span style="font-weight: bold; color: #344767;">Comment réserver un vélo</span>
+        <div>
+            <button id="minimize-video" style="background: none; border: none; cursor: pointer; margin-right: 5px; font-size: 16px;">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button id="close-video" style="background: none; border: none; cursor: pointer; font-size: 16px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <div id="video-container" style="padding: 0;">
+        <video id="tutorial-video" style="width: 100%; display: block;" autoplay muted loop>
+            <source src="{{ asset('assets/video/airmess_lib_velo.mp4') }}" type="video/mp4">
+            Votre navigateur ne prend pas en charge les vidéos HTML5.
+        </video>
+    </div>
+    <div style="padding: 10px; text-align: center;">
+        <button id="toggle-play" class="btn btn-sm btn-primary">
+            <i class="fas fa-pause"></i> Pause
+        </button>
+        <button id="toggle-mute" class="btn btn-sm btn-secondary">
+            <i class="fas fa-volume-mute"></i> Activer le son
+        </button>
+    </div>
+</div>
+
 <script>
     function rateStation(star, rating) {
         // Get station ID from parent container
@@ -546,6 +575,107 @@
         document.getElementById('filter-bikes').addEventListener('input', function() {
             applyFilters();
         });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Initialisation de la vidéo");
+        
+        // Éléments vidéo
+        const videoBox = document.getElementById('video-tutorial-box');
+        const video = document.getElementById('tutorial-video');
+        const togglePlayBtn = document.getElementById('toggle-play');
+        const toggleMuteBtn = document.getElementById('toggle-mute');
+        const minimizeBtn = document.getElementById('minimize-video');
+        const closeBtn = document.getElementById('close-video');
+        const videoContainer = document.getElementById('video-container');
+        
+        if (!video) {
+            console.error("Élément vidéo non trouvé");
+            return;
+        }
+        
+        console.log("Vidéo trouvée:", video);
+        console.log("Source vidéo:", video.querySelector('source')?.src);
+        
+        // Vérifier si la vidéo peut être lue
+        video.addEventListener('error', function(e) {
+            console.error("Erreur de chargement de la vidéo:", e);
+            const errorDiv = document.createElement('div');
+            errorDiv.style.padding = '20px';
+            errorDiv.style.color = 'red';
+            errorDiv.style.textAlign = 'center';
+            errorDiv.innerHTML = "Impossible de charger la vidéo. Veuillez vérifier que le fichier existe.";
+            videoContainer.innerHTML = '';
+            videoContainer.appendChild(errorDiv);
+        });
+        
+        // Vérifier si la vidéo est chargée correctement
+        video.addEventListener('loadeddata', function() {
+            console.log("Vidéo chargée avec succès");
+        });
+        
+        let minimized = false;
+        
+        // Gestion lecture/pause
+        togglePlayBtn.addEventListener('click', function() {
+            if (video.paused) {
+                video.play();
+                togglePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                console.log("Lecture de la vidéo");
+            } else {
+                video.pause();
+                togglePlayBtn.innerHTML = '<i class="fas fa-play"></i> Lecture';
+                console.log("Pause de la vidéo");
+            }
+        });
+        
+        // Gestion son
+        toggleMuteBtn.addEventListener('click', function() {
+            video.muted = !video.muted;
+            if (video.muted) {
+                toggleMuteBtn.innerHTML = '<i class="fas fa-volume-mute"></i> Activer le son';
+                console.log("Son désactivé");
+            } else {
+                toggleMuteBtn.innerHTML = '<i class="fas fa-volume-up"></i> Couper le son';
+                console.log("Son activé");
+            }
+        });
+        
+        // Gestion redémarrage automatique
+        video.addEventListener('ended', function() {
+            console.log("Vidéo terminée, redémarrage");
+            video.currentTime = 0;
+            video.play();
+        });
+        
+        // Minimiser/Agrandir
+        minimizeBtn.addEventListener('click', function() {
+            if (minimized) {
+                videoContainer.style.display = 'block';
+                minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>';
+                minimized = false;
+                console.log("Vidéo agrandie");
+            } else {
+                videoContainer.style.display = 'none';
+                minimizeBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                minimized = true;
+                console.log("Vidéo minimisée");
+            }
+        });
+        
+        // Fermer
+        closeBtn.addEventListener('click', function() {
+            videoBox.style.display = 'none';
+            // Stocker la préférence utilisateur dans localStorage
+            localStorage.setItem('videoTutorialClosed', 'true');
+            console.log("Vidéo fermée");
+        });
+        
+        // Vérifier si l'utilisateur a déjà fermé la vidéo
+        if (localStorage.getItem('videoTutorialClosed') === 'true') {
+            videoBox.style.display = 'none';
+            console.log("Vidéo cachée (préférence utilisateur)");
+        }
     });
 </script>
 {% endblock %}

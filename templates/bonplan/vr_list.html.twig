@@ -1,0 +1,110 @@
+{% extends 'dashVoyageurs/dashboardVoyageurs.html.twig' %}
+
+{% block title %}Expériences VR - Bons Plans{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .vr-card {
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .vr-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .vr-card-img {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .vr-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .vr-card-body {
+            padding: 1.5rem;
+        }
+        
+        .vr-icon {
+            margin-right: 5px;
+            color: #4CAF50;
+        }
+        
+        .vr-empty {
+            text-align: center;
+            padding: 3rem;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4">
+                    <i class="fas fa-vr-cardboard me-2"></i>
+                    Expériences VR des Bons Plans
+                </h1>
+                <p class="lead">Explorez nos destinations en réalité virtuelle avant de les visiter !</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% if bonplans|length > 0 %}
+                {% for bonplan in bonplans %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card vr-card">
+                            <div class="position-relative">
+                                {% if bonplan.imageBP %}
+                                    <img src="{{ asset(bonplan.imageBP) }}" class="vr-card-img" alt="{{ bonplan.nomplace }}">
+                                {% else %}
+                                    <img src="{{ asset('images/placeholder.jpg') }}" class="vr-card-img" alt="{{ bonplan.nomplace }}">
+                                {% endif %}
+                                <div class="vr-badge">
+                                    <i class="fas fa-vr-cardboard"></i> VR
+                                </div>
+                            </div>
+                            <div class="vr-card-body">
+                                <h5 class="card-title">{{ bonplan.nomplace }}</h5>
+                                <p class="card-text text-muted">
+                                    <i class="fas fa-map-marker-alt vr-icon"></i> {{ bonplan.localisation }}
+                                </p>
+                                <p class="card-text">{{ bonplan.description|slice(0, 100) }}{% if bonplan.description|length > 100 %}...{% endif %}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <small class="text-muted">{{ bonplan.typePlace }}</small>
+                                    <a href="{{ path('app_bonplan_vr', {'id': bonplan.idP}) }}" class="btn btn-primary">
+                                        <i class="fas fa-vr-cardboard me-1"></i> Explorer en VR
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="vr-empty">
+                        <i class="fas fa-vr-cardboard fa-4x mb-3 text-muted"></i>
+                        <h3>Aucune expérience VR disponible pour le moment</h3>
+                        <p class="text-muted">Revenez bientôt pour découvrir nos destinations en réalité virtuelle !</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %} 

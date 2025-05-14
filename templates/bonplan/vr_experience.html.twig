@@ -1,0 +1,787 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ bonplan.nomplace }} - Expérience VR{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+        }
+        #vr-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        #vr-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        #vr-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        .vr-btn {
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .vr-btn:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        .vr-btn.enter-vr {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Masquer les éléments d'interface qui pourraient interférer avec l'expérience VR
+        document.addEventListener('DOMContentLoaded', function() {
+            // Rechercher et masquer l'en-tête/navigation
+            const headers = document.querySelectorAll('header');
+            headers.forEach(header => header.style.display = 'none');
+            
+            // Masquer toute autre navigation ou éléments fixes
+            const navs = document.querySelectorAll('nav, .navmenu, .header-container');
+            navs.forEach(nav => nav.style.display = 'none');
+            
+            // Assurer que le corps prend tout l'espace
+            document.body.style.margin = '0';
+            document.body.style.padding = '0';
+            document.body.style.overflow = 'hidden';
+            document.body.style.width = '100vw';
+            document.body.style.height = '100vh';
+            
+            console.log("Éléments d'interface masqués pour l'expérience VR");
+        });
+        
+        console.log("Démarrage de l'expérience VR");
+        console.log("Type de lieu: {{ bonplan.typePlace }}");
+    </script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        console.log("Module VR chargé");
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { VRButton } from 'three/addons/webxr/VRButton.js';
+        
+        // Variables pour la scène Three.js
+        let camera, scene, renderer, controls;
+        
+        // Initialiser la scène
+        init();
+        
+        function init() {
+            try {
+                console.log("Initialisation de la scène 3D");
+                
+                // S'assurer que le conteneur VR existe et est correctement positionné
+                const container = document.getElementById('vr-container');
+                if (!container) {
+                    console.error("Conteneur VR non trouvé, création d'un nouveau conteneur");
+                    const newContainer = document.createElement('div');
+                    newContainer.id = 'vr-container';
+                    newContainer.style.position = 'absolute';
+                    newContainer.style.top = '0';
+                    newContainer.style.left = '0';
+                    newContainer.style.width = '100%';
+                    newContainer.style.height = '100%';
+                    document.body.appendChild(newContainer);
+                }
+                
+                // Créer la scène
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x87ceeb); // Couleur ciel bleu
+                
+                // Créer la caméra
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.set(0, 1.6, 3);
+                
+                // Créer le renderer avec des options plus robustes
+                try {
+                    renderer = new THREE.WebGLRenderer({ 
+                        antialias: true,
+                        alpha: true,
+                        powerPreference: "high-performance"
+                    });
+                    renderer.setPixelRatio(window.devicePixelRatio);
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    
+                    // Vérifier si WebXR est disponible
+                    if (navigator.xr) {
+                        console.log("WebXR détecté");
+                        renderer.xr.enabled = true;
+                    } else {
+                        console.log("WebXR non disponible - mode fallback activé");
+                    }
+                    
+                    const vrContainer = document.getElementById('vr-container');
+                    // Supprimer tout contenu existant
+                    while (vrContainer.firstChild) {
+                        vrContainer.removeChild(vrContainer.firstChild);
+                    }
+                    vrContainer.appendChild(renderer.domElement);
+                    console.log("Renderer ajouté au conteneur");
+                } catch (e) {
+                    console.error("Erreur lors de la création du renderer WebGL:", e);
+                    document.getElementById('vr-info').innerHTML += '<p style="color:red">Erreur WebGL: ' + e.message + '</p>';
+                    return; // Sortir de l'initialisation si le renderer échoue
+                }
+                
+                // Ajouter le bouton VR seulement si WebXR est disponible
+                try {
+                    if (navigator.xr) {
+                        document.getElementById('vr-controls').appendChild(VRButton.createButton(renderer));
+                    }
+                } catch (e) {
+                    console.error("Erreur lors de l'ajout du bouton VR:", e);
+                }
+                
+                // Ajouter les contrôles
+                controls = new OrbitControls(camera, renderer.domElement);
+                controls.target.set(0, 1.6, 0);
+                controls.update();
+                
+                // Ajouter l'éclairage
+                const light = new THREE.AmbientLight(0xffffff, 1.5);
+                scene.add(light);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                directionalLight.position.set(0, 1, 1);
+                scene.add(directionalLight);
+                
+                // Ajouter un sol
+                const floorGeometry = new THREE.PlaneGeometry(20, 20);
+                const floorMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x808080,
+                    roughness: 0.8,
+                    metalness: 0.2
+                });
+                const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+                floor.rotation.x = -Math.PI / 2;
+                floor.receiveShadow = true;
+                scene.add(floor);
+                
+                {% if bonplan.vr360ImagePath %}
+                    // Si une image 360° est disponible, créer un environnement sphérique
+                    console.log("Chargement de l'image 360°");
+                    const textureLoader = new THREE.TextureLoader();
+                    const texture = textureLoader.load('{{ asset(bonplan.vr360ImagePath) }}');
+                    texture.mapping = THREE.EquirectangularReflectionMapping;
+                    
+                    const skyGeometry = new THREE.SphereGeometry(500, 60, 40);
+                    const skyMaterial = new THREE.MeshBasicMaterial({ 
+                        map: texture,
+                        side: THREE.BackSide
+                    });
+                    const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+                    scene.add(sky);
+                {% else %}
+                    console.log("Pas d'image 360° - création d'un environnement par défaut");
+                {% endif %}
+                
+                {% if bonplan.vrModelPath %}
+                    // Si un modèle 3D est disponible, le charger
+                    console.log("Chargement du modèle 3D");
+                    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+                    
+                    const loader = new GLTFLoader();
+                    loader.load(
+                        '{{ asset(bonplan.vrModelPath) }}',
+                        function (gltf) {
+                            scene.add(gltf.scene);
+                            console.log("Modèle 3D chargé avec succès");
+                        },
+                        function (xhr) {
+                            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                        },
+                        function (error) {
+                            console.error('Erreur lors du chargement du modèle:', error);
+                        }
+                    );
+                {% else %}
+                    // Ajouter quelques objets 3D de base pour représenter le lieu
+                    console.log("Pas de modèle 3D - création d'un environnement par défaut");
+                    addBasicScene();
+                {% endif %}
+                
+                // Gérer le redimensionnement de la fenêtre
+                window.addEventListener('resize', onWindowResize);
+                
+                // Démarrer la boucle d'animation
+                renderer.setAnimationLoop(animate);
+                console.log("Animation démarrée");
+                
+                // Ajouter un cube rouge visible pour tester si le rendu fonctionne
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+                const cube = new THREE.Mesh(geometry, material);
+                cube.position.set(0, 1, 0);
+                scene.add(cube);
+                console.log("Cube de test ajouté à la scène");
+                
+            } catch (e) {
+                console.error("Erreur lors de l'initialisation de la scène:", e);
+                document.getElementById('vr-info').innerHTML += '<p style="color:red">Erreur: ' + e.message + '</p>';
+            }
+        }
+        
+        function addBasicScene() {
+            // Créer des objets 3D représentant symboliquement ce lieu
+            const typePlace = '{{ bonplan.typePlace }}';
+            
+            // Ajouter différents objets selon le type de lieu
+            if (typePlace === 'resto') {
+                // Ajouter des tables, chaises, etc.
+                addTables(5);
+            } else if (typePlace === 'coworkingspace') {
+                // Ajouter des bureaux, chaises de bureau, etc.
+                addDesks(8);
+            } else if (typePlace === 'cafe') {
+                // Ajouter un comptoir, tables de café, etc.
+                addCafe();
+            } else if (typePlace === 'musée') {
+                // Ajouter des présentoirs, oeuvres d'art, etc.
+                addMuseum();
+            } else {
+                // Par défaut, ajouter une structure de base
+                addDefaultStructure();
+            }
+        }
+        
+        function addTables(count) {
+            // Ajouter des tables et chaises pour un restaurant
+            for (let i = 0; i < count; i++) {
+                const table = new THREE.Group();
+                
+                // Table
+                const tableGeometry = new THREE.CylinderGeometry(0.6, 0.6, 0.1, 32);
+                const tableMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const tableTop = new THREE.Mesh(tableGeometry, tableMaterial);
+                tableTop.position.y = 0.75;
+                
+                // Pied de table
+                const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.75, 16);
+                const legMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const tableLeg = new THREE.Mesh(legGeometry, legMaterial);
+                tableLeg.position.y = 0.375;
+                
+                table.add(tableTop, tableLeg);
+                
+                // Positionner la table
+                const angle = (i / count) * Math.PI * 2;
+                const radius = 3;
+                table.position.set(
+                    Math.cos(angle) * radius,
+                    0,
+                    Math.sin(angle) * radius
+                );
+                
+                scene.add(table);
+                
+                // Ajouter des chaises autour de la table
+                addChairsAroundTable(table, 4);
+            }
+        }
+        
+        function addChairsAroundTable(table, count) {
+            for (let i = 0; i < count; i++) {
+                const chair = new THREE.Group();
+                
+                // Siège
+                const seatGeometry = new THREE.BoxGeometry(0.4, 0.1, 0.4);
+                const seatMaterial = new THREE.MeshStandardMaterial({ color: 0xA52A2A });
+                const seat = new THREE.Mesh(seatGeometry, seatMaterial);
+                seat.position.y = 0.45;
+                
+                // Dossier
+                const backGeometry = new THREE.BoxGeometry(0.4, 0.3, 0.1);
+                const backMaterial = new THREE.MeshStandardMaterial({ color: 0xA52A2A });
+                const back = new THREE.Mesh(backGeometry, backMaterial);
+                back.position.y = 0.65;
+                back.position.z = -0.15;
+                
+                chair.add(seat, back);
+                
+                // Positionner la chaise
+                const angle = (i / count) * Math.PI * 2;
+                const tablePos = table.position;
+                chair.position.set(
+                    tablePos.x + Math.cos(angle) * 1,
+                    0,
+                    tablePos.z + Math.sin(angle) * 1
+                );
+                
+                // Orienter la chaise vers la table
+                chair.lookAt(tablePos);
+                
+                scene.add(chair);
+            }
+        }
+        
+        function addDesks(count) {
+            // Ajouter des bureaux pour un espace de coworking
+            for (let i = 0; i < count; i++) {
+                const desk = new THREE.Group();
+                
+                // Bureau
+                const deskGeometry = new THREE.BoxGeometry(1.2, 0.1, 0.8);
+                const deskMaterial = new THREE.MeshStandardMaterial({ color: 0xD3D3D3 });
+                const deskTop = new THREE.Mesh(deskGeometry, deskMaterial);
+                deskTop.position.y = 0.75;
+                
+                // Pieds du bureau
+                const legGeometry = new THREE.BoxGeometry(0.1, 0.75, 0.1);
+                const legMaterial = new THREE.MeshStandardMaterial({ color: 0x696969 });
+                
+                const leg1 = new THREE.Mesh(legGeometry, legMaterial);
+                leg1.position.set(0.5, 0.375, 0.3);
+                
+                const leg2 = new THREE.Mesh(legGeometry, legMaterial);
+                leg2.position.set(0.5, 0.375, -0.3);
+                
+                const leg3 = new THREE.Mesh(legGeometry, legMaterial);
+                leg3.position.set(-0.5, 0.375, 0.3);
+                
+                const leg4 = new THREE.Mesh(legGeometry, legMaterial);
+                leg4.position.set(-0.5, 0.375, -0.3);
+                
+                desk.add(deskTop, leg1, leg2, leg3, leg4);
+                
+                // Positionner le bureau
+                const row = Math.floor(i / 4);
+                const col = i % 4;
+                desk.position.set(
+                    col * 2 - 3,
+                    0,
+                    row * 2 - 2
+                );
+                
+                scene.add(desk);
+                
+                // Ajouter une chaise devant le bureau
+                const chair = createOfficeChair();
+                chair.position.set(
+                    desk.position.x,
+                    0,
+                    desk.position.z + 0.7
+                );
+                chair.rotation.y = Math.PI;
+                scene.add(chair);
+                
+                // Ajouter un ordinateur sur le bureau
+                const computer = createComputer();
+                computer.position.set(
+                    desk.position.x,
+                    0.8,
+                    desk.position.z - 0.1
+                );
+                scene.add(computer);
+            }
+        }
+        
+        function createOfficeChair() {
+            const chair = new THREE.Group();
+            
+            // Siège
+            const seatGeometry = new THREE.BoxGeometry(0.5, 0.1, 0.5);
+            const seatMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+            const seat = new THREE.Mesh(seatGeometry, seatMaterial);
+            seat.position.y = 0.5;
+            
+            // Dossier
+            const backGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.1);
+            const backMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+            const back = new THREE.Mesh(backGeometry, backMaterial);
+            back.position.y = 0.75;
+            back.position.z = -0.25;
+            
+            chair.add(seat, back);
+            
+            return chair;
+        }
+        
+        function createComputer() {
+            const computer = new THREE.Group();
+            
+            // Écran
+            const screenGeometry = new THREE.BoxGeometry(0.5, 0.3, 0.05);
+            const screenMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+            screen.position.y = 0.15;
+            
+            // Support d'écran
+            const standGeometry = new THREE.BoxGeometry(0.05, 0.2, 0.05);
+            const standMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
+            const stand = new THREE.Mesh(standGeometry, standMaterial);
+            stand.position.y = 0;
+            
+            // Affichage bleu sur l'écran
+            const displayGeometry = new THREE.PlaneGeometry(0.45, 0.25);
+            const displayMaterial = new THREE.MeshBasicMaterial({ color: 0x3498db });
+            const display = new THREE.Mesh(displayGeometry, displayMaterial);
+            display.position.z = 0.03;
+            display.position.y = 0.15;
+            
+            computer.add(screen, stand, display);
+            
+            return computer;
+        }
+        
+        function addCafe() {
+            // Ajouter un comptoir
+            const counter = new THREE.Group();
+            
+            // Plan de travail
+            const counterTopGeometry = new THREE.BoxGeometry(4, 0.1, 1);
+            const counterTopMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const counterTop = new THREE.Mesh(counterTopGeometry, counterTopMaterial);
+            counterTop.position.y = 1;
+            
+            // Base du comptoir
+            const counterBaseGeometry = new THREE.BoxGeometry(4, 1, 0.9);
+            const counterBaseMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const counterBase = new THREE.Mesh(counterBaseGeometry, counterBaseMaterial);
+            counterBase.position.y = 0.5;
+            counterBase.position.z = 0.05;
+            
+            counter.add(counterTop, counterBase);
+            counter.position.set(0, 0, -4);
+            
+            scene.add(counter);
+            
+            // Ajouter des tabourets devant le comptoir
+            for (let i = 0; i < 4; i++) {
+                const stool = createStool();
+                stool.position.set(
+                    i * 1 - 1.5,
+                    0,
+                    -2.5
+                );
+                scene.add(stool);
+            }
+            
+            // Ajouter quelques tables
+            addTables(3);
+        }
+        
+        function createStool() {
+            const stool = new THREE.Group();
+            
+            // Siège
+            const seatGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.05, 16);
+            const seatMaterial = new THREE.MeshStandardMaterial({ color: 0xA52A2A });
+            const seat = new THREE.Mesh(seatGeometry, seatMaterial);
+            seat.position.y = 0.8;
+            
+            // Pied
+            const legGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.8, 8);
+            const legMaterial = new THREE.MeshStandardMaterial({ color: 0x696969 });
+            const leg = new THREE.Mesh(legGeometry, legMaterial);
+            leg.position.y = 0.4;
+            
+            // Base
+            const baseGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.05, 16);
+            const baseMaterial = new THREE.MeshStandardMaterial({ color: 0x696969 });
+            const base = new THREE.Mesh(baseGeometry, baseMaterial);
+            base.position.y = 0.025;
+            
+            stool.add(seat, leg, base);
+            
+            return stool;
+        }
+        
+        function addMuseum() {
+            // Ajouter des murs
+            const walls = createMuseumWalls();
+            scene.add(walls);
+            
+            // Ajouter des présentoirs avec des oeuvres d'art
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const radius = 4;
+                
+                const artwork = createArtwork();
+                artwork.position.set(
+                    Math.cos(angle) * radius,
+                    0,
+                    Math.sin(angle) * radius
+                );
+                
+                // Orienter l'œuvre vers le centre
+                artwork.lookAt(0, 0, 0);
+                
+                scene.add(artwork);
+            }
+        }
+        
+        function createMuseumWalls() {
+            const walls = new THREE.Group();
+            
+            // Matériau mur
+            const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+            
+            // Murs circulaires
+            const outerWallGeometry = new THREE.CylinderGeometry(6, 6, 3, 32, 1, true);
+            const outerWall = new THREE.Mesh(outerWallGeometry, wallMaterial);
+            outerWall.position.y = 1.5;
+            
+            walls.add(outerWall);
+            
+            return walls;
+        }
+        
+        function createArtwork() {
+            const artwork = new THREE.Group();
+            
+            // Présentoir
+            const standGeometry = new THREE.BoxGeometry(0.5, 1, 0.5);
+            const standMaterial = new THREE.MeshStandardMaterial({ color: 0xD3D3D3 });
+            const stand = new THREE.Mesh(standGeometry, standMaterial);
+            stand.position.y = 0.5;
+            
+            // Œuvre d'art (une simple peinture sur un cadre)
+            const frameGeometry = new THREE.BoxGeometry(1, 1, 0.1);
+            const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+            frame.position.y = 1.5;
+            
+            // Toile à l'intérieur du cadre
+            const canvasGeometry = new THREE.PlaneGeometry(0.9, 0.9);
+            
+            // Couleur aléatoire pour chaque œuvre
+            const colors = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF];
+            const canvasMaterial = new THREE.MeshBasicMaterial({ 
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+            
+            const canvas = new THREE.Mesh(canvasGeometry, canvasMaterial);
+            canvas.position.y = 1.5;
+            canvas.position.z = 0.06;
+            
+            artwork.add(stand, frame, canvas);
+            
+            return artwork;
+        }
+        
+        function addDefaultStructure() {
+            // Structure par défaut (un bâtiment simple)
+            const building = new THREE.Group();
+            
+            // Base/sol du bâtiment
+            const floorGeometry = new THREE.BoxGeometry(10, 0.1, 10);
+            const floorMaterial = new THREE.MeshStandardMaterial({ color: 0xC0C0C0 });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.position.y = 0.05;
+            
+            // Murs
+            const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+            
+            // Mur avant (avec ouverture pour porte)
+            const frontWallLeft = new THREE.Mesh(
+                new THREE.BoxGeometry(4, 3, 0.1),
+                wallMaterial
+            );
+            frontWallLeft.position.set(-3, 1.5, -5);
+            
+            const frontWallRight = new THREE.Mesh(
+                new THREE.BoxGeometry(4, 3, 0.1),
+                wallMaterial
+            );
+            frontWallRight.position.set(3, 1.5, -5);
+            
+            const frontWallTop = new THREE.Mesh(
+                new THREE.BoxGeometry(2, 1, 0.1),
+                wallMaterial
+            );
+            frontWallTop.position.set(0, 2.5, -5);
+            
+            // Mur arrière
+            const backWall = new THREE.Mesh(
+                new THREE.BoxGeometry(10, 3, 0.1),
+                wallMaterial
+            );
+            backWall.position.set(0, 1.5, 5);
+            
+            // Murs latéraux
+            const leftWall = new THREE.Mesh(
+                new THREE.BoxGeometry(0.1, 3, 10),
+                wallMaterial
+            );
+            leftWall.position.set(-5, 1.5, 0);
+            
+            const rightWall = new THREE.Mesh(
+                new THREE.BoxGeometry(0.1, 3, 10),
+                wallMaterial
+            );
+            rightWall.position.set(5, 1.5, 0);
+            
+            // Toit
+            const roofGeometry = new THREE.BoxGeometry(10.5, 0.1, 10.5);
+            const roofMaterial = new THREE.MeshStandardMaterial({ color: 0xA52A2A });
+            const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+            roof.position.y = 3.05;
+            
+            // Porte
+            const doorGeometry = new THREE.BoxGeometry(2, 2, 0.1);
+            const doorMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const door = new THREE.Mesh(doorGeometry, doorMaterial);
+            door.position.set(0, 1, -5.05);
+            
+            building.add(floor, frontWallLeft, frontWallRight, frontWallTop, backWall, leftWall, rightWall, roof, door);
+            
+            scene.add(building);
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function animate() {
+            controls.update();
+            renderer.render(scene, camera);
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div id="vr-container"></div>
+    <div id="vr-info" style="position: absolute; top: 20px; left: 20px; color: white; background-color: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 5px; z-index: 1000; max-width: 300px;">
+        <h3 style="margin-top: 0;">{{ bonplan.nomplace }}</h3>
+        <p>{{ bonplan.description|slice(0, 100) }}{% if bonplan.description|length > 100 %}...{% endif %}</p>
+        <p class="vr-status" style="font-weight: bold;">Chargement de l'expérience VR...</p>
+    </div>
+    <div id="vr-controls" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 1000;">
+        <a href="{{ path('app_bonplan_vr_list') }}" class="vr-btn" style="background-color: rgba(0, 0, 0, 0.7); color: white; text-decoration: none; padding: 12px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;">Retour</a>
+        <button class="vr-btn" id="debug-btn" onclick="toggleDebugInfo()" style="background-color: rgba(0, 0, 0, 0.7); color: white; border: none; padding: 12px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;">Infos de debug</button>
+    </div>
+    <div id="debug-info" style="display: none; position: absolute; bottom: 80px; left: 20px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 5px; max-width: 400px; z-index: 1000; font-family: monospace;">
+        <h4 style="margin-top: 0;">Informations de debugging</h4>
+        <p>Type de lieu: <strong>{{ bonplan.typePlace }}</strong></p>
+        <p>WebGL: <span id="webgl-status">Vérification...</span></p>
+        <p>WebXR: <span id="webxr-status">Vérification...</span></p>
+        <div id="debug-log" style="max-height: 150px; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.3); margin-top: 10px; padding-top: 10px; font-size: 12px;"></div>
+    </div>
+    
+    <script>
+        function toggleDebugInfo() {
+            const debugInfo = document.getElementById('debug-info');
+            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Vérifier la disponibilité de WebGL
+        function checkWebGL() {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            const webglStatus = document.getElementById('webgl-status');
+            
+            if (gl && gl instanceof WebGLRenderingContext) {
+                webglStatus.textContent = 'Oui';
+                webglStatus.style.color = 'lightgreen';
+            } else {
+                webglStatus.textContent = 'Non - la VR ne fonctionnera pas correctement';
+                webglStatus.style.color = 'red';
+            }
+        }
+        
+        // Vérifier la disponibilité de WebXR
+        function checkWebXR() {
+            const webxrStatus = document.getElementById('webxr-status');
+            
+            if ('xr' in navigator) {
+                navigator.xr.isSessionSupported('immersive-vr')
+                    .then(supported => {
+                        if (supported) {
+                            webxrStatus.textContent = 'Oui - casque VR compatible';
+                            webxrStatus.style.color = 'lightgreen';
+                        } else {
+                            webxrStatus.textContent = 'Partiellement - mode non-immersif uniquement';
+                            webxrStatus.style.color = 'orange';
+                        }
+                    })
+                    .catch(err => {
+                        webxrStatus.textContent = 'Erreur: ' + err.message;
+                        webxrStatus.style.color = 'red';
+                    });
+            } else {
+                webxrStatus.textContent = 'Non - navigation en mode 3D standard uniquement';
+                webxrStatus.style.color = 'orange';
+            }
+        }
+        
+        // Rediriger les logs vers notre interface de debugging
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        console.log = function(message) {
+            originalConsoleLog.apply(console, arguments);
+            addToDebugLog('LOG: ' + message);
+        };
+        console.error = function(message) {
+            originalConsoleError.apply(console, arguments);
+            addToDebugLog('ERROR: ' + message, true);
+        };
+        
+        function addToDebugLog(message, isError = false) {
+            const debugLog = document.getElementById('debug-log');
+            const logEntry = document.createElement('div');
+            logEntry.textContent = message;
+            
+            if (isError) {
+                logEntry.style.color = 'red';
+                // Aussi ajouter un message visible à l'utilisateur
+                const vrStatus = document.querySelector('.vr-status');
+                if (vrStatus) {
+                    vrStatus.textContent = 'Erreur: voir les infos de debug';
+                    vrStatus.style.color = 'red';
+                }
+            }
+            
+            debugLog.appendChild(logEntry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+        
+        // Exécuter les vérifications
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                checkWebGL();
+                checkWebXR();
+            }, 1000);
+        });
+    </script>
+{% endblock %} 
